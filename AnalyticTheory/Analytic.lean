@@ -435,11 +435,70 @@ noncomputable def theta (q : K) (α : Omega K) : Omega K :=
 noncomputable def thetaAlpha (q : K) (α β : Omega K) : Omega K :=
   theta K q (α⁻¹ * β)
 
-/-- Book, §2, (7): `Θ(q⁻¹X) = −X Θ(X)` for `0 < |q| < 1`.
+/-- `Ω` is a normed `K`-algebra (spectral norm). -/
+noncomputable instance omegaNormedAlgebra : NormedAlgebra K (Omega K) :=
+  { (inferInstance : Algebra K (Omega K)) with
+    norm_smul_le := (spectralNorm.normedSpace K (Omega K)).norm_smul_le }
+
+/-- Products `∏ (1 − xₙ)` with `xₙ` in a finite extension `S` of `K` inside `Ω` and
+`∑ ‖xₙ‖ < ∞` are multipliable in `Ω` (completeness of `S`). -/
+theorem multipliable_one_sub_omega (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
+    {x : ℕ → Omega K} (hx : ∀ n, x n ∈ S) (hs : Summable fun n => ‖x n‖) :
+    Multipliable fun n => 1 - x n := by
+  haveI : CompleteSpace S := FiniteDimensional.complete K S
+  set y : ℕ → S := fun n => ⟨x n, hx n⟩ with hy
+  have hs' : Summable fun n => ‖-y n‖ := by
+    simpa [hy, norm_neg] using hs
+  have hm : Multipliable fun n => 1 + (-y n) := multipliable_one_add_of_summable hs'
+  have := hm.map (S.val : S →+* Omega K) continuous_subtype_val
+  refine this.congr (fun n => ?_)
+  simp [hy, sub_eq_add_neg]
+
+theorem multipliable_geom_omega (q : K) (hq1 : ‖q‖ < 1) (α γ : Omega K)
+    (hγ : γ ∈ IntermediateField.adjoin K ({α} : Set (Omega K))) (m : ℕ) :
+    Multipliable fun n : ℕ => 1 - (algebraMap K (Omega K) q) ^ (n + m) * γ := by
+  haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set (Omega K))) :=
+    IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α)
+  refine multipliable_one_sub_omega K (IntermediateField.adjoin K ({α} : Set (Omega K)))
+    (fun n => ?_) ?_
+  · exact mul_mem (pow_mem (IntermediateField.algebraMap_mem _ q) _) hγ
+  · have hg : Summable fun n : ℕ => ‖q‖ ^ n := summable_geometric_of_lt_one (norm_nonneg _) hq1
+    refine (hg.mul_right (‖q‖ ^ m * ‖γ‖)).congr (fun n => ?_)
+    rw [norm_mul, norm_pow, norm_algebraMap_omega, pow_add]; ring
+
+/-- Book, §2, (7): `Θ(q⁻¹X) = −X Θ(X)` for `0 < |q| < 1` (`X ≠ 0`).
 Blueprint: `prop:theta-functional-eq`. -/
-theorem theta_functional_equation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (α : Omega K) :
+theorem theta_functional_equation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (α : Omega K)
+    (hα : α ≠ 0) :
     theta K q ((algebraMap K (Omega K) q)⁻¹ * α) = -α * theta K q α := by
-  sorry
+  set Q : Omega K := algebraMap K (Omega K) q with hQ
+  have hQ0 : Q ≠ 0 := (map_ne_zero _).mpr (norm_pos_iff.mp hq0)
+  set S := IntermediateField.adjoin K ({α} : Set (Omega K)) with hS
+  have hαS : α ∈ S := IntermediateField.mem_adjoin_simple_self K α
+  have hA : ∏' n : ℕ, (1 - Q ^ n * (Q⁻¹ * α)⁻¹) = ∏' n : ℕ, (1 - Q ^ (n + 1) * α⁻¹) := by
+    refine tprod_congr (fun n => ?_)
+    rw [mul_inv, inv_inv, pow_succ]; field_simp
+  have hB : ∏' n : ℕ, (1 - Q ^ (n + 1) * (Q⁻¹ * α)) = ∏' n : ℕ, (1 - Q ^ n * α) := by
+    refine tprod_congr (fun n => ?_)
+    rw [pow_succ]; field_simp
+  have hA2 : ∏' n : ℕ, (1 - Q ^ n * α⁻¹) = (1 - α⁻¹) * ∏' n : ℕ, (1 - Q ^ (n + 1) * α⁻¹) := by
+    have := tprod_eq_zero_mul' (f := fun n : ℕ => 1 - Q ^ n * α⁻¹)
+      (multipliable_geom_omega K q hq1 α α⁻¹ (inv_mem hαS) 1)
+    simpa using this
+  have hB2 : ∏' n : ℕ, (1 - Q ^ n * α) = (1 - α) * ∏' n : ℕ, (1 - Q ^ (n + 1) * α) := by
+    have := tprod_eq_zero_mul' (f := fun n : ℕ => 1 - Q ^ n * α)
+      (multipliable_geom_omega K q hq1 α α hαS 1)
+    simpa using this
+  unfold theta
+  rw [← hQ, hA, hB, hB2]
+  set A' := ∏' n : ℕ, (1 - Q ^ (n + 1) * α⁻¹)
+  set B := ∏' n : ℕ, (1 - Q ^ (n + 1) * α)
+  by_cases h1 : α = 1
+  · subst h1; rw [hA2]; simp
+  · have h2 : (1 - α⁻¹) ≠ 0 := by
+      intro h; apply h1; have := sub_eq_zero.mp h; simpa using this.symm
+    have h3 : 1 - α = -α * (1 - α⁻¹) := by field_simp; ring
+    rw [hA2, h3]; ring
 
 /-- Book, §2, Proposition 1 (Abel–Jacobi theorem, analytic form). A `q`-periodic divisor
 `m` is the divisor of a `q`-periodic function iff `deg_q(m) = 0` and `Φ_q(m) ≡ 1 mod^× q`;

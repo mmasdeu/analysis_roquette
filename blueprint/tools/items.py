@@ -492,3 +492,6 @@ _addlean('def:M-K', 'meroAlgebra')
 _addlean('lem:H-K-domain', 'exists_good_point', 'sum_ne_zero_of_good', 'bad_radii_finite')
 _addlean('prop:deg-q-formula', 'degQ_add')
 _addlean('def:D0q', 'mem_divisorsDegZero_iff')
+
+_upd('prop:theta-functional-eq', text=r'$\Theta(q^{-1}X)=-X\,\Theta(X)$ for $0<|q|<1$ and $X\neq 0$ (the products are multipliable in $\Omega$ since they live in the complete field $K(X)$; at $X=0$ the identity fails, as $\Theta(0)=1$).')
+_addlean('prop:theta-functional-eq', 'multipliable_one_sub_omega', 'multipliable_geom_omega', 'omegaNormedAlgebra')
