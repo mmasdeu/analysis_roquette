@@ -1,4 +1,4 @@
-import AnalyticTheory.Analytic
+import AnalyticTheory.Valuation
 
 /-!
 # Structure of `F_K(q)` (book, §2: items I–V, Corollaries Va, Vb)
@@ -36,7 +36,27 @@ noncomputable def divisorsDegZero (q : K) : AddSubgroup (Omega K → ℤ) :=
 Blueprint: `def:principal-divisors`. -/
 theorem mem_principalDivisors_iff (q : K) (m : Omega K → ℤ) :
     m ∈ principalDivisors K q ↔ ∃ f : MeroRing K, f ∈ Fq K q ∧ f ≠ 0 ∧ divisorOf K f = m := by
-  sorry
+  constructor
+  · intro h
+    unfold principalDivisors at h
+    induction h using AddSubgroup.closure_induction with
+    | mem x hx => exact hx
+    | zero => exact ⟨1, (FqSub K q).one_mem, one_ne_zero, divisorOf_one K⟩
+    | add x y _ _ hx hy =>
+      obtain ⟨f, hf, hf0, rfl⟩ := hx
+      obtain ⟨g, hg, hg0, rfl⟩ := hy
+      exact ⟨f * g, (FqSub K q).mul_mem hf hg, mul_ne_zero hf0 hg0, divisorOf_mul K hf0 hg0⟩
+    | neg x _ hx =>
+      obtain ⟨f, hf, hf0, rfl⟩ := hx
+      refine ⟨f⁻¹, (FqSub K q).inv_mem hf, inv_ne_zero hf0, ?_⟩
+      have := divisorOf_mul K hf0 (inv_ne_zero hf0)
+      rw [mul_inv_cancel₀ hf0, divisorOf_one] at this
+      funext α
+      have := congrFun this α
+      simp at this ⊢
+      omega
+  · rintro ⟨f, hf, hf0, rfl⟩
+    exact AddSubgroup.subset_closure ⟨f, hf, hf0, rfl⟩
 
 /-- The group `D⁰_K(q)` consists of the `q`-periodic divisors of degree `0`.
 Blueprint: `def:D0q`. -/

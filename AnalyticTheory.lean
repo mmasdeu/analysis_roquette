@@ -2,6 +2,10 @@ import AnalyticTheory.FunctionField
 import AnalyticTheory.Basic
 import AnalyticTheory.Holomorphic
 import AnalyticTheory.Analytic
+import AnalyticTheory.Dominance
+import AnalyticTheory.Taylor
+import AnalyticTheory.Identity
+import AnalyticTheory.Valuation
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
 import AnalyticTheory.Weierstrass

@@ -179,15 +179,6 @@ noncomputable def anVal (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
     p.2 ≠ 0 ∧ f = algebraMap (holSubring K) (MeroRing K) p.1 / algebraMap (holSubring K) (MeroRing K) p.2
   anOrdHol K α p.1 - anOrdHol K α p.2
 
-/-- Book, §2: `w_α` is an additive valuation of `M_K` with `w_α(0) = +∞`:
-`w_α(fg) = w_α(f) + w_α(g)`, `w_α(f + g) ≥ min`, `w_α(1) = 0`.
-Blueprint: `def:analytic-valuation`. -/
-theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
-    anVal K α 0 = ⊤ ∧ anVal K α 1 = 0 ∧
-      (∀ f g : MeroRing K, anVal K α (f * g) = anVal K α f + anVal K α g) ∧
-      (∀ f g : MeroRing K, min (anVal K α f) (anVal K α g) ≤ anVal K α (f + g)) := by
-  sorry
-
 /-- The nonzero element `c α` of `Ω`. -/
 noncomputable def scalePt (c : Kˣ) (α : OmegaX K) : OmegaX K :=
   ⟨algebraMap K (Omega K) (c : K) * α.1,
@@ -294,10 +285,11 @@ noncomputable def Divisors : AddSubgroup (Omega K → ℤ) where
   neg_mem' := fun {m} hm => ⟨fun r r' hr hrr' => by simpa using hm.1 r r' hr hrr',
     fun α β h => by simp [hm.2 α β h]⟩
 
-/-- Book, §2: the divisor of a meromorphic function (`(f)` in the book).
-Blueprint: `def:divisor-of`. -/
+/-- Book, §2: the divisor of a meromorphic function (`(f)` in the book): `m_α = w_α(f)` for
+`α ∈ Ω^×` (and `0` at the irrelevant point `α = 0`). Blueprint: `def:divisor-of`. -/
 noncomputable def divisorOf (f : MeroRing K) : Omega K → ℤ :=
-  fun α => WithTop.untopD 0 (anVal K α f)
+  open Classical in
+  fun α => if α = 0 then 0 else WithTop.untopD 0 (anVal K α f)
 
 /-- Book, §2: `q`-periodic divisors `D_K(q)`, i.e. divisors with `m_{qα} = m_α`.
 Blueprint: `def:Dq`. -/

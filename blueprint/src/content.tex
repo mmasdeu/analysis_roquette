@@ -202,8 +202,8 @@ Constant functions give a ring homomorphism $K\to H_K$, hence a $K$-algebra stru
 
 \begin{definition}[Analytic valuation $w_\alpha$]
 \label{def:analytic-valuation}
-\lean{AnalyticTheory.anVal, AnalyticTheory.anOrdHol, AnalyticTheory.anVal_isValuation}
-\uses{def:M-K}
+\lean{AnalyticTheory.anVal, AnalyticTheory.anOrdHol, AnalyticTheory.anVal_isValuation, AnalyticTheory.quotFun, AnalyticTheory.HasOrd, AnalyticTheory.hasOrd_exists, AnalyticTheory.hasOrd_unique, AnalyticTheory.tendsto_quot_zero, AnalyticTheory.hasOrd_mul, AnalyticTheory.anOrdHol_zero, AnalyticTheory.anOrdHol_one, AnalyticTheory.anOrdHol_mul, AnalyticTheory.anOrdHol_add_ge, AnalyticTheory.anVal_eq_of_rep, AnalyticTheory.anVal_ne_top, AnalyticTheory.omega_nhdsNE_neBot}
+\uses{def:M-K, prop:finite-order}
 \leanok
 $w_\alpha(g/h)=\operatorname{ord}_\alpha g-\operatorname{ord}_\alpha h$, where $\operatorname{ord}_\alpha g$ is the integer $n$ such that $g(x)/(x-\alpha)^n$ has a nonzero limit as $x\to\alpha$ ($+\infty$ for $g=0$); $w_\alpha$ is an additive valuation of $M_K$.
 \end{definition}
@@ -234,10 +234,10 @@ A divisor is an integer-valued function $m$ on $\Omega^\times$, finite in annuli
 
 \begin{definition}[Divisor of a function]
 \label{def:divisor-of}
-\lean{AnalyticTheory.divisorOf}
+\lean{AnalyticTheory.divisorOf, AnalyticTheory.divisorOf_mul, AnalyticTheory.divisorOf_one}
 \uses{def:divisor, def:analytic-valuation}
 \leanok
-The divisor $(f)$ of a meromorphic function $f$.
+The divisor $(f)$ of a meromorphic function: $m_\alpha=w_\alpha(f)$ for $\alpha\in\Omega^\times$ (and $0$ at $\alpha=0$); it is multiplicative: $(fg)=(f)+(g)$.
 \end{definition}
 
 \begin{definition}[$q$-periodic divisors]

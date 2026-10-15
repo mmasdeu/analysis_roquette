@@ -55,7 +55,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Blueprint nodes: 144 (definitions, lemmas, propositions, theorems, corollaries, remarks).
+* Blueprint nodes: 148 (definitions, lemmas, propositions, theorems, corollaries, remarks).
 * **No placeholder objects remain**: there is no `opaque` constant, no `sorry`-bodied definition,
   instance or structure field, and no statement recorded as `True`. Every `sorry` is the proof of
   a theorem (all statements compile; `lake build` reports them as warnings).

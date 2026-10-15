@@ -508,3 +508,9 @@ add('lemma', 'lem:identity-theorem', 'Identity theorem for Laurent series', ['la
 add('proposition', 'prop:finite-order', 'Finite order of vanishing', ['exists_order'],
     ['prop:taylor-expansion', 'lem:identity-theorem'], False,
     r'A holomorphic function that is not identically zero has, at every $\alpha\in\Omega^\times$, a finite order $k$: $f(x)/(x-\alpha)^k$ has a nonzero limit as $x\to\alpha$.')
+
+_addlean('def:analytic-valuation', 'quotFun', 'HasOrd', 'hasOrd_exists', 'hasOrd_unique', 'tendsto_quot_zero', 'hasOrd_mul',
+         'anOrdHol_zero', 'anOrdHol_one', 'anOrdHol_mul', 'anOrdHol_add_ge', 'anVal_eq_of_rep', 'anVal_ne_top', 'omega_nhdsNE_neBot')
+_adduses('def:analytic-valuation', 'prop:finite-order')
+_addlean('def:divisor-of', 'divisorOf_mul', 'divisorOf_one')
+_upd('def:divisor-of', text=r'The divisor $(f)$ of a meromorphic function: $m_\alpha=w_\alpha(f)$ for $\alpha\in\Omega^\times$ (and $0$ at $\alpha=0$); it is multiplicative: $(fg)=(f)+(g)$.')
