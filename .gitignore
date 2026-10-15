@@ -1,0 +1,8 @@
+.lake/
+build/
+blueprint/src/*.aux
+blueprint/src/*.log
+blueprint/src/*.out
+blueprint/src/*.toc
+__pycache__/
+blueprint/print/
