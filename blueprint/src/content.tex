@@ -564,6 +564,30 @@ If $f=\sum a_nX^n$ is a convergent Laurent series over $K$ and $\alpha\in\Omega^
 See the Lean proof of \texttt{taylor\_expansion, omega\_hasSum\_mem, tendsto\_mul\_cofinite\_prod}.
 \end{proof}
 
+\begin{lemma}[Identity theorem for Laurent series]
+\label{lem:identity-theorem}
+\lean{AnalyticTheory.laurent_eq_zero_of_vanishing, AnalyticTheory.exists_large_value, AnalyticTheory.exists_poly_of_max, AnalyticTheory.sumM_le, AnalyticTheory.poly_bad_radii_finite, AnalyticTheory.exists_norm_in_open}
+\uses{prop:taylor-expansion}
+\leanok
+A convergent Laurent series over $K$ that vanishes on the ball $\{x : |x-\alpha|<|\alpha|\}$ (with $\alpha\in\Omega^\times$) is zero. The proof collects the terms of maximal norm into a polynomial in $t=(x-\alpha)/\alpha$ and evaluates it at a point of generic radius.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{laurent\_eq\_zero\_of\_vanishing, exists\_large\_value, exists\_poly\_of\_max, sumM\_le, poly\_bad\_radii\_finite, exists\_norm\_in\_open}.
+\end{proof}
+
+\begin{proposition}[Finite order of vanishing]
+\label{prop:finite-order}
+\lean{AnalyticTheory.exists_order}
+\uses{prop:taylor-expansion, lem:identity-theorem}
+\leanok
+A holomorphic function that is not identically zero has, at every $\alpha\in\Omega^\times$, a finite order $k$: $f(x)/(x-\alpha)^k$ has a nonzero limit as $x\to\alpha$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_order}.
+\end{proof}
+
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
 
 \begin{definition}[Derivation $D$]

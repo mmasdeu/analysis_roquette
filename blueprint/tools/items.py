@@ -501,3 +501,10 @@ add('lemma', 'lem:binomial-expansion', 'Binomial theorem for integer exponents',
 add('proposition', 'prop:taylor-expansion', 'Taylor expansion of holomorphic functions', ['taylor_expansion', 'omega_hasSum_mem', 'tendsto_mul_cofinite_prod'],
     ['def:holomorphic', 'lem:binomial-expansion'], False,
     r'If $f=\sum a_nX^n$ is a convergent Laurent series over $K$ and $\alpha\in\Omega^\times$, then $f(\alpha+h)=\sum_k b_kh^k$ for $|h|<|\alpha|$, with $b_k\in K(\alpha)$ and $|b_k||\alpha|^k$ bounded.')
+
+add('lemma', 'lem:identity-theorem', 'Identity theorem for Laurent series', ['laurent_eq_zero_of_vanishing', 'exists_large_value', 'exists_poly_of_max', 'sumM_le', 'poly_bad_radii_finite', 'exists_norm_in_open'],
+    ['prop:taylor-expansion'], False,
+    r'A convergent Laurent series over $K$ that vanishes on the ball $\{x : |x-\alpha|<|\alpha|\}$ (with $\alpha\in\Omega^\times$) is zero. The proof collects the terms of maximal norm into a polynomial in $t=(x-\alpha)/\alpha$ and evaluates it at a point of generic radius.')
+add('proposition', 'prop:finite-order', 'Finite order of vanishing', ['exists_order'],
+    ['prop:taylor-expansion', 'lem:identity-theorem'], False,
+    r'A holomorphic function that is not identically zero has, at every $\alpha\in\Omega^\times$, a finite order $k$: $f(x)/(x-\alpha)^k$ has a nonzero limit as $x\to\alpha$.')
