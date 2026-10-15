@@ -191,7 +191,7 @@ theorem thmVIII_hasse (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 `1` is `K`-isomorphic to some `F_K(q)`, `0 < |q| < 1`, if and only if `|j| > 1` and the Hasse
 invariant is trivial. The period `q` is then unique. Blueprint: `thm:VIIIa`. -/
 theorem thmVIIIa_characterization (F : Type u) [Field F] [Algebra K F]
-    (hF : HasPrimeOfDegreeOne K F) :
+    (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F) :
     (1 < ‖absInv K F hF‖ ∧ SquareEquiv (hasseInv K F hF) 1) ↔
       ∃ q : K, 0 < ‖q‖ ∧ ‖q‖ < 1 ∧ Nonempty (F ≃ₐ[K] FqSub K q) := by
   sorry

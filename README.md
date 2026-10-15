@@ -18,6 +18,8 @@ progress is traced by the Lean blueprint in `blueprint/`.
 | `AnalyticTheory/AppendixA2.lean` | §A2: general invariants, Jacobian field, cocycles, (51)–(53) |
 | `AnalyticTheory/SemiPeriodic.lean` | §4–§5: `q`-trivial characters, Lemma 2, Theorems IX–XVI, Corollaries |
 | `AnalyticTheory/Isogeny.lean` | §6: commensurable periods, Theorems XVII–XIX, isogenies, CM |
+| `AnalyticTheory/FunctionField.lean` | prime divisors, divisors, Riemann–Roch spaces, genus |
+| `AnalyticTheory/Remarks.lean` | §2, additional remarks 1–2 |
 | `blueprint/src/content.tex` | the blueprint (generated, see below) |
 | `blueprint/tools/` | generator and consistency checker for the blueprint |
 
@@ -28,7 +30,7 @@ lake build                       # compiles all statements (sorry-proofs give wa
 leanblueprint pdf                # builds blueprint/print/print.pdf
 ```
 
-`leanblueprint` requires the repository to be a git repository (`git init` has been done,
+`leanblueprint` requires the repository to be a git repository (`git init` has been done;
 nothing has been committed).
 
 The blueprint is generated from `blueprint/tools/items.py`:
@@ -53,30 +55,35 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Total blueprint nodes: 130 (definitions, lemmas, propositions, theorems, corollaries,
-  remarks; this includes the Proposition 2 placeholder).
-* All statements compile. 66 declarations still carry `sorry`: theorem proofs, plus the few definitions whose bodies depend on placeholders (see below).
-* Nodes marked `\notready` in the blueprint are placeholders: either an `opaque`/`sorry`-bodied
-  object that Mathlib does not yet provide (genus, prime divisors, residue fields, derivations,
-  translations on `M_K`, `H¹` of Galois modules, characteristic cocycles, Brauer groups,
-  complex multiplication, general invariants), or a statement recorded as `True` because
-  its content needs that missing infrastructure.
-* Not formalized: Remarks 1–3 of §2 (text only); Proposition 2 of §2 (missing from the
-  LaTeX transcription of the book, see the blueprint node `rem:S2-prop2-missing`).
-
-## Filled-in definitions (second step)
-
-Now constructed rather than placeholders: `H_K`'s constants (`holAlgebra`), the
-scaling and reflection automorphisms of `H_K` and their extension to `M_K`
-(`holScale`, `translation`, `reflectionM`), the subfield `F_K(q)` with its `K`-algebra
-structure (`FqSub`, `FqAlgebra`), and the divisor groups (`Divisors`, `DivisorsPeriodic`).
-Still placeholders: `anVal`, `Dop`, `thetaM`, `wpPrimeM`, `genus`, `HasPrimeOfDegreeOne`,
-`absInv`, `hasseInv`, `absInvGen`, `hasseGen`, `degQ`, `PhiQ`, `FqbarXm`, `tauQSigma`,
-`charInvariant`, `H1Lq`, `eQ`, `charCocycle`, `translationOfClass`, `IsEllipticSubfield`,
-`HasComplexMultiplication`.
-
-Closure of `H_K` under products is now proved (`isHolomorphicOver_mul` in `Holomorphic.lean`),
-via the Cauchy product of convergent Laurent series: convolution coefficients are summed in
-the complete field `K`, and the product identity is checked in `Ω` by an approximation
-criterion that uses only the ultrametric inequality (`Ω` is ultrametric by
-`isNonarchimedean_spectralNorm`, so completeness of `Ω` is not needed).
+* Blueprint nodes: 144 (definitions, lemmas, propositions, theorems, corollaries, remarks).
+* **No placeholder objects remain**: there is no `opaque` constant, no `sorry`-bodied definition,
+  instance or structure field, and no statement recorded as `True`. Every `sorry` is the proof of
+  a theorem (all statements compile; `lake build` reports them as warnings).
+* Objects that Mathlib does not provide are constructed explicitly:
+  * function fields: prime divisors (DVRs containing `K`), divisors, degrees, Riemann–Roch spaces,
+    genus (`FunctionField.lean`);
+  * the analytic objects: `H_K` as functions on `Ω^×` (closed under products, proved), `M_K`, the
+    analytic valuations `w_α` (order of vanishing through limits), `D = X d/dX`, `Θ`, `℘`, `℘′`
+    (from their series), `deg_q`, `Φ_q` (formula (12) over a chosen system of representatives);
+  * Galois action on `M_L` through Laurent coefficients, `H¹(G, L^×/q)`, `e_q`, the character
+    invariant, the semi-periodic fields `F_K(𝐐)` as fixed fields in `F_L(q)`, Tate cohomology of the
+    cyclic group `G_𝐐`;
+  * the invariants `j`, `γ` through Weierstraß data, general invariants by descent to splitting
+    fields, the characteristic cocycle `σ_E σ_F⁻¹`, the translation group `T` (via the action on
+    prime divisors of degree `1`), `H¹(G, T)`;
+  * subfields `F_K(q̄ | Xᵐ)` (image of the substitution `X ↦ Xᵐ`), relative degrees, isogenies,
+    multiplicators and complex multiplication.
+  Where a construction needs facts that are theorems of the book (existence of a unique ring
+  automorphism with a given action, etc.), it is defined with `Classical.epsilon` over the
+  characterising property; existence and uniqueness are then recorded as theorems.
+* Not formalized as a separate statement: Remark 3 of §2 (infinite algebraic constant field
+  extensions; a definitional remark, recorded in the blueprint with `\notready`).
+* Proposition 2 of §2 (Riemann–Roch for `q`-periodic divisors), which had been missing from the first
+  LaTeX transcription, was read off the scan (book p. 16), added to `latex/sec2.tex`, and formalized
+  (`riemann_roch_analytic`).
+* Corrections of earlier statements found while removing placeholders: `SquareEquiv` now requires
+  `t ≠ 0`; Weierstraß-form statements assume that `x, y` generate `F` and that `F` is elliptic;
+  `H_K` consists of functions on `Ω^×` (previously `Ω → Ω`, which made `H_K` fail to be a domain);
+  `F_K(q̄|Xᵐ) ⊆ F_K(q)` requires `m` to be a multiple of the order of `q mod^× q̄`; in Theorem XVII (iii)
+  the group `U` is defined through `q̄` (as in the proof and Corollary XIXa; the printed `q` appears
+  to be a misprint).

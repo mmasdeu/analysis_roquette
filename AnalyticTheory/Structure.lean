@@ -32,6 +32,18 @@ divisors `m` with `deg_q(m) = 0` (it consists of exactly these, as `deg_q` is ad
 noncomputable def divisorsDegZero (q : K) : AddSubgroup (Omega K → ℤ) :=
   AddSubgroup.closure {m | m ∈ DivisorsPeriodic K q ∧ degQ K q m = 0}
 
+/-- The group `P_K(q)` consists of the divisors `(f)` of non-zero `q`-periodic functions.
+Blueprint: `def:principal-divisors`. -/
+theorem mem_principalDivisors_iff (q : K) (m : Omega K → ℤ) :
+    m ∈ principalDivisors K q ↔ ∃ f : MeroRing K, f ∈ Fq K q ∧ f ≠ 0 ∧ divisorOf K f = m := by
+  sorry
+
+/-- The group `D⁰_K(q)` consists of the `q`-periodic divisors of degree `0`.
+Blueprint: `def:D0q`. -/
+theorem mem_divisorsDegZero_iff (q : K) (m : Omega K → ℤ) :
+    m ∈ divisorsDegZero K q ↔ m ∈ DivisorsPeriodic K q ∧ degQ K q m = 0 := by
+  sorry
+
 /-- Book, §2: the group `C⁰_K(q) = D⁰_K(q) / P_K(q)` of divisor classes of degree `0`.
 Blueprint: `def:C0q`. -/
 noncomputable abbrev classGroupDegZero (q : K) : Type u :=

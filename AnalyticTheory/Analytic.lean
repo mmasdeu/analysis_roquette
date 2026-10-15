@@ -8,10 +8,10 @@ Convergent Laurent series, holomorphic and meromorphic functions on `Ω^×`
 divisors and functions, the fundamental theta function, the Jacobi image and
 the Abel–Jacobi theorem (Proposition 1).
 
-Placeholders (objects the book constructs explicitly but which Mathlib does not
-provide, or which are given by long formulas) are declared as `sorry`-bodied
-definitions or `opaque` constants, each with its defining property stated as a
-theorem.
+Objects the book constructs explicitly but which Mathlib does not provide (the analytic
+valuations, the degree and Jacobi image, ...) are defined through `Classical.epsilon` or
+explicit formulas; their defining properties (well-definedness, additivity, ...) are stated as
+theorems.
 -/
 
 open Filter Topology
@@ -132,6 +132,15 @@ noncomputable def anVal (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
   let p : holSubring K × holSubring K := Classical.epsilon fun p : holSubring K × holSubring K =>
     p.2 ≠ 0 ∧ f = algebraMap (holSubring K) (MeroRing K) p.1 / algebraMap (holSubring K) (MeroRing K) p.2
   anOrdHol K α p.1 - anOrdHol K α p.2
+
+/-- Book, §2: `w_α` is an additive valuation of `M_K` with `w_α(0) = +∞`:
+`w_α(fg) = w_α(f) + w_α(g)`, `w_α(f + g) ≥ min`, `w_α(1) = 0`.
+Blueprint: `def:analytic-valuation`. -/
+theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
+    anVal K α 0 = ⊤ ∧ anVal K α 1 = 0 ∧
+      (∀ f g : MeroRing K, anVal K α (f * g) = anVal K α f + anVal K α g) ∧
+      (∀ f g : MeroRing K, min (anVal K α f) (anVal K α g) ≤ anVal K α (f + g)) := by
+  sorry
 
 /-- The nonzero element `c α` of `Ω`. -/
 noncomputable def scalePt (c : Kˣ) (α : OmegaX K) : OmegaX K :=
@@ -293,6 +302,33 @@ noncomputable def PhiQ (q : K) (hq : q ≠ 0) (m : Omega K → ℤ) :
     (Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)) ^ (m α)
   if h : x ≠ 0 then QuotientGroup.mk (Units.mk0 x h) else 1
 
+/-- Book, §2: `deg_q` is additive on `D_K(q)`. Blueprint: `def:deg-q`. -/
+theorem degQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K → ℤ)
+    (hm : m ∈ DivisorsPeriodic K q) (hn : n ∈ DivisorsPeriodic K q) :
+    degQ K q (m + n) = degQ K q m + degQ K q n := by
+  sorry
+
+/-- Book, §2: `Φ_q` is a homomorphism `D_K(q) → K^×/q` ("obviously", loc. cit.).
+Blueprint: `def:Phi-q`. -/
+theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K → ℤ)
+    (hm : m ∈ DivisorsPeriodic K q) (hn : n ∈ DivisorsPeriodic K q) :
+    PhiQ K q (norm_pos_iff.mp hq0) (m + n) =
+      PhiQ K q (norm_pos_iff.mp hq0) m * PhiQ K q (norm_pos_iff.mp hq0) n := by
+  sorry
+
+/-- Book, §2: the degree and Jacobi image do not depend on the choice of the system of
+representatives (formula (12)). Blueprint: `prop:deg-q-formula`. -/
+theorem degQ_eq_of_system (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m : Omega K → ℤ)
+    (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K))
+    (hR : ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
+      ∃! β, β ∈ R ∧ ConjModQ K q α β) :
+    PhiQ K q (norm_pos_iff.mp hq0) m =
+      (open Classical in
+        let x : K := ∏ᶠ α ∈ {α ∈ R | ‖q‖ < omegaNorm K α ∧ omegaNorm K α ≤ 1},
+          (Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)) ^ (m α)
+        if h : x ≠ 0 then QuotientGroup.mk (Units.mk0 x h) else 1) := by
+  sorry
+
 /-- Book, §2: the fundamental theta function
 `Θ(X) = ∏_{n≥0}(1 − qⁿX⁻¹) ∏_{n<0}(1 − q^{-n}X)`, as a function on `Ω^×`.
 Blueprint: `def:theta`. -/
@@ -327,6 +363,26 @@ theorem exists_periodic_function_with_valuation (q : K) (hq0 : 0 < ‖q‖) (hq1
     (α : Omega K) (hα : α ≠ 0) :
     ∃ f : MeroRing K, f ∈ Fq K q ∧ anVal K α f = 1 ∧
       ∀ β : Omega K, β ≠ 0 → ¬ ConjModQ K q α β → anVal K β f = 0 := by
+  sorry
+
+/-- Book, §2: the set `L_K(q | 𝔪)` of `q`-periodic functions `f` with `(f) ≥ −𝔪` (including `0`).
+Blueprint: `prop:abel-jacobi-2`. -/
+def LSet (q : K) (m : Omega K → ℤ) : Set (MeroRing K) :=
+  {f | f ∈ Fq K q ∧ ∀ α : Omega K, α ≠ 0 → ((-(m α) : ℤ) : WithTop ℤ) ≤ anVal K α f}
+
+/-- Book, §2, Proposition 2 (Riemann–Roch theorem) together with the remarks preceding it: for a
+`q`-periodic divisor `𝔪`, `L_K(q|𝔪) = 0` if `deg_q 𝔪 < 0`; if `deg_q 𝔪 = 0` it is `0` unless
+`Φ_q(𝔪) ≡ 1`, in which case it has dimension `1`; and `dim L_K(q|𝔪) = deg_q(𝔪)` if `deg_q 𝔪 > 0`.
+Blueprint: `prop:abel-jacobi-2`. -/
+theorem riemann_roch_analytic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (m : Omega K → ℤ) (hm : m ∈ DivisorsPeriodic K q) :
+    (degQ K q m < 0 → LSet K q m = {0}) ∧
+    (degQ K q m = 0 →
+      (PhiQ K q (norm_pos_iff.mp hq0) m = 1 →
+        Module.finrank K (Submodule.span K (LSet K q m)) = 1) ∧
+      (PhiQ K q (norm_pos_iff.mp hq0) m ≠ 1 → LSet K q m = {0})) ∧
+    (0 < degQ K q m →
+      ((Module.finrank K (Submodule.span K (LSet K q m)) : ℕ) : ℤ) = degQ K q m) := by
   sorry
 
 /-- Book, §2, formula (12): `deg_q(m) = ∑ [K(α):K] m_α`, the sum over a system `R` of
