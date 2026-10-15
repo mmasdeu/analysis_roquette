@@ -6,3 +6,6 @@ blueprint/src/*.out
 blueprint/src/*.toc
 __pycache__/
 blueprint/print/
+blueprint/web/
+blueprint/lean_decls
+*.paux
