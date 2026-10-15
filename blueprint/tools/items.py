@@ -296,3 +296,15 @@ for _it in ITEMS:
 ITEMS.append(dict(env='definition', label='def:Fq-algebra', title=r'$K$-algebra structure on $F_K(q)$',
     lean=['FqHom', 'FqAlgebra'], uses=['def:Fq', 'def:const-algebra', 'def:translation'], notready=False,
     text=r'Constants lie in $F_K(q)$ because translations fix $K$, giving $K\to F_K(q)$.'))
+
+# ---- closure of H_K under products (second step)
+OVERRIDES['def:H-K'] = dict(notready=False, text=r'The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of $\Omega\to\Omega$. Closure under sums, negatives, constants and products is proved.')
+ITEMS.append(dict(env='definition', label='def:convolution', title=r'Convolution coefficients', lean=['convCoeff'],
+    uses=['def:convergent-laurent'], notready=False,
+    text=r'For Laurent coefficients $a,b$ the convolution $c_n=\sum_k a_k b_{n-k}$ (summed in $K$).'))
+ITEMS.append(dict(env='lemma', label='lem:H-K-mul', title=r'$H_K$ is closed under products', lean=['isHolomorphicOver_mul'],
+    uses=['def:H-K','def:convolution'], notready=False,
+    text=r'If $f,g$ are holomorphic over $K$ then so is $fg$: its coefficients are the convolutions of those of $f$ and $g$.'))
+
+for _it in ITEMS:
+    _it.update(OVERRIDES.get(_it["label"], {}))

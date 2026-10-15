@@ -104,8 +104,7 @@ $f:\Omega^\times\to\Omega$ is holomorphic over $K$ if it is given by a convergen
 \label{def:H-K}
 \lean{AnalyticTheory.holSubring}
 \uses{def:holomorphic}
-\notready
-The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of $\Omega\to\Omega$. Closure under sums, negatives and constants is proved; closure under products (a Cauchy-product estimate for convergent Laurent series) is pending.
+The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of $\Omega\to\Omega$. Closure under sums, negatives, constants and products is proved.
 \end{definition}
 
 \begin{lemma}[$H_K$ is a domain]
@@ -373,6 +372,20 @@ The image field of $\mu_m:\bar f(X)\mapsto\bar f(X^m)$. Placeholder.
 \uses{def:Fq, def:const-algebra, def:translation}
 Constants lie in $F_K(q)$ because translations fix $K$, giving $K\to F_K(q)$.
 \end{definition}
+
+\begin{definition}[Convolution coefficients]
+\label{def:convolution}
+\lean{AnalyticTheory.convCoeff}
+\uses{def:convergent-laurent}
+For Laurent coefficients $a,b$ the convolution $c_n=\sum_k a_k b_{n-k}$ (summed in $K$).
+\end{definition}
+
+\begin{lemma}[$H_K$ is closed under products]
+\label{lem:H-K-mul}
+\lean{AnalyticTheory.isHolomorphicOver_mul}
+\uses{def:H-K, def:convolution}
+If $f,g$ are holomorphic over $K$ then so is $fg$: its coefficients are the convolutions of those of $f$ and $g$.
+\end{lemma}
 
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
 

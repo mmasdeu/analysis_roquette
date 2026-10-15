@@ -1,4 +1,4 @@
-import AnalyticTheory.Basic
+import AnalyticTheory.Holomorphic
 
 /-!
 # Fields of periodic functions (book, §2)
@@ -22,19 +22,6 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-/-- `Ω`: an algebraic closure of `K` (book, §2, first paragraph).
-Blueprint: `def:omega`. -/
-abbrev Omega : Type u := AlgebraicClosure K
-
-/-- The absolute value of `K` extended to `Ω` (the spectral norm).
-Blueprint: `def:omega-norm`. -/
-noncomputable abbrev omegaNorm (α : Omega K) : ℝ := spectralNorm K (Omega K) α
-
-/-- The normed field structure on `Ω` given by the extension of the absolute value of `K`
-(`spectralNorm`). Blueprint: `def:omega-normed-field`. -/
-noncomputable instance omegaNormedField : NormedField (Omega K) :=
-  spectralNorm.normedField K (Omega K)
-
 /-- Book, §2: the valuation of `K` has a unique extension to `Ω`: any absolute value on `Ω`
 extending the one of `K` equals the spectral norm. Blueprint: `lem:ext-unique`. -/
 theorem omegaNorm_unique_extension (f : Omega K → ℝ) (hf : IsAbsoluteValue f)
@@ -42,101 +29,13 @@ theorem omegaNorm_unique_extension (f : Omega K → ℝ) (hf : IsAbsoluteValue f
     f = omegaNorm K := by
   sorry
 
-/-- Book, §2, equation (∗): a formal Laurent series `∑ aₙ Xⁿ` with coefficients in `K`
-is *convergent* if `|aₙ| rⁿ → 0` (as `n → ±∞`) for every real `r > 0`.
-Blueprint: `def:convergent-laurent`. -/
-def IsConvergentLaurent (a : ℤ → K) : Prop :=
-  ∀ r : ℝ, 0 < r → Tendsto (fun n : ℤ => ‖a n‖ * r ^ n) cofinite (𝓝 0)
-
-/-- Book, §2: `f : Ω^× → Ω` is *holomorphic over `K`* if it is given by a convergent
-Laurent series with coefficients in `K` at every `α ≠ 0`.
-Blueprint: `def:holomorphic`. -/
-def IsHolomorphicOver (f : Omega K → Omega K) : Prop :=
-  ∃ a : ℤ → K, IsConvergentLaurent K a ∧
-    ∀ α : Omega K, α ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α ^ n) (f α)
-
-/-- Book, §2: rescaling `f(X) ↦ f(cX)` of a function on `Ω^×`. -/
-noncomputable def scaleFun (c : Kˣ) (f : Omega K → Omega K) : Omega K → Omega K :=
-  fun α => f (algebraMap K (Omega K) (c : K) * α)
-
-/-- Constant functions are holomorphic. -/
-theorem isHolomorphicOver_const (c : K) :
-    IsHolomorphicOver K (fun _ : Omega K => algebraMap K (Omega K) c) := by
-  refine ⟨fun n => if n = 0 then c else 0, ?_, ?_⟩
-  · intro r hr
-    have hev : ∀ᶠ n : ℤ in cofinite, n ≠ 0 := by
-      refine Filter.eventually_cofinite.mpr ?_
-      simpa using Set.finite_singleton (0 : ℤ)
-    refine tendsto_const_nhds.congr' ?_
-    filter_upwards [hev] with n hn
-    simp [hn]
-  · intro α _
-    have h := hasSum_single (f := fun n : ℤ =>
-        algebraMap K (Omega K) (if n = 0 then c else 0) * α ^ n) 0
-      (fun n hn => by simp [hn])
-    simpa using h
-
-/-- Holomorphic functions are stable under sums. -/
-theorem isHolomorphicOver_add {f g : Omega K → Omega K} (hf : IsHolomorphicOver K f)
-    (hg : IsHolomorphicOver K g) : IsHolomorphicOver K (f + g) := by
-  obtain ⟨a, ha, hsa⟩ := hf
-  obtain ⟨b, hb, hsb⟩ := hg
-  refine ⟨fun n => a n + b n, ?_, ?_⟩
-  · intro r hr
-    refine squeeze_zero (fun n => mul_nonneg (norm_nonneg _) (zpow_pos hr n).le) (fun n => ?_)
-      (by simpa using (ha r hr).add (hb r hr))
-    calc ‖a n + b n‖ * r ^ n ≤ (‖a n‖ + ‖b n‖) * r ^ n :=
-          mul_le_mul_of_nonneg_right (norm_add_le _ _) (zpow_pos hr n).le
-      _ = ‖a n‖ * r ^ n + ‖b n‖ * r ^ n := add_mul _ _ _
-  · intro α hα
-    have h := (hsa α hα).add (hsb α hα)
-    simp only [Pi.add_apply]
-    convert h using 1
-    funext n
-    simp [map_add, add_mul]
-
-/-- Holomorphic functions are stable under negation. -/
-theorem isHolomorphicOver_neg {f : Omega K → Omega K} (hf : IsHolomorphicOver K f) :
-    IsHolomorphicOver K (-f) := by
-  obtain ⟨a, ha, hsa⟩ := hf
-  refine ⟨fun n => -a n, ?_, ?_⟩
-  · intro r hr
-    refine (ha r hr).congr (fun n => ?_)
-    simp [norm_neg]
-  · intro α hα
-    have h := (hsa α hα).neg
-    simp only [Pi.neg_apply]
-    convert h using 1
-    funext n
-    simp [map_neg, neg_mul]
-
-/-- Holomorphic functions are stable under rescaling `X ↦ cX` for `c ∈ K^×`. -/
-theorem isHolomorphicOver_scale (c : Kˣ) {f : Omega K → Omega K} (hf : IsHolomorphicOver K f) :
-    IsHolomorphicOver K (scaleFun K c f) := by
-  obtain ⟨a, hconv, hsum⟩ := hf
-  refine ⟨fun n => a n * (c : K) ^ n, ?_, ?_⟩
-  · intro r hr
-    have hcr : 0 < ‖(c : K)‖ * r := mul_pos (norm_pos_iff.mpr c.ne_zero) hr
-    refine (hconv _ hcr).congr (fun n => ?_)
-    rw [norm_mul, norm_zpow, mul_zpow]
-    ring
-  · intro α hα
-    have hc : algebraMap K (Omega K) (c : K) ≠ 0 := (map_ne_zero _).mpr c.ne_zero
-    have h := hsum _ (mul_ne_zero hc hα)
-    show HasSum _ (f (algebraMap K (Omega K) (c : K) * α))
-    convert h using 1
-    funext n
-    simp only [map_mul, map_zpow₀, mul_zpow]
-    ring
-
 /-- Book, §2: the holomorphic functions over `K`, `H_K`. We package them as a subring of
-the functions `Ω → Ω` (pointwise operations). The multiplicativity is not yet proved
-(it is a Cauchy-product estimate for convergent Laurent series).
+the functions `Ω → Ω` (pointwise operations). Closure under products is the Cauchy product of
+convergent Laurent series, proved in `Holomorphic.lean`.
 Blueprint: `def:H-K`. -/
 def holSubring : Subring (Omega K → Omega K) where
   carrier := {f | IsHolomorphicOver K f}
-  mul_mem' := by sorry
+  mul_mem' := fun hf hg => isHolomorphicOver_mul K hf hg
   one_mem' := by simpa using isHolomorphicOver_const K 1
   add_mem' := fun hf hg => isHolomorphicOver_add K hf hg
   zero_mem' := by simpa using isHolomorphicOver_const K 0

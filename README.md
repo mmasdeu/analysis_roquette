@@ -73,5 +73,10 @@ structure (`FqSub`, `FqAlgebra`), and the divisor groups (`Divisors`, `DivisorsP
 Still placeholders: `anVal`, `Dop`, `thetaM`, `wpPrimeM`, `genus`, `HasPrimeOfDegreeOne`,
 `absInv`, `hasseInv`, `absInvGen`, `hasseGen`, `degQ`, `PhiQ`, `FqbarXm`, `tauQSigma`,
 `charInvariant`, `H1Lq`, `eQ`, `charCocycle`, `translationOfClass`, `IsEllipticSubfield`,
-`HasComplexMultiplication`. Still open inside otherwise constructed definitions: closure of
-`H_K` under products (`holSubring`).
+`HasComplexMultiplication`.
+
+Closure of `H_K` under products is now proved (`isHolomorphicOver_mul` in `Holomorphic.lean`),
+via the Cauchy product of convergent Laurent series: convolution coefficients are summed in
+the complete field `K`, and the product identity is checked in `Ω` by an approximation
+criterion that uses only the ultrametric inequality (`Ω` is ultrametric by
+`isNonarchimedean_spectralNorm`, so completeness of `Ω` is not needed).
