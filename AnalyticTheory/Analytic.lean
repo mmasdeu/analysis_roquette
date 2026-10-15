@@ -30,7 +30,10 @@ extending the one of `K` equals the spectral norm. Blueprint: `lem:ext-unique`. 
 theorem omegaNorm_unique_extension (f : Omega K → ℝ) (hf : IsAbsoluteValue f)
     (hext : ∀ a : K, f (algebraMap K (Omega K) a) = ‖a‖) :
     f = omegaNorm K := by
-  sorry
+  funext x
+  have := spectralNorm_unique_field_norm_ext (K := K) (L := Omega K)
+    (f := hf.toAbsoluteValue) (by simpa using hext) x
+  simpa [omegaNorm] using this
 
 /-- The punctured plane `Ω^×`. -/
 abbrev OmegaX : Type u := {α : Omega K // α ≠ 0}

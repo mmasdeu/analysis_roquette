@@ -148,6 +148,47 @@ def deltaPoly (B C : K) : K := B ^ 2 - C - 64 * B ^ 3 + 72 * B * C - 432 * C ^ 2
 noncomputable def jInvQ (q : K) : K :=
   (1 - 48 * coeffB K q) ^ 3 / deltaPoly K (coeffB K q) (coeffC K q)
 
+theorem lem1_summable (R : ℕ → K) (hR : ∀ n, ‖R n‖ ≤ 1) {u : K} (hu : ‖u‖ < 1) :
+    Summable (fun n : ℕ => R n * u ^ n) := by
+  apply NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero
+  rw [Nat.cofinite_eq_atTop]
+  refine squeeze_zero_norm (fun n => ?_)
+    (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg u) hu)
+  rw [norm_mul, norm_pow]
+  exact mul_le_of_le_one_left (by positivity) (hR n)
+
+theorem lem1_norm_le (R : ℕ → K) (hR : ∀ n, ‖R n‖ ≤ 1) {u : K} (hu : ‖u‖ < 1) :
+    ‖∑' n : ℕ, R n * u ^ n‖ ≤ 1 := by
+  refine hasSum_norm_le (lem1_summable K R hR hu).hasSum zero_le_one (fun n => ?_)
+  rw [norm_mul, norm_pow]
+  calc ‖R n‖ * ‖u‖ ^ n ≤ 1 * 1 :=
+        mul_le_mul (hR n) (pow_le_one₀ (norm_nonneg u) hu.le) (by positivity) zero_le_one
+    _ = 1 := one_mul 1
+
+theorem lem1_diff (R : ℕ → K) (hR : ∀ n, ‖R n‖ ≤ 1) {u u' : K} (hu : ‖u‖ < 1) (hu' : ‖u'‖ < 1) :
+    ‖(∑' n : ℕ, R n * u ^ n) - ∑' n : ℕ, R n * u' ^ n‖ ≤ ‖u - u'‖ := by
+  rw [← (lem1_summable K R hR hu).tsum_sub (lem1_summable K R hR hu')]
+  refine hasSum_norm_le ((lem1_summable K R hR hu).sub (lem1_summable K R hR hu')).hasSum
+    (norm_nonneg _) (fun n => ?_)
+  rw [← mul_sub, norm_mul]
+  rcases Nat.eq_zero_or_pos n with rfl | hn
+  · simp
+  have hgeom : u ^ n - u' ^ n = (∑ i ∈ Finset.range n, u ^ i * u' ^ (n - 1 - i)) * (u - u') :=
+    ((Commute.all u u').geom_sum₂_mul n).symm
+  have hsum : ‖∑ i ∈ Finset.range n, u ^ i * u' ^ (n - 1 - i)‖ ≤ 1 :=
+    sum_norm_le_of_forall _ _ zero_le_one (fun i _ => by
+      rw [norm_mul, norm_pow, norm_pow]
+      calc ‖u‖ ^ i * ‖u'‖ ^ (n - 1 - i) ≤ 1 * 1 :=
+            mul_le_mul (pow_le_one₀ (norm_nonneg _) hu.le) (pow_le_one₀ (norm_nonneg _) hu'.le)
+              (by positivity) zero_le_one
+        _ = 1 := one_mul 1)
+  rw [hgeom, norm_mul]
+  calc ‖R n‖ * (‖∑ i ∈ Finset.range n, u ^ i * u' ^ (n - 1 - i)‖ * ‖u - u'‖)
+      ≤ 1 * (1 * ‖u - u'‖) :=
+        mul_le_mul (hR n) (mul_le_mul hsum le_rfl (norm_nonneg _) zero_le_one) (by positivity)
+          zero_le_one
+    _ = ‖u - u'‖ := by ring
+
 /-- Book, §3, Lemma 1: for `R = ∑ cᵢ Xⁱ` with `|cᵢ| ≤ 1`, the map `u ↦ 1/u + R(u)` is a
 bijection from `0 < |u| < 1` onto `|v| > 1`, and `|1/u + R(u)| = 1/|u|`.
 Blueprint: `lem:1`. -/
@@ -156,7 +197,84 @@ theorem lemma1_inversion (R : ℕ → K) (hR : ∀ n, ‖R n‖ ≤ 1) :
       {u : K | 0 < ‖u‖ ∧ ‖u‖ < 1} {v : K | 1 < ‖v‖} ∧
     ∀ u : K, 0 < ‖u‖ → ‖u‖ < 1 →
       ‖u⁻¹ + ∑' n : ℕ, R n * u ^ n‖ = ‖u‖⁻¹ := by
-  sorry
+  have hnorm : ∀ u : K, 0 < ‖u‖ → ‖u‖ < 1 →
+      ‖u⁻¹ + ∑' n : ℕ, R n * u ^ n‖ = ‖u‖⁻¹ := by
+    intro u hu0 hu1
+    have h1 : ‖(∑' n : ℕ, R n * u ^ n)‖ < ‖u⁻¹‖ := by
+      rw [norm_inv]
+      exact lt_of_le_of_lt (lem1_norm_le K R hR hu1) (one_lt_inv₀ hu0 |>.mpr hu1)
+    rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h1.ne', max_eq_left h1.le, norm_inv]
+  refine ⟨⟨?_, ?_, ?_⟩, hnorm⟩
+  · intro u ⟨hu0, hu1⟩
+    show 1 < ‖_‖
+    rw [hnorm u hu0 hu1]
+    exact (one_lt_inv₀ hu0).mpr hu1
+  · intro u ⟨hu0, hu1⟩ u' ⟨hu0', hu1'⟩ h
+    by_contra hne
+    have hu : u ≠ 0 := norm_pos_iff.mp hu0
+    have hu' : u' ≠ 0 := norm_pos_iff.mp hu0'
+    have hd : 0 < ‖u - u'‖ := norm_pos_iff.mpr (sub_ne_zero.mpr hne)
+    have heq : u⁻¹ - u'⁻¹ = (∑' n : ℕ, R n * u' ^ n) - ∑' n : ℕ, R n * u ^ n := by
+      simp only at h; linear_combination h
+    have h2 : ‖u⁻¹ - u'⁻¹‖ ≤ ‖u - u'‖ := by
+      rw [heq, norm_sub_rev]; exact lem1_diff K R hR hu1 hu1'
+    have h3 : u⁻¹ - u'⁻¹ = (u' - u) / (u * u') := by field_simp
+    rw [h3, norm_div, norm_mul, norm_sub_rev] at h2
+    have hp : ‖u‖ * ‖u'‖ < 1 := by nlinarith
+    rw [div_le_iff₀ (by positivity)] at h2
+    nlinarith
+  · intro v hv
+    have hv1 : (1 : ℝ) < ‖v‖ := hv
+    have hv0 : 0 < ‖v‖ := by linarith
+    set s : Set K := Metric.closedBall 0 ‖v‖⁻¹ with hs
+    have hvi : ‖v‖⁻¹ < 1 := inv_lt_one_of_one_lt₀ hv1
+    set Rf : K → K := fun w => ∑' n : ℕ, R n * w ^ n with hRf
+    have hmem : ∀ w ∈ s, ‖w‖ < 1 := fun w hw =>
+      lt_of_le_of_lt (by simpa [hs] using hw) hvi
+    have hden : ∀ w ∈ s, ‖v - Rf w‖ = ‖v‖ := by
+      intro w hw
+      have h1 : ‖-Rf w‖ < ‖v‖ := by
+        rw [norm_neg]; exact lt_of_le_of_lt (lem1_norm_le K R hR (hmem w hw)) hv1
+      rw [sub_eq_add_neg, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h1.ne',
+        max_eq_left h1.le]
+    set f : K → K := fun w => (v - Rf w)⁻¹ with hf
+    have hsf : Set.MapsTo f s s := by
+      intro w hw
+      show f w ∈ Metric.closedBall (0 : K) ‖v‖⁻¹
+      rw [mem_closedBall_zero_iff, hf]; simp only; rw [norm_inv, hden w hw]
+    set k : NNReal := ⟨(‖v‖⁻¹) ^ 2, by positivity⟩ with hk
+    have hk1 : k < 1 := by
+      rw [← NNReal.coe_lt_coe]
+      show (‖v‖⁻¹) ^ 2 < 1
+      exact pow_lt_one₀ (by positivity) hvi (by norm_num)
+    have hc : ContractingWith k (hsf.restrict f s s) := by
+      refine ⟨hk1, LipschitzWith.of_dist_le_mul (fun x y => ?_)⟩
+      have hx := hden x.1 x.2
+      have hy := hden y.1 y.2
+      have hx0 : v - Rf x.1 ≠ 0 := norm_pos_iff.mp (by rw [hx]; exact hv0)
+      have hy0 : v - Rf y.1 ≠ 0 := norm_pos_iff.mp (by rw [hy]; exact hv0)
+      show dist (f x.1) (f y.1) ≤ (k : ℝ) * dist x.1 y.1
+      rw [dist_eq_norm, dist_eq_norm]
+      have : f x.1 - f y.1 = (Rf x.1 - Rf y.1) / ((v - Rf x.1) * (v - Rf y.1)) := by
+        simp only [hf]; field_simp; ring
+      rw [this, norm_div, norm_mul, hx, hy]
+      have hd := lem1_diff K R hR (hmem x.1 x.2) (hmem y.1 y.2)
+      rw [div_le_iff₀ (by positivity)]
+      show ‖Rf x.1 - Rf y.1‖ ≤ (‖v‖⁻¹ ^ 2) * ‖x.1 - y.1‖ * (‖v‖ * ‖v‖)
+      calc ‖Rf x.1 - Rf y.1‖ ≤ ‖x.1 - y.1‖ := hd
+        _ = (‖v‖⁻¹ ^ 2) * ‖x.1 - y.1‖ * (‖v‖ * ‖v‖) := by field_simp
+    obtain ⟨w, hws, hfix, -, -⟩ := hc.exists_fixedPoint' (Metric.isClosed_closedBall.isComplete) hsf
+      (x := 0) (by simp [hs]) (edist_ne_top _ _)
+    have hden' := hden w hws
+    have hw : w = (v - Rf w)⁻¹ := hfix.symm
+    have hne : v - Rf w ≠ 0 := norm_pos_iff.mp (by rw [hden']; exact hv0)
+    have hnw : ‖w‖ = ‖v‖⁻¹ := by rw [hw, norm_inv, hden']
+    refine ⟨w, ⟨by rw [hnw]; positivity, by rw [hnw]; exact hvi⟩, ?_⟩
+    show w⁻¹ + Rf w = v
+    have hinv : w⁻¹ = v - Rf w := by
+      conv_lhs => rw [hw]
+      rw [inv_inv]
+    rw [hinv]; ring
 
 /-- Book, §3, Theorem VII: `j(q) = 1/q + R(q)` with `R` a universal power series with integral
 coefficients; `|j(q)| = 1/|q| > 1`; and every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one
