@@ -5,7 +5,10 @@ import AnalyticTheory.Analytic
 import AnalyticTheory.Dominance
 import AnalyticTheory.Taylor
 import AnalyticTheory.Identity
+import AnalyticTheory.WeierstrassPrep
+import AnalyticTheory.Zeros
 import AnalyticTheory.Valuation
+import AnalyticTheory.Rationality
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
 import AnalyticTheory.Weierstrass

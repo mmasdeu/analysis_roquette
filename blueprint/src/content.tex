@@ -588,6 +588,65 @@ A holomorphic function that is not identically zero has, at every $\alpha\in\Ome
 See the Lean proof of \texttt{exists\_order}.
 \end{proof}
 
+\begin{lemma}[Weierstra\ss\ preparation on the unit circle]
+\label{lem:weierstrass-prep}
+\lean{AnalyticTheory.weierstrass_prep, AnalyticTheory.wit_prop, AnalyticTheory.divD, AnalyticTheory.divR, AnalyticTheory.div_identity, AnalyticTheory.hasSum_cauchy_product, AnalyticTheory.PolyData, AnalyticTheory.WitProp}
+\leanok
+Let $H=\sum h_my^m$ be a null sequence over a complete ultrametric field with $|h_m|\le 1$, $|h_0|=|h_s|=1$ and $|h_m|\le\varepsilon<1$ for $m<0$ and $m>s$. Then $y^s=Q\cdot H+R$ with $Q$ a null sequence, $|Q-h_s^{-1}|\le\varepsilon$, and $R$ a polynomial of degree $<s$ with coefficients of norm $\le1$. (Euclidean division by the polynomial part, then a contraction argument in $C_0(\mathbb Z,F)$.)
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{weierstrass\_prep, wit\_prop, divD, divR, div\_identity, hasSum\_cauchy\_product, PolyData, WitProp}.
+\end{proof}
+
+\begin{proposition}[Zeros on a sphere with tied dominant terms]
+\label{prop:tie-structure}
+\lean{AnalyticTheory.tie_structure, AnalyticTheory.exists_zero_of_tie, AnalyticTheory.prep_eval, AnalyticTheory.cauchy_omega}
+\uses{lem:weierstrass-prep, prop:taylor-expansion}
+\leanok
+If the maximal terms of a convergent Laurent series $f$ at radius $\rho$ are attained at two indices, there are $x_0\in\Omega$ with $|x_0|=\rho$ and a monic polynomial $P$ (all of whose roots have norm $1$) with: for $|y|=1$, $f(x_0y)=0$ iff $P(y)=0$. In particular $f$ has a zero of norm $\rho$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{tie\_structure, exists\_zero\_of\_tie, prep\_eval, cauchy\_omega}.
+\end{proof}
+
+\begin{proposition}[Finiteness of zeros]
+\label{prop:zeros-finite}
+\lean{AnalyticTheory.zeros_sphere_finite, AnalyticTheory.zeros_annulus_finite, AnalyticTheory.bad_radii_finite_Icc, AnalyticTheory.exists_tie_of_not_good, AnalyticTheory.holZeros_finite, AnalyticTheory.hol_rep}
+\uses{prop:tie-structure, lem:H-K-domain}
+\leanok
+A nonzero holomorphic function over $K$ has only finitely many zeros in every closed annulus $r\le|x|\le r'$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{zeros\_sphere\_finite, zeros\_annulus\_finite, bad\_radii\_finite\_Icc, exists\_tie\_of\_not\_good, holZeros\_finite, hol\_rep}.
+\end{proof}
+
+\begin{proposition}[Invariance of $w_\alpha$ under conjugation]
+\label{prop:rationality}
+\lean{AnalyticTheory.aut_isometry, AnalyticTheory.hol_apply_aut, AnalyticTheory.quotFun_aut, AnalyticTheory.hasOrd_aut, AnalyticTheory.anOrdHol_aut, AnalyticTheory.anVal_aut, AnalyticTheory.divisorOf_rational}
+\uses{def:analytic-valuation}
+\leanok
+$K$-automorphisms of $\Omega$ are isometries, commute with evaluation of holomorphic functions, and hence $w_{\sigma\alpha}=w_\alpha$ (rationality condition (ii) for divisors).
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{aut\_isometry, hol\_apply\_aut, quotFun\_aut, hasOrd\_aut, anOrdHol\_aut, anVal\_aut, divisorOf\_rational}.
+\end{proof}
+
+\begin{proposition}[Divisors of meromorphic functions are divisors]
+\label{prop:divisor-finite}
+\lean{AnalyticTheory.divisorOf_finite, AnalyticTheory.divisorOf_mem_Divisors, AnalyticTheory.principalDivisors_le}
+\uses{prop:zeros-finite, prop:rationality, def:divisor-of, def:principal-divisors}
+\leanok
+For $0\ne f\in M_K$ the divisor $(f)$ satisfies the finiteness condition (i) and the rationality condition (ii) of \S2, so $P_K(q)\subset D_K$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{divisorOf\_finite, divisorOf\_mem\_Divisors, principalDivisors\_le}.
+\end{proof}
+
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
 
 \begin{definition}[Derivation $D$]

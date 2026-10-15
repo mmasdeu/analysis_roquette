@@ -39,14 +39,96 @@ theorem cauchy_omega (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
     simpa using this
 
 
+/-- Evaluation of the preparation identity `P = Q·H` at a point of the unit circle. -/
+theorem prep_eval (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
+    (H Q R : ℤ → S) (s : ℕ) (ε : ℝ) (hε0 : 0 ≤ ε) (hε1 : ε < 1)
+    (hHd : Dec H) (hQd : Dec Q) (hQ0 : ‖Q 0‖ = 1) (hQi : ∀ i : ℤ, i ≠ 0 → ‖Q i‖ ≤ ε)
+    (hRs : ∀ n : ℤ, (n < 0 ∨ (s : ℤ) ≤ n) → R n = 0)
+    (hQH : ∀ n, HasSum (fun i => Q i * H (n - i)) ((eSeq (s : ℤ) : ℤ → S) n - R n))
+    (y : Omega K) (hy1 : ‖y‖ = 1) :
+    ∃ A B : Omega K, ‖A‖ = 1 ∧ HasSum (fun j => ((H j : S) : Omega K) * y ^ j) B ∧
+      A * B = y ^ s - ∑ i ∈ Finset.range s, ((R (i : ℤ) : S) : Omega K) * y ^ i := by
+  classical
+  have hy0 : y ≠ 0 := by intro h; rw [h, norm_zero] at hy1; exact zero_ne_one hy1
+  set S' := IntermediateField.adjoin K ({y} : Set (Omega K)) ⊔ S with hS'
+  haveI : FiniteDimensional K (IntermediateField.adjoin K ({y} : Set (Omega K))) :=
+    IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral y)
+  haveI : FiniteDimensional K S' := by
+    rw [hS']; infer_instance
+  have hSS' : S ≤ S' := le_sup_right
+  have hyS' : y ∈ S' :=
+    (le_sup_left : IntermediateField.adjoin K ({y} : Set (Omega K)) ≤ S')
+      (IntermediateField.mem_adjoin_simple_self K y)
+  set u : ℤ → Omega K := fun i => ((Q i : S) : Omega K) * y ^ i with hu
+  set v : ℤ → Omega K := fun j => ((H j : S) : Omega K) * y ^ j with hv
+  have huS : ∀ i, u i ∈ S' := fun i => mul_mem (hSS' (Q i).2) (zpow_mem hyS' _)
+  have hvS : ∀ j, v j ∈ S' := fun j => mul_mem (hSS' (H j).2) (zpow_mem hyS' _)
+  have hun : ∀ i, ‖u i‖ = ‖Q i‖ := fun i => by
+    simp only [hu, norm_mul, norm_zpow, hy1, one_zpow, mul_one]; rfl
+  have hvn : ∀ j, ‖v j‖ = ‖H j‖ := fun j => by
+    simp only [hv, norm_mul, norm_zpow, hy1, one_zpow, mul_one]; rfl
+  have hud : Dec u := hQd.congr (fun i => (hun i).symm)
+  have hvd : Dec v := hHd.congr (fun i => (hvn i).symm)
+  obtain ⟨A, B, c, hA, hB, hc, hcAB⟩ := cauchy_omega K S' huS hvS hud hvd
+  have hcm : ∀ m, c m = (((eSeq (s : ℤ) : ℤ → S) m - R m : S) : Omega K) * y ^ m := by
+    intro m
+    have h1 := (hQH m).map (S.val : S →+ Omega K) continuous_subtype_val
+    have h2 := h1.mul_right (y ^ m)
+    have h3 : HasSum (fun i => u i * v (m - i))
+        ((((eSeq (s : ℤ) : ℤ → S) m - R m : S) : Omega K) * y ^ m) := by
+      convert h2 using 1
+      funext i
+      have e : ((Q i * H (m - i) : S) : Omega K) = (Q i : Omega K) * (H (m - i) : Omega K) := rfl
+      have : y ^ i * y ^ (m - i) = y ^ m := by rw [← zpow_add₀ hy0]; congr 1; ring
+      show ((Q i : S) : Omega K) * y ^ i * (((H (m - i) : S) : Omega K) * y ^ (m - i)) =
+        ((Q i * H (m - i) : S) : Omega K) * y ^ m
+      rw [e, ← this]; ring
+    exact (hc m).unique h3
+  set r : ℕ → Omega K := fun i => ((R (i : ℤ) : S) : Omega K) with hr
+  have hes_sum : HasSum (fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m) (y ^ s) := by
+    have := hasSum_single (f := fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m)
+      (s : ℤ) (fun m hm => by simp [eSeq, hm])
+    simpa [eSeq] using this
+  have hR_sum : HasSum (fun m : ℤ => ((R m : S) : Omega K) * y ^ m)
+      (∑ i ∈ Finset.range s, r i * y ^ i) := by
+    set T0 : Finset ℤ := (Finset.range s).image (fun i : ℕ => (i : ℤ)) with hT0
+    have hz : ∀ m ∉ T0, ((R m : S) : Omega K) * y ^ m = 0 := by
+      intro m hm
+      have : R m = 0 := hRs m (by
+        by_contra hcon
+        push_neg at hcon
+        exact hm (Finset.mem_image.mpr ⟨m.toNat, Finset.mem_range.mpr (by omega), by omega⟩))
+      simp [this]
+    have hsumeq : ∑ i ∈ Finset.range s, r i * y ^ i =
+        ∑ m ∈ T0, ((R m : S) : Omega K) * y ^ m := by
+      rw [hT0, Finset.sum_image (fun a _ b _ hab => by simpa using hab)]
+      refine Finset.sum_congr rfl (fun i _ => ?_)
+      simp [hr]
+    rw [hsumeq]
+    exact hasSum_sum_of_ne_finset_zero hz
+  have hcsum : HasSum (fun m => c m) (y ^ s - ∑ i ∈ Finset.range s, r i * y ^ i) := by
+    have h1 := hes_sum.sub hR_sum
+    have h2 : (fun m => c m) = fun m => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m -
+        ((R m : S) : Omega K) * y ^ m := by
+      funext m; rw [hcm m]; push_cast; ring
+    rw [h2]; exact h1
+  have hAB0 : A * B = y ^ s - ∑ i ∈ Finset.range s, r i * y ^ i := hcAB.unique hcsum
+  have hA1 : ‖A‖ = 1 := by
+    have := norm_hasSum_of_dominant u hA 0 (δ := ε) hε0
+      (by rw [hun, hQ0]; exact hε1)
+      (fun i hi => by rw [hun]; exact hQi i hi)
+    rw [this, hun, hQ0]
+  exact ⟨A, B, hA1, hB, hAB0⟩
+
 /-- Zero existence on a tie sphere. -/
-theorem exists_zero_of_tie {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K → Omega K}
+theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K → Omega K}
     (hF : ∀ x : Omega K, x ≠ 0 →
       HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
     {ρ : ℝ} (hρ : 0 < ρ) {n1 n2 : ℤ} (h12 : n1 < n2)
     (hmax : ∀ n, ‖a n‖ * ρ ^ n ≤ ‖a n1‖ * ρ ^ n1)
     (htie : ‖a n2‖ * ρ ^ n2 = ‖a n1‖ * ρ ^ n1) (hpos : 0 < ‖a n1‖ * ρ ^ n1) :
-    ∃ x : Omega K, ‖x‖ = ρ ∧ x ≠ 0 ∧ F x = 0 := by
+    ∃ (x0 : Omega K) (P : Polynomial (Omega K)), ‖x0‖ = ρ ∧ x0 ≠ 0 ∧ P.Monic ∧ 1 ≤ P.natDegree ∧
+      (∀ y, P.IsRoot y → ‖y‖ = 1) ∧ (∀ y : Omega K, ‖y‖ = 1 → (F (x0 * y) = 0 ↔ P.IsRoot y)) := by
   classical
   set w := ‖a n1‖ * ρ ^ n1 with hw
   have ha1 : a n1 ≠ 0 := by
@@ -187,146 +269,266 @@ theorem exists_zero_of_tie {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : O
     refine Finset.sum_eq_zero (fun i hi => ?_)
     have : m ≠ i := by have := Finset.mem_range.mp hi; omega
     simp [this]
-  have hPdeg : P.degree ≠ 0 := by
-    rw [hP, Polynomial.degree_sub_eq_left_of_degree_lt (by rwa [Polynomial.degree_X_pow])]
-    rw [Polynomial.degree_X_pow]; exact_mod_cast hs1.trans_lt' (by omega) |>.ne'
-  obtain ⟨y, hy⟩ := IsAlgClosed.exists_root P hPdeg
-  have hyeval : y ^ s = ∑ i ∈ Finset.range s, r i * y ^ i := by
-    have := hy
-    simp only [Polynomial.IsRoot.def, hP, hp0, Polynomial.eval_sub, Polynomial.eval_pow,
-      Polynomial.eval_X, Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_C] at this
-    exact sub_eq_zero.mp this
+  have hPmonic : P.Monic := Polynomial.monic_X_pow_sub hp0deg
+  have hp0nat : p0.natDegree < s := by
+    by_cases h : p0 = 0
+    · rw [h, Polynomial.natDegree_zero]; omega
+    · exact (Polynomial.natDegree_lt_iff_degree_lt h).mpr hp0deg
+  have hPnat : P.natDegree = s := by
+    rw [hP, Polynomial.natDegree_sub_eq_left_of_natDegree_lt (by rwa [Polynomial.natDegree_X_pow]),
+      Polynomial.natDegree_X_pow]
+  have hPeval : ∀ y, P.eval y = y ^ s - ∑ i ∈ Finset.range s, r i * y ^ i := by
+    intro y
+    simp only [hP, hp0, Polynomial.eval_sub, Polynomial.eval_pow,
+      Polynomial.eval_X, Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_C]
   have hrb : ∀ i, ‖r i‖ ≤ 1 := fun i => hRb _
-  have hyle : ‖y‖ ≤ 1 := by
-    by_contra hgt
-    push_neg at hgt
-    have h1 : ‖y ^ s‖ ≤ ‖y‖ ^ (s - 1) := by
-      rw [hyeval]
-      refine sum_norm_le_of_forall _ _ (by positivity) (fun i hi => ?_)
-      rw [norm_mul, norm_pow]
-      have hi' : i ≤ s - 1 := by have := Finset.mem_range.mp hi; omega
-      calc ‖r i‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (s - 1) :=
-            mul_le_mul (hrb i) (pow_le_pow_right₀ hgt.le hi') (by positivity) zero_le_one
-        _ = ‖y‖ ^ (s - 1) := one_mul _
-    rw [norm_pow] at h1
-    have : ‖y‖ ^ s = ‖y‖ ^ (s - 1) * ‖y‖ := by
-      rw [← pow_succ]; congr 1; omega
-    have hpos' : 0 < ‖y‖ ^ (s - 1) := by positivity
-    nlinarith
-  have hyge : 1 ≤ ‖y‖ := by
-    by_contra hlt
-    push_neg at hlt
-    have h1 : ‖r 0‖ < 1 := by
-      obtain ⟨m, hm⟩ : ∃ m, s = m + 1 := ⟨s - 1, by omega⟩
-      have hy2 := hyeval
-      rw [hm, Finset.sum_range_succ'] at hy2
-      simp only [pow_zero, mul_one] at hy2
-      have hsplit : r 0 = y ^ (m + 1) - ∑ i ∈ Finset.range m, r (i + 1) * y ^ (i + 1) := by
-        linear_combination (-1 : Omega K) * hy2
-      rw [hsplit]
-      have hyn0 : 0 ≤ ‖y‖ := norm_nonneg _
-      have ha1 : ‖y ^ (m + 1)‖ < 1 := by
-        rw [norm_pow]; exact pow_lt_one₀ hyn0 hlt (by omega)
-      have ha2 : ‖∑ i ∈ Finset.range m, r (i + 1) * y ^ (i + 1)‖ ≤ ‖y‖ := by
-        refine sum_norm_le_of_forall _ _ hyn0 (fun i hi => ?_)
+  have hroot : ∀ y, P.IsRoot y → ‖y‖ = 1 := by
+    intro y hy
+    have hyeval : y ^ s = ∑ i ∈ Finset.range s, r i * y ^ i := by
+      have := hy
+      rw [Polynomial.IsRoot.def, hPeval] at this
+      exact sub_eq_zero.mp this
+    have hyle : ‖y‖ ≤ 1 := by
+      by_contra hgt
+      push_neg at hgt
+      have h1 : ‖y ^ s‖ ≤ ‖y‖ ^ (s - 1) := by
+        rw [hyeval]
+        refine sum_norm_le_of_forall _ _ (by positivity) (fun i hi => ?_)
         rw [norm_mul, norm_pow]
-        calc ‖r (i + 1)‖ * ‖y‖ ^ (i + 1) ≤ 1 * ‖y‖ ^ 1 :=
-              mul_le_mul (hrb _) (pow_le_pow_of_le_one hyn0 hlt.le (by omega)) (by positivity) zero_le_one
-          _ = ‖y‖ := by rw [one_mul, pow_one]
-      exact lt_of_le_of_lt (ultra_sub _ _) (max_lt ha1 (lt_of_le_of_lt ha2 hlt))
-    have : ‖r 0‖ = 1 := hR0
-    linarith
-  have hy1 : ‖y‖ = 1 := le_antisymm hyle hyge
-  have hy0 : y ≠ 0 := by intro h; rw [h, norm_zero] at hy1; exact zero_ne_one hy1
-  set S' := IntermediateField.adjoin K ({x0, y} : Set (Omega K)) with hS'
-  haveI : FiniteDimensional K S' :=
-    IntermediateField.finiteDimensional_adjoin (fun x _ => Algebra.IsIntegral.isIntegral x)
-  have hSS' : S ≤ S' := IntermediateField.adjoin.mono K _ _ (by intro z hz; simp at hz ⊢; exact Or.inl hz)
-  have hyS' : y ∈ S' := IntermediateField.subset_adjoin K _ (by simp)
-  set u : ℤ → Omega K := fun i => ((Q i : S) : Omega K) * y ^ i with hu
-  set v : ℤ → Omega K := fun j => ((H j : S) : Omega K) * y ^ j with hv
-  have huS : ∀ i, u i ∈ S' := fun i => mul_mem (hSS' (Q i).2) (zpow_mem hyS' _)
-  have hvS : ∀ j, v j ∈ S' := fun j => mul_mem (hSS' (H j).2) (zpow_mem hyS' _)
-  have hun : ∀ i, ‖u i‖ = ‖Q i‖ := fun i => by simp only [hu, norm_mul, norm_zpow, hy1, one_zpow, mul_one]; rfl
-  have hvn : ∀ j, ‖v j‖ = ‖H j‖ := fun j => by simp only [hv, norm_mul, norm_zpow, hy1, one_zpow, mul_one]; rfl
-  have hud : Dec u := hQd.congr (fun i => (hun i).symm)
-  have hvd : Dec v := hHd.congr (fun i => (hvn i).symm)
-  obtain ⟨A, B, c, hA, hB, hc, hcAB⟩ := cauchy_omega K S' huS hvS hud hvd
-  -- the convolution coefficients
-  have hcm : ∀ m, c m = (((eSeq (s : ℤ) : ℤ → S) m - R m : S) : Omega K) * y ^ m := by
-    intro m
-    have h1 := (hQH m).map (S.val : S →+ Omega K) continuous_subtype_val
-    have h2 := h1.mul_right (y ^ m)
-    have h3 : HasSum (fun i => u i * v (m - i)) ((((eSeq (s : ℤ) : ℤ → S) m - R m : S) : Omega K) * y ^ m) := by
-      convert h2 using 1
-      funext i
-      have e : ((Q i * H (m - i) : S) : Omega K) = (Q i : Omega K) * (H (m - i) : Omega K) := rfl
-      have : y ^ i * y ^ (m - i) = y ^ m := by rw [← zpow_add₀ hy0]; congr 1; ring
-      show ((Q i : S) : Omega K) * y ^ i * (((H (m - i) : S) : Omega K) * y ^ (m - i)) =
-        ((Q i * H (m - i) : S) : Omega K) * y ^ m
-      rw [e, ← this]; ring
-    exact (hc m).unique h3
-  -- the total
-  have hes_sum : HasSum (fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m) (y ^ s) := by
-    have := hasSum_single (f := fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m)
-      (s : ℤ) (fun m hm => by simp [eSeq, hm])
-    simpa [eSeq] using this
-  have hR_sum : HasSum (fun m : ℤ => ((R m : S) : Omega K) * y ^ m)
-      (∑ i ∈ Finset.range s, r i * y ^ i) := by
-    set T0 : Finset ℤ := (Finset.range s).image (fun i : ℕ => (i : ℤ)) with hT0
-    have hz : ∀ m ∉ T0, ((R m : S) : Omega K) * y ^ m = 0 := by
-      intro m hm
-      have : R m = 0 := hRs m (by
-        by_contra hcon
-        push_neg at hcon
-        exact hm (Finset.mem_image.mpr ⟨m.toNat, Finset.mem_range.mpr (by omega), by omega⟩))
-      simp [this]
-    have hsumeq : ∑ i ∈ Finset.range s, r i * y ^ i =
-        ∑ m ∈ T0, ((R m : S) : Omega K) * y ^ m := by
-      rw [hT0, Finset.sum_image (fun a _ b _ hab => by simpa using hab)]
-      refine Finset.sum_congr rfl (fun i _ => ?_)
-      simp [hr]
-    rw [hsumeq]
-    exact hasSum_sum_of_ne_finset_zero hz
-  have hcsum : HasSum (fun m => c m) 0 := by
-    have h1 := hes_sum.sub hR_sum
-    rw [hyeval, sub_self] at h1
-    have h2 : (fun m => c m) = fun m => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m -
-        ((R m : S) : Omega K) * y ^ m := by
-      funext m; rw [hcm m]; push_cast; ring
-    rw [h2]; exact h1
-  have hAB0 : A * B = 0 := hcAB.unique hcsum
-  have hA1 : ‖A‖ = 1 := by
-    have := norm_hasSum_of_dominant u hA 0 (δ := ε) hε0
-      (by rw [hun, hQ0]; exact hε1)
-      (fun i hi => by rw [hun]; exact hQi i hi)
-    rw [this, hun, hQ0]
-  have hAne : A ≠ 0 := by intro h; rw [h, norm_zero] at hA1; exact zero_ne_one hA1
-  have hB0 : B = 0 := by
-    rcases mul_eq_zero.mp hAB0 with h | h
-    · exact absurd h hAne
-    · exact h
-  -- the zero
-  have hxy : x0 * y ≠ 0 := mul_ne_zero hx00 hy0
-  have hFx := hF (x0 * y) hxy
-  have hgy : HasSum (fun n : ℤ => g n * y ^ n) 0 := by
-    have h1 : HasSum (fun j : ℤ => g N2 * y ^ N1 * v j) (g N2 * y ^ N1 * B) := hB.mul_left _
-    rw [hB0, mul_zero] at h1
-    have h2 : (fun j : ℤ => g N2 * y ^ N1 * v j) = fun j : ℤ => g (N1 + j) * y ^ (N1 + j) := by
-      funext j
-      simp only [hv, hH, hgS']
-      have hdiv : ((gS (N1 + j) / gS N2 : S) : Omega K) = g (N1 + j) / g N2 := by
-        push_cast; rfl
-      rw [hdiv, zpow_add₀ hy0]
-      field_simp
-    rw [h2] at h1
-    exact (Equiv.addLeft N1).hasSum_iff.mp (by simpa [Function.comp_def] using h1)
-  have hFx0 : F (x0 * y) = 0 := by
-    have : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * (x0 * y) ^ n) 0 := by
-      convert hgy using 1
-      funext n; simp only [hg, mul_zpow]; ring
-    exact hFx.unique this
-  refine ⟨x0 * y, ?_, hxy, hFx0⟩
-  rw [norm_mul, hx0norm, hy1, mul_one]
+        have hi' : i ≤ s - 1 := by have := Finset.mem_range.mp hi; omega
+        calc ‖r i‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (s - 1) :=
+              mul_le_mul (hrb i) (pow_le_pow_right₀ hgt.le hi') (by positivity) zero_le_one
+          _ = ‖y‖ ^ (s - 1) := one_mul _
+      rw [norm_pow] at h1
+      have : ‖y‖ ^ s = ‖y‖ ^ (s - 1) * ‖y‖ := by
+        rw [← pow_succ]; congr 1; omega
+      have hpos' : 0 < ‖y‖ ^ (s - 1) := by positivity
+      nlinarith
+    have hyge : 1 ≤ ‖y‖ := by
+      by_contra hlt
+      push_neg at hlt
+      have h1 : ‖r 0‖ < 1 := by
+        obtain ⟨m, hm⟩ : ∃ m, s = m + 1 := ⟨s - 1, by omega⟩
+        have hy2 := hyeval
+        rw [hm, Finset.sum_range_succ'] at hy2
+        simp only [pow_zero, mul_one] at hy2
+        have hsplit : r 0 = y ^ (m + 1) - ∑ i ∈ Finset.range m, r (i + 1) * y ^ (i + 1) := by
+          linear_combination (-1 : Omega K) * hy2
+        rw [hsplit]
+        have hyn0 : 0 ≤ ‖y‖ := norm_nonneg _
+        have ha1 : ‖y ^ (m + 1)‖ < 1 := by
+          rw [norm_pow]; exact pow_lt_one₀ hyn0 hlt (by omega)
+        have ha2 : ‖∑ i ∈ Finset.range m, r (i + 1) * y ^ (i + 1)‖ ≤ ‖y‖ := by
+          refine sum_norm_le_of_forall _ _ hyn0 (fun i hi => ?_)
+          rw [norm_mul, norm_pow]
+          calc ‖r (i + 1)‖ * ‖y‖ ^ (i + 1) ≤ 1 * ‖y‖ ^ 1 :=
+                mul_le_mul (hrb _) (pow_le_pow_of_le_one hyn0 hlt.le (by omega)) (by positivity)
+                  zero_le_one
+            _ = ‖y‖ := by rw [one_mul, pow_one]
+        exact lt_of_le_of_lt (ultra_sub _ _) (max_lt ha1 (lt_of_le_of_lt ha2 hlt))
+      have : ‖r 0‖ = 1 := hR0
+      linarith
+    exact le_antisymm hyle hyge
+  have hgN2y : ∀ y : Omega K, y ≠ 0 → g N2 * y ^ N1 ≠ 0 := fun y hy =>
+    mul_ne_zero hgN2 (zpow_ne_zero _ hy)
+  have key : ∀ y : Omega K, ‖y‖ = 1 → (F (x0 * y) = 0 ↔ P.IsRoot y) := by
+    intro y hy1
+    have hy0 : y ≠ 0 := by intro h; rw [h, norm_zero] at hy1; exact zero_ne_one hy1
+    obtain ⟨A, B, hA1, hB, hAB⟩ := prep_eval K S H Q R s ε hε0 hε1 hHd hQd hQ0 hQi hRs hQH y hy1
+    have hAne : A ≠ 0 := by intro h; rw [h, norm_zero] at hA1; exact zero_ne_one hA1
+    have hFy : F (x0 * y) = g N2 * y ^ N1 * B := by
+      have hx := hF (x0 * y) (mul_ne_zero hx00 hy0)
+      have h1 : HasSum (fun j : ℤ => g N2 * y ^ N1 * (((H j : S) : Omega K) * y ^ j))
+          (g N2 * y ^ N1 * B) := hB.mul_left _
+      have h2 : (fun j : ℤ => g N2 * y ^ N1 * (((H j : S) : Omega K) * y ^ j)) =
+          fun j : ℤ => g (N1 + j) * y ^ (N1 + j) := by
+        funext j
+        simp only [hH, hgS']
+        have hdiv : ((gS (N1 + j) / gS N2 : S) : Omega K) = g (N1 + j) / g N2 := by
+          push_cast; rfl
+        rw [hdiv, zpow_add₀ hy0]
+        field_simp
+      rw [h2] at h1
+      have h3 : HasSum (fun n : ℤ => g n * y ^ n) (g N2 * y ^ N1 * B) :=
+        (Equiv.addLeft N1).hasSum_iff.mp (by simpa [Function.comp_def] using h1)
+      have h4 : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * (x0 * y) ^ n)
+          (g N2 * y ^ N1 * B) := by
+        convert h3 using 1
+        funext n; simp only [hg, mul_zpow]; ring
+      exact hx.unique h4
+    rw [hFy, Polynomial.IsRoot.def, hPeval, ← hAB]
+    constructor
+    · intro h
+      rcases mul_eq_zero.mp h with h | h
+      · exact absurd h (hgN2y y hy0)
+      · rw [h, mul_zero]
+    · intro h
+      rcases mul_eq_zero.mp h with h | h
+      · exact absurd h hAne
+      · rw [h, mul_zero]
+  exact ⟨x0, P, hx0norm, hx00, hPmonic, by omega, hroot, key⟩
+
+/-- Zero existence on a tie sphere. -/
+theorem exists_zero_of_tie {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K → Omega K}
+    (hF : ∀ x : Omega K, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
+    {ρ : ℝ} (hρ : 0 < ρ) {n1 n2 : ℤ} (h12 : n1 < n2)
+    (hmax : ∀ n, ‖a n‖ * ρ ^ n ≤ ‖a n1‖ * ρ ^ n1)
+    (htie : ‖a n2‖ * ρ ^ n2 = ‖a n1‖ * ρ ^ n1) (hpos : 0 < ‖a n1‖ * ρ ^ n1) :
+    ∃ x : Omega K, ‖x‖ = ρ ∧ x ≠ 0 ∧ F x = 0 := by
+  obtain ⟨x0, P, hx0, hx00, hmon, hnat, hroot, key⟩ :=
+    tie_structure K ha hF hρ h12 hmax htie hpos
+  have hdeg : P.degree ≠ 0 := by
+    rw [Polynomial.degree_eq_natDegree hmon.ne_zero]
+    exact_mod_cast (by omega : P.natDegree ≠ 0)
+  obtain ⟨y, hy⟩ := IsAlgClosed.exists_root P hdeg
+  have hy1 := hroot y hy
+  refine ⟨x0 * y, by rw [norm_mul, hx0, hy1, mul_one], mul_ne_zero hx00 (by
+    intro h; rw [h, norm_zero] at hy1; exact zero_ne_one hy1), (key y hy1).mpr hy⟩
+
+
+theorem zpow_bounds_Icc {r r' ρ : ℝ} (hr : 0 < r) (h1 : r ≤ ρ) (h2 : ρ ≤ r') (n : ℤ) :
+    min (r ^ n) (r' ^ n) ≤ ρ ^ n ∧ ρ ^ n ≤ r ^ n + r' ^ n := by
+  have hρ : 0 < ρ := lt_of_lt_of_le hr h1
+  have hr'pos : 0 < r' := lt_of_lt_of_le hρ h2
+  have p1 : 0 < r ^ n := zpow_pos hr n
+  have p2 : 0 < r' ^ n := zpow_pos hr'pos n
+  rcases le_total 0 n with hn | hn
+  · have a1 : r ^ n ≤ ρ ^ n := zpow_le_zpow_left₀ hn hr.le h1
+    have a2 : ρ ^ n ≤ r' ^ n := zpow_le_zpow_left₀ hn hρ.le h2
+    exact ⟨le_trans (min_le_left _ _) a1, by linarith⟩
+  · obtain ⟨m, rfl⟩ : ∃ m : ℕ, n = -(m : ℤ) := ⟨n.natAbs, by omega⟩
+    simp only [zpow_neg, zpow_natCast] at *
+    have a1 : r ^ m ≤ ρ ^ m := pow_le_pow_left₀ hr.le h1 m
+    have a2 : ρ ^ m ≤ r' ^ m := pow_le_pow_left₀ hρ.le h2 m
+    have b1 : (ρ ^ m)⁻¹ ≤ (r ^ m)⁻¹ := inv_anti₀ (by positivity) a1
+    have b2 : (r' ^ m)⁻¹ ≤ (ρ ^ m)⁻¹ := inv_anti₀ (by positivity) a2
+    exact ⟨le_trans (min_le_right _ _) b2, by linarith⟩
+
+/-- The radii in `[r, r']` without a strictly dominant term form a finite set. -/
+theorem bad_radii_finite_Icc {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
+    {r r' : ℝ} (hr : 0 < r) (hrr' : r ≤ r') :
+    {ρ : ℝ | ρ ∈ Set.Icc r r' ∧ ¬ GoodRadius K a ρ}.Finite := by
+  classical
+  obtain ⟨n0, hn0⟩ := h0
+  have hr'pos : 0 < r' := lt_of_lt_of_le hr hrr'
+  set κ : ℝ := ‖a n0‖ * min (r ^ n0) (r' ^ n0) with hκ
+  have hκpos : 0 < κ := mul_pos (norm_pos_iff.mpr hn0)
+    (lt_min (zpow_pos hr _) (zpow_pos hr'pos _))
+  set u : ℤ → ℝ := fun n => ‖a n‖ * (r ^ n + r' ^ n) with hu
+  have hut : Tendsto u cofinite (𝓝 0) := by
+    have h1 := ha r hr
+    have h2 := ha r' hr'pos
+    have := h1.add h2
+    rw [add_zero] at this
+    refine this.congr (fun n => ?_)
+    simp only [hu]; ring
+  have hF : {n | κ ≤ u n}.Finite :=
+    (Filter.eventually_cofinite.mp (hut.eventually (gt_mem_nhds hκpos))).subset
+      (fun n hn => by simpa using hn)
+  have hw_le : ∀ ρ ∈ Set.Icc r r', ∀ n, ‖a n‖ * ρ ^ n ≤ u n := fun ρ hρ n =>
+    mul_le_mul_of_nonneg_left (zpow_bounds_Icc hr hρ.1 hρ.2 n).2 (norm_nonneg _)
+  have hw_lb : ∀ ρ ∈ Set.Icc r r', κ ≤ ‖a n0‖ * ρ ^ n0 := fun ρ hρ =>
+    mul_le_mul_of_nonneg_left (zpow_bounds_Icc hr hρ.1 hρ.2 n0).1 (norm_nonneg _)
+  set Fs := hF.toFinset with hFs
+  have hmemF : ∀ n, n ∈ Fs ↔ κ ≤ u n := fun n => by simp [hFs]
+  have hrr : r ∈ Set.Icc r r' := ⟨le_rfl, hrr'⟩
+  have hn0F : n0 ∈ Fs := (hmemF n0).mpr
+    (le_trans (hw_lb r hrr) (hw_le r hrr n0))
+  refine Set.Finite.subset
+    ((Fs ×ˢ Fs).finite_toSet.biUnion
+      (fun p _ => (show {ρ : ℝ | 0 < ρ ∧ p.1 ≠ p.2 ∧ ‖a p.1‖ * ρ ^ p.1 = ‖a p.2‖ * ρ ^ p.2 ∧
+        0 < ‖a p.1‖}.Subsingleton from ?_).finite)) ?_
+  · intro ρ ⟨hρ0, hne, hρ, hap⟩ ρ' ⟨hs0, _, hs, _⟩
+    have hk : p.1 - p.2 ≠ 0 := sub_ne_zero.mpr hne
+    have e1 : ρ ^ (p.1 - p.2) * ‖a p.1‖ = ‖a p.2‖ := by
+      rw [zpow_sub₀ hρ0.ne']; field_simp; linarith
+    have e2 : ρ' ^ (p.1 - p.2) * ‖a p.1‖ = ‖a p.2‖ := by
+      rw [zpow_sub₀ hs0.ne']; field_simp; linarith
+    exact zpow_inj_of_ne hρ0 hs0 hk (mul_right_cancel₀ hap.ne' (e1.trans e2.symm))
+  · intro ρ ⟨hρ, hbad⟩
+    have hρ0 : 0 < ρ := lt_of_lt_of_le hr hρ.1
+    obtain ⟨N, hNF, hNmax⟩ := Finset.exists_max_image Fs (fun n => ‖a n‖ * ρ ^ n) ⟨n0, hn0F⟩
+    have hNge : κ ≤ ‖a N‖ * ρ ^ N :=
+      le_trans (hw_lb ρ hρ) (hNmax n0 hn0F)
+    have : ∃ n, n ≠ N ∧ ‖a N‖ * ρ ^ N ≤ ‖a n‖ * ρ ^ n := by
+      by_contra hcon
+      push_neg at hcon
+      exact hbad ⟨N, fun n hn => hcon n hn⟩
+    obtain ⟨n, hnN, hn⟩ := this
+    have hnF : n ∈ Fs := (hmemF n).mpr (le_trans hNge (le_trans hn (hw_le ρ hρ n)))
+    have htie : ‖a n‖ * ρ ^ n = ‖a N‖ * ρ ^ N := le_antisymm (hNmax n hnF) hn
+    have hpos : 0 < ‖a n‖ := by
+      have h1 : 0 < ‖a n‖ * ρ ^ n := lt_of_lt_of_le hκpos (le_trans hNge hn)
+      exact (mul_pos_iff_of_pos_right (zpow_pos hρ0 n)).mp h1
+    simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+    exact ⟨(n, N), Finset.mem_coe.mpr (Finset.mem_product.mpr ⟨hnF, hNF⟩), hρ0, hnN, htie, hpos⟩
+
+
+/-- A non-good radius yields two tied maximal indices. -/
+theorem exists_tie_of_not_good {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
+    {ρ : ℝ} (hρ : 0 < ρ) (hbad : ¬ GoodRadius K a ρ) :
+    ∃ n1 n2 : ℤ, n1 < n2 ∧ (∀ n, ‖a n‖ * ρ ^ n ≤ ‖a n1‖ * ρ ^ n1) ∧
+      ‖a n2‖ * ρ ^ n2 = ‖a n1‖ * ρ ^ n1 ∧ 0 < ‖a n1‖ * ρ ^ n1 := by
+  classical
+  obtain ⟨n0, hn0⟩ := h0
+  set wn : ℤ → ℝ := fun n => ‖a n‖ * ρ ^ n with hwn
+  have hwt : Tendsto wn cofinite (𝓝 0) := ha ρ hρ
+  have hwpos0 : 0 < wn n0 := mul_pos (norm_pos_iff.mpr hn0) (zpow_pos hρ _)
+  have hP : {n | ¬ wn n < wn n0}.Finite :=
+    Filter.eventually_cofinite.mp (hwt.eventually (gt_mem_nhds hwpos0))
+  obtain ⟨N, hNP, hNmax⟩ := Finset.exists_max_image hP.toFinset wn ⟨n0, by simp⟩
+  have hNmax' : ∀ n, wn n ≤ wn N := by
+    intro n
+    by_cases hn : n ∈ hP.toFinset
+    · exact hNmax n hn
+    · have : wn n < wn n0 := by simpa using hn
+      exact le_trans this.le (hNmax n0 (by simp))
+  have hNpos : 0 < wn N := lt_of_lt_of_le hwpos0 (hNmax' n0)
+  have : ∃ n, n ≠ N ∧ wn N ≤ wn n := by
+    by_contra hcon
+    push_neg at hcon
+    exact hbad ⟨N, fun n hn => hcon n hn⟩
+  obtain ⟨n, hnN, hn⟩ := this
+  have htie : wn n = wn N := le_antisymm (hNmax' n) hn
+  rcases lt_or_gt_of_ne hnN with h | h
+  · exact ⟨n, N, h, fun m => le_trans (hNmax' m) htie.symm.le, htie.symm, lt_of_lt_of_le hNpos htie.symm.le⟩
+  · exact ⟨N, n, h, hNmax', htie, hNpos⟩
+
+/-- The zeros on a sphere form a finite set. -/
+theorem zeros_sphere_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
+    {F : Omega K → Omega K}
+    (hF : ∀ x : Omega K, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
+    {ρ : ℝ} (hρ : 0 < ρ) : {x : Omega K | x ≠ 0 ∧ ‖x‖ = ρ ∧ F x = 0}.Finite := by
+  classical
+  by_cases hgood : GoodRadius K a ρ
+  · refine Set.Finite.subset (Set.finite_empty) (fun x ⟨hx0, hxρ, hFx⟩ => ?_)
+    exact absurd hFx (sum_ne_zero_of_good K ha hx0 (hF x hx0) (hxρ ▸ hgood))
+  · obtain ⟨n1, n2, h12, hmax, htie, hpos⟩ := exists_tie_of_not_good K ha h0 hρ hgood
+    obtain ⟨x0, P, hx0, hx00, hmon, hnat, hroot, key⟩ :=
+      tie_structure K ha hF hρ h12 hmax htie hpos
+    have hfin : {y : Omega K | P.IsRoot y}.Finite := by
+      have : {y : Omega K | P.IsRoot y} = ↑P.roots.toFinset := by
+        ext y; simp [Polynomial.mem_roots hmon.ne_zero]
+      rw [this]; exact Finset.finite_toSet _
+    refine (hfin.image (fun y => x0 * y)).subset (fun x ⟨hx, hxρ, hFx⟩ => ?_)
+    refine ⟨x / x0, ?_, by field_simp⟩
+    have hy1 : ‖x / x0‖ = 1 := by rw [norm_div, hxρ, hx0, div_self hρ.ne']
+    exact (key _ hy1).mp (by rwa [show x0 * (x / x0) = x by field_simp])
+
+/-- A non-zero holomorphic function has only finitely many zeros in each closed annulus. -/
+theorem zeros_annulus_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
+    {F : Omega K → Omega K}
+    (hF : ∀ x : Omega K, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
+    {r r' : ℝ} (hr : 0 < r) (hrr' : r ≤ r') :
+    {x : Omega K | x ≠ 0 ∧ r ≤ ‖x‖ ∧ ‖x‖ ≤ r' ∧ F x = 0}.Finite := by
+  have hbad := bad_radii_finite_Icc K ha h0 hr hrr'
+  refine (hbad.biUnion (fun ρ hρ => zeros_sphere_finite K ha h0 hF
+    (lt_of_lt_of_le hr hρ.1.1))).subset (fun x ⟨hx0, h1, h2, hFx⟩ => ?_)
+  simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+  refine ⟨‖x‖, ⟨⟨h1, h2⟩, fun hgood => ?_⟩, hx0, rfl, hFx⟩
+  exact sum_ne_zero_of_good K ha hx0 (hF x hx0) hgood hFx
 
 end AnalyticTheory

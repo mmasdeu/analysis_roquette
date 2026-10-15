@@ -514,3 +514,19 @@ _addlean('def:analytic-valuation', 'quotFun', 'HasOrd', 'hasOrd_exists', 'hasOrd
 _adduses('def:analytic-valuation', 'prop:finite-order')
 _addlean('def:divisor-of', 'divisorOf_mul', 'divisorOf_one')
 _upd('def:divisor-of', text=r'The divisor $(f)$ of a meromorphic function: $m_\alpha=w_\alpha(f)$ for $\alpha\in\Omega^\times$ (and $0$ at $\alpha=0$); it is multiplicative: $(fg)=(f)+(g)$.')
+
+add('lemma', 'lem:weierstrass-prep', 'Weierstra\\ss\\ preparation on the unit circle', ['weierstrass_prep', 'wit_prop', 'divD', 'divR', 'div_identity', 'hasSum_cauchy_product', 'PolyData', 'WitProp'],
+    [], False,
+    r'Let $H=\sum h_my^m$ be a null sequence over a complete ultrametric field with $|h_m|\le 1$, $|h_0|=|h_s|=1$ and $|h_m|\le\varepsilon<1$ for $m<0$ and $m>s$. Then $y^s=Q\cdot H+R$ with $Q$ a null sequence, $|Q-h_s^{-1}|\le\varepsilon$, and $R$ a polynomial of degree $<s$ with coefficients of norm $\le1$. (Euclidean division by the polynomial part, then a contraction argument in $C_0(\mathbb Z,F)$.)')
+add('proposition', 'prop:tie-structure', 'Zeros on a sphere with tied dominant terms', ['tie_structure', 'exists_zero_of_tie', 'prep_eval', 'cauchy_omega'],
+    ['lem:weierstrass-prep', 'prop:taylor-expansion'], False,
+    r'If the maximal terms of a convergent Laurent series $f$ at radius $\rho$ are attained at two indices, there are $x_0\in\Omega$ with $|x_0|=\rho$ and a monic polynomial $P$ (all of whose roots have norm $1$) with: for $|y|=1$, $f(x_0y)=0$ iff $P(y)=0$. In particular $f$ has a zero of norm $\rho$.')
+add('proposition', 'prop:zeros-finite', 'Finiteness of zeros', ['zeros_sphere_finite', 'zeros_annulus_finite', 'bad_radii_finite_Icc', 'exists_tie_of_not_good', 'holZeros_finite', 'hol_rep'],
+    ['prop:tie-structure', 'lem:H-K-domain'], False,
+    r'A nonzero holomorphic function over $K$ has only finitely many zeros in every closed annulus $r\le|x|\le r'+"'"+r'$.')
+add('proposition', 'prop:rationality', 'Invariance of $w_\\alpha$ under conjugation', ['aut_isometry', 'hol_apply_aut', 'quotFun_aut', 'hasOrd_aut', 'anOrdHol_aut', 'anVal_aut', 'divisorOf_rational'],
+    ['def:analytic-valuation'], False,
+    r'$K$-automorphisms of $\Omega$ are isometries, commute with evaluation of holomorphic functions, and hence $w_{\sigma\alpha}=w_\alpha$ (rationality condition (ii) for divisors).')
+add('proposition', 'prop:divisor-finite', 'Divisors of meromorphic functions are divisors', ['divisorOf_finite', 'divisorOf_mem_Divisors', 'principalDivisors_le'],
+    ['prop:zeros-finite', 'prop:rationality', 'def:divisor-of', 'def:principal-divisors'], False,
+    r'For $0\ne f\in M_K$ the divisor $(f)$ satisfies the finiteness condition (i) and the rationality condition (ii) of \S2, so $P_K(q)\subset D_K$.')

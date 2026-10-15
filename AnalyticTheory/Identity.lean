@@ -342,7 +342,7 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K
     (hF : ∀ x : Omega K, x ≠ 0 →
       HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
     {α : Omega K} (hα : α ≠ 0) (h0 : ∃ n, a n ≠ 0) :
-    ∃ (k : ℕ) (c : Omega K), c ≠ 0 ∧
+    ∃ (k : ℕ) (c : Omega K), c ≠ 0 ∧ (k = 0 ↔ F α ≠ 0) ∧
       Tendsto (fun x : Omega K => F x / (x - α) ^ k) (𝓝[≠] α) (𝓝 c) := by
   classical
   have hr : 0 < ‖α‖ := norm_pos_iff.mpr hα
@@ -361,7 +361,20 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K
   have hlow : ∀ i < k0, b i = 0 := fun i hi => by
     have := Nat.find_min hex hi; push_neg at this; exact this
   have hC0 : 0 ≤ C := le_trans (by positivity) (hC 0)
-  refine ⟨k0, b k0, hbk0, ?_⟩
+  have hFα : F α = b 0 := by
+    have h1 := hb 0 (by rw [norm_zero]; exact hr)
+    rw [add_zero] at h1
+    have h2 : HasSum (fun k : ℕ => b k * (0 : Omega K) ^ k) (b 0) := by
+      have := hasSum_single (f := fun k : ℕ => b k * (0 : Omega K) ^ k) 0
+        (fun k hk => by simp [zero_pow hk])
+      simpa using this
+    exact h1.unique h2
+  have hk0iff : k0 = 0 ↔ F α ≠ 0 := by
+    rw [hFα]
+    constructor
+    · intro h; rw [h] at hbk0; exact hbk0
+    · intro h; exact Nat.eq_zero_of_le_zero (Nat.find_min' hex h)
+  refine ⟨k0, b k0, hbk0, hk0iff, ?_⟩
   -- estimate
   have key : ∀ h : Omega K, ‖h‖ < r → h ≠ 0 →
       ‖F (α + h) / h ^ k0 - b k0‖ ≤ C * (r ^ (k0 + 1))⁻¹ * ‖h‖ := by

@@ -1,5 +1,6 @@
 import AnalyticTheory.Analytic
 import AnalyticTheory.Identity
+import AnalyticTheory.Zeros
 
 /-!
 # The analytic valuations `w_α` (book, §2)
@@ -50,8 +51,32 @@ theorem hasOrd_exists {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f
       simpa [hcon] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : Omega K)) 0)
     have : g x.1 = 0 := h1.unique h2
     rw [← congrFun hgf x]; simpa using this
-  obtain ⟨k, c, hc, ht⟩ := exists_order K ha hsum hα h0
+  obtain ⟨k, c, hc, -, ht⟩ := exists_order K ha hsum hα h0
   refine ⟨(k : ℤ), c, hc, ?_⟩
+  have hne : ∀ᶠ x in 𝓝[≠] α, x ≠ 0 :=
+    (eventually_ne_nhds hα).filter_mono nhdsWithin_le_nhds
+  refine ht.congr' ?_
+  filter_upwards [hne] with x hx
+  simp only [quotFun, dif_pos hx, zpow_natCast]
+  rw [← congrFun hgf ⟨x, hx⟩]
+
+theorem hasOrd_data {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f ≠ 0) :
+    ∃ k : ℕ, HasOrd K α f (k : ℤ) ∧ (k = 0 ↔ f.1 ⟨α, hα⟩ ≠ 0) := by
+  obtain ⟨g, ⟨a, ha, hsum⟩, hgf⟩ := f.2
+  have h0 : ∃ n, a n ≠ 0 := by
+    by_contra hcon
+    push_neg at hcon
+    apply hf
+    apply Subtype.ext
+    funext x
+    have h1 := hsum x.1 x.2
+    have h2 : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x.1 ^ n) (0 : Omega K) := by
+      simpa [hcon] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : Omega K)) 0)
+    have : g x.1 = 0 := h1.unique h2
+    rw [← congrFun hgf x]; simpa using this
+  obtain ⟨k, c, hc, hk, ht⟩ := exists_order K ha hsum hα h0
+  have hfα : f.1 ⟨α, hα⟩ = g α := (congrFun hgf ⟨α, hα⟩).symm
+  refine ⟨k, ⟨c, hc, ?_⟩, by rw [hfα]; exact hk⟩
   have hne : ∀ᶠ x in 𝓝[≠] α, x ≠ 0 :=
     (eventually_ne_nhds hα).filter_mono nhdsWithin_le_nhds
   refine ht.congr' ?_

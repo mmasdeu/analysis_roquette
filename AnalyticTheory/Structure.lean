@@ -1,4 +1,4 @@
-import AnalyticTheory.Valuation
+import AnalyticTheory.Rationality
 
 /-!
 # Structure of `F_K(q)` (book, §2: items I–V, Corollaries Va, Vb)
@@ -57,6 +57,13 @@ theorem mem_principalDivisors_iff (q : K) (m : Omega K → ℤ) :
       omega
   · rintro ⟨f, hf, hf0, rfl⟩
     exact AddSubgroup.subset_closure ⟨f, hf, hf0, rfl⟩
+
+/-- Principal divisors are divisors. Blueprint: `def:principal-divisors`. -/
+theorem principalDivisors_le (q : K) : principalDivisors K q ≤ Divisors K := by
+  unfold principalDivisors
+  rw [AddSubgroup.closure_le]
+  rintro m ⟨f, -, -, rfl⟩
+  exact divisorOf_mem_Divisors K f
 
 /-- The group `D⁰_K(q)` consists of the `q`-periodic divisors of degree `0`.
 Blueprint: `def:D0q`. -/
