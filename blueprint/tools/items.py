@@ -495,3 +495,9 @@ _addlean('def:D0q', 'mem_divisorsDegZero_iff')
 
 _upd('prop:theta-functional-eq', text=r'$\Theta(q^{-1}X)=-X\,\Theta(X)$ for $0<|q|<1$ and $X\neq 0$ (the products are multipliable in $\Omega$ since they live in the complete field $K(X)$; at $X=0$ the identity fails, as $\Theta(0)=1$).')
 _addlean('prop:theta-functional-eq', 'multipliable_one_sub_omega', 'multipliable_geom_omega', 'omegaNormedAlgebra')
+
+add('lemma', 'lem:binomial-expansion', 'Binomial theorem for integer exponents', ['binomZ', 'hasSum_binom_expansion'], [], False,
+    r'In a complete normed field, $(x+y)^n=\sum_k\binom nk x^{n-k}y^k$ for all $n\in\mathbb Z$ and $|y|<|x|$, with generalized binomial coefficients.')
+add('proposition', 'prop:taylor-expansion', 'Taylor expansion of holomorphic functions', ['taylor_expansion', 'omega_hasSum_mem', 'tendsto_mul_cofinite_prod'],
+    ['def:holomorphic', 'lem:binomial-expansion'], False,
+    r'If $f=\sum a_nX^n$ is a convergent Laurent series over $K$ and $\alpha\in\Omega^\times$, then $f(\alpha+h)=\sum_k b_kh^k$ for $|h|<|\alpha|$, with $b_k\in K(\alpha)$ and $|b_k||\alpha|^k$ bounded.')

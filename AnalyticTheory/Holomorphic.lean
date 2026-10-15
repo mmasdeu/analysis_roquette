@@ -30,6 +30,11 @@ noncomputable abbrev omegaNorm (α : Omega K) : ℝ := spectralNorm K (Omega K) 
 noncomputable instance omegaNormedField : NormedField (Omega K) :=
   spectralNorm.normedField K (Omega K)
 
+/-- `Ω` is a normed `K`-algebra (spectral norm). -/
+noncomputable instance omegaNormedAlgebra : NormedAlgebra K (Omega K) :=
+  { (inferInstance : Algebra K (Omega K)) with
+    norm_smul_le := (spectralNorm.normedSpace K (Omega K)).norm_smul_le }
+
 
 /-- Book, §2, equation (∗): a formal Laurent series `∑ aₙ Xⁿ` with coefficients in `K`
 is *convergent* if `|aₙ| rⁿ → 0` (as `n → ±∞`) for every real `r > 0`.

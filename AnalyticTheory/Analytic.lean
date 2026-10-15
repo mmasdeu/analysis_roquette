@@ -435,11 +435,6 @@ noncomputable def theta (q : K) (α : Omega K) : Omega K :=
 noncomputable def thetaAlpha (q : K) (α β : Omega K) : Omega K :=
   theta K q (α⁻¹ * β)
 
-/-- `Ω` is a normed `K`-algebra (spectral norm). -/
-noncomputable instance omegaNormedAlgebra : NormedAlgebra K (Omega K) :=
-  { (inferInstance : Algebra K (Omega K)) with
-    norm_smul_le := (spectralNorm.normedSpace K (Omega K)).norm_smul_le }
-
 /-- Products `∏ (1 − xₙ)` with `xₙ` in a finite extension `S` of `K` inside `Ω` and
 `∑ ‖xₙ‖ < ∞` are multipliable in `Ω` (completeness of `S`). -/
 theorem multipliable_one_sub_omega (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
