@@ -20,8 +20,6 @@ Blueprint nodes: `def:commensurable`, `def:Fq-qbar-Xm`, `lem:XVII`, `thm:XVII`, 
 
 open Filter Topology
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
 
 namespace AnalyticTheory
 
@@ -67,6 +65,9 @@ def autFixing (E F : Subfield M) : Subgroup (F ≃+* F) where
     show a.symm x = x
     rw [RingEquiv.symm_apply_eq]
     exact (ha x hx).symm
+
+/-- The degree `[F : E]` of a subfield `E` of a field `F`. Blueprint: `def:rel-degree`. -/
+noncomputable def subDeg {F : Type*} [Field F] (E : Subfield F) : ℕ := Module.finrank E F
 
 end Relative
 
@@ -306,7 +307,7 @@ theorem thmXIX_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : Se
         {E : Subfield (FKQ K L q T) // IsEllipticSubfield K E ∧ HasPeriod K E qbar},
       ∀ m : {m : ℕ // 0 < m ∧ OrderDvd K q qbar m},
         ∀ d : ℕ, qbar ^ d = q ^ (m : ℕ) →
-          Module.finrank (e m).1 (FKQ K L q T) = d * m ∧
+          subDeg (e m).1 = d * m ∧
           (∀ (hE : IsEllipticOver K (FKQ K L q T)) (hs : SplitsOver K (FKQ K L q T) L)
               (h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ (e m).1),
             letI := subfieldAlgebra K (e m).1 h
@@ -352,7 +353,7 @@ theorem corXIXb_maximal_split (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T
       ∃ d₀ m₀ : ℕ, d₀ = Nat.lcm (Module.finrank K L)
           (orderOf (QuotientGroup.mk (Units.mk0 qbar (norm_pos_iff.mp hqb0)) :
             Kˣ ⧸ Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0)))) ∧
-        q ^ m₀ = qbar ^ d₀ ∧ Module.finrank E₀ (FKQ K L q T) = d₀ * m₀ := by
+        q ^ m₀ = qbar ^ d₀ ∧ subDeg E₀ = d₀ * m₀ := by
   sorry
 
 /-- Book, §6, Corollary XIXc: there is a unique maximal subfield `F₀ ⊂ F` which is `K`-isomorphic
@@ -363,7 +364,7 @@ theorem corXIXc_maximal_jacobian (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
       IsGreatest {E : Subfield (FKQ K L q T) | IsEllipticSubfield K E ∧ HasPeriod K E q ∧
         ∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
           letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E} F₀ ∧
-      Module.finrank F₀ (FKQ K L q T) = Module.finrank K L ^ 2 := by
+      subDeg F₀ = Module.finrank K L ^ 2 := by
   sorry
 
 /-- Book, §6, Corollary XIXd: the degree of `F` over any elliptic subfield that splits over `K` is
@@ -374,12 +375,12 @@ theorem corXIXd_degree_n (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : Se
     (∀ E : Subfield (FKQ K L q T), IsEllipticSubfield K E →
       (∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
         letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) →
-      Module.finrank K L ∣ Module.finrank E (FKQ K L q T)) ∧
+      Module.finrank K L ∣ subDeg E) ∧
     ∃ e : {r : K // r ^ Module.finrank K L = q} ≃
         {E : Subfield (FKQ K L q T) // IsEllipticSubfield K E ∧
           (∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
             letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) ∧
-          Module.finrank E (FKQ K L q T) = Module.finrank K L},
+          subDeg E = Module.finrank K L},
       (∀ r, HasPeriod K (e r).1 r.1) ∧
       (∀ r, IsGalois (e r).1 (FKQ K L q T) ∧ IsCyclic (FKQ K L q T ≃ₐ[(e r).1] FKQ K L q T)) := by
   sorry

@@ -20,8 +20,6 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
 
 /-- A chosen family of Laurent coefficients of a holomorphic function on `Ω^×`.
 Blueprint: `def:D-operator`. -/

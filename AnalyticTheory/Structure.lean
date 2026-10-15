@@ -40,9 +40,24 @@ theorem mem_principalDivisors_iff (q : K) (m : Omega K → ℤ) :
 
 /-- The group `D⁰_K(q)` consists of the `q`-periodic divisors of degree `0`.
 Blueprint: `def:D0q`. -/
-theorem mem_divisorsDegZero_iff (q : K) (m : Omega K → ℤ) :
+theorem mem_divisorsDegZero_iff (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m : Omega K → ℤ) :
     m ∈ divisorsDegZero K q ↔ m ∈ DivisorsPeriodic K q ∧ degQ K q m = 0 := by
-  sorry
+  constructor
+  · intro h
+    unfold divisorsDegZero at h
+    induction h using AddSubgroup.closure_induction with
+    | mem x hx => exact hx
+    | zero => exact ⟨(DivisorsPeriodic K q).zero_mem, by simp [degQ]⟩
+    | add x y _ _ hx hy =>
+      refine ⟨(DivisorsPeriodic K q).add_mem hx.1 hy.1, ?_⟩
+      rw [degQ_add K q hq0 hq1 x y hx.1 hy.1, hx.2, hy.2]; rfl
+    | neg x _ hx =>
+      refine ⟨(DivisorsPeriodic K q).neg_mem hx.1, ?_⟩
+      have := degQ_add K q hq0 hq1 x (-x) hx.1 ((DivisorsPeriodic K q).neg_mem hx.1)
+      rw [add_neg_cancel, hx.2] at this
+      have h0 : degQ K q 0 = 0 := by simp [degQ]
+      omega
+  · exact fun h => AddSubgroup.subset_closure h
 
 /-- Book, §2: the group `C⁰_K(q) = D⁰_K(q) / P_K(q)` of divisor classes of degree `0`.
 Blueprint: `def:C0q`. -/
@@ -117,8 +132,6 @@ and `0` elsewhere. Blueprint: `def:translation-class`. -/
 noncomputable def pointDivisor (q : K) (α : Omega K) : Omega K → ℤ :=
   open Classical in fun x => if ConjModQ K q α x then 1 else 0
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
 /-- Book, §2: the algebraic translation automorphism of `F_K(q)` attached to a divisor class
 `c ∈ C⁰_K(q)`: the `K`-automorphism `τ` moving the prime divisor of a point `α ∈ K^×` to that of
 `β ∈ K^×` whenever `c = [β] − [α]`, i.e. `w_β(τ f) = w_α(f)`.

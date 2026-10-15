@@ -17,8 +17,6 @@ theorems.
 
 open Filter Topology
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
 
 namespace AnalyticTheory
 
@@ -128,7 +126,13 @@ instance : IsDomain (holSubring K) := holSubring_isDomain K
 
 /-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`.
 Blueprint: `def:M-K`. -/
-abbrev MeroRing : Type u := FractionRing (holSubring K)
+def MeroRing : Type u := FractionRing (holSubring K)
+
+noncomputable instance : Field (MeroRing K) := inferInstanceAs (Field (FractionRing (holSubring K)))
+noncomputable instance : Algebra (holSubring K) (MeroRing K) :=
+  inferInstanceAs (Algebra (holSubring K) (FractionRing (holSubring K)))
+instance : IsFractionRing (holSubring K) (MeroRing K) :=
+  inferInstanceAs (IsFractionRing (holSubring K) (FractionRing (holSubring K)))
 
 /-- Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`.
 Blueprint: `def:reflection`. -/
@@ -148,6 +152,13 @@ noncomputable def constHom : K →+* holSubring K where
 Blueprint: `def:const-algebra`. -/
 noncomputable instance holAlgebra : Algebra K (holSubring K) := RingHom.toAlgebra (constHom K)
 
+/-- The constants `K ⊂ M_K`. -/
+noncomputable instance meroAlgebra : Algebra K (MeroRing K) :=
+  ((algebraMap (holSubring K) (MeroRing K)).comp (algebraMap K (holSubring K))).toAlgebra
+
+instance : IsScalarTower K (holSubring K) (MeroRing K) :=
+  IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+
 /-- Book, §2: the order of vanishing at `α ∈ Ω^×` of a holomorphic function: the integer `n`
 for which `f(x)/(x − α)ⁿ` has a non-zero limit as `x → α`; `+∞` for `f = 0`.
 Blueprint: `def:analytic-valuation`. -/
@@ -158,7 +169,6 @@ noncomputable def anOrdHol (α : Omega K) (f : holSubring K) : WithTop ℤ :=
       Tendsto (fun x : Omega K => if h : x ≠ 0 then f.1 ⟨x, h⟩ / (x - α) ^ n else 0)
         (𝓝[≠] α) (𝓝 c) : ℤ) : WithTop ℤ)
 
-set_option synthInstance.maxHeartbeats 200000 in
 /-- The analytic valuation `w_α` belonging to `α ∈ Ω^×` (book, §2): `w_α(g/h) = ord_α g − ord_α h`
 for a representation of `f ∈ M_K` as a quotient of holomorphic functions; `w_α(0) = +∞`.
 That this is an additive valuation of `M_K` is `anVal_isValuation`.
@@ -226,8 +236,6 @@ Blueprint: `def:translation`. -/
 noncomputable def translation (a : Kˣ) : MeroRing K ≃+* MeroRing K :=
   meroScale K a⁻¹
 
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 1000000 in
 /-- Book, §2 (first observation): the `q`-periodic meromorphic functions form a subfield
 `F_K(q)` of `M_K`: those `f` with `τ_q f = f`. Blueprint: `def:Fq`. -/
 noncomputable def FqSub (q : K) : Subfield (MeroRing K) where
@@ -256,7 +264,6 @@ theorem translation_algebraMap (a : Kˣ) (c : K) :
   unfold translation meroScale
   rw [h1, IsFractionRing.ringEquivOfRingEquiv_algebraMap, h2]
 
-set_option synthInstance.maxHeartbeats 200000 in
 /-- The constants `K → F_K(q)`. Blueprint: `def:Fq-algebra`. -/
 noncomputable def FqHom (q : K) : K →+* FqSub K q where
   toFun c := ⟨algebraMap K (MeroRing K) c, fun a _ => translation_algebraMap K a c⟩
@@ -342,7 +349,16 @@ noncomputable def PhiQ (q : K) (hq : q ≠ 0) (m : Omega K → ℤ) :
 theorem degQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K → ℤ)
     (hm : m ∈ DivisorsPeriodic K q) (hn : n ∈ DivisorsPeriodic K q) :
     degQ K q (m + n) = degQ K q m + degQ K q n := by
-  sorry
+  have hfin : ∀ m ∈ DivisorsPeriodic K q, (repAnnulus K q ∩ Function.support
+      (fun α : Omega K => (Module.finrank K (IntermediateField.adjoin K ({α} : Set (Omega K))) : ℤ)
+        * m α)).Finite := by
+    intro m hm
+    refine (hm.1.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ?_)
+    refine ⟨hα.2.1.le, hα.2.2, ?_⟩
+    intro h; apply hs; simp [h]
+  unfold degQ
+  simp only [Pi.add_apply, mul_add]
+  exact finsum_mem_add_distrib' (hfin m hm) (hfin n hn)
 
 /-- Book, §2: `Φ_q` is a homomorphism `D_K(q) → K^×/q` ("obviously", loc. cit.).
 Blueprint: `def:Phi-q`. -/
@@ -350,7 +366,50 @@ theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
     (hm : m ∈ DivisorsPeriodic K q) (hn : n ∈ DivisorsPeriodic K q) :
     PhiQ K q (norm_pos_iff.mp hq0) (m + n) =
       PhiQ K q (norm_pos_iff.mp hq0) m * PhiQ K q (norm_pos_iff.mp hq0) n := by
-  sorry
+  classical
+  set N : Omega K → K := fun α =>
+    Algebra.norm K (IntermediateField.AdjoinSimple.gen K α) with hN
+  have hα0 : ∀ α ∈ repAnnulus K q, α ≠ 0 := fun α hα h0 => by
+    have := hα.2.1
+    rw [h0] at this
+    have h00 : omegaNorm K (0 : Omega K) = 0 := spectralNorm_zero
+    linarith
+  have hNne : ∀ α ∈ repAnnulus K q, N α ≠ 0 := by
+    intro α hα
+    haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set (Omega K))) :=
+      IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α)
+    simp only [hN]
+    rw [Ne, Algebra.norm_eq_zero_iff]
+    intro h
+    apply hα0 α hα
+    have := congrArg Subtype.val h
+    simpa using this
+  have hfin : ∀ m ∈ DivisorsPeriodic K q, (repAnnulus K q ∩ Function.mulSupport
+      (fun α : Omega K => N α ^ m α)).Finite := by
+    intro m hm
+    refine (hm.1.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ?_)
+    refine ⟨hα.2.1.le, hα.2.2, ?_⟩
+    intro h; apply hs; simp [h]
+  have hx : ∀ m ∈ DivisorsPeriodic K q, (∏ᶠ α ∈ repAnnulus K q, N α ^ m α) ≠ 0 := by
+    intro m hm
+    refine finprod_mem_induction (fun x : K => x ≠ 0) one_ne_zero (fun a b ha hb => mul_ne_zero ha hb)
+      (fun α hα => zpow_ne_zero _ (hNne α hα))
+  have hmul : ∏ᶠ α ∈ repAnnulus K q, N α ^ (m + n) α =
+      (∏ᶠ α ∈ repAnnulus K q, N α ^ m α) * ∏ᶠ α ∈ repAnnulus K q, N α ^ n α := by
+    rw [← finprod_mem_mul_distrib' (hfin m hm) (hfin n hn)]
+    refine finprod_mem_congr rfl (fun α hα => ?_)
+    simp only [Pi.add_apply]
+    exact zpow_add₀ (hNne α hα) _ _
+  have h1 := hx m hm
+  have h2 := hx n hn
+  have h3 : (∏ᶠ α ∈ repAnnulus K q, N α ^ (m + n) α) ≠ 0 := by rw [hmul]; exact mul_ne_zero h1 h2
+  unfold PhiQ
+  simp only [hN] at *
+  rw [dif_pos h1, dif_pos h2, dif_pos h3]
+  simp only [hmul]
+  rw [← QuotientGroup.mk_mul]
+  congr 1
+  exact Units.ext rfl
 
 /-- Book, §2: the degree and Jacobi image do not depend on the choice of the system of
 representatives (formula (12)). Blueprint: `prop:deg-q-formula`. -/

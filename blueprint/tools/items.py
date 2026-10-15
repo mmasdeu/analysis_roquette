@@ -486,3 +486,9 @@ add('definition', 'def:H1-GT', 'Cohomology $H^1(G,T)$', ['IsCocycleAut', 'Cohomo
 _upd('thm:A2-cocycle-translation', text=r'$F$ is the Jacobian field of $E$ iff $\zeta_E(\sigma)\in T$ for all $\sigma\in G$.', uses=['def:char-cocycle', 'def:translation-group'])
 _upd('prop:A2-classification', text=r'The elliptic fields $E$ split by $L$ with the invariants $j,\gamma$ of $F$ correspond to the pairs $\pm\zeta$ in $H^1(G,T)$: each is isomorphic to some $E_\zeta$, each $E_\zeta$ is such a field, and $E_\zeta\cong E_{\zeta^{\prime}}$ iff $\zeta^{\prime}\sim\pm\zeta$; the cocycle is compatible with inflation.',
      uses=['thm:A2-cocycle-translation', 'thm:IX', 'def:H1-GT'])
+
+_addlean('def:rel-degree', 'subDeg')
+_addlean('def:M-K', 'meroAlgebra')
+_addlean('lem:H-K-domain', 'exists_good_point', 'sum_ne_zero_of_good', 'bad_radii_finite')
+_addlean('prop:deg-q-formula', 'degQ_add')
+_addlean('def:D0q', 'mem_divisorsDegZero_iff')

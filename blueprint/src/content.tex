@@ -149,14 +149,14 @@ The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of t
 
 \begin{lemma}[$H_K$ is a domain]
 \label{lem:H-K-domain}
-\lean{AnalyticTheory.holSubring_isDomain}
+\lean{AnalyticTheory.holSubring_isDomain, AnalyticTheory.exists_good_point, AnalyticTheory.sum_ne_zero_of_good, AnalyticTheory.bad_radii_finite}
 \uses{def:H-K}
 $H_K$ is an integral domain.
 \end{lemma}
 
 \begin{definition}[The field $M_K$]
 \label{def:M-K}
-\lean{AnalyticTheory.MeroRing}
+\lean{AnalyticTheory.MeroRing, AnalyticTheory.meroAlgebra}
 \uses{lem:H-K-domain}
 $M_K$ is the quotient field of $H_K$ (meromorphic functions).
 \end{definition}
@@ -274,7 +274,7 @@ For every $\alpha\in\Omega^\times$ there is a $q$-periodic $f$ with $w_\alpha(f)
 
 \begin{proposition}[Formula (12)]
 \label{prop:deg-q-formula}
-\lean{AnalyticTheory.degQ_formula, AnalyticTheory.degQ_eq_of_system}
+\lean{AnalyticTheory.degQ_formula, AnalyticTheory.degQ_eq_of_system, AnalyticTheory.degQ_add}
 \uses{def:deg-q}
 Formula (12): the degree and the Jacobi image are given by the stated sums/products over any system of representatives.
 \end{proposition}
@@ -834,7 +834,7 @@ In Weierstraß normal form, $j=12^3g_2^3/(g_2^3-27g_3^2)$.
 
 \begin{definition}[Relative degrees of subfields]
 \label{def:rel-degree}
-\lean{AnalyticTheory.relDeg, AnalyticTheory.relInsepDeg, AnalyticTheory.IsRelSeparable, AnalyticTheory.IsRelPurelyInseparable, AnalyticTheory.IsRelGalois, AnalyticTheory.autFixing}
+\lean{AnalyticTheory.relDeg, AnalyticTheory.relInsepDeg, AnalyticTheory.IsRelSeparable, AnalyticTheory.IsRelPurelyInseparable, AnalyticTheory.IsRelGalois, AnalyticTheory.autFixing, AnalyticTheory.subDeg}
 Degree, degree of inseparability, separability, pure inseparability, Galois property and automorphism group of an extension $F\,|\,E$ of subfields of a common field.
 \end{definition}
 

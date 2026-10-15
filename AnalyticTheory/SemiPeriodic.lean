@@ -21,8 +21,6 @@ Blueprint nodes: `def:q-trivial`, `lem:2`, `thm:IX`, `thm:X`, `thm:XI`, `thm:XII
 
 open Filter Topology
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
 
 namespace AnalyticTheory
 

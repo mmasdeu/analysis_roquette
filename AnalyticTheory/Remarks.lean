@@ -15,8 +15,6 @@ Remarks 1, 2 for such `L`; it is recorded in the blueprint only.
 Blueprint nodes: `rem:S2-ext-const`, `rem:S2-galois`.
 -/
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
 
 namespace AnalyticTheory
 
