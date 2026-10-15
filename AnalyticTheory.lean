@@ -5,6 +5,7 @@ import AnalyticTheory.Analytic
 import AnalyticTheory.Dominance
 import AnalyticTheory.Taylor
 import AnalyticTheory.Identity
+import AnalyticTheory.Gauss
 import AnalyticTheory.WeierstrassPrep
 import AnalyticTheory.Zeros
 import AnalyticTheory.Valuation
