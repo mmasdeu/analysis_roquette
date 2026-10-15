@@ -755,6 +755,89 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
 
 end Prep
 
+
+theorem tendsto_mul_prod_int {u v : ℤ → ℝ} (hu0 : ∀ n, 0 ≤ u n) (hv0 : ∀ n, 0 ≤ v n)
+    (hu : Tendsto u cofinite (𝓝 0)) (hv : Tendsto v cofinite (𝓝 0)) :
+    Tendsto (fun p : ℤ × ℤ => u p.1 * v p.2) cofinite (𝓝 0) := by
+  obtain ⟨U, hU⟩ := hu.bddAbove_range_of_cofinite
+  obtain ⟨V, hV⟩ := hv.bddAbove_range_of_cofinite
+  have hU' : ∀ n, u n ≤ U := fun n => hU ⟨n, rfl⟩
+  have hV' : ∀ n, v n ≤ V := fun n => hV ⟨n, rfl⟩
+  have hU0 : 0 ≤ U := le_trans (hu0 0) (hU' 0)
+  have hV0 : 0 ≤ V := le_trans (hv0 0) (hV' 0)
+  rw [Metric.tendsto_nhds]
+  intro ε hε
+  rw [Filter.eventually_cofinite]
+  set η := ε / (U + V + 1) with hη
+  have hη0 : 0 < η := by positivity
+  have hA : {n | η ≤ u n}.Finite := by
+    have := Filter.eventually_cofinite.mp (hu.eventually (gt_mem_nhds hη0))
+    exact this.subset (fun m hm => by simpa using hm)
+  have hB : {n | η ≤ v n}.Finite := by
+    have := Filter.eventually_cofinite.mp (hv.eventually (gt_mem_nhds hη0))
+    exact this.subset (fun m hm => by simpa using hm)
+  refine (hA.prod hB).subset (fun p hp => ?_)
+  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, abs_mul, abs_of_nonneg (hu0 _),
+    abs_of_nonneg (hv0 _), not_lt] at hp
+  have hηU : η * (U + V + 1) = ε := by rw [hη]; field_simp
+  refine ⟨?_, ?_⟩
+  · by_contra hlt
+    have hlt : u p.1 < η := not_le.mp (by simpa using hlt)
+    have : u p.1 * v p.2 ≤ η * V := mul_le_mul hlt.le (hV' _) (hv0 _) hη0.le
+    nlinarith
+  · by_contra hlt
+    have hlt : v p.2 < η := not_le.mp (by simpa using hlt)
+    have : u p.1 * v p.2 ≤ U * η := mul_le_mul (hU' _) hlt.le (hv0 _) hU0
+    nlinarith
+
+section Cauchy
+
+variable [CompleteSpace F]
+
+/-- Cauchy product of two null sequences (ultrametric, complete): the convolution coefficients
+have `HasSum` equal to the product of the sums. -/
+theorem hasSum_cauchy_product {u v : ℤ → F} (hu : Dec u) (hv : Dec v) :
+    ∃ A B : F, HasSum u A ∧ HasSum v B ∧
+      (∀ m, HasSum (fun i => u i * v (m - i)) (∑' i, u i * v (m - i))) ∧
+      HasSum (fun m => ∑' i, u i * v (m - i)) (A * B) := by
+  have hus : Summable u := NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero
+    (tendsto_zero_iff_norm_tendsto_zero.mpr hu)
+  have hvs : Summable v := NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero
+    (tendsto_zero_iff_norm_tendsto_zero.mpr hv)
+  obtain ⟨A, hA⟩ := hus
+  obtain ⟨B, hB⟩ := hvs
+  -- the product family is summable
+  have hpsum : Summable fun p : ℤ × ℤ => u p.1 * v p.2 := by
+    refine NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero ?_
+    have := tendsto_mul_prod_int (u := fun n => ‖u n‖) (v := fun n => ‖v n‖)
+      (fun n => norm_nonneg _) (fun n => norm_nonneg _) hu hv
+    refine squeeze_zero_norm (fun p => ?_) this
+    rw [norm_mul]
+  obtain ⟨S, hS⟩ := hpsum
+  have hfib1 : ∀ i, HasSum (fun j => u i * v j) (u i * B) := fun i => hB.mul_left (u i)
+  have hS1 : HasSum (fun i => u i * B) S := hS.prod_fiberwise hfib1
+  have hAB : S = A * B := by
+    have : HasSum (fun i => u i * B) (A * B) := hA.mul_right B
+    exact hS1.unique this
+  -- fibres for the diagonal grouping
+  let σ : ℤ × ℤ ≃ ℤ × ℤ :=
+    { toFun := fun p => (p.1 + p.2, p.1)
+      invFun := fun p => (p.2, p.1 - p.2)
+      left_inv := fun p => by simp
+      right_inv := fun p => by simp }
+  have hS2 : HasSum (fun p : ℤ × ℤ => u p.2 * v (p.1 - p.2)) S := by
+    have := (σ.symm.hasSum_iff (f := fun p : ℤ × ℤ => u p.1 * v p.2)).mpr hS
+    simpa [σ, Function.comp_def] using this
+  have hfib : ∀ m : ℤ, Summable fun i => u i * v (m - i) := by
+    intro m
+    have := hS2.summable.comp_injective (i := fun i : ℤ => (m, i)) (fun a b h => by simpa using h)
+    exact this
+  refine ⟨A, B, hA, hB, fun m => (hfib m).hasSum, ?_⟩
+  rw [← hAB]
+  exact hS2.prod_fiberwise (fun m => (hfib m).hasSum)
+
+end Cauchy
+
 end Seq
 
 end AnalyticTheory
