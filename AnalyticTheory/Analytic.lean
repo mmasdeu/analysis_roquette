@@ -1,4 +1,5 @@
 import AnalyticTheory.Holomorphic
+import AnalyticTheory.Dominance
 
 /-!
 # Fields of periodic functions (book, §2)
@@ -89,7 +90,39 @@ noncomputable def holReflectHom : holSubring K ≃+* holSubring K where
 
 /-- Book, §2: `H_K` is an integral domain. Blueprint: `lem:H-K-domain`. -/
 theorem holSubring_isDomain : IsDomain (holSubring K) := by
-  sorry
+  haveI : Nontrivial (holSubring K) := ⟨⟨1, 0, fun h => by
+    have := congrFun (congrArg Subtype.val h) ⟨1, one_ne_zero⟩
+    exact one_ne_zero this⟩⟩
+  haveI : NoZeroDivisors (holSubring K) := ⟨fun {f g} h => by
+    by_contra hcon
+    push_neg at hcon
+    obtain ⟨hf, hg⟩ := hcon
+    -- representations and non-vanishing coefficients
+    have key : ∀ f : holSubring K, f ≠ 0 → ∃ (a : ℤ → K), IsConvergentLaurent K a ∧
+        (∃ n, a n ≠ 0) ∧ ∀ α : OmegaX K, HasSum
+          (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (f.1 α) := by
+      intro f hf
+      obtain ⟨F, ⟨a, ha, hFa⟩, hFf⟩ := f.2
+      have hsum : ∀ α : OmegaX K, HasSum
+          (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (f.1 α) := fun α => by
+        rw [← hFf]; exact hFa α.1 α.2
+      refine ⟨a, ha, ?_, hsum⟩
+      by_contra hno
+      push_neg at hno
+      apply hf
+      apply Subtype.ext
+      funext α
+      have hz : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (0 : Omega K) := by
+        simpa [hno] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : Omega K)) 0)
+      simpa using (hsum α).unique hz
+    obtain ⟨a, ha, ha0, hfa⟩ := key f hf
+    obtain ⟨b, hb, hb0, hgb⟩ := key g hg
+    obtain ⟨α, hα, hga, hgb'⟩ := exists_good_point K ha hb ha0 hb0
+    have h1 := congrFun (congrArg Subtype.val h) ⟨α, hα⟩
+    have h2 : f.1 ⟨α, hα⟩ * g.1 ⟨α, hα⟩ = 0 := h1
+    exact mul_ne_zero (sum_ne_zero_of_good K ha hα (hfa ⟨α, hα⟩) hga)
+      (sum_ne_zero_of_good K hb hα (hgb ⟨α, hα⟩) hgb') h2⟩
+  exact NoZeroDivisors.to_isDomain _
 
 instance : IsDomain (holSubring K) := holSubring_isDomain K
 
