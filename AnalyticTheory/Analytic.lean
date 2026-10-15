@@ -16,6 +16,9 @@ theorem.
 
 open Filter Topology
 
+set_option synthInstance.maxHeartbeats 400000
+set_option maxHeartbeats 1000000
+
 namespace AnalyticTheory
 
 universe u
@@ -29,17 +32,22 @@ theorem omegaNorm_unique_extension (f : Omega K → ℝ) (hf : IsAbsoluteValue f
     f = omegaNorm K := by
   sorry
 
-/-- Book, §2: the holomorphic functions over `K`, `H_K`. We package them as a subring of
-the functions `Ω → Ω` (pointwise operations). Closure under products is the Cauchy product of
-convergent Laurent series, proved in `Holomorphic.lean`.
-Blueprint: `def:H-K`. -/
-def holSubring : Subring (Omega K → Omega K) where
-  carrier := {f | IsHolomorphicOver K f}
-  mul_mem' := fun hf hg => isHolomorphicOver_mul K hf hg
-  one_mem' := by simpa using isHolomorphicOver_const K 1
-  add_mem' := fun hf hg => isHolomorphicOver_add K hf hg
-  zero_mem' := by simpa using isHolomorphicOver_const K 0
-  neg_mem' := fun hf => isHolomorphicOver_neg K hf
+/-- The punctured plane `Ω^×`. -/
+abbrev OmegaX : Type u := {α : Omega K // α ≠ 0}
+
+/-- Book, §2: the holomorphic functions over `K`, `H_K`: functions on `Ω^×` that are given
+by convergent Laurent series with coefficients in `K` (the value at `0` is irrelevant, so
+we work with functions on `Ω^×`; closure under products is the Cauchy product of convergent
+Laurent series, proved in `Holomorphic.lean`). Blueprint: `def:H-K`. -/
+def holSubring : Subring (OmegaX K → Omega K) where
+  carrier := {f | ∃ g : Omega K → Omega K, IsHolomorphicOver K g ∧ (fun α : OmegaX K => g α.1) = f}
+  mul_mem' := fun {f f'} ⟨g, hg, hgf⟩ ⟨g', hg', hgf'⟩ =>
+    ⟨g * g', isHolomorphicOver_mul K hg hg', by rw [← hgf, ← hgf']; rfl⟩
+  one_mem' := ⟨fun _ => 1, by simpa using isHolomorphicOver_const K 1, rfl⟩
+  add_mem' := fun {f f'} ⟨g, hg, hgf⟩ ⟨g', hg', hgf'⟩ =>
+    ⟨g + g', isHolomorphicOver_add K hg hg', by rw [← hgf, ← hgf']; rfl⟩
+  zero_mem' := ⟨fun _ => 0, by simpa using isHolomorphicOver_const K 0, rfl⟩
+  neg_mem' := fun {f} ⟨g, hg, hgf⟩ => ⟨-g, isHolomorphicOver_neg K hg, by rw [← hgf]; rfl⟩
 
 /-- Holomorphic functions are stable under the reflection `X ↦ X⁻¹`. -/
 theorem isHolomorphicOver_inv {f : Omega K → Omega K} (hf : IsHolomorphicOver K f) :
@@ -61,8 +69,16 @@ theorem isHolomorphicOver_inv {f : Omega K → Omega K} (hf : IsHolomorphicOver 
 
 /-- Book, §2: the reflection `f(X) ↦ f(X⁻¹)` as a ring automorphism of `H_K`. -/
 noncomputable def holReflectHom : holSubring K ≃+* holSubring K where
-  toFun f := ⟨fun α => f.1 α⁻¹, isHolomorphicOver_inv K f.2⟩
-  invFun f := ⟨fun α => f.1 α⁻¹, isHolomorphicOver_inv K f.2⟩
+  toFun f := ⟨fun α => f.1 ⟨α.1⁻¹, inv_ne_zero α.2⟩, by
+    obtain ⟨g, hg, hgf⟩ := f.2
+    refine ⟨fun α => g α⁻¹, isHolomorphicOver_inv K hg, ?_⟩
+    funext α
+    exact congrFun hgf ⟨α.1⁻¹, inv_ne_zero α.2⟩⟩
+  invFun f := ⟨fun α => f.1 ⟨α.1⁻¹, inv_ne_zero α.2⟩, by
+    obtain ⟨g, hg, hgf⟩ := f.2
+    refine ⟨fun α => g α⁻¹, isHolomorphicOver_inv K hg, ?_⟩
+    funext α
+    exact congrFun hgf ⟨α.1⁻¹, inv_ne_zero α.2⟩⟩
   left_inv f := Subtype.ext (funext fun α => by simp)
   right_inv f := Subtype.ext (funext fun α => by simp)
   map_mul' f g := rfl
@@ -85,7 +101,8 @@ noncomputable def reflectionM : MeroRing K ≃+* MeroRing K :=
 
 /-- Book, §2: the constant functions `K ↪ H_K`. Blueprint: `def:const-algebra`. -/
 noncomputable def constHom : K →+* holSubring K where
-  toFun c := ⟨fun _ => algebraMap K (Omega K) c, isHolomorphicOver_const K c⟩
+  toFun c := ⟨fun _ => algebraMap K (Omega K) c, fun _ => algebraMap K (Omega K) c,
+    isHolomorphicOver_const K c, rfl⟩
   map_one' := Subtype.ext (funext fun _ => map_one _)
   map_mul' c d := Subtype.ext (funext fun _ => map_mul _ _ _)
   map_zero' := Subtype.ext (funext fun _ => map_zero _)
@@ -95,15 +112,40 @@ noncomputable def constHom : K →+* holSubring K where
 Blueprint: `def:const-algebra`. -/
 noncomputable instance holAlgebra : Algebra K (holSubring K) := RingHom.toAlgebra (constHom K)
 
-/-- The analytic valuation `w_α` belonging to `α ∈ Ω^×` (book, §2): the order of
-vanishing at `α`, with `w_α(0) = +∞`. Placeholder (defined by Weierstraß products in the
-book). Blueprint: `def:analytic-valuation`. -/
-noncomputable def anVal (α : Omega K) : AddValuation (MeroRing K) (WithTop ℤ) := sorry
+/-- Book, §2: the order of vanishing at `α ∈ Ω^×` of a holomorphic function: the integer `n`
+for which `f(x)/(x − α)ⁿ` has a non-zero limit as `x → α`; `+∞` for `f = 0`.
+Blueprint: `def:analytic-valuation`. -/
+noncomputable def anOrdHol (α : Omega K) (f : holSubring K) : WithTop ℤ :=
+  open Classical in
+  if f = 0 then ⊤ else
+    ((Classical.epsilon fun n : ℤ => ∃ c : Omega K, c ≠ 0 ∧
+      Tendsto (fun x : Omega K => if h : x ≠ 0 then f.1 ⟨x, h⟩ / (x - α) ^ n else 0)
+        (𝓝[≠] α) (𝓝 c) : ℤ) : WithTop ℤ)
 
-/-- Book, §2: rescaling `f(X) ↦ f(cX)` as a ring automorphism of `H_K`, for `c ∈ K^×`.
+set_option synthInstance.maxHeartbeats 200000 in
+/-- The analytic valuation `w_α` belonging to `α ∈ Ω^×` (book, §2): `w_α(g/h) = ord_α g − ord_α h`
+for a representation of `f ∈ M_K` as a quotient of holomorphic functions; `w_α(0) = +∞`.
+That this is an additive valuation of `M_K` is `anVal_isValuation`.
+Blueprint: `def:analytic-valuation`. -/
+noncomputable def anVal (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
+  open Classical in
+  let p : holSubring K × holSubring K := Classical.epsilon fun p : holSubring K × holSubring K =>
+    p.2 ≠ 0 ∧ f = algebraMap (holSubring K) (MeroRing K) p.1 / algebraMap (holSubring K) (MeroRing K) p.2
+  anOrdHol K α p.1 - anOrdHol K α p.2
+
+/-- The nonzero element `c α` of `Ω`. -/
+noncomputable def scalePt (c : Kˣ) (α : OmegaX K) : OmegaX K :=
+  ⟨algebraMap K (Omega K) (c : K) * α.1,
+    mul_ne_zero ((map_ne_zero _).mpr c.ne_zero) α.2⟩
+
+/-- Book, §2: rescaling `f(X) ↦ f(cX)` as a ring endomorphism of `H_K`, for `c ∈ K^×`.
 Blueprint: `def:holscale`. -/
 noncomputable def holScaleHom (c : Kˣ) : holSubring K →+* holSubring K where
-  toFun f := ⟨scaleFun K c f.1, isHolomorphicOver_scale K c f.2⟩
+  toFun f := ⟨fun α => f.1 (scalePt K c α), by
+    obtain ⟨g, hg, hgf⟩ := f.2
+    refine ⟨scaleFun K c g, isHolomorphicOver_scale K c hg, ?_⟩
+    funext α
+    exact congrFun hgf (scalePt K c α)⟩
   map_one' := Subtype.ext rfl
   map_mul' f g := Subtype.ext rfl
   map_zero' := Subtype.ext rfl
@@ -117,13 +159,17 @@ noncomputable def holScale (c : Kˣ) : holSubring K ≃+* holSubring K where
   map_mul' := (holScaleHom K c).map_mul
   map_add' := (holScaleHom K c).map_add
   left_inv f := Subtype.ext (funext fun α => by
-    show f.1 (algebraMap K (Omega K) (c : K) * (algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * α)) = f.1 α
-    congr 1
-    rw [← mul_assoc, ← map_mul, Units.mul_inv, map_one, one_mul])
+    show f.1 (scalePt K c (scalePt K c⁻¹ α)) = f.1 α
+    have h : scalePt K c (scalePt K c⁻¹ α) = α := Subtype.ext (by
+      show algebraMap K (Omega K) (c : K) * (algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * α.1) = α.1
+      rw [← mul_assoc, ← map_mul, Units.mul_inv, map_one, one_mul])
+    rw [h])
   right_inv f := Subtype.ext (funext fun α => by
-    show f.1 (algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * (algebraMap K (Omega K) (c : K) * α)) = f.1 α
-    congr 1
-    rw [← mul_assoc, ← map_mul, Units.inv_mul, map_one, one_mul])
+    show f.1 (scalePt K c⁻¹ (scalePt K c α)) = f.1 α
+    have h : scalePt K c⁻¹ (scalePt K c α) = α := Subtype.ext (by
+      show algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * (algebraMap K (Omega K) (c : K) * α.1) = α.1
+      rw [← mul_assoc, ← map_mul, Units.inv_mul, map_one, one_mul])
+    rw [h])
 
 /-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`.
 Blueprint: `def:M-K`. -/
@@ -135,7 +181,8 @@ Blueprint: `def:translation`. -/
 noncomputable def translation (a : Kˣ) : MeroRing K ≃+* MeroRing K :=
   meroScale K a⁻¹
 
-set_option synthInstance.maxHeartbeats 200000 in
+set_option synthInstance.maxHeartbeats 400000 in
+set_option maxHeartbeats 1000000 in
 /-- Book, §2 (first observation): the `q`-periodic meromorphic functions form a subfield
 `F_K(q)` of `M_K`: those `f` with `τ_q f = f`. Blueprint: `def:Fq`. -/
 noncomputable def FqSub (q : K) : Subfield (MeroRing K) where
@@ -220,14 +267,31 @@ def ModTimes (q : K) (a b : Omega K) : Prop :=
 def ConjModQ (q : K) (α β : Omega K) : Prop :=
   ∃ γ : Omega K, minpoly K γ = minpoly K β ∧ ModTimes K q α γ
 
-/-- Book, §2: the degree `deg_q(m)` of a `q`-periodic divisor, formula (12).
-Placeholder; the explicit formula is stated in `degQ_formula`. Blueprint: `def:deg-q`. -/
-opaque degQ (q : K) : (Omega K → ℤ) → ℤ
+/-- Book, §2: a system of representatives (chosen once and for all) of the `K`-conjugacy classes
+mod `^× q` of elements of the annulus `|q| < |α| ≤ 1` (each class meets the annulus).
+Blueprint: `def:deg-q`. -/
+noncomputable def repSystem (q : K) : Set (Omega K) :=
+  Classical.epsilon fun R : Set (Omega K) => ∀ α : Omega K, ‖q‖ < omegaNorm K α →
+    omegaNorm K α ≤ 1 → ∃! β, β ∈ R ∧ ConjModQ K q α β
 
-/-- Book, §2: the Jacobi image `Φ_q(m) ∈ K^×/q` of a `q`-periodic divisor (formula (12)).
-Placeholder; the explicit formula is stated in `degQ_formula`. Blueprint: `def:Phi-q`. -/
-opaque PhiQ (q : K) (hq : q ≠ 0) :
-    (Omega K → ℤ) → Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq)
+/-- The representatives of `repSystem` lying in the annulus `|q| < |α| ≤ 1`. -/
+noncomputable def repAnnulus (q : K) : Set (Omega K) :=
+  {α ∈ repSystem K q | ‖q‖ < omegaNorm K α ∧ omegaNorm K α ≤ 1}
+
+/-- Book, §2: the degree `deg_q(m) = ∑ [K(α):K] m_α` of a `q`-periodic divisor, formula (12),
+the sum over a system of representatives. Blueprint: `def:deg-q`. -/
+noncomputable def degQ (q : K) (m : Omega K → ℤ) : ℤ :=
+  ∑ᶠ α ∈ repAnnulus K q,
+    (Module.finrank K (IntermediateField.adjoin K ({α} : Set (Omega K))) : ℤ) * m α
+
+/-- Book, §2: the Jacobi image `Φ_q(m) = ∏' N_{K(α)|K}(α)^{m_α} mod^× q ∈ K^×/q` of a
+`q`-periodic divisor, formula (12). Blueprint: `def:Phi-q`. -/
+noncomputable def PhiQ (q : K) (hq : q ≠ 0) (m : Omega K → ℤ) :
+    Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq) :=
+  open Classical in
+  let x : K := ∏ᶠ α ∈ repAnnulus K q,
+    (Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)) ^ (m α)
+  if h : x ≠ 0 then QuotientGroup.mk (Units.mk0 x h) else 1
 
 /-- Book, §2: the fundamental theta function
 `Θ(X) = ∏_{n≥0}(1 − qⁿX⁻¹) ∏_{n<0}(1 − q^{-n}X)`, as a function on `Ω^×`.

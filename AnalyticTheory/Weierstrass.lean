@@ -20,33 +20,81 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-/-- The derivation `D = X d/dX` on `M_K`. Placeholder. Blueprint: `def:D-operator`. -/
-noncomputable def Dop : MeroRing K → MeroRing K := sorry
+set_option synthInstance.maxHeartbeats 400000
+set_option maxHeartbeats 1000000
 
-/-- The meromorphic function `Θ(X)` (book, §2, (6)) viewed in `M_K`. Placeholder.
+/-- A chosen family of Laurent coefficients of a holomorphic function on `Ω^×`.
+Blueprint: `def:D-operator`. -/
+noncomputable def laurentCoeff (f : OmegaX K → Omega K) : ℤ → K :=
+  Classical.epsilon fun a : ℤ → K => IsConvergentLaurent K a ∧
+    ∀ α : OmegaX K, HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (f α)
+
+/-- The derivation `D = X d/dX` on functions given by Laurent series: `∑ aₙXⁿ ↦ ∑ n aₙXⁿ`.
+Blueprint: `def:D-operator`. -/
+noncomputable def DholFun (f : OmegaX K → Omega K) : OmegaX K → Omega K :=
+  fun α => ∑' n : ℤ, (n : Omega K) * algebraMap K (Omega K) (laurentCoeff K f n) * α.1 ^ n
+
+/-- The derivation `D = X d/dX` on `M_K`: `D(g/h) = (Dg · h − g · Dh)/h²` for
+holomorphic `g, h` (with `D` acting on Laurent coefficients). That `D` is a well-defined
+derivation of `M_K` is `Dop_derivation`. Blueprint: `def:D-operator`. -/
+noncomputable def Dop (f : MeroRing K) : MeroRing K :=
+  Classical.epsilon fun r : MeroRing K => ∃ g h Dg Dh : holSubring K, h ≠ 0 ∧
+    f = algebraMap (holSubring K) (MeroRing K) g / algebraMap (holSubring K) (MeroRing K) h ∧
+    Dg.1 = DholFun K g.1 ∧ Dh.1 = DholFun K h.1 ∧
+    r = (algebraMap (holSubring K) (MeroRing K) Dg * algebraMap (holSubring K) (MeroRing K) h -
+          algebraMap (holSubring K) (MeroRing K) g * algebraMap (holSubring K) (MeroRing K) Dh) /
+        (algebraMap (holSubring K) (MeroRing K) h) ^ 2
+
+/-- `f ∈ M_K` takes the values `F(α)` on `Ω^×` (wherever a denominator of a representation
+`f = g/h` does not vanish). Blueprint: `def:wp`. -/
+def EvalsTo (f : MeroRing K) (F : OmegaX K → Omega K) : Prop :=
+  ∃ g h : holSubring K, h ≠ 0 ∧
+    f = algebraMap (holSubring K) (MeroRing K) g / algebraMap (holSubring K) (MeroRing K) h ∧
+    ∀ α : OmegaX K, h.1 α ≠ 0 → F α = g.1 α / h.1 α
+
+/-- The meromorphic function `Θ(X)` (book, §2, (6)) viewed in `M_K` (it is holomorphic on `Ω^×`).
 Blueprint: `def:theta-M`. -/
-noncomputable def thetaM (q : K) : MeroRing K := sorry
+noncomputable def thetaM (q : K) : MeroRing K :=
+  algebraMap (holSubring K) (MeroRing K)
+    (Classical.epsilon fun t : holSubring K => ∀ α : OmegaX K, t.1 α = theta K q α.1)
 
 /-- `ζ = D log Θ`. Blueprint: `def:zeta`. -/
 noncomputable def zetaM (q : K) : MeroRing K := Dop K (thetaM K q) / thetaM K q
-
-/-- Book, §3: `℘ = −Dζ` (before normalization by constants). Blueprint: `def:wp`. -/
-noncomputable def wpM (q : K) : MeroRing K := -Dop K (zetaM K q)
-
-/-- Book, §3, (18): `℘′ = ½(D℘ − ℘)`, defined formally in every characteristic. Placeholder
-for the element of `M_K` whose existence is asserted in `wpPrime_spec`.
-Blueprint: `def:wp-prime`. -/
-noncomputable def wpPrimeM (q : K) : MeroRing K := sorry
-
-/-- Book, §3, (18): `2℘′ = D℘ − ℘`. Blueprint: `def:wp-prime`. -/
-theorem wpPrime_spec (q : K) :
-    2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
-  sorry
 
 /-- The sums `s_k = ∑_{m>0} m^k q^m/(1 − q^m) = ∑_n (∑_{d|n} d^k) qⁿ` (book, (35)).
 Blueprint: `def:s-k`. -/
 noncomputable def sK (k : ℕ) (q : K) : K :=
   ∑' n : ℕ, ((∑ d ∈ n.divisors, (d : ℤ) ^ k : ℤ) : K) * q ^ n
+
+/-- Book, §3, (30) (new definition): `℘(X) = ∑_{n∈ℤ} qⁿX/(1 − qⁿX)² − 2 s₁`, the element of `M_K`
+with these values on `Ω^×`. Blueprint: `def:wp`. -/
+noncomputable def wpM (q : K) : MeroRing K :=
+  Classical.epsilon fun f : MeroRing K => EvalsTo K f fun α =>
+    (∑' n : ℤ, (algebraMap K (Omega K) q) ^ n * α.1 / (1 - (algebraMap K (Omega K) q) ^ n * α.1) ^ 2)
+      - 2 * algebraMap K (Omega K) (sK K 1 q)
+
+/-- Book, §3, (18) and (new definition): `℘′(X) = ∑_{n∈ℤ} q²ⁿX²/(1 − qⁿX)³ + s₁`, i.e.
+`½(D℘ − ℘)` formally in every characteristic. Blueprint: `def:wp-prime`. -/
+noncomputable def wpPrimeM (q : K) : MeroRing K :=
+  Classical.epsilon fun f : MeroRing K => EvalsTo K f fun α =>
+    (∑' n : ℤ, (algebraMap K (Omega K) q) ^ (2 * n) * α.1 ^ 2 /
+        (1 - (algebraMap K (Omega K) q) ^ n * α.1) ^ 3)
+      + algebraMap K (Omega K) (sK K 1 q)
+
+/-- Book, §3, (16): `℘ = −Dζ − 2 s₁`. Blueprint: `def:wp`. -/
+theorem wp_eq_neg_D_zeta (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
+    wpM K q = -Dop K (zetaM K q) - 2 * algebraMap K (MeroRing K) (sK K 1 q) := by
+  sorry
+
+/-- `D` is a derivation of `M_K`. Blueprint: `def:D-operator`. -/
+theorem Dop_derivation : ∀ f g : MeroRing K, Dop K (f + g) = Dop K f + Dop K g ∧
+    Dop K (f * g) = f * Dop K g + g * Dop K f := by
+  sorry
+
+/-- Book, §3, (18): `2℘′ = D℘ − ℘`. Blueprint: `def:wp-prime`. -/
+theorem wpPrime_spec (q : K) :
+    2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
+  sorry
 
 /-- The coefficient `B = −5 s₃` (book, (37)). Blueprint: `def:coeffB`. -/
 noncomputable def coeffB (q : K) : K := -5 * sK K 3 q
