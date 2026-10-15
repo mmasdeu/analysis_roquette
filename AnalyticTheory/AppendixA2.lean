@@ -29,17 +29,43 @@ def SplitsOver (K : Type u) (E : Type u) (L : Type u) [Field K] [Field E] [Algeb
     (_ : IsScalarTower K E EL) (_ : IsScalarTower K L EL),
     IsConstantExtension K E L EL ∧ HasPrimeOfDegreeOne L EL
 
-/-- Book, §A2: the absolute invariant `j` of an arbitrary elliptic field `E | K`
-(`j = j_L` for any splitting field `L`, independent of `L`, and in `K`).
-Placeholder. Blueprint: `def:absinv-general`. -/
-noncomputable opaque absInvGen (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
-    (hE : IsEllipticOver K E) : K
+/-- Book, §A2: the data of a splitting field `L` of `E | K` together with a constant extension
+`EL | L` having a prime divisor of degree `1`. Blueprint: `def:splits-over`. -/
+structure SplittingData (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E] where
+  L : Type u
+  EL : Type u
+  [fL : Field L]
+  [aL : Algebra K L]
+  [fEL : Field EL]
+  [aE : Algebra E EL]
+  [aLEL : Algebra L EL]
+  [aKEL : Algebra K EL]
+  [stE : IsScalarTower K E EL]
+  [stL : IsScalarTower K L EL]
+  constExt : IsConstantExtension K E L EL
+  deg1 : HasPrimeOfDegreeOne L EL
+
+attribute [instance] SplittingData.fL SplittingData.aL SplittingData.fEL SplittingData.aE
+  SplittingData.aLEL SplittingData.aKEL SplittingData.stE SplittingData.stL
+
+/-- Book, §A2: the absolute invariant `j` of an arbitrary elliptic field `E | K`: the element of
+`K` whose image in `L` is `j_{EL}` for a splitting field `L` (independent of `L`, a theorem of the
+book). Blueprint: `def:absinv-general`. -/
+noncomputable def absInvGen (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
+    (_hE : IsEllipticOver K E) : K :=
+  Classical.epsilon fun j : K =>
+    ∃ d : SplittingData K E, absInv d.L d.EL d.deg1 = algebraMap K d.L j
 
 /-- Book, §A2: the Hasse invariant `γ` of an arbitrary elliptic field `E | K` with
-`j ≠ 0, 12³`, represented by an element of `K` as in §A1. Placeholder.
+`j ≠ 0, 12³`, represented by an element of `K` as in §A1: its image in `L` agrees with
+the Hasse invariant of `EL | L` modulo squares (modulo `π(L⁺)` in characteristic `2`).
 Blueprint: `def:hasse-general`. -/
-noncomputable opaque hasseGen (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
-    (hE : IsEllipticOver K E) : K
+noncomputable def hasseGen (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
+    (_hE : IsEllipticOver K E) : K :=
+  Classical.epsilon fun γ : K =>
+    ∃ d : SplittingData K E,
+      (ringChar K ≠ 2 → SquareEquiv (algebraMap K d.L γ) (hasseInv d.L d.EL d.deg1)) ∧
+      (ringChar K = 2 → PiEquiv (algebraMap K d.L γ) (hasseInv d.L d.EL d.deg1))
 
 /-- Book, §A2, Theorem (absolute invariant is in `K`, independent of splitting field): the
 absolute invariant of `E` agrees with the one computed over any splitting field `L`.

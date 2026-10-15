@@ -1,4 +1,4 @@
-import Mathlib
+import AnalyticTheory.FunctionField
 
 /-!
 # Basic notions (Introduction and terminology of the book)
@@ -32,11 +32,6 @@ structure IsFunctionFieldOver (K : Type u) (F : Type u) [Field K] [Field F] [Alg
   transcendence_degree_one : ∃ t : F, IsTranscendenceBasis K (fun _ : Unit => t)
   algebraicallyClosed : ∀ x : F, IsIntegral K x → ∃ k : K, algebraMap K F k = x
 
-/-- The genus of a function field `F | K`, defined through Riemann–Roch.
-Placeholder: Mathlib does not provide the genus of a function field.
-Blueprint: `def:genus` (placeholder). -/
-opaque genus (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] : ℕ
-
 /-- Book, Introduction: `F | K` is *conservative* if its genus does not change under
 every finite algebraic constant field extension `FL | L`.
 Blueprint: `def:conservative`. -/
@@ -53,12 +48,6 @@ structure IsEllipticOver (K : Type u) (F : Type u) [Field K] [Field F] [Algebra 
   functionField : IsFunctionFieldOver K F
   genus_one : genus K F = 1
   conservative : IsConservative K F
-
-/-- Book, Introduction: `F | K` has a *prime divisor of degree `1`.
-Placeholder predicate: prime divisors of function fields are not in Mathlib.
-Blueprint: `def:degree-one-prime` (placeholder). -/
-opaque HasPrimeOfDegreeOne (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] :
-    Prop
 
 /-- Book, §1 (constant field extensions): `FL` is the constant field extension of `F`
 by `L`, i.e. `FL` is generated as a field by the images of `F` and of `L`.

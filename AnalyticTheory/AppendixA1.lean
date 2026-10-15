@@ -55,17 +55,84 @@ def IsNormalFormA32 {K : Type u} {F : Type u} [Field K] [Field F] [Algebra K F]
     (x y : F) (A' C' : K) : Prop :=
   y ^ 2 + x * y = x ^ 3 + algebraMap K F A' * x ^ 2 + algebraMap K F C'
 
-/-- Book, §A1: the absolute invariant `j` of an elliptic function field `F | K` with a prime
-divisor of degree `1` (defined by (A1.8), resp. (A1.16)/(A1.27) in the other characteristics).
-Placeholder. Blueprint: `def:absolute-invariant`. -/
-noncomputable opaque absInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
-    (hF : HasPrimeOfDegreeOne K F) : K
+/-! ### Invariants of a Weierstraß equation
 
-/-- Book, §A1: the Hasse invariant `γ` of `F | K` (with `j ≠ 0, 12³`), represented by an
-element of `K` (see the module documentation). Placeholder.
+For the equation `y² + (ux + v) y = x³ + a₁x² + a₂x + a₃` (book (A1.26), standard long form
+with `a₁ ↦ u`, `a₃ ↦ v`, `a₂ ↦ a₁`, `a₄ ↦ a₂`, `a₆ ↦ a₃`) we use the usual quantities
+`b₂, b₄, b₆, b₈, c₄, c₆, Δ`, which are universal polynomials valid in every characteristic. -/
+
+section Invariants
+
+variable {K : Type u} [Field K]
+
+/-- `b₂ = u² + 4a₁` (this is the book's `b₁` of (A1.4)). Blueprint: `def:weierstrass-invariants`. -/
+def wB2 (u a₁ : K) : K := u ^ 2 + 4 * a₁
+/-- `b₄ = 2a₂ + uv`. -/
+def wB4 (u v a₂ : K) : K := 2 * a₂ + u * v
+/-- `b₆ = v² + 4a₃`. -/
+def wB6 (v a₃ : K) : K := v ^ 2 + 4 * a₃
+/-- `b₈ = u²a₃ + 4a₁a₃ − uva₂ + a₁v² − a₂²`. -/
+def wB8 (u v a₁ a₂ a₃ : K) : K := u ^ 2 * a₃ + 4 * a₁ * a₃ - u * v * a₂ + a₁ * v ^ 2 - a₂ ^ 2
+/-- `c₄ = b₂² − 24 b₄`. -/
+def wC4 (u v a₁ a₂ : K) : K := wB2 u a₁ ^ 2 - 24 * wB4 u v a₂
+/-- `c₆ = −b₂³ + 36 b₂b₄ − 216 b₆`. -/
+def wC6 (u v a₁ a₂ a₃ : K) : K :=
+  -(wB2 u a₁) ^ 3 + 36 * wB2 u a₁ * wB4 u v a₂ - 216 * wB6 v a₃
+/-- The discriminant `Δ = −b₂²b₈ − 8b₄³ − 27b₆² + 9b₂b₄b₆`. -/
+def wDisc (u v a₁ a₂ a₃ : K) : K :=
+  -(wB2 u a₁) ^ 2 * wB8 u v a₁ a₂ a₃ - 8 * wB4 u v a₂ ^ 3 - 27 * wB6 v a₃ ^ 2 +
+    9 * wB2 u a₁ * wB4 u v a₂ * wB6 v a₃
+
+/-- The absolute invariant `j = c₄³/Δ` of a Weierstraß equation. Blueprint:
+`def:weierstrass-invariants`. -/
+def jOfData (u v a₁ a₂ a₃ : K) : K := wC4 u v a₁ a₂ ^ 3 / wDisc u v a₁ a₂ a₃
+
+/-- The Hasse invariant (as a representative in `K`) of a Weierstraß equation, following
+(A1.13) (characteristic `≠ 2, 3`: `−c₄/c₆`, equivalent to `−½ g₂/g₃` modulo squares),
+(A1.25) (characteristic `3`: `b₂`) and (A1.36) (characteristic `2`: `a₁/u² + v/u³`, the class
+of `A′` modulo `π(K⁺)`). Blueprint: `def:weierstrass-invariants`. -/
+noncomputable def hasseOfData (u v a₁ a₂ a₃ : K) : K :=
+  if ringChar K = 2 then a₁ / u ^ 2 + v / u ^ 3
+  else if ringChar K = 3 then wB2 u a₁
+  else -(wC4 u v a₁ a₂) / wC6 u v a₁ a₂ a₃
+
+end Invariants
+
+/-- Book, §A1: the data of generators `x, y` of `F | K` with a Weierstraß equation (A1.26) of
+non-zero discriminant. Blueprint: `def:weierstrass-data`. -/
+structure WeierstrassData (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] where
+  x : F
+  y : F
+  u : K
+  v : K
+  a₁ : K
+  a₂ : K
+  a₃ : K
+  eq : IsNormalFormA1 x y u v a₁ a₂ a₃
+  gen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤
+  disc : wDisc u v a₁ a₂ a₃ ≠ 0
+
+open Classical in
+/-- Book, §A1: the absolute invariant `j` of an elliptic function field `F | K` with a prime
+divisor of degree `1`: computed from any Weierstraß equation of `F`. (Independence of the choice
+is a theorem of the book.) Blueprint: `def:absolute-invariant`. -/
+noncomputable def absInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
+    (_hF : HasPrimeOfDegreeOne K F) : K :=
+  if h : Nonempty (WeierstrassData K F) then
+    jOfData (Classical.choice h).u (Classical.choice h).v (Classical.choice h).a₁
+      (Classical.choice h).a₂ (Classical.choice h).a₃
+  else 0
+
+open Classical in
+/-- Book, §A1: the Hasse invariant `γ` of `F | K` (with `j ≠ 0, 12³`), represented by an element of
+`K` (see the module documentation), computed from any Weierstraß equation.
 Blueprint: `def:hasse-invariant`. -/
-noncomputable opaque hasseInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
-    (hF : HasPrimeOfDegreeOne K F) : K
+noncomputable def hasseInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
+    (_hF : HasPrimeOfDegreeOne K F) : K :=
+  if h : Nonempty (WeierstrassData K F) then
+    hasseOfData (Classical.choice h).u (Classical.choice h).v (Classical.choice h).a₁
+      (Classical.choice h).a₂ (Classical.choice h).a₃
+  else 0
 
 /-- Book, §A1, (A1.8): in Weierstraß normal form with `g₂, g₃` and `char K ≠ 2, 3`,
 the absolute invariant is `j = 12³ g₂³ / (g₂³ − 27 g₃²)`. Blueprint: `prop:absinv-weierstrass`. -/
