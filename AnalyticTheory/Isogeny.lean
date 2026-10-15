@@ -1,16 +1,17 @@
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA2
+import AnalyticTheory.SemiPeriodic
 
 /-!
 # Elliptic subfields and isogenies (book, §6)
 
 Commensurable periods, the fields `F_K(q̄ | Xᵐ)`, Theorems XVII, XVIII, XIX and their corollaries,
-isogenies, and the absence of complex multiplication (Corollary XVIIIb and the proposition on
-absolute integrality of `j`).
+isogenies, multiplicators and the absence of complex multiplication (Corollary XVIIIb and the
+proposition on absolute integrality of `j`).
 
-Placeholders: degrees of field extensions between subfields, elliptic subfields, periods of
-elliptic subfields, and complex multiplication are declared `opaque` predicates or stated as
-`True`, to be refined once the corresponding Mathlib infrastructure is in place.
+The substitution `X ↦ Xᵐ` is the ring endomorphism of `M_K` characterised by its action on
+holomorphic functions (`substPow`); relative degrees, separability and Galois properties of
+extensions of subfields of a common field are expressed through the inclusion maps (`relDeg`, …).
 
 Blueprint nodes: `def:commensurable`, `def:Fq-qbar-Xm`, `lem:XVII`, `thm:XVII`, `thm:XVIII`,
 `cor:XVIIIa`, `cor:XVIIIb`, `prop:abs-integral`, `thm:XIX`, `cor:XIXa`, `cor:XIXb`, `cor:XIXc`,
@@ -19,9 +20,55 @@ Blueprint nodes: `def:commensurable`, `def:Fq-qbar-Xm`, `lem:XVII`, `thm:XVII`, 
 
 open Filter Topology
 
+set_option synthInstance.maxHeartbeats 400000
+set_option maxHeartbeats 1000000
+
 namespace AnalyticTheory
 
 universe u
+
+/-! ### Extensions of subfields -/
+
+section Relative
+
+variable {M : Type*} [Field M]
+
+/-- The degree `[F : E]` of subfields `E ≤ F` of `M` (and `0` if `E ≰ F`).
+Blueprint: `def:rel-degree`. -/
+noncomputable def relDeg (E F : Subfield M) : ℕ :=
+  open Classical in
+  if h : E ≤ F then letI := (Subfield.inclusion h).toAlgebra; Module.finrank E F else 0
+
+/-- The degree of inseparability of `F | E`. Blueprint: `def:rel-degree`. -/
+noncomputable def relInsepDeg (E F : Subfield M) : ℕ :=
+  open Classical in
+  if h : E ≤ F then letI := (Subfield.inclusion h).toAlgebra; Field.finInsepDegree E F else 0
+
+/-- `F | E` is a separable extension. Blueprint: `def:rel-degree`. -/
+def IsRelSeparable (E F : Subfield M) : Prop :=
+  ∃ h : E ≤ F, letI := (Subfield.inclusion h).toAlgebra; Algebra.IsSeparable E F
+
+/-- `F | E` is purely inseparable. Blueprint: `def:rel-degree`. -/
+def IsRelPurelyInseparable (E F : Subfield M) : Prop :=
+  ∃ h : E ≤ F, letI := (Subfield.inclusion h).toAlgebra; IsPurelyInseparable E F
+
+/-- `F | E` is a Galois extension. Blueprint: `def:rel-degree`. -/
+def IsRelGalois (E F : Subfield M) : Prop :=
+  ∃ h : E ≤ F, letI := (Subfield.inclusion h).toAlgebra; IsGalois E F
+
+/-- The group of automorphisms of `F` fixing `E` pointwise. Blueprint: `def:rel-degree`. -/
+def autFixing (E F : Subfield M) : Subgroup (F ≃+* F) where
+  carrier := {φ | ∀ x : F, (x : M) ∈ E → φ x = x}
+  mul_mem' := fun {a b} ha hb x hx => by
+    show a (b x) = x
+    rw [hb x hx, ha x hx]
+  one_mem' := fun x hx => rfl
+  inv_mem' := fun {a} ha x hx => by
+    show a.symm x = x
+    rw [RingEquiv.symm_apply_eq]
+    exact (ha x hx).symm
+
+end Relative
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
@@ -30,36 +77,119 @@ nonzero integers `d, m`. Blueprint: `def:commensurable`. -/
 def Commensurable (q qbar : K) : Prop :=
   ∃ d m : ℤ, d ≠ 0 ∧ m ≠ 0 ∧ qbar ^ d = q ^ m
 
-/-- Book, §6, (72): the image field `F_K(q̄ | Xᵐ)` of `μ_m : f̄(X) ↦ f̄(Xᵐ)`.
-Placeholder. Blueprint: `def:Fq-qbar-Xm`. -/
-noncomputable opaque FqbarXm (q qbar : K) (m : ℤ) : Subfield (MeroRing K)
+/-- Book, §6: `m` is divisible by the order of `q mod^× q̄`, i.e. `q^m` is a power of `q̄`.
+Blueprint: `def:Fq-qbar-Xm`. -/
+def OrderDvd (q qbar : K) (m : ℤ) : Prop := ∃ d : ℤ, qbar ^ d = q ^ m
 
-/-- Book, §6: an *elliptic subfield* of `F_K(q)` (placeholder predicate). Blueprint: `def:elliptic-subfield`. -/
-opaque IsEllipticSubfield (q : K) (E : Subfield (MeroRing K)) : Prop
+/-- Book, §6: `μ` is the substitution `X ↦ Xᵐ` on `M_K`: it maps the holomorphic function `g` to the
+holomorphic function `g(Xᵐ)`. Blueprint: `def:Fq-qbar-Xm`. -/
+def IsSubstPow (m : ℤ) (μ : MeroRing K →+* MeroRing K) : Prop :=
+  ∀ g : holSubring K, ∃ g' : holSubring K,
+    μ (algebraMap (holSubring K) (MeroRing K) g) = algebraMap (holSubring K) (MeroRing K) g' ∧
+    ∀ α : OmegaX K, g'.1 α = g.1 ⟨α.1 ^ m, zpow_ne_zero m α.2⟩
 
-/-- Book, §6, (72)–(73) and the statement preceding XVII: `F_K(q̄ | Xᵐ) ⊆ F_K(q)` whenever
-`q̄` is commensurable with `q` and `m ≠ 0` is divisible by the order of `q mod^× q̄`;
-moreover `F_K(q̄|X⁻ᵐ) = F_K(q̄|Xᵐ)`. Blueprint: `lem:XVII`. -/
-theorem fq_qbar_Xm_subset (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) (m : ℤ) (hm : m ≠ 0) :
-    FqbarXm K q qbar m ≤ FqSub K q ∧ FqbarXm K q qbar (-m) = FqbarXm K q qbar m := by
+/-- Book, §6: the substitution `μ_m : f(X) ↦ f(Xᵐ)` as an endomorphism of `M_K`.
+Blueprint: `def:Fq-qbar-Xm`. -/
+noncomputable def substPow (m : ℤ) : MeroRing K →+* MeroRing K :=
+  haveI : Nonempty (MeroRing K →+* MeroRing K) := ⟨RingHom.id _⟩
+  Classical.epsilon (IsSubstPow K m)
+
+/-- Book, §6, (72): the image field `F_K(q̄ | Xᵐ)` of `μ_m : F_K(q̄) → M_K`.
+Blueprint: `def:Fq-qbar-Xm`. -/
+noncomputable def FqbarXm (qbar : K) (m : ℤ) : Subfield (MeroRing K) :=
+  (FqSub K qbar).map (substPow K m)
+
+/-- Book, §6, (73): `μ_{-m} = μ_m ε` with `ε` the reflection. Blueprint: `def:Fq-qbar-Xm`. -/
+theorem substPow_neg (m : ℤ) (hm : m ≠ 0) :
+    substPow K (-m) = (substPow K m).comp (reflectionM K : MeroRing K →+* MeroRing K) := by
   sorry
 
-/-- Book, §6, Theorem XVII (i)–(iv): the degree, degree of inseparability, automorphism group
-and Galois criterion for `F_K(q|X)` over `F_K(q̄|Xᵐ)`. Placeholder formulation (the degrees
-are recorded as `True`). Blueprint: `thm:XVII`. -/
+/-- The constants `K ⊂ E` for a subfield `E` of an extension field `F | K`: the `K`-algebra structure
+on `E`. Blueprint: `def:elliptic-subfield`. -/
+def subfieldAlgebra {F : Type u} [Field F] [Algebra K F] (E : Subfield F)
+    (h : ∀ c : K, algebraMap K F c ∈ E) : Algebra K E :=
+  (RingHom.codRestrict (algebraMap K F) E h).toAlgebra
+
+/-- Book, §6: a subfield `E` of an extension field `F | K` containing `K` is an *elliptic subfield*
+if it is an elliptic function field over `K`. Blueprint: `def:elliptic-subfield`. -/
+def IsEllipticSubfield {F : Type u} [Field F] [Algebra K F] (E : Subfield F) : Prop :=
+  ∃ h : ∀ c : K, algebraMap K F c ∈ E,
+    letI := subfieldAlgebra K E h; IsEllipticOver K E
+
+/-- Book, §6: the subfield `E` has *period* `q̄`: it is `K`-isomorphic to `F_K(q̄)`.
+Blueprint: `def:elliptic-subfield`. -/
+def HasPeriod {F : Type u} [Field F] [Algebra K F] (E : Subfield F) (qbar : K) : Prop :=
+  ∃ h : ∀ c : K, algebraMap K F c ∈ E,
+    letI := subfieldAlgebra K E h; Nonempty (E ≃ₐ[K] FqSub K qbar)
+
+/-- Book, §6, (72)–(73): `F_K(q̄ | Xᵐ) ⊆ F_K(q)` whenever `q̄` is commensurable with `q` and
+`m ≠ 0` is divisible by the order of `q mod^× q̄`; moreover `F_K(q̄|X⁻ᵐ) = F_K(q̄|Xᵐ)`.
+Blueprint: `lem:XVII`. -/
+theorem fq_qbar_Xm_subset (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m : ℤ) (hm : m ≠ 0) (hdvd : OrderDvd K q qbar m) :
+    FqbarXm K qbar m ≤ FqSub K q ∧ FqbarXm K qbar (-m) = FqbarXm K qbar m := by
+  sorry
+
+/-- The subgroup `U ⊂ K^×` of elements `u` with `u^m ≡ 1 mod^× q̄`. Blueprint: `thm:XVII`. -/
+def Usub (qbar : K) (hqb : qbar ≠ 0) (m : ℕ) : Subgroup Kˣ where
+  carrier := {u | ∃ k : ℤ, (u : K) ^ m = qbar ^ k}
+  mul_mem' := fun {a b} ⟨k, hk⟩ ⟨l, hl⟩ => ⟨k + l, by
+    rw [Units.val_mul, mul_pow, hk, hl, zpow_add₀ hqb]⟩
+  one_mem' := ⟨0, by simp⟩
+  inv_mem' := fun {a} ⟨k, hk⟩ => ⟨-k, by
+    rw [Units.val_inv_eq_inv_val, inv_pow, hk, zpow_neg]⟩
+
+/-- Book, §6, Theorem XVII (i)–(ii): for `m > 0` a multiple of the order of `q mod^× q̄` (so that
+`q̄^d = q^m` with `d > 0`), `[F_K(q) : F_K(q̄|Xᵐ)] = dm`, and the degree of inseparability is the
+largest power `p^r` of the characteristic dividing `m`, with maximal separable subextension
+`F_K(q^{p^r} | X^{p^r})`. Blueprint: `thm:XVII`. -/
 theorem thmXVII_degree (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) (m : ℕ) (hm : 0 < m) :
-    True := by
-  trivial
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
+    (hqd : qbar ^ d = q ^ m) :
+    relDeg (FqbarXm K qbar m) (FqSub K q) = d * m ∧
+    relInsepDeg (FqbarXm K qbar m) (FqSub K q) = ringChar K ^ (m.factorization (ringChar K)) ∧
+    IsRelSeparable (FqbarXm K qbar m)
+      (FqbarXm K (q ^ (ringChar K ^ (m.factorization (ringChar K))))
+        ((ringChar K ^ (m.factorization (ringChar K)) : ℕ) : ℤ)) ∧
+    IsRelPurelyInseparable
+      (FqbarXm K (q ^ (ringChar K ^ (m.factorization (ringChar K))))
+        ((ringChar K ^ (m.factorization (ringChar K)) : ℕ) : ℤ)) (FqSub K q) := by
+  sorry
+
+/-- Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are the
+translations `τ_u`, `u ∈ U`, and the automorphism group is `U/q`. (The book writes `u^m ≡ 1 mod^× q`;
+the proof and Corollary XIXa show that `q̄` is meant.) Blueprint: `thm:XVII`. -/
+theorem thmXVII_automorphisms (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
+    (hqd : qbar ^ d = q ^ m) :
+    (∀ φ : FqSub K q ≃+* FqSub K q, φ ∈ autFixing (FqbarXm K qbar m) (FqSub K q) ↔
+      ∃ u : Kˣ, u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m ∧
+        ∀ x : FqSub K q, (φ x : MeroRing K) = translation K u (x : MeroRing K)) ∧
+    Nonempty (autFixing (FqbarXm K qbar m) (FqSub K q) ≃*
+      (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸
+        (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
+          (Usub K qbar (norm_pos_iff.mp hqb0) m))) := by
+  sorry
+
+/-- Book, §6, Theorem XVII (iv): `F_K(q)` is Galois over `F_K(q̄|Xᵐ)` iff `p ∤ m`, `K` contains the
+`m`-th roots of unity, and `q̄` is an `m`-th power in `K`. Blueprint: `thm:XVII`. -/
+theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
+    (hqd : qbar ^ d = q ^ m) :
+    IsRelGalois (FqbarXm K qbar m) (FqSub K q) ↔
+      (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar) := by
+  sorry
 
 /-- Book, §6, Theorem XVIII: every elliptic subfield `E` of `F_K(q)` is `F_K(q̄|Xᵐ)` for a unique
-period `q̄` (commensurable with `q`) and a unique `m` (the largest integer with `E ⊆ M_K(Xᵐ)`).
-Blueprint: `thm:XVIII`. -/
+period `q̄` (commensurable with `q`) and a unique `m > 0` (the largest integer such that every
+function of `E` is a function of `Xᵐ`). Blueprint: `thm:XVIII`. -/
 theorem thmXVIII_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (E : Subfield (MeroRing K)) (hE : IsEllipticSubfield K q E) (hEF : E ≤ FqSub K q) :
-    ∃ (qbar : K) (m : ℤ), 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ Commensurable K q qbar ∧
-      m ≠ 0 ∧ E = FqbarXm K q qbar m := by
+    (E : Subfield (FqSub K q)) (hE : IsEllipticSubfield K E) :
+    ∃ (qbar : K) (m : ℕ), 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ Commensurable K q qbar ∧
+      0 < m ∧ OrderDvd K q qbar m ∧
+      E.map (FqSub K q).subtype = FqbarXm K qbar m ∧
+      (∀ q' : K, HasPeriod K E q' → q' = qbar) ∧
+      IsGreatest {k : ℕ | 0 < k ∧ E.map (FqSub K q).subtype ≤ (substPow K k).fieldRange} m := by
   sorry
 
 /-- Book, §6: an *isogeny* `μ : E → F` of elliptic function fields is a `K`-embedding `E ↪ F`.
@@ -70,15 +200,70 @@ def IsIsogeny (E F : Type u) [Field E] [Field F] [Algebra K E] [Algebra K F] : P
 /-- Book, §6, Corollary XVIIIa: an elliptic field `E | K` admits an isogeny to `F_K(q)` iff `E` is
 `K`-isomorphic to `F_K(q̄)` with `q̄` commensurable with `q`. Blueprint: `cor:XVIIIa`. -/
 theorem corXVIIIa_isogeny (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (E : Type u) [Field E] [Algebra K E] :
+    (E : Type u) [Field E] [Algebra K E] (hE : IsEllipticOver K E) :
     IsIsogeny K E (FqSub K q) ↔
       ∃ qbar : K, 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ Commensurable K q qbar ∧
         Nonempty (E ≃ₐ[K] FqSub K qbar) := by
   sorry
 
-/-- Book, §6: complex multiplication, `M(F) ≠ ℤ` (placeholder predicate on the ring of
-multiplicators). Blueprint: `def:complex-multiplication`. -/
-opaque HasComplexMultiplication (K : Type u) [Field K] (F : Type u) [Field F] [Algebra K F] : Prop
+/-- Book, §6, Corollary XVIIIa (second part): for `q̄` commensurable with `q` and `m ≠ 0` divisible
+by the order of `q mod^× q̄` the substitution `μ_m : F_K(q̄) → F_K(q)` is an isogeny of degree `dm`
+(`q̄^d = q^m`); every isogeny `F_K(q̄) → F_K(q)` is `μ_m τ` with `τ` a translation of `F_K(q̄)`.
+Blueprint: `cor:XVIIIa`. -/
+theorem corXVIIIa_isogenies (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) :
+    (∀ m : ℤ, m ≠ 0 → OrderDvd K q qbar m → ∃ μ : FqSub K qbar →ₐ[K] FqSub K q,
+      (∀ x, (μ x : MeroRing K) = substPow K m (x : MeroRing K)) ∧
+      ∀ d : ℕ, qbar ^ d = q ^ m → relDeg (FqbarXm K qbar m) (FqSub K q) = d * m.natAbs) ∧
+    (∀ μ : FqSub K qbar →ₐ[K] FqSub K q, ∃ (m : ℤ) (u : Kˣ), m ≠ 0 ∧ OrderDvd K q qbar m ∧
+      ∀ x, (μ x : MeroRing K) = substPow K m (translation K u (x : MeroRing K))) := by
+  sorry
+
+/-! #### Multiplicators and complex multiplication -/
+
+section CM
+
+variable (K' : Type u) [Field K'] (F : Type u) [Field F] [Algebra K' F]
+
+/-- Book, §6: the divisor map `μ* : D(F) → D(E)` of an isogeny `μ : E → F`:
+`μ*(𝔭) = (deg 𝔭 / deg 𝔮) 𝔮` where `𝔮` is the prime divisor of `E` below `𝔭`
+(`𝔮 = μ⁻¹(O_𝔭)`), and `0` if there is none. Blueprint: `def:isogeny`. -/
+noncomputable def isogenyPullbackPrime {E : Type u} [Field E] [Algebra K' E] (μ : E →ₐ[K'] F)
+    (P : PrimeDivisor K' F) : FFDivisor K' E :=
+  open Classical in
+  Classical.epsilon fun D : FFDivisor K' E =>
+    (∃ Q : PrimeDivisor K' E, (∀ x : E, x ∈ Q.ring ↔ μ x ∈ P.ring) ∧
+      D = Finsupp.single Q ((P.degree / Q.degree : ℕ) : ℤ)) ∨
+    ((¬ ∃ Q : PrimeDivisor K' E, ∀ x : E, x ∈ Q.ring ↔ μ x ∈ P.ring) ∧ D = 0)
+
+/-- The transposed divisor map `μ* : D(F) → D(E)` of an isogeny. Blueprint: `def:isogeny`. -/
+noncomputable def isogenyPullback {E : Type u} [Field E] [Algebra K' E] (μ : E →ₐ[K'] F) :
+    FFDivisor K' F →+ FFDivisor K' E :=
+  Finsupp.liftAddHom fun P => zmultiplesHom (FFDivisor K' E) (isogenyPullbackPrime K' F μ P)
+
+/-- Book, §6: `f : C⁰(F) → C⁰(E)` is the *multiplicator* defined by `μ` if it is induced by
+`μ*` on divisors of degree `0`. Blueprint: `def:isogeny`. -/
+def IsMultiplicator {E : Type u} [Field E] [Algebra K' E] (μ : E →ₐ[K'] F)
+    (f : FFClassGroupDegZero K' F →+ FFClassGroupDegZero K' E) : Prop :=
+  ∀ (D : FFDivisor.degZero K' F) (D' : FFDivisor.degZero K' E),
+    (D' : FFDivisor K' E) = isogenyPullback K' F μ (D : FFDivisor K' F) →
+      f (QuotientAddGroup.mk D) = QuotientAddGroup.mk D'
+
+/-- Book, §6: the ring `𝐌(F | K)` generated by the multiplicators of `C⁰(F | K)` (inside the
+endomorphism ring of the group `C⁰(F | K)`). Blueprint: `def:complex-multiplication`. -/
+def multiplicatorRing : Subring (AddMonoid.End (FFClassGroupDegZero K' F)) :=
+  Subring.closure {f | ∃ μ : F →ₐ[K'] F, IsMultiplicator K' F μ f}
+
+/-- Book, §6: `F | K` has *complex multiplication*, i.e. `𝐌(F) ≠ ℤ`: for some finite extension `L`
+and constant field extension `FL | L`, the ring of multiplicators `𝐌(FL | L)` is not just the
+natural multiplicators. Blueprint: `def:complex-multiplication`. -/
+def HasComplexMultiplication : Prop :=
+  ¬ ∀ (L FL : Type u) [Field L] [Field FL] [Algebra K' L] [Algebra F FL] [Algebra L FL]
+      [Algebra K' FL] [IsScalarTower K' F FL] [IsScalarTower K' L FL],
+      FiniteDimensional K' L → IsConstantExtension K' F L FL →
+        ∀ f ∈ multiplicatorRing L FL, ∃ n : ℤ, f = (n : AddMonoid.End (FFClassGroupDegZero L FL))
+
+end CM
 
 /-- Book, §6, Corollary XVIIIb: `F_K(q)` does not have complex multiplication.
 Blueprint: `cor:XVIIIb`. -/
@@ -96,35 +281,109 @@ theorem prop_cm_absolutely_integral (K : Type u) [Field K] (F : Type u) [Field F
       Polynomial.aeval (absInvGen K F hF) (p.map (Int.castRingHom K)) = 0 := by
   sorry
 
-/-- Book, §6, Theorem XIX: the elliptic subfields `E ⊆ F` of an elliptic field `F` admitting the
-period `q`: (i) each has a period `q̄ ∈ K`, commensurable with `q`; (ii) for fixed `q̄`, they correspond
-`1 − 1` to integers `m > 0` divisible by the order of `q mod^× q̄`, with `[F : E] = dm` where
-`q^m = q̄^d`, and `χ̄ = χ^d`. Placeholder formulation (the bijection is recorded as `True`).
-Blueprint: `thm:XIX`. -/
-theorem thmXIX_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    True := by
-  trivial
+/-! #### Elliptic subfields of semi-periodic fields (Theorem XIX) -/
 
-/-- Book, §6, Corollary XIXa: degree of inseparability `pʳ`, automorphism group `U/q`, and the Galois
-criterion for `F | E`. Placeholder. Blueprint: `cor:XIXa`. -/
-theorem corXIXa_galois (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) : True := by
-  trivial
+section XIX
+
+variable (L : Type u) [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
+  [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
+
+/-- Book, §6, Theorem XIX (i): every elliptic subfield `E` of a field `F = F_K(𝐐)` admitting the
+period `q` admits a period `q̄ ∈ K`, commensurable with `q`. Blueprint: `thm:XIX`. -/
+theorem thmXIX_period (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+    (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K E) :
+    ∃ qbar : K, 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ Commensurable K q qbar ∧ HasPeriod K E qbar := by
+  sorry
+
+/-- Book, §6, Theorem XIX (ii): for `q̄` commensurable with `q` the elliptic subfields `E ⊂ F` with
+period `q̄` correspond `1 − 1` to the integers `m > 0` divisible by the order of `q mod^× q̄`; if `E`
+belongs to `m` then `[F : E] = dm` with `q^m = q̄^d`, the character invariant of `E` is `χ^d` (up to
+inversion), and `m` is the largest integer such that `E` lies in an elliptic subfield of `F` admitting
+the period `q^m`. Blueprint: `thm:XIX`. -/
+theorem thmXIX_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) :
+    ∃ e : {m : ℕ // 0 < m ∧ OrderDvd K q qbar m} ≃
+        {E : Subfield (FKQ K L q T) // IsEllipticSubfield K E ∧ HasPeriod K E qbar},
+      ∀ m : {m : ℕ // 0 < m ∧ OrderDvd K q qbar m},
+        ∀ d : ℕ, qbar ^ d = q ^ (m : ℕ) →
+          Module.finrank (e m).1 (FKQ K L q T) = d * m ∧
+          (∀ (hE : IsEllipticOver K (FKQ K L q T)) (hs : SplitsOver K (FKQ K L q T) L)
+              (h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ (e m).1),
+            letI := subfieldAlgebra K (e m).1 h
+            ∀ (hE' : IsEllipticOver K (e m).1) (hs' : SplitsOver K (e m).1 L),
+              charInvariant K L qbar (e m).1 hE' hs' =
+                  charInvariant K L q (FKQ K L q T) hE hs ^ d ∨
+                charInvariant K L qbar (e m).1 hE' hs' =
+                  (charInvariant K L q (FKQ K L q T) hE hs ^ d)⁻¹) ∧
+          IsGreatest {k : ℕ | ∃ E' : Subfield (FKQ K L q T), IsEllipticSubfield K E' ∧
+            (e m).1 ≤ E' ∧ HasPeriod K E' (q ^ k)} m := by
+  sorry
+
+/-- Book, §6, Corollary XIXa: for an elliptic subfield `E ⊂ F` of period `q̄` belonging to `m`:
+(i) the degree of inseparability of `F | E` is `p^r`, the largest `p`-power dividing `m`; (ii) the
+automorphism group of `F | E` is `U/q`, `U = {u ∈ K^× | u^m ≡ 1 mod^× q̄}`; (iii) `F | E` is Galois
+iff `p ∤ m`, `K` contains the `m`-th roots of unity and `q̄` has an `m`-th root in `K`.
+Blueprint: `cor:XIXa`. -/
+theorem corXIXa_galois (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1)
+    (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K E) (hper : HasPeriod K E qbar)
+    (m d : ℕ) (hm : 0 < m) (hd : 0 < d) (hqd : qbar ^ d = q ^ m)
+    (hmax : IsGreatest {k : ℕ | ∃ E' : Subfield (FKQ K L q T), IsEllipticSubfield K E' ∧
+      E ≤ E' ∧ HasPeriod K E' (q ^ k)} m) :
+    Field.finInsepDegree E (FKQ K L q T) = ringChar K ^ (m.factorization (ringChar K)) ∧
+    Nonempty ((FKQ K L q T ≃ₐ[E] FKQ K L q T) ≃*
+      (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸
+        (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
+          (Usub K qbar (norm_pos_iff.mp hqb0) m))) ∧
+    (IsGalois E (FKQ K L q T) ↔
+      (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar)) := by
+  sorry
 
 /-- Book, §6, Corollary XIXb: for each commensurable `q̄` there is a unique maximal elliptic
-subfield `E₀ ⊆ F` with period `q̄` that splits over `K`; `[F : E₀] = d₀ m₀`. Placeholder.
-Blueprint: `cor:XIXb`. -/
-theorem corXIXb_maximal_split (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) : True := by
-  trivial
+subfield `E₀ ⊂ F` of period `q̄` that splits over `K`; `[F : E₀] = d₀ m₀` with `d₀ = lcm(n, r)`,
+`n` the order of the character invariant (`n = [L:K]`), `r` the order of `q̄ mod^× q`, and
+`q^{m₀} = q̄^{d₀}`. Blueprint: `cor:XIXb`. -/
+theorem corXIXb_maximal_split (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) :
+    ∃ E₀ : Subfield (FKQ K L q T),
+      IsGreatest {E : Subfield (FKQ K L q T) | IsEllipticSubfield K E ∧ HasPeriod K E qbar ∧
+        ∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
+          letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E} E₀ ∧
+      ∃ d₀ m₀ : ℕ, d₀ = Nat.lcm (Module.finrank K L)
+          (orderOf (QuotientGroup.mk (Units.mk0 qbar (norm_pos_iff.mp hqb0)) :
+            Kˣ ⧸ Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0)))) ∧
+        q ^ m₀ = qbar ^ d₀ ∧ Module.finrank E₀ (FKQ K L q T) = d₀ * m₀ := by
+  sorry
 
-/-- Book, §6, Corollary XIXc: there is a unique maximal subfield `F₀ ⊆ F` which is `K`-isomorphic
-to the Jacobian `F_K(q)`, with `[F : F₀] = n²`. Placeholder. Blueprint: `cor:XIXc`. -/
-theorem corXIXc_maximal_jacobian (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) : True := by
-  trivial
+/-- Book, §6, Corollary XIXc: there is a unique maximal subfield `F₀ ⊂ F` which is `K`-isomorphic
+to the Jacobian `F_K(q)`, with `[F : F₀] = n²`. Blueprint: `cor:XIXc`. -/
+theorem corXIXc_maximal_jacobian (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (T : SemiPeriodicTriple K L q) :
+    ∃ F₀ : Subfield (FKQ K L q T),
+      IsGreatest {E : Subfield (FKQ K L q T) | IsEllipticSubfield K E ∧ HasPeriod K E q ∧
+        ∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
+          letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E} F₀ ∧
+      Module.finrank F₀ (FKQ K L q T) = Module.finrank K L ^ 2 := by
+  sorry
 
 /-- Book, §6, Corollary XIXd: the degree of `F` over any elliptic subfield that splits over `K` is
-divisible by `n`; subfields of degree `n` exist iff `q` is an `n`-th power in `K`. Placeholder.
+divisible by `n = [L:K]`; subfields of degree `n` exist iff `q` is an `n`-th power in `K`; they are in
+`1 − 1` correspondence with the `n`-th roots of `q` in `K` (their periods), and `F | E₀` is cyclic.
 Blueprint: `cor:XIXd`. -/
-theorem corXIXd_degree_n (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) : True := by
-  trivial
+theorem corXIXd_degree_n (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q) :
+    (∀ E : Subfield (FKQ K L q T), IsEllipticSubfield K E →
+      (∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
+        letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) →
+      Module.finrank K L ∣ Module.finrank E (FKQ K L q T)) ∧
+    ∃ e : {r : K // r ^ Module.finrank K L = q} ≃
+        {E : Subfield (FKQ K L q T) // IsEllipticSubfield K E ∧
+          (∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
+            letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) ∧
+          Module.finrank E (FKQ K L q T) = Module.finrank K L},
+      (∀ r, HasPeriod K (e r).1 r.1) ∧
+      (∀ r, IsGalois (e r).1 (FKQ K L q T) ∧ IsCyclic (FKQ K L q T ≃ₐ[(e r).1] FKQ K L q T)) := by
+  sorry
+
+end XIX
 
 end AnalyticTheory

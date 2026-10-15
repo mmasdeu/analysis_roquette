@@ -103,6 +103,29 @@ noncomputable def genus (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K
   sInf {g : ℕ | ∃ N : ℤ, ∀ D : FFDivisor K F, N ≤ D.deg →
     ((Module.finrank K (rrSpace D) : ℕ) : ℤ) = D.deg - g + 1}
 
+/-- The action of a `K`-automorphism `φ` of `F` on prime divisors: the valuation ring of `φ P`
+is `φ(O_P)`. Blueprint: `def:aut-action-divisors`. -/
+noncomputable def PrimeDivisor.map (φ : F ≃ₐ[K] F) (P : PrimeDivisor K F) : PrimeDivisor K F where
+  ring := P.ring.comap (φ.symm : F →+* F)
+  isDVR := by
+    haveI := P.isDVR
+    let e : P.ring ≃+* (P.ring.comap (φ.symm : F →+* F)) :=
+      { toFun := fun y => ⟨φ y.1, by
+          rw [ValuationSubring.mem_comap]; simpa using y.2⟩
+        invFun := fun x => ⟨φ.symm x.1, ValuationSubring.mem_comap.mp x.2⟩
+        left_inv := fun y => Subtype.ext (by simp)
+        right_inv := fun x => Subtype.ext (by simp)
+        map_mul' := fun x y => Subtype.ext (by simp)
+        map_add' := fun x y => Subtype.ext (by simp) }
+    exact IsDiscreteValuationRing.RingEquivClass.isDiscreteValuationRing e
+  contains := fun c => by
+    rw [ValuationSubring.mem_comap]
+    simpa using P.contains c
+
+/-- The action of a `K`-automorphism of `F` on divisors. Blueprint: `def:aut-action-divisors`. -/
+noncomputable def FFDivisor.act (φ : F ≃ₐ[K] F) : FFDivisor K F →+ FFDivisor K F :=
+  Finsupp.mapDomain.addMonoidHom (PrimeDivisor.map φ)
+
 /-- Book, Introduction: `F | K` has a *prime divisor of degree `1`*.
 Blueprint: `def:degree-one-prime`. -/
 def HasPrimeOfDegreeOne (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] : Prop :=
