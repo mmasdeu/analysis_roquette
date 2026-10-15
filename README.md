@@ -53,9 +53,9 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Total blueprint nodes: 129 (definitions, lemmas, propositions, theorems, corollaries,
+* Total blueprint nodes: 130 (definitions, lemmas, propositions, theorems, corollaries,
   remarks; this includes the Proposition 2 placeholder).
-* All statements compile. 86 declarations carry `sorry` (no proofs filled in yet, as requested).
+* All statements compile. 66 declarations still carry `sorry`: theorem proofs, plus the few definitions whose bodies depend on placeholders (see below).
 * Nodes marked `\notready` in the blueprint are placeholders: either an `opaque`/`sorry`-bodied
   object that Mathlib does not yet provide (genus, prime divisors, residue fields, derivations,
   translations on `M_K`, `H¹` of Galois modules, characteristic cocycles, Brauer groups,
@@ -63,3 +63,15 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   its content needs that missing infrastructure.
 * Not formalized: Remarks 1–3 of §2 (text only); Proposition 2 of §2 (missing from the
   LaTeX transcription of the book, see the blueprint node `rem:S2-prop2-missing`).
+
+## Filled-in definitions (second step)
+
+Now constructed rather than placeholders: `H_K`'s constants (`holAlgebra`), the
+scaling and reflection automorphisms of `H_K` and their extension to `M_K`
+(`holScale`, `translation`, `reflectionM`), the subfield `F_K(q)` with its `K`-algebra
+structure (`FqSub`, `FqAlgebra`), and the divisor groups (`Divisors`, `DivisorsPeriodic`).
+Still placeholders: `anVal`, `Dop`, `thetaM`, `wpPrimeM`, `genus`, `HasPrimeOfDegreeOne`,
+`absInv`, `hasseInv`, `absInvGen`, `hasseGen`, `degQ`, `PhiQ`, `FqbarXm`, `tauQSigma`,
+`charInvariant`, `H1Lq`, `eQ`, `charCocycle`, `translationOfClass`, `IsEllipticSubfield`,
+`HasComplexMultiplication`. Still open inside otherwise constructed definitions: closure of
+`H_K` under products (`holSubring`).

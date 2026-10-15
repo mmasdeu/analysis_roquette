@@ -279,3 +279,20 @@ add('theorem','thm:A2-cocycle-translation','Cocycle with values in translations'
  r'$F$ is the Jacobian of $E$ iff the characteristic cocycle takes values in translations. Recorded as $\mathrm{True}$.')
 add('proposition','prop:A2-classification','Classification by $H^1(G,T)$',['a2_classification','cohomological_invariant_independent'],['thm:A2-cocycle-translation','thm:IX'],True,
  r'Elliptic fields with invariants $j,\gamma$ split by $L$ correspond to pairs $\pm\zeta\in H^1(G,T)$. Recorded as $\mathrm{True}$.')
+
+# ---- status updates after filling in definitions (later edits override earlier ones)
+OVERRIDES = {
+ 'def:const-algebra': dict(notready=False),
+ 'def:translation': dict(notready=False),
+ 'def:reflection': dict(notready=False),
+ 'def:Dq': dict(notready=False),
+ 'def:divisor': dict(notready=False),
+ 'def:H-K': dict(notready=True, text=r'The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of $\Omega\to\Omega$. Closure under sums, negatives and constants is proved; closure under products (a Cauchy-product estimate for convergent Laurent series) is pending.'),
+ 'def:principal-divisors': dict(notready=True, text=r'Divisors of $q$-periodic functions. Closure under addition depends on the placeholder valuation $w_\alpha$.'),
+ 'def:D0q': dict(notready=True, text=r'$D^0_K(q)$: $q$-periodic divisors of degree $0$. Closure depends on the placeholder degree $\deg_q$.'),
+}
+for _it in ITEMS:
+    _it.update(OVERRIDES.get(_it['label'], {}))
+ITEMS.append(dict(env='definition', label='def:Fq-algebra', title=r'$K$-algebra structure on $F_K(q)$',
+    lean=['FqHom', 'FqAlgebra'], uses=['def:Fq', 'def:const-algebra', 'def:translation'], notready=False,
+    text=r'Constants lie in $F_K(q)$ because translations fix $K$, giving $K\to F_K(q)$.'))

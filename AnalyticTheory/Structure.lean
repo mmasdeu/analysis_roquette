@@ -20,10 +20,6 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-/-- The `K`-algebra structure on `F_K(q)` (the constants are fixed by translations).
-Placeholder. Blueprint: `def:Fq-algebra`. -/
-noncomputable instance FqAlgebra (q : K) : Algebra K (FqSub K q) := sorry
-
 /-- Book, §2, first observation: the `q`-periodic meromorphic functions. Placeholder for
 the principal divisors `P_K(q)` of `F_K(q)`. Blueprint: `def:principal-divisors`. -/
 noncomputable def principalDivisors (q : K) : AddSubgroup (Omega K → ℤ) where
@@ -118,7 +114,8 @@ theorem translation_analytic_eq_algebraic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖
       (QuotientAddGroup.mk m : classGroupDegZero K q) = c →
         PhiQ K q (norm_pos_iff.mp hq0) (m : Omega K → ℤ) = QuotientGroup.mk (Units.mk0 a ha))
     (x : FqSub K q) :
-    ((translationOfClass K q c x : FqSub K q) : MeroRing K) = translation K a (x : MeroRing K) := by
+    ((translationOfClass K q c x : FqSub K q) : MeroRing K) =
+      translation K (Units.mk0 a ha) (x : MeroRing K) := by
   sorry
 
 end AnalyticTheory

@@ -104,7 +104,8 @@ $f:\Omega^\times\to\Omega$ is holomorphic over $K$ if it is given by a convergen
 \label{def:H-K}
 \lean{AnalyticTheory.holSubring}
 \uses{def:holomorphic}
-The holomorphic functions over $K$ form a ring $H_K$ (packaged as a subring of $\Omega\to\Omega$).
+\notready
+The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of $\Omega\to\Omega$. Closure under sums, negatives and constants is proved; closure under products (a Cauchy-product estimate for convergent Laurent series) is pending.
 \end{definition}
 
 \begin{lemma}[$H_K$ is a domain]
@@ -125,7 +126,6 @@ $M_K$ is the quotient field of $H_K$ (meromorphic functions).
 \label{def:const-algebra}
 \lean{AnalyticTheory.holAlgebra}
 \uses{def:H-K}
-\notready
 Constant functions give $K \hookrightarrow H_K$. Placeholder instance.
 \end{definition}
 
@@ -141,7 +141,6 @@ $w_\alpha$ is the order of vanishing at $\alpha$, with $w_\alpha(0)=+\infty$. Pl
 \label{def:translation}
 \lean{AnalyticTheory.translation}
 \uses{def:M-K}
-\notready
 $\tau_a:f(X)\mapsto f(a^{-1}X)$ on $M_K$. Placeholder.
 \end{definition}
 
@@ -277,14 +276,16 @@ $F_K(q)$ is an elliptic function field over $K$.
 \label{def:principal-divisors}
 \lean{AnalyticTheory.principalDivisors}
 \uses{def:divisor-of}
-Divisors of $q$-periodic functions.
+\notready
+Divisors of $q$-periodic functions. Closure under addition depends on the placeholder valuation $w_\alpha$.
 \end{definition}
 
 \begin{definition}[Degree-zero divisors $D^0_K(q)$]
 \label{def:D0q}
 \lean{AnalyticTheory.divisorsDegZero}
 \uses{def:Dq, def:deg-q}
-$D^0_K(q)$: $q$-periodic divisors of degree $0$.
+\notready
+$D^0_K(q)$: $q$-periodic divisors of degree $0$. Closure depends on the placeholder degree $\deg_q$.
 \end{definition}
 
 \begin{definition}[Divisor class group $C^0_K(q)$]
@@ -366,6 +367,13 @@ The function $\Theta$ viewed in $M_K$. Placeholder.
 The image field of $\mu_m:\bar f(X)\mapsto\bar f(X^m)$. Placeholder.
 \end{definition}
 
+\begin{definition}[$K$-algebra structure on $F_K(q)$]
+\label{def:Fq-algebra}
+\lean{AnalyticTheory.FqHom, AnalyticTheory.FqAlgebra}
+\uses{def:Fq, def:const-algebra, def:translation}
+Constants lie in $F_K(q)$ because translations fix $K$, giving $K\to F_K(q)$.
+\end{definition}
+
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
 
 \begin{definition}[Derivation $D$ (placeholder)]
@@ -429,7 +437,6 @@ $\wp,\wp\'$ generate $F_K(q)$; the poles are $2\mathfrak p_1$ and $3\mathfrak p_
 \label{def:reflection}
 \lean{AnalyticTheory.reflectionM}
 \uses{def:M-K}
-\notready
 $\varepsilon:f(X)\mapsto f(X^{-1})$. Placeholder.
 \end{definition}
 

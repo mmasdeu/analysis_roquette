@@ -56,16 +56,118 @@ def IsHolomorphicOver (f : Omega K → Omega K) : Prop :=
     ∀ α : Omega K, α ≠ 0 →
       HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α ^ n) (f α)
 
+/-- Book, §2: rescaling `f(X) ↦ f(cX)` of a function on `Ω^×`. -/
+noncomputable def scaleFun (c : Kˣ) (f : Omega K → Omega K) : Omega K → Omega K :=
+  fun α => f (algebraMap K (Omega K) (c : K) * α)
+
+/-- Constant functions are holomorphic. -/
+theorem isHolomorphicOver_const (c : K) :
+    IsHolomorphicOver K (fun _ : Omega K => algebraMap K (Omega K) c) := by
+  refine ⟨fun n => if n = 0 then c else 0, ?_, ?_⟩
+  · intro r hr
+    have hev : ∀ᶠ n : ℤ in cofinite, n ≠ 0 := by
+      refine Filter.eventually_cofinite.mpr ?_
+      simpa using Set.finite_singleton (0 : ℤ)
+    refine tendsto_const_nhds.congr' ?_
+    filter_upwards [hev] with n hn
+    simp [hn]
+  · intro α _
+    have h := hasSum_single (f := fun n : ℤ =>
+        algebraMap K (Omega K) (if n = 0 then c else 0) * α ^ n) 0
+      (fun n hn => by simp [hn])
+    simpa using h
+
+/-- Holomorphic functions are stable under sums. -/
+theorem isHolomorphicOver_add {f g : Omega K → Omega K} (hf : IsHolomorphicOver K f)
+    (hg : IsHolomorphicOver K g) : IsHolomorphicOver K (f + g) := by
+  obtain ⟨a, ha, hsa⟩ := hf
+  obtain ⟨b, hb, hsb⟩ := hg
+  refine ⟨fun n => a n + b n, ?_, ?_⟩
+  · intro r hr
+    refine squeeze_zero (fun n => mul_nonneg (norm_nonneg _) (zpow_pos hr n).le) (fun n => ?_)
+      (by simpa using (ha r hr).add (hb r hr))
+    calc ‖a n + b n‖ * r ^ n ≤ (‖a n‖ + ‖b n‖) * r ^ n :=
+          mul_le_mul_of_nonneg_right (norm_add_le _ _) (zpow_pos hr n).le
+      _ = ‖a n‖ * r ^ n + ‖b n‖ * r ^ n := add_mul _ _ _
+  · intro α hα
+    have h := (hsa α hα).add (hsb α hα)
+    simp only [Pi.add_apply]
+    convert h using 1
+    funext n
+    simp [map_add, add_mul]
+
+/-- Holomorphic functions are stable under negation. -/
+theorem isHolomorphicOver_neg {f : Omega K → Omega K} (hf : IsHolomorphicOver K f) :
+    IsHolomorphicOver K (-f) := by
+  obtain ⟨a, ha, hsa⟩ := hf
+  refine ⟨fun n => -a n, ?_, ?_⟩
+  · intro r hr
+    refine (ha r hr).congr (fun n => ?_)
+    simp [norm_neg]
+  · intro α hα
+    have h := (hsa α hα).neg
+    simp only [Pi.neg_apply]
+    convert h using 1
+    funext n
+    simp [map_neg, neg_mul]
+
+/-- Holomorphic functions are stable under rescaling `X ↦ cX` for `c ∈ K^×`. -/
+theorem isHolomorphicOver_scale (c : Kˣ) {f : Omega K → Omega K} (hf : IsHolomorphicOver K f) :
+    IsHolomorphicOver K (scaleFun K c f) := by
+  obtain ⟨a, hconv, hsum⟩ := hf
+  refine ⟨fun n => a n * (c : K) ^ n, ?_, ?_⟩
+  · intro r hr
+    have hcr : 0 < ‖(c : K)‖ * r := mul_pos (norm_pos_iff.mpr c.ne_zero) hr
+    refine (hconv _ hcr).congr (fun n => ?_)
+    rw [norm_mul, norm_zpow, mul_zpow]
+    ring
+  · intro α hα
+    have hc : algebraMap K (Omega K) (c : K) ≠ 0 := (map_ne_zero _).mpr c.ne_zero
+    have h := hsum _ (mul_ne_zero hc hα)
+    show HasSum _ (f (algebraMap K (Omega K) (c : K) * α))
+    convert h using 1
+    funext n
+    simp only [map_mul, map_zpow₀, mul_zpow]
+    ring
+
 /-- Book, §2: the holomorphic functions over `K`, `H_K`. We package them as a subring of
-the functions `Ω → Ω` (pointwise operations). The closure proofs are not yet filled in.
+the functions `Ω → Ω` (pointwise operations). The multiplicativity is not yet proved
+(it is a Cauchy-product estimate for convergent Laurent series).
 Blueprint: `def:H-K`. -/
 def holSubring : Subring (Omega K → Omega K) where
   carrier := {f | IsHolomorphicOver K f}
   mul_mem' := by sorry
-  one_mem' := by sorry
-  add_mem' := by sorry
-  zero_mem' := by sorry
-  neg_mem' := by sorry
+  one_mem' := by simpa using isHolomorphicOver_const K 1
+  add_mem' := fun hf hg => isHolomorphicOver_add K hf hg
+  zero_mem' := by simpa using isHolomorphicOver_const K 0
+  neg_mem' := fun hf => isHolomorphicOver_neg K hf
+
+/-- Holomorphic functions are stable under the reflection `X ↦ X⁻¹`. -/
+theorem isHolomorphicOver_inv {f : Omega K → Omega K} (hf : IsHolomorphicOver K f) :
+    IsHolomorphicOver K (fun α => f α⁻¹) := by
+  obtain ⟨a, hconv, hsum⟩ := hf
+  refine ⟨fun n => a (-n), ?_, ?_⟩
+  · intro r hr
+    have h := hconv r⁻¹ (inv_pos.mpr hr)
+    have h' : Tendsto (fun n : ℤ => ‖a (-n)‖ * (r⁻¹) ^ (-n)) cofinite (𝓝 0) :=
+      h.comp (neg_injective.tendsto_cofinite)
+    refine h'.congr (fun n => ?_)
+    simp [zpow_neg]
+  · intro α hα
+    have h := hsum α⁻¹ (inv_ne_zero hα)
+    have h2 := (Equiv.neg ℤ).hasSum_iff.mpr h
+    convert h2 using 1
+    funext n
+    simp [zpow_neg, inv_inv]
+
+/-- Book, §2: the reflection `f(X) ↦ f(X⁻¹)` as a ring automorphism of `H_K`. -/
+noncomputable def holReflectHom : holSubring K ≃+* holSubring K where
+  toFun f := ⟨fun α => f.1 α⁻¹, isHolomorphicOver_inv K f.2⟩
+  invFun f := ⟨fun α => f.1 α⁻¹, isHolomorphicOver_inv K f.2⟩
+  left_inv f := Subtype.ext (funext fun α => by simp)
+  right_inv f := Subtype.ext (funext fun α => by simp)
+  map_mul' f g := rfl
+  map_add' f g := rfl
 
 /-- Book, §2: `H_K` is an integral domain. Blueprint: `lem:H-K-domain`. -/
 theorem holSubring_isDomain : IsDomain (holSubring K) := by
@@ -77,32 +179,104 @@ instance : IsDomain (holSubring K) := holSubring_isDomain K
 Blueprint: `def:M-K`. -/
 abbrev MeroRing : Type u := FractionRing (holSubring K)
 
-/-- Book, §2: the constant functions give the `K`-algebra structure of `H_K`.
-Placeholder. Blueprint: `def:const-algebra`. -/
-noncomputable instance holAlgebra : Algebra K (holSubring K) := sorry
+/-- Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`.
+Blueprint: `def:reflection`. -/
+noncomputable def reflectionM : MeroRing K ≃+* MeroRing K :=
+  IsFractionRing.ringEquivOfRingEquiv (holReflectHom K)
+
+/-- Book, §2: the constant functions `K ↪ H_K`. Blueprint: `def:const-algebra`. -/
+noncomputable def constHom : K →+* holSubring K where
+  toFun c := ⟨fun _ => algebraMap K (Omega K) c, isHolomorphicOver_const K c⟩
+  map_one' := Subtype.ext (funext fun _ => map_one _)
+  map_mul' c d := Subtype.ext (funext fun _ => map_mul _ _ _)
+  map_zero' := Subtype.ext (funext fun _ => map_zero _)
+  map_add' c d := Subtype.ext (funext fun _ => map_add _ _ _)
+
+/-- The `K`-algebra structure on `H_K` given by the constant functions.
+Blueprint: `def:const-algebra`. -/
+noncomputable instance holAlgebra : Algebra K (holSubring K) := RingHom.toAlgebra (constHom K)
 
 /-- The analytic valuation `w_α` belonging to `α ∈ Ω^×` (book, §2): the order of
 vanishing at `α`, with `w_α(0) = +∞`. Placeholder (defined by Weierstraß products in the
 book). Blueprint: `def:analytic-valuation`. -/
 noncomputable def anVal (α : Omega K) : AddValuation (MeroRing K) (WithTop ℤ) := sorry
 
-/-- Book, §2: the translation automorphism `τ_a : f(X) ↦ f(a⁻¹X)` of `M_K`.
-Placeholder. Blueprint: `def:translation`. -/
-noncomputable def translation (a : K) : MeroRing K ≃+* MeroRing K := sorry
+/-- Book, §2: rescaling `f(X) ↦ f(cX)` as a ring automorphism of `H_K`, for `c ∈ K^×`.
+Blueprint: `def:holscale`. -/
+noncomputable def holScaleHom (c : Kˣ) : holSubring K →+* holSubring K where
+  toFun f := ⟨scaleFun K c f.1, isHolomorphicOver_scale K c f.2⟩
+  map_one' := Subtype.ext rfl
+  map_mul' f g := Subtype.ext rfl
+  map_zero' := Subtype.ext rfl
+  map_add' f g := Subtype.ext rfl
 
+/-- Book, §2: `H_K` is stable under the rescaling `X ↦ cX`, which is an automorphism.
+Blueprint: `def:holscale`. -/
+noncomputable def holScale (c : Kˣ) : holSubring K ≃+* holSubring K where
+  toFun := holScaleHom K c
+  invFun := holScaleHom K c⁻¹
+  map_mul' := (holScaleHom K c).map_mul
+  map_add' := (holScaleHom K c).map_add
+  left_inv f := Subtype.ext (funext fun α => by
+    show f.1 (algebraMap K (Omega K) (c : K) * (algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * α)) = f.1 α
+    congr 1
+    rw [← mul_assoc, ← map_mul, Units.mul_inv, map_one, one_mul])
+  right_inv f := Subtype.ext (funext fun α => by
+    show f.1 (algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * (algebraMap K (Omega K) (c : K) * α)) = f.1 α
+    congr 1
+    rw [← mul_assoc, ← map_mul, Units.inv_mul, map_one, one_mul])
+
+/-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`.
+Blueprint: `def:M-K`. -/
+noncomputable def meroScale (a : Kˣ) : MeroRing K ≃+* MeroRing K :=
+  IsFractionRing.ringEquivOfRingEquiv (holScale K a)
+
+/-- Book, §2: the translation automorphism `τ_a : f(X) ↦ f(a⁻¹X)` of `M_K`, for `a ∈ K^×`.
+Blueprint: `def:translation`. -/
+noncomputable def translation (a : Kˣ) : MeroRing K ≃+* MeroRing K :=
+  meroScale K a⁻¹
+
+set_option synthInstance.maxHeartbeats 200000 in
 /-- Book, §2 (first observation): the `q`-periodic meromorphic functions form a subfield
-`F_K(q)` of `M_K`. Blueprint: `def:Fq`. -/
+`F_K(q)` of `M_K`: those `f` with `τ_q f = f`. Blueprint: `def:Fq`. -/
 noncomputable def FqSub (q : K) : Subfield (MeroRing K) where
-  carrier := {f | translation K q f = f}
-  mul_mem' := by sorry
-  one_mem' := by sorry
-  add_mem' := by sorry
-  zero_mem' := by sorry
-  neg_mem' := by sorry
-  inv_mem' := by sorry
+  carrier := {f | ∀ a : Kˣ, (a : K) = q → translation K a f = f}
+  mul_mem' := fun {f g} hf hg a ha => by
+    simp only [map_mul, hf a ha, hg a ha]
+  one_mem' := fun a _ => map_one _
+  add_mem' := fun {f g} hf hg a ha => by
+    simp only [map_add, hf a ha, hg a ha]
+  zero_mem' := fun a _ => map_zero _
+  neg_mem' := fun {f} hf a ha => by
+    simp only [map_neg, hf a ha]
+  inv_mem' := fun {f} hf a ha => by
+    simp only [map_inv₀, hf a ha]
 
 /-- The underlying set of `F_K(q)`. -/
 def Fq (q : K) : Set (MeroRing K) := (FqSub K q : Set (MeroRing K))
+
+/-- Translation fixes the constants `K ⊂ M_K`. Blueprint: `def:translation`. -/
+theorem translation_algebraMap (a : Kˣ) (c : K) :
+    translation K a (algebraMap K (MeroRing K) c) = algebraMap K (MeroRing K) c := by
+  have h1 : algebraMap K (MeroRing K) c =
+      algebraMap (holSubring K) (MeroRing K) (constHom K c) :=
+    IsScalarTower.algebraMap_apply K (holSubring K) (MeroRing K) c
+  have h2 : holScale K a⁻¹ (constHom K c) = constHom K c := Subtype.ext rfl
+  unfold translation meroScale
+  rw [h1, IsFractionRing.ringEquivOfRingEquiv_algebraMap, h2]
+
+set_option synthInstance.maxHeartbeats 200000 in
+/-- The constants `K → F_K(q)`. Blueprint: `def:Fq-algebra`. -/
+noncomputable def FqHom (q : K) : K →+* FqSub K q where
+  toFun c := ⟨algebraMap K (MeroRing K) c, fun a _ => translation_algebraMap K a c⟩
+  map_one' := Subtype.ext (map_one _)
+  map_mul' c d := Subtype.ext (map_mul _ _ _)
+  map_zero' := Subtype.ext (map_zero _)
+  map_add' c d := Subtype.ext (map_add _ _ _)
+
+/-- The `K`-algebra structure on `F_K(q)`. Blueprint: `def:Fq-algebra`. -/
+noncomputable instance FqAlgebra (q : K) : Algebra K (FqSub K q) :=
+  RingHom.toAlgebra (FqHom K q)
 
 /-- Book, §2: a *divisor* is a collection `m = {m_α}` of integers over `Ω^×` with
 (i) finiteness in every annulus `0 < r ≤ |α| ≤ r'`, and (ii) rationality: `m_α = m_β`
@@ -111,9 +285,16 @@ noncomputable def Divisors : AddSubgroup (Omega K → ℤ) where
   carrier := {m | (∀ r r' : ℝ, 0 < r → r ≤ r' →
       {α : Omega K | r ≤ omegaNorm K α ∧ omegaNorm K α ≤ r' ∧ m α ≠ 0}.Finite) ∧
     (∀ α β : Omega K, minpoly K α = minpoly K β → m α = m β)}
-  add_mem' := by sorry
-  zero_mem' := by sorry
-  neg_mem' := by sorry
+  zero_mem' := ⟨fun r r' _ _ => by simp, fun α β _ => rfl⟩
+  add_mem' := fun {m n} hm hn => ⟨fun r r' hr hrr' =>
+      ((hm.1 r r' hr hrr').union (hn.1 r r' hr hrr')).subset (fun α hα => by
+        obtain ⟨h1, h2, h3⟩ := hα
+        by_cases hm0 : m α = 0
+        · exact Or.inr ⟨h1, h2, by simpa [Pi.add_apply, hm0] using h3⟩
+        · exact Or.inl ⟨h1, h2, hm0⟩),
+    fun α β h => by simp [Pi.add_apply, hm.2 α β h, hn.2 α β h]⟩
+  neg_mem' := fun {m} hm => ⟨fun r r' hr hrr' => by simpa using hm.1 r r' hr hrr',
+    fun α β h => by simp [hm.2 α β h]⟩
 
 /-- Book, §2: the divisor of a meromorphic function (`(f)` in the book).
 Blueprint: `def:divisor-of`. -/
@@ -125,9 +306,10 @@ Blueprint: `def:Dq`. -/
 noncomputable def DivisorsPeriodic (q : K) : AddSubgroup (Omega K → ℤ) where
   carrier := {m | m ∈ Divisors K ∧
     ∀ α : Omega K, m (algebraMap K (Omega K) q * α) = m α}
-  add_mem' := by sorry
-  zero_mem' := by sorry
-  neg_mem' := by sorry
+  zero_mem' := ⟨(Divisors K).zero_mem, fun α => rfl⟩
+  add_mem' := fun {m n} hm hn => ⟨(Divisors K).add_mem hm.1 hn.1,
+    fun α => by simp [hm.2 α, hn.2 α]⟩
+  neg_mem' := fun {m} hm => ⟨(Divisors K).neg_mem hm.1, fun α => by simp [hm.2 α]⟩
 
 /-- Book, §2: `a ≡ b mod^× q` for `a, b ∈ Ω^×` means `b = a q^k` for some `k ∈ ℤ`.
 Blueprint: `def:mod-times`. -/

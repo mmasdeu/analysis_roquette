@@ -75,9 +75,6 @@ theorem thmVI_relation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
         algebraMap K (MeroRing K) (coeffC K q) := by
   sorry
 
-/-- Placeholder: the reflection `ε : f(X) ↦ f(X⁻¹)` of `M_K`. Blueprint: `def:reflection`. -/
-noncomputable def reflectionM : MeroRing K ≃+* MeroRing K := sorry
-
 /-- Book, §3, (20)–(21): the reflection fixes `℘` and sends `℘′ ↦ −℘′ − ℘`. Blueprint: `thm:VI`. -/
 theorem thmVI_reflection (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     reflectionM K (wpM K q) = wpM K q ∧
