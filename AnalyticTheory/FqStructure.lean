@@ -1,4 +1,4 @@
-import AnalyticTheory.FqPlaces
+import AnalyticTheory.FqGenus
 
 /-!
 # Structure of `F_K(q)` (book, §2: items I–V, Corollaries Va, Vb)
