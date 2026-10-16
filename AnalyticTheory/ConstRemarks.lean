@@ -623,6 +623,192 @@ theorem ramIndex_eq_one_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃
 
 variable [IsGalois K L]
 
+section galAction
+
+variable {K L}
+
+theorem normL_eq_spectral (x : L) : ‖x‖ = spectralNorm K L x := by
+  haveI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  let f : AbsoluteValue L ℝ :=
+    { toFun := fun z => ‖z‖
+      map_mul' := norm_mul
+      nonneg' := norm_nonneg
+      eq_zero' := fun _ => norm_eq_zero
+      add_le' := norm_add_le }
+  exact spectralNorm_unique_field_norm_ext (f := f) (fun c => norm_algebraMap' L c) x
+
+theorem gal_norm (σ : L ≃ₐ[K] L) (x : L) : ‖σ x‖ = ‖x‖ := by
+  rw [normL_eq_spectral (K := K), normL_eq_spectral (K := K) x, ← spectralNorm_eq_of_equiv σ x]
+
+theorem gal_isometry (σ : L ≃ₐ[K] L) : Isometry σ :=
+  AddMonoidHomClass.isometry_of_norm σ (gal_norm σ)
+
+theorem isConvergentLaurent_gal (σ : L ≃ₐ[K] L) {a : ℤ → L} (ha : IsConvergentLaurent L a) :
+    IsConvergentLaurent L (fun n => σ (a n)) := by
+  intro r hr; simpa [gal_norm] using ha r hr
+
+theorem convCoeff_gal (σ : L ≃ₐ[K] L) {a b : ℤ → L} (ha : IsConvergentLaurent L a)
+    (hb : IsConvergentLaurent L b) :
+    (fun n => σ (convCoeff L a b n)) = convCoeff L (fun n => σ (a n)) (fun n => σ (b n)) := by
+  funext n
+  unfold convCoeff
+  have h := (summable_convolution L ha hb n).hasSum.map (σ : L →+* L) (gal_isometry σ).continuous
+  rw [show σ (∑' k, a k * b (n - k)) = (σ : L →+* L) (∑' k, a k * b (n - k)) from rfl, ← h.tsum_eq]
+  refine tsum_congr (fun k => ?_)
+  simp
+
+/-- The coefficientwise action on holomorphic functions. -/
+noncomputable def holGalFun (σ : L ≃ₐ[K] L) (g : holSubring L) : holSubring L :=
+  holOfSeq L (fun n => σ (holCoeff L g n)) (isConvergentLaurent_gal σ (holCoeff_convergent L g))
+
+theorem holCoeff_holGalFun (σ : L ≃ₐ[K] L) (g : holSubring L) :
+    holCoeff L (holGalFun σ g) = fun n => σ (holCoeff L g n) := holCoeff_holOfSeq L _ _
+
+/-- The action of `σ ∈ Gal(L|K)` on `H_L` through the coefficients. -/
+noncomputable def holGal (σ : L ≃ₐ[K] L) : holSubring L →+* holSubring L where
+  toFun := holGalFun σ
+  map_one' := holCoeff_injective L (by
+    rw [holCoeff_holGalFun, holCoeff_one]
+    funext n; simp only [deltaSeq]; split_ifs <;> simp)
+  map_mul' f g := holCoeff_injective L (by
+    rw [holCoeff_mul, holCoeff_holGalFun, holCoeff_holGalFun, holCoeff_holGalFun, holCoeff_mul,
+      convCoeff_gal σ (holCoeff_convergent L f) (holCoeff_convergent L g)])
+  map_zero' := holCoeff_injective L (by
+    rw [holCoeff_holGalFun, holCoeff_zero]; funext n; simp)
+  map_add' f g := holCoeff_injective L (by
+    rw [holCoeff_add, holCoeff_holGalFun, holCoeff_holGalFun, holCoeff_holGalFun, holCoeff_add]
+    funext n; simp)
+
+theorem holCoeff_holGal (σ : L ≃ₐ[K] L) (g : holSubring L) :
+    holCoeff L (holGal σ g) = fun n => σ (holCoeff L g n) := holCoeff_holGalFun σ g
+
+theorem holGal_holGal (σ τ : L ≃ₐ[K] L) (g : holSubring L) :
+    holGal σ (holGal τ g) = holGal (σ * τ) g := by
+  apply holCoeff_injective L
+  rw [holCoeff_holGal, holCoeff_holGal, holCoeff_holGal]; rfl
+
+theorem holGal_one (g : holSubring L) : holGal (1 : L ≃ₐ[K] L) g = g := by
+  apply holCoeff_injective L
+  rw [holCoeff_holGal]; rfl
+
+/-- `holGal σ` as a ring automorphism. -/
+noncomputable def holGalEquiv (σ : L ≃ₐ[K] L) : holSubring L ≃+* holSubring L :=
+  { holGal σ with
+    invFun := holGal σ⁻¹
+    left_inv := fun g => by
+      show holGal σ⁻¹ (holGal σ g) = g
+      rw [holGal_holGal, inv_mul_cancel, holGal_one]
+    right_inv := fun g => by
+      show holGal σ (holGal σ⁻¹ g) = g
+      rw [holGal_holGal, mul_inv_cancel, holGal_one] }
+
+/-- The action of `σ` on `M_L`. -/
+noncomputable def meroGal (σ : L ≃ₐ[K] L) : MeroRing L ≃+* MeroRing L :=
+  IsFractionRing.ringEquivOfRingEquiv (holGalEquiv σ)
+
+theorem meroGal_alg (σ : L ≃ₐ[K] L) (g : holSubring L) :
+    meroGal σ (algebraMap (holSubring L) (MeroRing L) g) =
+      algebraMap (holSubring L) (MeroRing L) (holGal σ g) := by
+  unfold meroGal
+  rw [IsFractionRing.ringEquivOfRingEquiv_algebraMap]; rfl
+
+theorem holGal_const (σ : L ≃ₐ[K] L) (c : L) :
+    holGal σ (algebraMap L (holSubring L) c) = algebraMap L (holSubring L) (σ c) := by
+  apply holCoeff_injective L
+  rw [holCoeff_holGal]
+  have h1 := holCoeff_algebraMap_mul L c 1
+  rw [mul_one, holCoeff_one] at h1
+  have h2 := holCoeff_algebraMap_mul L (σ c) 1
+  rw [mul_one, holCoeff_one] at h2
+  rw [h1, h2]
+  funext n; simp only [deltaSeq]; split_ifs <;> simp
+
+theorem isGalAct_meroGal (σ : L ≃ₐ[K] L) : IsGalAct K L σ (meroGal σ) := by
+  refine ⟨fun c => ?_, fun g a ha hsum => ?_⟩
+  · rw [alg_L_eq, meroGal_alg, holGal_const, ← alg_L_eq]
+  · have hcoeff : holCoeff L g = a := holCoeff_eq L ha hsum
+    refine ⟨holGal σ g, meroGal_alg σ g, fun α => ?_⟩
+    have := holOfSeq_hasSum L _ (isConvergentLaurent_gal σ (holCoeff_convergent L g)) α
+    have e : (fun n => algebraMap L (Omega L) (σ (holCoeff L g n)) * α.1 ^ n) =
+        (fun n => algebraMap L (Omega L) (σ (a n)) * α.1 ^ n) := by
+      funext n; rw [hcoeff]
+    rw [← e]; exact this
+
+end galAction
+
+
+section galDiv
+
+variable {K L}
+
+theorem galAct_holRel {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (hρ : IsGalAct K L σ ρ)
+    {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ') {g g' : holSubring L}
+    (hg : ρ (algebraMap (holSubring L) (MeroRing L) g) = algebraMap (holSubring L) (MeroRing L) g') :
+    HolRel σ' g g' := by
+  intro x hx
+  obtain ⟨g'', hg'', hsum⟩ := hρ.2 g (holCoeff L g) (holCoeff_convergent L g) (holCoeff_hasSum L g)
+  have e : g' = g'' := IsFractionRing.injective (holSubring L) (MeroRing L) (hg.symm.trans hg'')
+  subst e
+  have h1 := hsum ⟨σ' x, (map_ne_zero σ').mpr hx⟩
+  have h2 := (holCoeff_hasSum L g ⟨x, hx⟩).map (σ' : Omega L →+ Omega L)
+    (ext_isometry K L hσ').continuous
+  refine h1.unique ?_
+  convert h2 using 1
+  funext n
+  simp only [Function.comp, AddMonoidHom.coe_coe, map_mul, map_zpow₀]
+  rw [hσ']
+
+theorem minpoly_ext {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ')
+    (α : Omega L) : minpoly L (σ' α) = (minpoly L α).map (σ : L →+* L) := by
+  have hint : IsIntegral L α := Algebra.IsIntegral.isIntegral α
+  have hmon : ((minpoly L α).map (σ : L →+* L)).Monic := (minpoly.monic hint).map _
+  have hirr : Irreducible ((minpoly L α).map (σ : L →+* L)) :=
+    (MulEquiv.irreducible_iff (Polynomial.mapEquiv (σ : L ≃+* L)).toMulEquiv).mpr (minpoly.irreducible hint)
+  have hroot : Polynomial.aeval (σ' α) ((minpoly L α).map (σ : L →+* L)) = 0 := by
+    have := congrArg σ' (minpoly.aeval L α)
+    rw [map_zero, Polynomial.aeval_def, Polynomial.eval₂_eq_sum_range] at this
+    rw [Polynomial.aeval_def, Polynomial.eval₂_eq_sum_range, Polynomial.natDegree_map]
+    rw [map_sum] at this
+    rw [← this]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    rw [Polynomial.coeff_map, map_mul, map_pow, hσ']
+    rfl
+  exact (minpoly.eq_of_irreducible_of_monic hirr hroot hmon).symm
+
+theorem eIdx_ext {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ')
+    {α : Omega L} (hα : α ≠ 0) : eIdx L (σ' α) = eIdx L α := by
+  have hσα : σ' α ≠ 0 := (map_ne_zero σ').mpr hα
+  set P := polyHol L (minpoly L α)
+  set P' := polyHol L (minpoly L (σ' α))
+  have hrel : HolRel σ' P P' := by
+    have hρ := isGalAct_meroGal σ
+    refine galAct_holRel hρ hσ' ?_
+    rw [meroGal_alg]
+    congr 1
+    apply holCoeff_injective L
+    rw [holCoeff_holGal]
+    funext n
+    rw [holCoeff_polyHol, holCoeff_polyHol, minpoly_ext hσ', Polynomial.coeff_map]
+    split_ifs <;> simp
+  have h1 := anOrdHol_minpoly L hσα
+  have h2 := anOrdHol_minpoly L hα
+  rw [anOrdHol_transfer σ' (ext_isometry K L hσ') hrel hα, h2] at h1
+  exact_mod_cast h1.symm
+
+theorem anVal_galAct {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (hρ : IsGalAct K L σ ρ)
+    {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ') {α : Omega L} (hα : α ≠ 0)
+    (f : MeroRing L) : anVal L (σ' α) (ρ f) = anVal L α f := by
+  obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring L) f
+  have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
+  obtain ⟨x', hx', -⟩ := hρ.2 x (holCoeff L x) (holCoeff_convergent L x) (holCoeff_hasSum L x)
+  obtain ⟨y', hy', -⟩ := hρ.2 y (holCoeff L y) (holCoeff_convergent L y) (holCoeff_hasSum L y)
+  have hpt := anPt_transfer (f₂ := ρ f) σ' (ext_isometry K L hσ') hα (galAct_holRel hρ hσ' hx')
+    (galAct_holRel hρ hσ' hy') hy0 hxy.symm (by rw [← hxy, map_div₀, hx', hy'])
+  unfold anVal
+  rw [hpt, eIdx_ext hσ' hα]
+
+end galDiv
+
 /-- Book, §2, Remark 2: for `f ∈ M_L` and `σ ∈ G`, `(σ f)(σ α) = σ(f(α))`, where `σ` acts on the
 coefficients of `f` and `σ'` is any extension of `σ` to `Ω_L`. Blueprint: `rem:S2-galois`. -/
 theorem remark_galois_action_eval (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L)
@@ -630,8 +816,8 @@ theorem remark_galois_action_eval (σ : GalGroup K L) (ρ : MeroRing L ≃+* Mer
     (g g' : holSubring L)
     (hg : ρ (algebraMap (holSubring L) (MeroRing L) g) = algebraMap (holSubring L) (MeroRing L) g')
     (α : OmegaX L) :
-    g'.1 ⟨σ' α.1, (map_ne_zero σ').mpr α.2⟩ = σ' (g.1 α) := by
-  sorry
+    g'.1 ⟨σ' α.1, (map_ne_zero σ').mpr α.2⟩ = σ' (g.1 α) :=
+  galAct_holRel hρ hσ' hg α.1 α.2
 
 /-- Book, §2, Remark 2: `G` acts on `M_L` with fixed field `M_K`. Blueprint: `rem:S2-galois`. -/
 theorem remark_galois_fixed_field :
@@ -646,7 +832,9 @@ theorem remark_galois_action_divisors (σ : GalGroup K L) (ρ : MeroRing L ≃+*
     (hρ : IsGalAct K L σ ρ) (σ' : Omega L ≃+* Omega L) (hσ' : IsExtension K L σ σ')
     (f : MeroRing L) (hf : f ≠ 0) (α : Omega L) (hα : α ≠ 0) :
     divisorOf L (ρ f) (σ' α) = divisorOf L f α := by
-  sorry
+  have hσα : σ' α ≠ 0 := (map_ne_zero σ').mpr hα
+  unfold divisorOf
+  rw [if_neg hσα, if_neg hα, anVal_galAct hρ hσ' hα]
 
 /-- Book, §2, Remark 2: the group of `G`-fixed elements of `D_L` is `D_K` (embedded as in Remark 1).
 Blueprint: `rem:S2-galois`. -/
