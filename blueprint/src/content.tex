@@ -343,6 +343,78 @@ Formula (12): the degree and the Jacobi image are given by the stated sums/produ
 See the Lean proof of \texttt{degQ\_formula, degQ\_eq\_of\_system, degQ\_add, system\_bijOn, system\_prod\_ratio, normGen, normGen\_conj, IsRepSystem, annPart}.
 \end{proof}
 
+\begin{proposition}[Riemann--Roch spaces at points]
+\label{prop:fq-places-LS}
+\lean{AnalyticTheory.LS, AnalyticTheory.finrank_LS, AnalyticTheory.LS_eq_bot, AnalyticTheory.finiteDimensional_LS, AnalyticTheory.degQ_pointDivisor, AnalyticTheory.repAnnulus_pt, AnalyticTheory.finrank_LS_sub_pt, AnalyticTheory.exists_exact_LS, AnalyticTheory.exists_inverse_mod, AnalyticTheory.pointDivisor_mem, AnalyticTheory.degQ_pointDivisor_K, AnalyticTheory.PhiQ_pointDivisor_K}
+\uses{prop:abel-jacobi-2, prop:deg-q-formula}
+\leanok
+$L(\mathfrak m)$ as a $K$-subspace of $F_K(q)$ has dimension $\deg_q\mathfrak m$ for $\deg_q\mathfrak m>0$; the point divisor $\mathfrak p_\beta$ has degree $[K(\beta):K]$, and $\Phi_q(\mathfrak p_a)\equiv a$ for $a\in K^\times$. Consequently some $h\in L(\mathfrak m)$ has exact order $-m_\beta$ at $\beta$, and (comparing $L(nD)/L(nD-\mathfrak p_\beta)$ with $L((n+k)D)/L((n+k)D-\mathfrak p_\beta)$) every $g\in L(kD)$ with $w_\beta(g)=0$, $\beta\notin\mathrm{supp}\,D$, has an inverse modulo $\mathfrak p_\beta$ in some $L(nD)$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{LS, finrank\_LS, LS\_eq\_bot, finiteDimensional\_LS, degQ\_pointDivisor, repAnnulus\_pt, finrank\_LS\_sub\_pt, exists\_exact\_LS, exists\_inverse\_mod, pointDivisor\_mem, degQ\_pointDivisor\_K, PhiQ\_pointDivisor\_K}.
+\end{proof}
+
+\begin{proposition}[Integrality of the rings $A_D$]
+\label{prop:fq-places-integral}
+\lean{AnalyticTheory.AD, AnalyticTheory.exists_LS_of_AD, AnalyticTheory.le_degQ, AnalyticTheory.exists_denominator, AnalyticTheory.exists_denominator_ne, AnalyticTheory.LS_succ_le, AnalyticTheory.isIntegral_of_AD}
+\uses{prop:fq-places-LS}
+\leanok
+Let $D$ be the pole divisor of a nonconstant $y\in F_K(q)$ and $A_D=\bigcup_nL(nD)$ (functions with poles in $\mathrm{supp}\,D$). Then $L((n+1)D)=yL(nD)+L(2D)$ for $n\ge1$ (dimension count), so $A_D$ is a finitely generated $K[y]$-module and every element of $A_D$ is integral over $K[y]$. Every element of $F_K(q)$ has a denominator in $A_D$, prime to any given point outside $\mathrm{supp}\,D$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{AD, exists\_LS\_of\_AD, le\_degQ, exists\_denominator, exists\_denominator\_ne, LS\_succ\_le, isIntegral\_of\_AD}.
+\end{proof}
+
+\begin{theorem}[Classification of the valuations of $F_K(q)$]
+\label{thm:fq-places-classify}
+\lean{AnalyticTheory.exists_center, AnalyticTheory.exists_center_v, AnalyticTheory.classify_valuation, AnalyticTheory.classify_mvaluation, AnalyticTheory.primeDivisor_classify, AnalyticTheory.AddValuation_nonneg_of_isIntegral, AnalyticTheory.Valuation_le_one_of_isIntegral}
+\uses{prop:fq-places-integral, cor:periodic-with-prescribed-zero}
+\leanok
+Let $v$ be a nontrivial valuation of $F_K(q)$, trivial on $K$. Take $y\in\{\wp,\wp^{-1}\}$ with $v(y)\ge0$; then $v\ge0$ on $A_D$ (integrality). Let $0\neq g\in A_D$ with $v(g)>0$: if no zero $\beta$ of $g$ outside $\mathrm{supp}\,D$ satisfied $w_\beta(f)>0\Rightarrow v(f)>0$ on $A_D$, a product of $v$-units would be divisible by $g$. For such a centre $\beta$, inverses modulo $\beta$ give $v(f)>0\Leftrightarrow w_\beta(f)>0$ on $A_D$, and denominators give $v(x)\ge0\Leftrightarrow w_\beta(x)\ge0$ on $F_K(q)$. This replaces the appeal to the Artin--Whaples theorem.
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_center, exists\_center\_v, classify\_valuation, classify\_mvaluation, primeDivisor\_classify, AddValuation\_nonneg\_of\_isIntegral, Valuation\_le\_one\_of\_isIntegral}.
+\end{proof}
+
+\begin{proposition}[The prime divisor $\mathfrak p_\alpha$ and its degree]
+\label{prop:fq-prime-at}
+\lean{AnalyticTheory.ringAt, AnalyticTheory.isUnit_ringAt_iff, AnalyticTheory.ringAt_isDVR, AnalyticTheory.primeAt, AnalyticTheory.primeAt_degree, AnalyticTheory.exists_approx, AnalyticTheory.exists_K_point_not_conj}
+\uses{prop:fq-places-LS, prop:fq-places-integral}
+\leanok
+$\{x:w_\alpha(x)\ge0\}$ is a discrete valuation ring of $F_K(q)$ containing $K$; its residue field is the image of $L(nD)\to\mathcal O/\mathfrak m$ for large $n$ (approximation), of dimension $\dim L(nD)-\dim L(nD-\mathfrak p_\alpha)=[K(\alpha):K]$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{ringAt, isUnit\_ringAt\_iff, ringAt\_isDVR, primeAt, primeAt\_degree, exists\_approx, exists\_K\_point\_not\_conj}.
+\end{proof}
+
+\begin{theorem}[The genus of $F_K(q)$ is $1$]
+\label{thm:fq-genus}
+\lean{AnalyticTheory.fq_genus, AnalyticTheory.perDiv, AnalyticTheory.perDiv_apply, AnalyticTheory.degQ_perDiv, AnalyticTheory.rrSpace_eq, AnalyticTheory.finrank_rrSpace, AnalyticTheory.ptOf, AnalyticTheory.eq_primeAt, AnalyticTheory.primeAt_eq_iff, AnalyticTheory.ringAt_eq_iff, AnalyticTheory.anVal_uniformizer, AnalyticTheory.anVal_irreducible, AnalyticTheory.degree_eq}
+\uses{thm:fq-places-classify, prop:fq-prime-at, def:genus, def:rr-space}
+\leanok
+The algebraic prime divisors are the $\mathfrak p_\alpha$ ($\mathfrak p_\alpha=\mathfrak p_\beta$ iff $\alpha,\beta$ are conjugate mod$^\times q$), uniformizers have $w_\alpha=1$, an algebraic divisor $D$ corresponds to the $q$-periodic divisor $\sum D(\mathfrak p)\mathfrak p$ with the same degree and $L(D)=L_K(q\,|\,\mathfrak m)$. By Proposition 2, $\dim L(D)=\deg D$ for $\deg D>0$, so $g=1$.
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{fq\_genus, perDiv, perDiv\_apply, degQ\_perDiv, rrSpace\_eq, finrank\_rrSpace, ptOf, eq\_primeAt, primeAt\_eq\_iff, ringAt\_eq\_iff, anVal\_uniformizer, anVal\_irreducible, degree\_eq}.
+\end{proof}
+
+\begin{lemma}[Automorphisms are determined at $K$-points]
+\label{lem:fq-translation-unique}
+\lean{AnalyticTheory.ringEquiv_eq_of_anVal, AnalyticTheory.exists_const_approx_K, AnalyticTheory.translationFq, AnalyticTheory.translation_comm}
+\uses{prop:fq-prime-at}
+\leanok
+At a $K$-rational point every function without pole is congruent to a constant (residue degree $1$). Hence if two $K$-automorphisms of $F_K(q)$ give the same valuations at all $K$-points, their difference on any $f$ vanishes at infinitely many classes, so they agree.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{ringEquiv\_eq\_of\_anVal, exists\_const\_approx\_K, translationFq, translation\_comm}.
+\end{proof}
+
 \begin{theorem}[Item I: $F_K(q)$ is a function field]
 \label{thm:fq-function-field}
 \lean{AnalyticTheory.fq_is_function_field}
@@ -358,7 +430,7 @@ See the Lean proof of \texttt{fq\_is\_function\_field}.
 \begin{theorem}[Item II: valuations of $F_K(q)$]
 \label{thm:fq-valuations}
 \lean{AnalyticTheory.fq_valuation_eq_iff, AnalyticTheory.fq_valuation_surjective, AnalyticTheory.fq_valuations_classified}
-\uses{thm:fq-function-field, def:analytic-valuation}
+\uses{thm:fq-function-field, def:analytic-valuation, thm:fq-places-classify}
 \leanok
 $w_\alpha=w_\beta$ on $F_K(q)$ iff $\alpha,\beta$ are $K$-conjugate mod$^\times q$; the value group is $\mathbb Z$; every valuation over $K$ is some $w_\alpha$.
 \end{theorem}
@@ -370,7 +442,7 @@ See the Lean proof of \texttt{fq\_valuation\_eq\_iff, fq\_valuation\_surjective,
 \begin{theorem}[Item III: residue fields]
 \label{thm:fq-residue}
 \lean{AnalyticTheory.fq_residue_degree}
-\uses{thm:fq-valuations}
+\uses{thm:fq-valuations, prop:fq-prime-at}
 \leanok
 The valuation ring of $w_\alpha$ on $F_K(q)$ is the valuation ring of a prime divisor of $F_K(q)\,|\,K$ whose degree is $[K(\alpha):K]$.
 \end{theorem}
@@ -382,7 +454,7 @@ See the Lean proof of \texttt{fq\_residue\_degree}.
 \begin{theorem}[Item IV: $F_K(q)$ is elliptic]
 \label{thm:fq-elliptic}
 \lean{AnalyticTheory.fq_is_elliptic}
-\uses{thm:fq-function-field, def:elliptic}
+\uses{thm:fq-function-field, def:elliptic, thm:fq-genus}
 \leanok
 $F_K(q)$ is an elliptic function field over $K$.
 \end{theorem}
@@ -449,11 +521,12 @@ See the Lean proof of \texttt{translation\_class\_unique}.
 \begin{corollary}[Corollary Vb]
 \label{cor:translation-Vb}
 \lean{AnalyticTheory.translation_analytic_eq_algebraic}
-\uses{cor:translation-Va, def:translation-class}
+\uses{cor:translation-Va, def:translation-class, lem:fq-translation-unique}
 \leanok
 The analytic and algebraic translation automorphisms coincide on $F_K(q)$.
 \end{corollary}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{translation\_analytic\_eq\_algebraic}.
 \end{proof}
 

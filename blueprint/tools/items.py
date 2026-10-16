@@ -629,3 +629,45 @@ _k = next(n for n, i in enumerate(ITEMS) if i['label'] == 'thm:VI')
 ITEMS[_k:_k + 1] = [_moved[l] for l in _vi_pre] + [ITEMS[_k]] + [_moved[l] for l in _vi_post]
 _upd('thm:VI-relation', text=r'$\wp'+"'"+r'^2+\wp\wp'+"'"+r'=\wp^3+B\wp+C$ with $B=-5s_3$, $C=-\frac1{12}(5s_3+7s_5)$. At $X=1+h$, $h=q^{j+1}$, the functions $U=h^2\wp$, $V=h^3\wp'+"'"+r'$ are $U=1+h+\rho_2h^4+\rho_3h^5+\rho_4h^6+O(h^7)$, $V=-(1+h)^2+\pi_1h^4+\pi_2h^5+\pi_3h^6+O(h^7)$; the relation $V^2+hUV=U^3+Ah^2U^2+Bh^4U+Ch^6$ forces the coefficients of $h^0,\dots,h^6$ to vanish: $A=0$, $B=-2\pi_1-3\rho_2$, $C=-\pi_1-3\pi_2-2\pi_3-5\rho_2-7\rho_3-3\rho_4$. Termwise integer identities give $-2\pi_1-3\rho_2=\sum_m(-5m^3)Q_m$ and $\dots=\sum_m-\frac{5m^3+7m^5}{12}Q_m$, and the Lambert series identifies these with $B$ and $C$.')
 _addlean('thm:VI-relation', 'coeffs_of_rel', 'relK', 'expand_U', 'expand_V', 'coeff_vanish', 'hasSum_split', 'Erel_decomp', 'coeffB_eq', 'coeffC_eq', 'summandB', 'summandC', 'idB', 'idC', 'gC', 'twelve_mul_gC')
+
+# --- Section 2, items I-V: the Artin-Whaples step done through Riemann-Roch
+add('proposition', 'prop:fq-places-LS', 'Riemann--Roch spaces at points',
+    ['LS', 'finrank_LS', 'LS_eq_bot', 'finiteDimensional_LS', 'degQ_pointDivisor', 'repAnnulus_pt',
+     'finrank_LS_sub_pt', 'exists_exact_LS', 'exists_inverse_mod', 'pointDivisor_mem', 'degQ_pointDivisor_K',
+     'PhiQ_pointDivisor_K'],
+    ['prop:abel-jacobi-2', 'prop:deg-q-formula'], False,
+    r'$L(\mathfrak m)$ as a $K$-subspace of $F_K(q)$ has dimension $\deg_q\mathfrak m$ for $\deg_q\mathfrak m>0$; the point divisor $\mathfrak p_\beta$ has degree $[K(\beta):K]$, and $\Phi_q(\mathfrak p_a)\equiv a$ for $a\in K^\times$. Consequently some $h\in L(\mathfrak m)$ has exact order $-m_\beta$ at $\beta$, and (comparing $L(nD)/L(nD-\mathfrak p_\beta)$ with $L((n+k)D)/L((n+k)D-\mathfrak p_\beta)$) every $g\in L(kD)$ with $w_\beta(g)=0$, $\beta\notin\mathrm{supp}\,D$, has an inverse modulo $\mathfrak p_\beta$ in some $L(nD)$.')
+add('proposition', 'prop:fq-places-integral', 'Integrality of the rings $A_D$',
+    ['AD', 'exists_LS_of_AD', 'le_degQ', 'exists_denominator', 'exists_denominator_ne', 'LS_succ_le',
+     'isIntegral_of_AD'],
+    ['prop:fq-places-LS'], False,
+    r'Let $D$ be the pole divisor of a nonconstant $y\in F_K(q)$ and $A_D=\bigcup_nL(nD)$ (functions with poles in $\mathrm{supp}\,D$). Then $L((n+1)D)=yL(nD)+L(2D)$ for $n\ge1$ (dimension count), so $A_D$ is a finitely generated $K[y]$-module and every element of $A_D$ is integral over $K[y]$. Every element of $F_K(q)$ has a denominator in $A_D$, prime to any given point outside $\mathrm{supp}\,D$.')
+add('theorem', 'thm:fq-places-classify', 'Classification of the valuations of $F_K(q)$',
+    ['exists_center', 'exists_center_v', 'classify_valuation', 'classify_mvaluation', 'primeDivisor_classify',
+     'AddValuation_nonneg_of_isIntegral', 'Valuation_le_one_of_isIntegral'],
+    ['prop:fq-places-integral', 'cor:periodic-with-prescribed-zero'], False,
+    r'Let $v$ be a nontrivial valuation of $F_K(q)$, trivial on $K$. Take $y\in\{\wp,\wp^{-1}\}$ with $v(y)\ge0$; then $v\ge0$ on $A_D$ (integrality). Let $0\neq g\in A_D$ with $v(g)>0$: if no zero $\beta$ of $g$ outside $\mathrm{supp}\,D$ satisfied $w_\beta(f)>0\Rightarrow v(f)>0$ on $A_D$, a product of $v$-units would be divisible by $g$. For such a centre $\beta$, inverses modulo $\beta$ give $v(f)>0\Leftrightarrow w_\beta(f)>0$ on $A_D$, and denominators give $v(x)\ge0\Leftrightarrow w_\beta(x)\ge0$ on $F_K(q)$. This replaces the appeal to the Artin--Whaples theorem.')
+add('proposition', 'prop:fq-prime-at', 'The prime divisor $\\mathfrak p_\\alpha$ and its degree',
+    ['ringAt', 'isUnit_ringAt_iff', 'ringAt_isDVR', 'primeAt', 'primeAt_degree', 'exists_approx',
+     'exists_K_point_not_conj'],
+    ['prop:fq-places-LS', 'prop:fq-places-integral'], False,
+    r'$\{x:w_\alpha(x)\ge0\}$ is a discrete valuation ring of $F_K(q)$ containing $K$; its residue field is the image of $L(nD)\to\mathcal O/\mathfrak m$ for large $n$ (approximation), of dimension $\dim L(nD)-\dim L(nD-\mathfrak p_\alpha)=[K(\alpha):K]$.')
+add('theorem', 'thm:fq-genus', 'The genus of $F_K(q)$ is $1$',
+    ['fq_genus', 'perDiv', 'perDiv_apply', 'degQ_perDiv', 'rrSpace_eq', 'finrank_rrSpace', 'ptOf', 'eq_primeAt',
+     'primeAt_eq_iff', 'ringAt_eq_iff', 'anVal_uniformizer', 'anVal_irreducible', 'degree_eq'],
+    ['thm:fq-places-classify', 'prop:fq-prime-at', 'def:genus', 'def:rr-space'], False,
+    r'The algebraic prime divisors are the $\mathfrak p_\alpha$ ($\mathfrak p_\alpha=\mathfrak p_\beta$ iff $\alpha,\beta$ are conjugate mod$^\times q$), uniformizers have $w_\alpha=1$, an algebraic divisor $D$ corresponds to the $q$-periodic divisor $\sum D(\mathfrak p)\mathfrak p$ with the same degree and $L(D)=L_K(q\,|\,\mathfrak m)$. By Proposition 2, $\dim L(D)=\deg D$ for $\deg D>0$, so $g=1$.')
+add('lemma', 'lem:fq-translation-unique', 'Automorphisms are determined at $K$-points',
+    ['ringEquiv_eq_of_anVal', 'exists_const_approx_K', 'translationFq', 'translation_comm'],
+    ['prop:fq-prime-at'], False,
+    r'At a $K$-rational point every function without pole is congruent to a constant (residue degree $1$). Hence if two $K$-automorphisms of $F_K(q)$ give the same valuations at all $K$-points, their difference on any $f$ vanishes at infinitely many classes, so they agree.')
+_upd('thm:fq-residue', notready=False)
+_adduses('thm:fq-valuations', 'thm:fq-places-classify')
+_adduses('thm:fq-residue', 'prop:fq-prime-at')
+_adduses('thm:fq-elliptic', 'thm:fq-genus')
+_adduses('cor:translation-Vb', 'lem:fq-translation-unique')
+_vi2 = ['prop:fq-places-LS', 'prop:fq-places-integral', 'thm:fq-places-classify', 'prop:fq-prime-at', 'thm:fq-genus', 'lem:fq-translation-unique']
+_moved2 = {i['label']: i for i in ITEMS if i['label'] in _vi2}
+ITEMS[:] = [i for i in ITEMS if i['label'] not in _moved2]
+_k2 = next(n for n, i in enumerate(ITEMS) if i['label'] == 'thm:fq-function-field')
+ITEMS[_k2:_k2] = [_moved2[l] for l in _vi2]
