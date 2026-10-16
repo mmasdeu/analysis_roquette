@@ -20,11 +20,6 @@ theorem wp_eq_neg_D_zeta (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     wpM K q = -Dop K (zetaM K q) - 2 * algebraMap K (MeroRing K) (sK K 1 q) := by
   sorry
 
-/-- Book, §3, (18): `2℘′ = D℘ − ℘`. Blueprint: `def:wp-prime`. -/
-theorem wpPrime_spec (q : K) :
-    2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
-  sorry
-
 /-- Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with
 `g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
 Blueprint: `rem:normal-form-3`. -/

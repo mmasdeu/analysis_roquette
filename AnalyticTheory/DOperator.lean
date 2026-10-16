@@ -193,4 +193,43 @@ theorem Dop_derivation : ∀ f g : MeroRing K, Dop K (f + g) = Dop K f + Dop K g
 
 end mero
 
+
+section family
+
+variable {ι : Type*}
+
+theorem NullFamily.mono {c c' : ι → ℤ → K} (hn : NullFamily K c) (h : ∀ i n, ‖c' i n‖ ≤ ‖c i n‖) :
+    NullFamily K c' := by
+  intro r hr ε hε
+  refine (hn r hr ε hε).subset (fun i ⟨n, hn'⟩ => ⟨n, lt_of_lt_of_le hn' ?_⟩)
+  exact mul_le_mul_of_nonneg_right (h i n) (by positivity)
+
+theorem nullFamily_holD {f : ι → holSubring K} (hn : NullFamily K (fun i => holCoeff K (f i))) :
+    NullFamily K (fun i => holCoeff K (holD (f i))) := by
+  refine hn.mono (fun i n => ?_)
+  rw [holCoeff_holD, norm_mul]
+  calc ‖(n : K)‖ * ‖holCoeff K (f i) n‖ ≤ 1 * ‖holCoeff K (f i) n‖ :=
+        mul_le_mul_of_nonneg_right (IsUltrametricDist.norm_intCast_le_one K n) (norm_nonneg _)
+    _ = _ := one_mul _
+
+/-- `D` commutes with sums of null families. -/
+theorem holD_hasSum_family {f : ι → holSubring K}
+    (hn : NullFamily K (fun i => holCoeff K (f i))) {g : holSubring K}
+    (hg : ∀ α : OmegaX K, HasSum (fun i => (f i).1 α) (g.1 α)) (α : OmegaX K) :
+    HasSum (fun i => (holD (f i)).1 α) ((holD g).1 α) := by
+  obtain ⟨g₀, hg₀c, hg₀⟩ := hol_hasSum_family hn
+  have hgg : g = g₀ := Subtype.ext (funext fun x => (hg x).unique (hg₀ x))
+  subst hgg
+  obtain ⟨g₁, hg₁c, hg₁⟩ := hol_hasSum_family (nullFamily_holD hn)
+  have : holD g = g₁ := by
+    apply holCoeff_injective K
+    rw [holCoeff_holD, hg₁c, hg₀c]
+    funext m
+    refine HasSum.unique ?_ ((nullFamily_holD hn).hasSum_sum m)
+    have := (hn.hasSum_sum m).mul_left (m : K)
+    simpa [holCoeff_holD] using this
+  rw [this]; exact hg₁ α
+
+end family
+
 end AnalyticTheory
