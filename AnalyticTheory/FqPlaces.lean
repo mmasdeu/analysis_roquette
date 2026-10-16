@@ -979,4 +979,122 @@ theorem exists_denominator_ne {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic
 
 end classify
 
+section classify2
+
+variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+include hq0 hq1 in
+/-- A valuation which is nonnegative on `A_D` has its centre at a point `β ∉ supp D`: some `β`
+with `w_β(f) > 0 ⇒ v(f) > 0` and `v(f) > 0 ⇒ w_β(f) > 0` for `f ∈ A_D`. -/
+theorem exists_center (v : AddValuation (FqSub K q) (WithTop ℤ)) {D : Omega K → ℤ}
+    (hD : D ∈ DivisorsPeriodic K q) (hD0 : ∀ α, 0 ≤ D α) (hdeg : 0 < degQ K q D)
+    (hAv : ∀ f ∈ AD q D, 0 ≤ v f) (hv1 : ∀ c : K, c ≠ 0 → v (algebraMap K (FqSub K q) c) = 0)
+    {g : FqSub K q} (hgA : g ∈ AD q D) (hg0 : g ≠ 0) (hgv : 0 < v g) :
+    ∃ β : Omega K, β ≠ 0 ∧ D β = 0 ∧
+      ∀ f ∈ AD q D, (0 < anVal K β (f : MeroRing K) ↔ 0 < v f) := by
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  have hg' : (g : MeroRing K) ≠ 0 := fun h => hg0 (Subtype.ext h)
+  have hgP := divisorOf_periodic hq0 g.2
+  have hfin := annPart_support_finite hq0 hq1 hgP (repSystem K q)
+  set Z := hfin.toFinset.filter (fun β => D β = 0 ∧ 0 < divisorOf K (g : MeroRing K) β) with hZ
+  have hZmem : ∀ β ∈ Z, β ∈ repAnnulus K q ∧ D β = 0 ∧ 0 < divisorOf K (g : MeroRing K) β := by
+    intro β hβ
+    rw [hZ, Finset.mem_filter, Set.Finite.mem_toFinset] at hβ
+    exact ⟨hβ.1.1, hβ.2.1, hβ.2.2⟩
+  have hrep0 : ∀ β ∈ repAnnulus K q, β ≠ 0 := fun β hβ h0 => by
+    have := hβ.2.1; rw [h0] at this
+    have h00 : omegaNorm K (0 : Omega K) = 0 := spectralNorm_zero
+    linarith
+  -- Step 1: some zero of `g` is a centre.
+  have hstep1 : ∃ β ∈ Z, ∀ f ∈ AD q D, 0 < anVal K β (f : MeroRing K) → 0 < v f := by
+    by_contra hcon
+    push_neg at hcon
+    choose! fs hfsA hfsβ hfsv using hcon
+    set N : ℕ := ∑ β ∈ Z, (divisorOf K (g : MeroRing K) β).toNat with hN
+    set Fp : FqSub K q := ∏ β ∈ Z, fs β ^ N with hFp
+    have hvF : v Fp = 0 := by
+      rw [hFp, AddValuation_prod]
+      refine Finset.sum_eq_zero (fun β hβ => ?_)
+      rw [v.map_pow, le_antisymm (hfsv β hβ) (hAv _ (hfsA β hβ)), smul_zero]
+    have hFA : Fp ∈ AD q D := Subalgebra.prod_mem _ (fun β hβ => Subalgebra.pow_mem _ (hfsA β hβ) _)
+    have hGA : Fp * g⁻¹ ∈ AD q D := by
+      intro α hα hDα
+      obtain ⟨w, hw⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hα hg')
+      have hgα : anVal K α (g : MeroRing K) = (w : WithTop ℤ) := hw.symm
+      have hw0 : 0 ≤ w := by have := hgA α hα hDα; rw [hgα] at this; exact_mod_cast this
+      show 0 ≤ anVal K α ((Fp : MeroRing K) * (g : MeroRing K)⁻¹)
+      rw [(anVal_isValuation K α hα).2.2.1, anVal_inv_of hα hg' hgα]
+      by_cases hw' : w = 0
+      · rw [hw', neg_zero, WithTop.coe_zero, add_zero]; exact hFA α hα hDα
+      · obtain ⟨β', hβ', hcβ, -⟩ := repAnnulus_pt hq0 hq1 hα
+        have hβ'0 := hrep0 β' hβ'
+        have hDβ' : D β' = 0 := by rw [← periodic_conj hq0' hD hcβ, hDα]
+        have hgβ' : divisorOf K (g : MeroRing K) β' = w := by
+          rw [← periodic_conj hq0' hgP hcβ]
+          have := anVal_of_divisorOf hg' rfl hα
+          rw [hgα] at this; exact_mod_cast this.symm
+        have hβZ : β' ∈ Z := by
+          rw [hZ, Finset.mem_filter, Set.Finite.mem_toFinset]
+          exact ⟨⟨hβ', by rw [hgβ']; exact hw'⟩, hDβ', by rw [hgβ']; omega⟩
+        rw [anVal_conjModQ hq0' Fp.2 hα hcβ]
+        have hcoe : ((Fp : FqSub K q) : MeroRing K) = ∏ β ∈ Z, ((fs β : MeroRing K)) ^ N := by
+          rw [hFp]; push_cast; rfl
+        rw [hcoe, anVal_prod hβ'0]
+        have hterm : ∀ β ∈ Z, 0 ≤ anVal K β' ((fs β : MeroRing K) ^ N) := fun β hβ => by
+          rw [anVal_pow' hβ'0]; exact nsmul_nonneg (hfsA β hβ β' hβ'0 hDβ') N
+        have hsingle := Finset.single_le_sum hterm hβZ
+        have hfβ' : (1 : WithTop ℤ) ≤ anVal K β' (fs β' : MeroRing K) := by
+          have h := hfsβ β' hβZ
+          by_cases htop : anVal K β' (fs β' : MeroRing K) = ⊤
+          · rw [htop]; exact le_top
+          · obtain ⟨t, ht⟩ := WithTop.ne_top_iff_exists.mp htop
+            rw [← ht] at h ⊢
+            have : 0 < t := by exact_mod_cast h
+            exact_mod_cast (by omega : 1 ≤ t)
+        have hwN : (w : ℤ) ≤ N := by
+          have : (divisorOf K (g : MeroRing K) β').toNat ≤ N :=
+            Finset.single_le_sum (f := fun β => (divisorOf K (g : MeroRing K) β).toNat)
+              (fun _ _ => Nat.zero_le _) hβZ
+          rw [hgβ'] at this; omega
+        have hge : ((w : ℤ) : WithTop ℤ) ≤ ∑ β ∈ Z, anVal K β' ((fs β : MeroRing K) ^ N) := by
+          refine le_trans ?_ hsingle
+          rw [anVal_pow' hβ'0]
+          calc ((w : ℤ) : WithTop ℤ) ≤ ((N : ℤ) : WithTop ℤ) := by exact_mod_cast hwN
+            _ = N • (1 : WithTop ℤ) := by rw [nsmul_one]; norm_cast
+            _ ≤ N • anVal K β' (fs β' : MeroRing K) := nsmul_le_nsmul_right hfβ' N
+        generalize (∑ β ∈ Z, anVal K β' ((fs β : MeroRing K) ^ N)) = X at hge ⊢
+        induction X using WithTop.recTopCoe with
+        | top => simp
+        | coe x =>
+          have : w ≤ x := by exact_mod_cast hge
+          rw [← WithTop.coe_add]
+          exact_mod_cast (by omega : (0 : ℤ) ≤ x + -w)
+    have hdec : Fp = g * (Fp * g⁻¹) := by field_simp
+    have h2 := congrArg v hdec
+    rw [v.map_mul, hvF] at h2
+    have h1 := hAv _ hGA
+    have h3 : (0 : WithTop ℤ) < v g + v (Fp * g⁻¹) := lt_of_lt_of_le hgv (le_add_of_nonneg_right h1)
+    rw [← h2] at h3
+    exact lt_irrefl _ h3
+  obtain ⟨β, hβZ, hβ⟩ := hstep1
+  obtain ⟨hβR, hDβ, -⟩ := hZmem β hβZ
+  have hβ0 := hrep0 β hβR
+  refine ⟨β, hβ0, hDβ, fun f hf => ⟨hβ f hf, fun hfv => ?_⟩⟩
+  by_contra hfβ
+  have hfβ0 : anVal K β (f : MeroRing K) = 0 :=
+    le_antisymm (not_lt.mp hfβ) (hf β hβ0 hDβ)
+  obtain ⟨k, hk⟩ := exists_LS_of_AD hq0 hq1 hD0 hf
+  obtain ⟨n, u, hu, hu1⟩ := exists_inverse_mod hq0 hq1 hD hD0 hdeg hβ0 hDβ hk hfβ0
+  have huA : u ∈ AD q D := LS_le_AD n hu
+  have h1A : 1 - u * f ∈ AD q D := (AD q D).sub_mem (AD q D).one_mem ((AD q D).mul_mem huA hf)
+  have hv1' := hβ _ h1A hu1
+  have hvuf : 0 < v (u * f) := by
+    rw [v.map_mul]; exact lt_of_lt_of_le hfv (le_add_of_nonneg_left (hAv u huA))
+  have := v.map_add (1 - u * f) (u * f)
+  rw [sub_add_cancel, v.map_one] at this
+  exact absurd (lt_of_lt_of_le (lt_min hv1' hvuf) this) (lt_irrefl _)
+
+end classify2
+
 end AnalyticTheory
