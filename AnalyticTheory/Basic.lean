@@ -23,12 +23,12 @@ class IsLocalField (K : Type u) [NontriviallyNormedField K] : Prop where
   complete : CompleteSpace K
 
 /-- Book, Introduction (Terminology): `F | K` is a *function field*: finitely generated
-over `K` of transcendence degree `1`, and `K` is algebraically closed in `F`.
+(as a field extension) over `K` of transcendence degree `1`, and `K` is algebraically closed in `F`.
 Blueprint: `def:function-field`.
 Transcendence degree one is expressed by a one-element transcendence basis. -/
 structure IsFunctionFieldOver (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] :
     Prop where
-  finiteType : Algebra.FiniteType K F
+  fg : ∃ s : Finset F, IntermediateField.adjoin K (s : Set F) = ⊤
   transcendence_degree_one : ∃ t : F, IsTranscendenceBasis K (fun _ : Unit => t)
   algebraicallyClosed : ∀ x : F, IsIntegral K x → ∃ k : K, algebraMap K F k = x
 
