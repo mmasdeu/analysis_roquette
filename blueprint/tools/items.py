@@ -562,3 +562,19 @@ add('proposition', 'prop:infinite-products', 'Infinite products in $H_K$', ['exi
 add('proposition', 'prop:theta-phi', 'The theta function of a minimal polynomial', ['theta_spec', 'exists_theta', 'thF', 'thG', 'psi', 'gcoef', 'tendsto_gnorm_thF', 'tendsto_gnorm_thG', 'anVal_thF', 'anVal_thG', 'chi', 'chi_unique', 'conjModQ_iff_chi', 'psi_eq_minpoly', 'anVal_polyHol_minpoly', 'thF_scale', 'thG_scale'],
     ['prop:infinite-products', 'thm:division-hol', 'def:theta', 'def:conj-mod-q'], False,
     r'Let $\alpha\in\Omega^\times$ have minimal polynomial $\varphi$ of degree $N$ over $K$ and $0<|q|<1$. Then $T_\varphi=\prod_{n\ge0}q^{nN}\varphi(q^{-n}X)X^{-N}\prod_{n\ge1}\varphi(q^nX)/\varphi(0)\in H_K$ is a nonzero holomorphic function with $T_\varphi(q^{-1}X)=\varphi(0)^{-1}X^NT_\varphi(X)$ and $w_\xi(T_\varphi)=1$ if $\xi$ is $K$-conjugate to $\alpha q^k$ for some $k\in\mathbb Z$, $0$ otherwise (the factors are the minimal polynomials of $q^k\alpha$).')
+_upd('cor:periodic-with-prescribed-zero', text=r'For every $\alpha\in\Omega^\times$ there is a $q$-periodic $f$ with $w_\alpha(f)=1$; if $\beta$ is not $K$-conjugate to $\alpha$ mod$^\times q$, then $f$ can be chosen with moreover $w_\beta(f)=0$ ($f$ depends on $\beta$). Proof: $f=T_\alpha T_w/(T_u^{d}T_v)$ with $u,v,w\in K^\times$ avoiding the classes of $\alpha,\beta$.')
+_addlean('cor:periodic-with-prescribed-zero', 'cor_construct', 'conj_family_subsingleton', 'exists_good_index', 'thM', 'translation_thM_zpow', 'anVal_thM_zpow')
+_addlean('prop:deg-q-formula', 'system_bijOn', 'system_prod_ratio', 'normGen', 'normGen_conj', 'IsRepSystem', 'annPart')
+_addlean('prop:abel-jacobi-1', 'aj_forward', 'aj_backward', 'mero_unit_of_anVal_zero', 'translation_Xm', 'mem_Fq_iff')
+_adduses('prop:abel-jacobi-1', 'prop:theta-divisor', 'thm:division-hol')
+_addlean('prop:abel-jacobi-2', 'solToL', 'solToL_injective', 'mem_LSet_iff_range')
+_adduses('prop:abel-jacobi-2', 'prop:theta-divisor', 'prop:periodic-solutions')
+add('proposition', 'prop:conj-classes', 'Conjugacy classes mod $q$', ['conjModQ_refl', 'conjModQ_symm', 'conjModQ_trans', 'exists_shift_annulus', 'repSystem_spec'],
+    ['def:conj-mod-q', 'def:deg-q'], False,
+    r'$K$-conjugacy mod$^\times q$ is an equivalence relation on $\Omega^\times$; every class meets the annulus $|q|<|\alpha|\le1$, so a system of representatives in the annulus exists.')
+add('proposition', 'prop:theta-divisor', 'The theta function $\\Theta_{\\mathfrak m}$', ['thetaFun', 'thetaFun_spec', 'thetaDiv', 'thetaS', 'anVal_thetaDiv', 'translation_thetaDiv', 'dTheta', 'aTheta', 'degQ_eq_dTheta', 'PhiQ_eq_mk', 'periodic_conj', 'periodic_zpow', 'Xm'],
+    ['prop:theta-phi', 'prop:conj-classes', 'def:Dq'], False,
+    r'For a $q$-periodic divisor $\mathfrak m$, $\Theta_{\mathfrak m}=\prod_\alpha T_\alpha^{m_\alpha}$ (over representatives in the annulus) has divisor $\mathfrak m$ and satisfies $\Theta_{\mathfrak m}(q^{-1}X)=a^{-1}X^d\Theta_{\mathfrak m}(X)$ with $d=\deg_q\mathfrak m$ and $(-1)^da\equiv\Phi_q(\mathfrak m)\bmod^\times q$ (formulas (10), (11)).')
+add('proposition', 'prop:periodic-solutions', 'Holomorphic solutions of $G(q^{-1}X)=\\kappa X^dG(X)$', ['solSpace', 'mem_solSpace_iff', 'solSpace_eq_bot_of_neg', 'solSpace_zero_eq_bot', 'solSpace_zero_finrank', 'solSpace_finrank_pos', 'seqOf', 'seqOf_rec', 'seqOf_convergent', 'finite_quad', 'triZ', 'solEval', 'holCoeff_holScale', 'mem_hol_of_anVal_nonneg'],
+    ['prop:laurent-coefficients', 'thm:division-hol'], False,
+    r'The coefficients satisfy $g_n=\kappa q^ng_{n-d}$. For $d>0$ the solutions are $g_{i+jd}=c_i\kappa^jq^{ij+dj(j+1)/2}$, a space of dimension $d$; for $d<0$ there is none but $0$; for $d=0$ there is a nonzero solution iff $\kappa\in q^{\mathbb Z}$, and then a one-dimensional space.')

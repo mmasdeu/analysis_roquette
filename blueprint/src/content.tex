@@ -309,37 +309,38 @@ See the Lean proof of \texttt{theta\_functional\_equation, multipliable\_one\_su
 
 \begin{proposition}[Proposition 1 (Abel--Jacobi)]
 \label{prop:abel-jacobi-1}
-\lean{AnalyticTheory.abel_jacobi_one}
-\uses{def:Phi-q, def:deg-q, def:Fq, def:divisor-of, prop:theta-functional-eq}
+\lean{AnalyticTheory.abel_jacobi_one, AnalyticTheory.aj_forward, AnalyticTheory.aj_backward, AnalyticTheory.mero_unit_of_anVal_zero, AnalyticTheory.translation_Xm, AnalyticTheory.mem_Fq_iff}
+\uses{def:Phi-q, def:deg-q, def:Fq, def:divisor-of, prop:theta-functional-eq, prop:theta-divisor, thm:division-hol}
 \leanok
 A $q$-periodic divisor is the divisor of a $q$-periodic function iff $\deg_q(\mathfrak m)=0$ and $\Phi_q(\mathfrak m)\equiv 1\bmod^\times q$; then the function is unique up to $K^\times$.
 \end{proposition}
 \begin{proof}
 \leanok
-See the Lean proof of \texttt{abel\_jacobi\_one}.
+See the Lean proof of \texttt{abel\_jacobi\_one, aj\_forward, aj\_backward, mero\_unit\_of\_anVal\_zero, translation\_Xm, mem\_Fq\_iff}.
 \end{proof}
 
 \begin{corollary}[Corollary to Proposition 1]
 \label{cor:periodic-with-prescribed-zero}
-\lean{AnalyticTheory.exists_periodic_function_with_valuation}
+\lean{AnalyticTheory.exists_periodic_function_with_valuation, AnalyticTheory.cor_construct, AnalyticTheory.conj_family_subsingleton, AnalyticTheory.exists_good_index, AnalyticTheory.thM, AnalyticTheory.translation_thM_zpow, AnalyticTheory.anVal_thM_zpow}
 \uses{prop:abel-jacobi-1, def:conj-mod-q}
 \leanok
-For every $\alpha\in\Omega^\times$ there is a $q$-periodic $f$ with $w_\alpha(f)=1$, and $w_\beta(f)=0$ for $\beta$ not conjugate to $\alpha$ mod$^\times q$.
+For every $\alpha\in\Omega^\times$ there is a $q$-periodic $f$ with $w_\alpha(f)=1$; if $\beta$ is not $K$-conjugate to $\alpha$ mod$^\times q$, then $f$ can be chosen with moreover $w_\beta(f)=0$ ($f$ depends on $\beta$). Proof: $f=T_\alpha T_w/(T_u^{d}T_v)$ with $u,v,w\in K^\times$ avoiding the classes of $\alpha,\beta$.
 \end{corollary}
 \begin{proof}
 \leanok
-See the Lean proof of \texttt{exists\_periodic\_function\_with\_valuation}.
+See the Lean proof of \texttt{exists\_periodic\_function\_with\_valuation, cor\_construct, conj\_family\_subsingleton, exists\_good\_index, thM, translation\_thM\_zpow, anVal\_thM\_zpow}.
 \end{proof}
 
 \begin{proposition}[Formula (12)]
 \label{prop:deg-q-formula}
-\lean{AnalyticTheory.degQ_formula, AnalyticTheory.degQ_eq_of_system, AnalyticTheory.degQ_add}
+\lean{AnalyticTheory.degQ_formula, AnalyticTheory.degQ_eq_of_system, AnalyticTheory.degQ_add, AnalyticTheory.system_bijOn, AnalyticTheory.system_prod_ratio, AnalyticTheory.normGen, AnalyticTheory.normGen_conj, AnalyticTheory.IsRepSystem, AnalyticTheory.annPart}
 \uses{def:deg-q}
 \leanok
 Formula (12): the degree and the Jacobi image are given by the stated sums/products over any system of representatives.
 \end{proposition}
 \begin{proof}
-See the Lean proof of \texttt{degQ\_formula, degQ\_eq\_of\_system, degQ\_add}.
+\leanok
+See the Lean proof of \texttt{degQ\_formula, degQ\_eq\_of\_system, degQ\_add, system\_bijOn, system\_prod\_ratio, normGen, normGen\_conj, IsRepSystem, annPart}.
 \end{proof}
 
 \begin{theorem}[Item I: $F_K(q)$ is a function field]
@@ -526,14 +527,14 @@ See the Lean proof of \texttt{isHolomorphicOver\_mul}.
 
 \begin{proposition}[Proposition 2 (Riemann--Roch theorem)]
 \label{prop:abel-jacobi-2}
-\lean{AnalyticTheory.LSet, AnalyticTheory.riemann_roch_analytic}
-\uses{prop:abel-jacobi-1, def:deg-q, def:Phi-q}
+\lean{AnalyticTheory.LSet, AnalyticTheory.riemann_roch_analytic, AnalyticTheory.solToL, AnalyticTheory.solToL_injective, AnalyticTheory.mem_LSet_iff_range}
+\uses{prop:abel-jacobi-1, def:deg-q, def:Phi-q, prop:theta-divisor, prop:periodic-solutions}
 \leanok
 For a $q$-periodic divisor $\mathfrak m$, the space $L_K(q\,|\,\mathfrak m)$ of $q$-periodic functions $f$ with $(f)\ge-\mathfrak m$ is $0$ if $\deg_q\mathfrak m<0$ (and also if $\deg_q\mathfrak m=0$, $\Phi_q(\mathfrak m)\not\equiv1$); it has dimension $1$ if $\deg_q\mathfrak m=0$, $\Phi_q(\mathfrak m)\equiv1$; and $\dim L_K(q\,|\,\mathfrak m)=\deg_q(\mathfrak m)$ if $\deg_q\mathfrak m>0$.
 \end{proposition}
 \begin{proof}
 \leanok
-See the Lean proof of \texttt{LSet, riemann\_roch\_analytic}.
+See the Lean proof of \texttt{LSet, riemann\_roch\_analytic, solToL, solToL\_injective, mem\_LSet\_iff\_range}.
 \end{proof}
 
 \begin{definition}[Translation automorphisms]
@@ -768,6 +769,42 @@ Let $\alpha\in\Omega^\times$ have minimal polynomial $\varphi$ of degree $N$ ove
 \begin{proof}
 \leanok
 See the Lean proof of \texttt{theta\_spec, exists\_theta, thF, thG, psi, gcoef, tendsto\_gnorm\_thF, tendsto\_gnorm\_thG, anVal\_thF, anVal\_thG, chi, chi\_unique, conjModQ\_iff\_chi, psi\_eq\_minpoly, anVal\_polyHol\_minpoly, thF\_scale, thG\_scale}.
+\end{proof}
+
+\begin{proposition}[Conjugacy classes mod $q$]
+\label{prop:conj-classes}
+\lean{AnalyticTheory.conjModQ_refl, AnalyticTheory.conjModQ_symm, AnalyticTheory.conjModQ_trans, AnalyticTheory.exists_shift_annulus, AnalyticTheory.repSystem_spec}
+\uses{def:conj-mod-q, def:deg-q}
+\leanok
+$K$-conjugacy mod$^\times q$ is an equivalence relation on $\Omega^\times$; every class meets the annulus $|q|<|\alpha|\le1$, so a system of representatives in the annulus exists.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{conjModQ\_refl, conjModQ\_symm, conjModQ\_trans, exists\_shift\_annulus, repSystem\_spec}.
+\end{proof}
+
+\begin{proposition}[The theta function $\Theta_{\mathfrak m}$]
+\label{prop:theta-divisor}
+\lean{AnalyticTheory.thetaFun, AnalyticTheory.thetaFun_spec, AnalyticTheory.thetaDiv, AnalyticTheory.thetaS, AnalyticTheory.anVal_thetaDiv, AnalyticTheory.translation_thetaDiv, AnalyticTheory.dTheta, AnalyticTheory.aTheta, AnalyticTheory.degQ_eq_dTheta, AnalyticTheory.PhiQ_eq_mk, AnalyticTheory.periodic_conj, AnalyticTheory.periodic_zpow, AnalyticTheory.Xm}
+\uses{prop:theta-phi, prop:conj-classes, def:Dq}
+\leanok
+For a $q$-periodic divisor $\mathfrak m$, $\Theta_{\mathfrak m}=\prod_\alpha T_\alpha^{m_\alpha}$ (over representatives in the annulus) has divisor $\mathfrak m$ and satisfies $\Theta_{\mathfrak m}(q^{-1}X)=a^{-1}X^d\Theta_{\mathfrak m}(X)$ with $d=\deg_q\mathfrak m$ and $(-1)^da\equiv\Phi_q(\mathfrak m)\bmod^\times q$ (formulas (10), (11)).
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{thetaFun, thetaFun\_spec, thetaDiv, thetaS, anVal\_thetaDiv, translation\_thetaDiv, dTheta, aTheta, degQ\_eq\_dTheta, PhiQ\_eq\_mk, periodic\_conj, periodic\_zpow, Xm}.
+\end{proof}
+
+\begin{proposition}[Holomorphic solutions of $G(q^{-1}X)=\kappa X^dG(X)$]
+\label{prop:periodic-solutions}
+\lean{AnalyticTheory.solSpace, AnalyticTheory.mem_solSpace_iff, AnalyticTheory.solSpace_eq_bot_of_neg, AnalyticTheory.solSpace_zero_eq_bot, AnalyticTheory.solSpace_zero_finrank, AnalyticTheory.solSpace_finrank_pos, AnalyticTheory.seqOf, AnalyticTheory.seqOf_rec, AnalyticTheory.seqOf_convergent, AnalyticTheory.finite_quad, AnalyticTheory.triZ, AnalyticTheory.solEval, AnalyticTheory.holCoeff_holScale, AnalyticTheory.mem_hol_of_anVal_nonneg}
+\uses{prop:laurent-coefficients, thm:division-hol}
+\leanok
+The coefficients satisfy $g_n=\kappa q^ng_{n-d}$. For $d>0$ the solutions are $g_{i+jd}=c_i\kappa^jq^{ij+dj(j+1)/2}$, a space of dimension $d$; for $d<0$ there is none but $0$; for $d=0$ there is a nonzero solution iff $\kappa\in q^{\mathbb Z}$, and then a one-dimensional space.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{solSpace, mem\_solSpace\_iff, solSpace\_eq\_bot\_of\_neg, solSpace\_zero\_eq\_bot, solSpace\_zero\_finrank, solSpace\_finrank\_pos, seqOf, seqOf\_rec, seqOf\_convergent, finite\_quad, triZ, solEval, holCoeff\_holScale, mem\_hol\_of\_anVal\_nonneg}.
 \end{proof}
 
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
