@@ -530,3 +530,16 @@ add('proposition', 'prop:rationality', 'Invariance of $w_\\alpha$ under conjugat
 add('proposition', 'prop:divisor-finite', 'Divisors of meromorphic functions are divisors', ['divisorOf_finite', 'divisorOf_mem_Divisors', 'principalDivisors_le'],
     ['prop:zeros-finite', 'prop:rationality', 'def:divisor-of', 'def:principal-divisors'], False,
     r'For $0\ne f\in M_K$ the divisor $(f)$ satisfies the finiteness condition (i) and the rationality condition (ii) of \S2, so $P_K(q)\subset D_K$.')
+
+add('lemma', 'lem:gauss-extremal', 'Gauss lemma with extremal indices', ['wt', 'IsLeftMax', 'IsRightMax', 'exists_leftMax', 'exists_rightMax', 'leftMax_conv', 'rightMax_conv', 'leftMax_mono', 'reflSeq', 'exists_max_of_tendsto'],
+    ['def:convergent-laurent'], False,
+    r'For convergent Laurent sequences $a,b$ and $r>0$ let $N_a$ ($N_a^+$) be the leftmost (rightmost) index maximizing $|a_n|r^n$. Then $N_{a*b}=N_a+N_b$, $N^+_{a*b}=N^+_a+N^+_b$ and $\max|(a*b)_n|r^n=\max|a_n|r^n\cdot\max|b_n|r^n$. Moreover $r\mapsto N_a(r)$ is nondecreasing.')
+add('lemma', 'lem:unit-convolution', 'Units of the convolution algebra', ['unit_aux', 'unit_monomial', 'deltaSeq', 'isLeftMax_unique', 'isRightMax_unique'],
+    ['lem:gauss-extremal'], False,
+    r'If $a*b=\delta_0$ for convergent Laurent sequences, then $a$ has a single nonzero coefficient.')
+add('proposition', 'prop:laurent-coefficients', 'Laurent coefficients of holomorphic functions', ['laurent_summable', 'laurentFun', 'holOfSeq', 'laurent_unique', 'holCoeff', 'holCoeff_mul', 'holCoeff_injective', 'monoHol', 'monoHol_apply'],
+    ['lem:identity-theorem', 'def:H-K'], False,
+    r'Every convergent Laurent sequence defines an element of $H_K$; the coefficient sequence of an element of $H_K$ is unique, and that of a product is the convolution.')
+add('corollary', 'cor:hol-units', 'Units of $H_K$', ['hol_unit'],
+    ['lem:unit-convolution', 'prop:laurent-coefficients'], False,
+    r'The units of $H_K$ are the functions $cX^n$ with $c\in K^\times$, $n\in\mathbb Z$.')
