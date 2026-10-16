@@ -120,8 +120,3 @@ New files: `Dominance.lean`, `Taylor.lean`, `Identity.lean`, `WeierstrassPrep.le
   has a zero of norm `ρ`, and its zeros there are the `x₀`-multiples of the roots of a monic polynomial;
   hence finitely many zeros in every closed annulus.
 * `w_{σα} = w_α` for `K`-automorphisms `σ`; so `divisorOf f ∈ D_K` for every `f ∈ M_K` and `P_K(q) ≤ D_K`.
-
-Not yet done towards the Riemann–Roch statements (Proposition 1/2): the division theorem in `H_K`
-(a holomorphic `A` with `ord_α A ≥ ord_α B` for all `α` is divisible by `B`), the unit theorem for
-quotients, the explicit theta functions with `K`-rational descent, and the Artin–Whaples step of
-`Structure.lean`.
