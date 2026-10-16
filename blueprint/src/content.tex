@@ -557,24 +557,26 @@ See the Lean proof of \texttt{translation\_analytic\_eq\_algebraic}.
 
 \begin{remark}[Remark 1 (extension of constants)]
 \label{rem:S2-ext-const}
-\lean{AnalyticTheory.ramIndex, AnalyticTheory.quotIncl, AnalyticTheory.remark_ext_const_divisors, AnalyticTheory.ramIndex_eq_one_of_separable}
+\lean{AnalyticTheory.ramIndex, AnalyticTheory.quotIncl, AnalyticTheory.remark_ext_const_divisors, AnalyticTheory.ramIndex_eq_one_of_separable, AnalyticTheory.divExtFun, AnalyticTheory.divExtFun_apply, AnalyticTheory.divExtFun_mem, AnalyticTheory.divExtFun_periodic, AnalyticTheory.anVal_meroExt, AnalyticTheory.ramIndex_eq_eIdx, AnalyticTheory.eIdx_eq_finInsepDegree, AnalyticTheory.eIdx_dvd, AnalyticTheory.eIdx_le_of_separable, AnalyticTheory.degQ_PhiQ_divExt, AnalyticTheory.psi_isometry, AnalyticTheory.anPt_transfer, AnalyticTheory.omegaL_norm_eq}
 \uses{def:Dq, def:deg-q, def:Phi-q}
 \leanok
-For a finite extension $L\,|\,K$ there is an embedding $D_K\subset D_L$, $m'_{\alpha_i}=e_i(\alpha)m_\alpha$, with ramification indices $e_i(\alpha)$ (quotients of degrees of inseparability); it maps $D_K(q)$ into $D_L(q)$ and preserves $\deg_q$ and $\Phi_q$; $e_i=1$ if $L\,|\,K$ is separable.
+For a finite extension $L\,|\,K$ there is an embedding $D_K\subset D_L$, $m'_{\psi\alpha}=e(\alpha)m_\alpha$, with ramification indices $e(\alpha)=e_{\alpha,K}/e_{\psi\alpha,L}$ (quotients of degrees of inseparability); it maps $D_K(q)$ into $D_L(q)$ and preserves $\deg_q$ and $\Phi_q$; $e(\alpha)=1$ if $L\,|\,K$ is separable. Proof: $\psi:\Omega_K\cong\Omega_L$ is an isometry, point orders are transported along it, so $w_{\psi\alpha,L}=e(\alpha)\,w_{\alpha,K}$ on $M_K$; comparing $\Theta_{\mathfrak m}$ (over $K$, viewed in $M_L$) with $\Theta_{\mathfrak m'}$ over $L$ gives $\deg_q$ and $\Phi_q$. For separable $L$, $[K(\beta):K]_i\le[L(\beta):K]_i=[L(\beta):L]_i$.
 \end{remark}
 \begin{proof}
-See the Lean proof of \texttt{ramIndex, quotIncl, remark\_ext\_const\_divisors, ramIndex\_eq\_one\_of\_separable}.
+\leanok
+See the Lean proof of \texttt{ramIndex, quotIncl, remark\_ext\_const\_divisors, ramIndex\_eq\_one\_of\_separable, divExtFun, divExtFun\_apply, divExtFun\_mem, divExtFun\_periodic, anVal\_meroExt, ramIndex\_eq\_eIdx, eIdx\_eq\_finInsepDegree, eIdx\_dvd, eIdx\_le\_of\_separable, degQ\_PhiQ\_divExt, psi\_isometry, anPt\_transfer, omegaL\_norm\_eq}.
 \end{proof}
 
 \begin{remark}[Remark 2 (Galois constant extensions)]
 \label{rem:S2-galois}
-\lean{AnalyticTheory.IsCoeffInclusion, AnalyticTheory.remark_galois_action_eval, AnalyticTheory.remark_galois_fixed_field, AnalyticTheory.remark_galois_action_divisors, AnalyticTheory.remark_galois_fixed_divisors, AnalyticTheory.remark_galois_equivariance}
+\lean{AnalyticTheory.IsCoeffInclusion, AnalyticTheory.remark_galois_action_eval, AnalyticTheory.remark_galois_fixed_field, AnalyticTheory.remark_galois_action_divisors, AnalyticTheory.remark_galois_fixed_divisors, AnalyticTheory.remark_galois_equivariance, AnalyticTheory.holGal, AnalyticTheory.meroGal, AnalyticTheory.isGalAct_meroGal, AnalyticTheory.galAct_holRel, AnalyticTheory.anVal_galAct, AnalyticTheory.eIdx_ext, AnalyticTheory.hol_descend, AnalyticTheory.galAct_fix_holExt, AnalyticTheory.degQ_PhiQ_of_fun, AnalyticTheory.meroGal_translation, AnalyticTheory.ext_isometry, AnalyticTheory.gal_norm}
 \uses{rem:S2-ext-const, def:galois-action}
 \leanok
 For $L\,|\,K$ Galois with group $G$: $G$ acts on $M_L$ through the coefficients, with fixed field $M_K$, $(\sigma f)(\sigma\alpha)=\sigma(f(\alpha))$, $(\sigma f)=\sigma(f)$ for divisors, the fixed divisors are $D_K$, and $\deg_q$, $\Phi_q$ are $G$-equivariant.
 \end{remark}
 \begin{proof}
-See the Lean proof of \texttt{IsCoeffInclusion, remark\_galois\_action\_eval, remark\_galois\_fixed\_field, remark\_galois\_action\_divisors, remark\_galois\_fixed\_divisors, remark\_galois\_equivariance}.
+\leanok
+See the Lean proof of \texttt{IsCoeffInclusion, remark\_galois\_action\_eval, remark\_galois\_fixed\_field, remark\_galois\_action\_divisors, remark\_galois\_fixed\_divisors, remark\_galois\_equivariance, holGal, meroGal, isGalAct\_meroGal, galAct\_holRel, anVal\_galAct, eIdx\_ext, hol\_descend, galAct\_fix\_holExt, degQ\_PhiQ\_of\_fun, meroGal\_translation, ext\_isometry, gal\_norm}.
 \end{proof}
 
 \begin{remark}[Remark 3 (infinite constant extensions)]

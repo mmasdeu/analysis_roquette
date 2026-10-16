@@ -688,3 +688,11 @@ _m3 = {i['label']: i for i in ITEMS if i['label'] in ('prop:fq-const-ext', 'lem:
 ITEMS[:] = [i for i in ITEMS if i['label'] not in _m3]
 _k3 = next(n for n, i in enumerate(ITEMS) if i['label'] == 'thm:fq-function-field')
 ITEMS[_k3:_k3] = [_m3['prop:fq-const-ext'], _m3['lem:genus-iso']]
+
+# --- Remarks 1, 2 of section 2
+_addlean('rem:S2-ext-const', 'divExtFun', 'divExtFun_apply', 'divExtFun_mem', 'divExtFun_periodic', 'anVal_meroExt',
+         'ramIndex_eq_eIdx', 'eIdx_eq_finInsepDegree', 'eIdx_dvd', 'eIdx_le_of_separable', 'degQ_PhiQ_divExt',
+         'psi_isometry', 'anPt_transfer', 'omegaL_norm_eq')
+_addlean('rem:S2-galois', 'holGal', 'meroGal', 'isGalAct_meroGal', 'galAct_holRel', 'anVal_galAct', 'eIdx_ext',
+         'hol_descend', 'galAct_fix_holExt', 'degQ_PhiQ_of_fun', 'meroGal_translation', 'ext_isometry', 'gal_norm')
+_upd('rem:S2-ext-const', text=r"""For a finite extension $L\,|\,K$ there is an embedding $D_K\subset D_L$, $m'_{\psi\alpha}=e(\alpha)m_\alpha$, with ramification indices $e(\alpha)=e_{\alpha,K}/e_{\psi\alpha,L}$ (quotients of degrees of inseparability); it maps $D_K(q)$ into $D_L(q)$ and preserves $\deg_q$ and $\Phi_q$; $e(\alpha)=1$ if $L\,|\,K$ is separable. Proof: $\psi:\Omega_K\cong\Omega_L$ is an isometry, point orders are transported along it, so $w_{\psi\alpha,L}=e(\alpha)\,w_{\alpha,K}$ on $M_K$; comparing $\Theta_{\mathfrak m}$ (over $K$, viewed in $M_L$) with $\Theta_{\mathfrak m'}$ over $L$ gives $\deg_q$ and $\Phi_q$. For separable $L$, $[K(\beta):K]_i\le[L(\beta):K]_i=[L(\beta):L]_i$.""")
