@@ -189,6 +189,190 @@ theorem aj_backward (hd : degQ K q m = 0) (hΦ : PhiQ K q (norm_pos_iff.mp hq0) 
 
 end aj
 
+theorem eq_of_conjModQ_K {q : K} (hq0 : q ≠ 0) {γ : Omega K} {y : K}
+    (h : ConjModQ K q γ (algebraMap K (Omega K) y)) : ∃ k : ℤ, γ = algebraMap K (Omega K) (q ^ k * y) := by
+  classical
+  have h' := conjModQ_iff_chi.mp (conjModQ_symm hq0 h)
+  obtain ⟨k, hk⟩ := h'
+  unfold chi at hk
+  have hk' : minpoly K γ = minpoly K (algebraMap K (Omega K) (q ^ k) * algebraMap K (Omega K) y) := by
+    by_contra hc; rw [if_neg hc] at hk; exact zero_ne_one hk
+  rw [← map_mul, minpoly.eq_X_sub_C (Omega K)] at hk'
+  have := minpoly.aeval K γ
+  rw [hk'] at this
+  simp only [map_sub, Polynomial.aeval_X, Polynomial.aeval_C] at this
+  exact ⟨k, sub_eq_zero.mp this⟩
+
+theorem conj_family_subsingleton {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {c : K} (hc : c ≠ 0)
+    (γ : Omega K) :
+    {n : ℕ | ConjModQ K q γ (algebraMap K (Omega K) (c * (1 + q ^ (n + 1))))}.Subsingleton := by
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hnorm : ∀ n : ℕ, ‖(1 : K) + q ^ (n + 1)‖ = 1 := by
+    intro n
+    have h1 : ‖q ^ (n + 1)‖ < 1 := by
+      rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hq1 (by omega)
+    rw [norm_pow] at h1
+    rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm] <;> simp [norm_pow, h1.le, h1.ne']
+  intro n hn n' hn'
+  obtain ⟨k, hk⟩ := eq_of_conjModQ_K hq0' hn
+  obtain ⟨k', hk'⟩ := eq_of_conjModQ_K hq0' hn'
+  have h1 : q ^ k * (c * (1 + q ^ (n + 1))) = q ^ k' * (c * (1 + q ^ (n' + 1))) :=
+    (algebraMap K (Omega K)).injective (hk.symm.trans hk')
+  have h2 := congrArg norm h1
+  simp only [norm_mul, norm_zpow, hnorm, mul_one] at h2
+  have hcn : 0 < ‖c‖ := norm_pos_iff.mpr hc
+  have hkk : k = k' := zpow_right_injective₀ hq0 hq1.ne (mul_right_cancel₀ hcn.ne' h2)
+  subst hkk
+  have h3 := mul_left_cancel₀ (zpow_ne_zero k hq0') h1
+  have h4 := mul_left_cancel₀ hc h3
+  have h5 : q ^ (n + 1) = q ^ (n' + 1) := by linear_combination h4
+  have h6 := congrArg norm h5
+  simp only [norm_pow] at h6
+  have := pow_right_injective₀ hq0 hq1.ne h6
+  omega
+
+section cor
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+/-- `T_y` in `M_K`. -/
+noncomputable def thM (y : Omega K) : MeroRing K :=
+  algebraMap (holSubring K) (MeroRing K) (thetaFun hq0 hq1 y)
+
+theorem thM_ne_zero {y : Omega K} (hy : y ≠ 0) : thM hq0 hq1 y ≠ 0 :=
+  alg_hol_ne_zero (thetaFun_spec hq0 hq1 hy).1
+
+theorem translation_thM_zpow {y : Omega K} (hy : y ≠ 0) (z : ℤ) :
+    translation K (Units.mk0 q (norm_pos_iff.mp hq0)) (thM hq0 hq1 y ^ z) =
+      algebraMap K (MeroRing K) (((minpoly K y).coeff 0)⁻¹ ^ z) *
+        Xm (((minpoly K y).natDegree : ℤ) * z) * thM hq0 hq1 y ^ z := by
+  obtain ⟨-, hfe, -⟩ := thetaFun_spec hq0 hq1 hy
+  unfold thM
+  rw [map_zpow₀, translation_alg, hfe, map_mul, map_mul, algebraMap_hol_mero, mul_zpow, mul_zpow,
+    map_zpow₀]
+  rw [show algebraMap (holSubring K) (MeroRing K) (monoHol K ((minpoly K y).natDegree : ℤ)) =
+    Xm ((minpoly K y).natDegree : ℤ) from rfl, Xm_zpow]
+
+open scoped Classical in
+theorem anVal_thM_zpow {y : Omega K} (hy : y ≠ 0) (z : ℤ) {ξ : Omega K} (hξ : ξ ≠ 0) :
+    anVal K ξ (thM hq0 hq1 y ^ z) =
+      ((z * (if ConjModQ K q y ξ then 1 else 0) : ℤ) : WithTop ℤ) := by
+  refine anVal_zpow_of hξ (thM_ne_zero hq0 hq1 hy) ?_ z
+  rw [thM, (thetaFun_spec hq0 hq1 hy).2.2 ξ hξ]
+  split_ifs <;> simp
+
+omit hq1 in
+theorem minpoly_alg (x : K) : minpoly K (algebraMap K (Omega K) x) = X - C x :=
+  minpoly.eq_X_sub_C (Omega K) x
+
+include hq0 hq1 in
+theorem exists_good_index (cs : List K) (hcs : ∀ c ∈ cs, c ≠ 0) (γs : List (Omega K)) :
+    ∃ n : ℕ, ∀ c ∈ cs, ∀ γ ∈ γs,
+      ¬ ConjModQ K q γ (algebraMap K (Omega K) (c * (1 + q ^ (n + 1)))) := by
+  have hfin : (⋃ c ∈ cs, ⋃ γ ∈ γs, {n : ℕ | ConjModQ K q γ
+      (algebraMap K (Omega K) (c * (1 + q ^ (n + 1))))}).Finite :=
+    Set.Finite.biUnion (List.finite_toSet cs) (fun c hc => Set.Finite.biUnion (List.finite_toSet γs)
+      (fun γ _ => (conj_family_subsingleton hq0 hq1 (hcs c hc) γ).finite))
+  obtain ⟨n, hn⟩ := hfin.exists_notMem
+  refine ⟨n, fun c hc γ hγ h => hn ?_⟩
+  simp only [Set.mem_iUnion]
+  exact ⟨c, hc, γ, hγ, h⟩
+
+omit [IsUltrametricDist K] [CompleteSpace K] in
+include hq1 in
+theorem one_add_ne_zero (n : ℕ) : (1 : K) + q ^ (n + 1) ≠ 0 := by
+  intro h
+  have h1 : q ^ (n + 1) = -1 := by linear_combination h
+  have h2 := congrArg norm h1
+  rw [norm_pow, norm_neg, norm_one] at h2
+  have : ‖q‖ ^ (n + 1) < 1 := pow_lt_one₀ (norm_nonneg _) hq1 (by omega)
+  linarith
+
+include hq0 hq1 in
+open scoped Classical in
+theorem cor_construct {α : Omega K} (hα : α ≠ 0) {β : Omega K} (hβ : β ≠ 0) :
+    ∃ f : MeroRing K, f ∈ Fq K q ∧ anVal K α f = 1 ∧ (¬ ConjModQ K q α β → anVal K β f = 0) := by
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  set c0 := (minpoly K α).coeff 0 with hc0def
+  have hc0 : c0 ≠ 0 := minpoly.coeff_zero_ne_zero (Algebra.IsIntegral.isIntegral α) hα
+  set d := (minpoly K α).natDegree with hd
+  obtain ⟨n1, hn1⟩ := exists_good_index hq0 hq1 [1] (by simp) [α, β]
+  set u : K := 1 * (1 + q ^ (n1 + 1)) with hu
+  have hu0 : u ≠ 0 := by rw [hu, one_mul]; exact one_add_ne_zero hq1 n1
+  set cw : K := (-u) ^ d / c0 with hcw
+  have hcw0 : cw ≠ 0 := div_ne_zero (pow_ne_zero _ (neg_ne_zero.mpr hu0)) hc0
+  obtain ⟨n2, hn2⟩ := exists_good_index hq0 hq1 [1, cw] (by simp [hcw0]) [α, β]
+  set v : K := 1 * (1 + q ^ (n2 + 1)) with hv
+  set w : K := cw * (1 + q ^ (n2 + 1)) with hw
+  have hv0 : v ≠ 0 := by rw [hv, one_mul]; exact one_add_ne_zero hq1 n2
+  have hw0 : w ≠ 0 := mul_ne_zero hcw0 (one_add_ne_zero hq1 n2)
+  have hau : algebraMap K (Omega K) u ≠ 0 := (_root_.map_ne_zero _).mpr hu0
+  have hav : algebraMap K (Omega K) v ≠ 0 := (_root_.map_ne_zero _).mpr hv0
+  have haw : algebraMap K (Omega K) w ≠ 0 := (_root_.map_ne_zero _).mpr hw0
+  -- the function
+  set f : MeroRing K := thM hq0 hq1 α ^ (1 : ℤ) * thM hq0 hq1 (algebraMap K (Omega K) w) ^ (1 : ℤ) *
+    thM hq0 hq1 (algebraMap K (Omega K) u) ^ (-(d : ℤ)) *
+    thM hq0 hq1 (algebraMap K (Omega K) v) ^ (-1 : ℤ) with hf
+  have hmp : ∀ x : K, (minpoly K (algebraMap K (Omega K) x)).natDegree = 1 ∧
+      (minpoly K (algebraMap K (Omega K) x)).coeff 0 = -x := by
+    intro x
+    rw [minpoly_alg]
+    refine ⟨Polynomial.natDegree_X_sub_C x, by simp⟩
+  refine ⟨f, ?_, ?_, ?_⟩
+  · rw [mem_Fq_iff hq0', hf, map_mul, map_mul, map_mul, translation_thM_zpow hq0 hq1 hα,
+      translation_thM_zpow hq0 hq1 haw, translation_thM_zpow hq0 hq1 hau,
+      translation_thM_zpow hq0 hq1 hav, (hmp w).1, (hmp w).2, (hmp u).1, (hmp u).2, (hmp v).1,
+      (hmp v).2]
+    simp only [zpow_one, Nat.cast_one, one_mul, mul_one, mul_neg, ← hd, ← hc0def]
+    have hX : Xm (K := K) (d : ℤ) * Xm 1 * Xm (-(d : ℤ)) * Xm (-1) = 1 := by
+      rw [← Xm_add, ← Xm_add, ← Xm_add]
+      ring_nf
+      exact Xm_zero
+    have hwv : w = cw * v := by rw [hw, hv, one_mul]
+    have hud : (-u) ^ d ≠ 0 := pow_ne_zero _ (neg_ne_zero.mpr hu0)
+    have hCK : c0⁻¹ * (-w)⁻¹ * (-u)⁻¹ ^ (-(d : ℤ)) * (-v)⁻¹ ^ (-1 : ℤ) = 1 := by
+      rw [inv_zpow', inv_zpow', neg_neg, neg_neg, zpow_natCast, zpow_one, hwv, hcw]
+      field_simp
+    have hC : algebraMap K (MeroRing K) c0⁻¹ * algebraMap K (MeroRing K) (-w)⁻¹ *
+        algebraMap K (MeroRing K) ((-u)⁻¹ ^ (-(d : ℤ))) *
+        algebraMap K (MeroRing K) ((-v)⁻¹ ^ (-1 : ℤ)) = 1 := by
+      rw [← map_mul, ← map_mul, ← map_mul, hCK, map_one]
+    calc _ = (algebraMap K (MeroRing K) c0⁻¹ * algebraMap K (MeroRing K) (-w)⁻¹ *
+        algebraMap K (MeroRing K) ((-u)⁻¹ ^ (-(d : ℤ))) *
+        algebraMap K (MeroRing K) ((-v)⁻¹ ^ (-1 : ℤ))) *
+          (Xm (K := K) (d : ℤ) * Xm 1 * Xm (-(d : ℤ)) * Xm (-1)) *
+          (thM hq0 hq1 α * thM hq0 hq1 ((algebraMap K (Omega K)) w) *
+            thM hq0 hq1 ((algebraMap K (Omega K)) u) ^ (-(d : ℤ)) *
+            thM hq0 hq1 ((algebraMap K (Omega K)) v) ^ (-1 : ℤ)) := by ring
+      _ = _ := by rw [hC, hX, one_mul, one_mul]
+  · have h1 : ¬ ConjModQ K q (algebraMap K (Omega K) w) α := fun h =>
+      hn2 cw (by simp) α (by simp) (conjModQ_symm hq0' h)
+    have h2 : ¬ ConjModQ K q (algebraMap K (Omega K) u) α := fun h =>
+      hn1 1 (by simp) α (by simp) (conjModQ_symm hq0' h)
+    have h3 : ¬ ConjModQ K q (algebraMap K (Omega K) v) α := fun h =>
+      hn2 1 (by simp) α (by simp) (conjModQ_symm hq0' h)
+    rw [hf, (anVal_isValuation K α hα).2.2.1, (anVal_isValuation K α hα).2.2.1,
+      (anVal_isValuation K α hα).2.2.1, anVal_thM_zpow hq0 hq1 hα _ hα,
+      anVal_thM_zpow hq0 hq1 haw _ hα, anVal_thM_zpow hq0 hq1 hau _ hα,
+      anVal_thM_zpow hq0 hq1 hav _ hα, if_pos (conjModQ_refl q α), if_neg h1, if_neg h2, if_neg h3]
+    norm_cast
+    simp
+  · intro hαβ
+    have h1 : ¬ ConjModQ K q (algebraMap K (Omega K) w) β := fun h =>
+      hn2 cw (by simp) β (by simp) (conjModQ_symm hq0' h)
+    have h2 : ¬ ConjModQ K q (algebraMap K (Omega K) u) β := fun h =>
+      hn1 1 (by simp) β (by simp) (conjModQ_symm hq0' h)
+    have h3 : ¬ ConjModQ K q (algebraMap K (Omega K) v) β := fun h =>
+      hn2 1 (by simp) β (by simp) (conjModQ_symm hq0' h)
+    rw [hf, (anVal_isValuation K β hβ).2.2.1, (anVal_isValuation K β hβ).2.2.1,
+      (anVal_isValuation K β hβ).2.2.1, anVal_thM_zpow hq0 hq1 hα _ hβ,
+      anVal_thM_zpow hq0 hq1 haw _ hβ, anVal_thM_zpow hq0 hq1 hau _ hβ,
+      anVal_thM_zpow hq0 hq1 hav _ hβ, if_neg hαβ, if_neg h1, if_neg h2, if_neg h3]
+    norm_cast
+    simp
+
+end cor
+
 variable (K)
 
 /-- Book, §2: the degree and Jacobi image do not depend on the choice of the system of
@@ -220,13 +404,19 @@ theorem abel_jacobi_one (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     exact aj_backward hq0 hq1 hm hd hΦ
 
 /-- Book, §2, corollary to Proposition 1: for every `α ∈ Ω^×` there is a `q`-periodic
-function with `w_α(f) = 1`, and `f` can be chosen with `w_β(f) = 0` whenever `β` is not
-`K`-conjugate to `α mod^× q`. Blueprint: `cor:periodic-with-prescribed-zero`. -/
+function with `w_α(f) = 1`; and if `β` is not `K`-conjugate to `α mod^× q`, then `f` can be chosen
+with moreover `w_β(f) = 0` (the choice of `f` depends on `β`).
+Blueprint: `cor:periodic-with-prescribed-zero`. -/
 theorem exists_periodic_function_with_valuation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (α : Omega K) (hα : α ≠ 0) :
-    ∃ f : MeroRing K, f ∈ Fq K q ∧ anVal K α f = 1 ∧
-      ∀ β : Omega K, β ≠ 0 → ¬ ConjModQ K q α β → anVal K β f = 0 := by
-  sorry
+    (∃ f : MeroRing K, f ∈ Fq K q ∧ anVal K α f = 1) ∧
+      ∀ β : Omega K, β ≠ 0 → ¬ ConjModQ K q α β →
+        ∃ f : MeroRing K, f ∈ Fq K q ∧ anVal K α f = 1 ∧ anVal K β f = 0 := by
+  refine ⟨?_, fun β hβ hαβ => ?_⟩
+  · obtain ⟨f, hf, h1, -⟩ := cor_construct hq0 hq1 hα hα
+    exact ⟨f, hf, h1⟩
+  · obtain ⟨f, hf, h1, h2⟩ := cor_construct hq0 hq1 hα hβ
+    exact ⟨f, hf, h1, h2 hαβ⟩
 
 /-- Book, §2: the set `L_K(q | 𝔪)` of `q`-periodic functions `f` with `(f) ≥ −𝔪` (including `0`).
 Blueprint: `prop:abel-jacobi-2`. -/
