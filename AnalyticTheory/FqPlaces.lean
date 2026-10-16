@@ -1195,4 +1195,148 @@ theorem classify_valuation (v : AddValuation (FqSub K q) (WithTop ℤ))
 
 end classify2
 
+section primeAt
+
+variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+/-- The valuation ring of `w_α` in `F_K(q)`. -/
+noncomputable def ringAt (q : K) {α : Omega K} (hα : α ≠ 0) : ValuationSubring (FqSub K q) where
+  carrier := {x | 0 ≤ anVal K α (x : MeroRing K)}
+  mul_mem' := fun {x y} hx hy => by
+    show 0 ≤ anVal K α ((x : MeroRing K) * y)
+    rw [(anVal_isValuation K α hα).2.2.1]; exact add_nonneg hx hy
+  one_mem' := by
+    show 0 ≤ anVal K α 1
+    rw [(anVal_isValuation K α hα).2.1]
+  add_mem' := fun {x y} hx hy => by
+    have := anVal_ge_add hα (n := 0) (by exact_mod_cast hx) (by exact_mod_cast hy)
+    exact_mod_cast this
+  zero_mem' := by
+    show 0 ≤ anVal K α 0
+    rw [anVal_zero K α hα]; exact le_top
+  neg_mem' := fun {x} hx => by
+    show 0 ≤ anVal K α (-(x : MeroRing K))
+    rw [anVal_neg hα]; exact hx
+  mem_or_inv_mem' := fun x => by
+    by_cases hx : x = 0
+    · left
+      rw [hx]
+      show 0 ≤ anVal K α 0
+      rw [anVal_zero K α hα]; exact le_top
+    · have hx' : (x : MeroRing K) ≠ 0 := fun h => hx (Subtype.ext h)
+      obtain ⟨t, ht⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hα hx')
+      by_cases h : 0 ≤ t
+      · left
+        show 0 ≤ anVal K α (x : MeroRing K)
+        rw [← ht]; exact_mod_cast h
+      · right
+        show 0 ≤ anVal K α ((x : MeroRing K)⁻¹)
+        rw [anVal_inv_of hα hx' ht.symm]
+        exact_mod_cast (by omega : (0 : ℤ) ≤ -t)
+
+theorem mem_ringAt {α : Omega K} (hα : α ≠ 0) {x : FqSub K q} :
+    x ∈ ringAt q hα ↔ 0 ≤ anVal K α (x : MeroRing K) := Iff.rfl
+
+theorem isUnit_ringAt_iff {α : Omega K} (hα : α ≠ 0) (x : ringAt q hα) :
+    IsUnit x ↔ anVal K α ((x : FqSub K q) : MeroRing K) = 0 := by
+  constructor
+  · rintro ⟨u, rfl⟩
+    have h1 := congrArg (fun y : ringAt q hα => anVal K α (((y : FqSub K q)) : MeroRing K))
+      u.mul_inv
+    simp only at h1
+    change anVal K α ((((u : ringAt q hα) : FqSub K q) : MeroRing K) *
+      (((u⁻¹ : (ringAt q hα)ˣ) : ringAt q hα) : FqSub K q)) = anVal K α 1 at h1
+    rw [(anVal_isValuation K α hα).2.2.1, (anVal_isValuation K α hα).2.1] at h1
+    have ha := (u : ringAt q hα).2
+    have hb := ((u⁻¹ : (ringAt q hα)ˣ) : ringAt q hα).2
+    rw [mem_ringAt] at ha hb
+    generalize anVal K α (((u : ringAt q hα) : FqSub K q) : MeroRing K) = a at ha h1 ⊢
+    generalize anVal K α ((((u⁻¹ : (ringAt q hα)ˣ) : ringAt q hα) : FqSub K q) : MeroRing K) = b at hb h1
+    induction a using WithTop.recTopCoe with
+    | top => simp at h1
+    | coe a =>
+      induction b using WithTop.recTopCoe with
+      | top => simp at h1
+      | coe b =>
+        have h1' : a + b = 0 := by exact_mod_cast h1
+        have : 0 ≤ a := by exact_mod_cast ha
+        have : 0 ≤ b := by exact_mod_cast hb
+        exact_mod_cast (by omega : a = 0)
+  · intro h
+    have hx0 : (x : FqSub K q) ≠ 0 := by
+      intro h0
+      rw [h0, show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K α hα] at h
+      exact WithTop.top_ne_zero h
+    have hx' : ((x : FqSub K q) : MeroRing K) ≠ 0 := fun h' => hx0 (Subtype.ext h')
+    have hinv : (x : FqSub K q)⁻¹ ∈ ringAt q hα := by
+      rw [mem_ringAt]
+      show 0 ≤ anVal K α (((x : FqSub K q) : MeroRing K)⁻¹)
+      rw [anVal_inv_of hα hx' (h.trans (by rfl : (0 : WithTop ℤ) = ((0 : ℤ) : WithTop ℤ))),
+        neg_zero]; rfl
+    refine isUnit_iff_exists_inv.mpr ⟨⟨_, hinv⟩, Subtype.ext ?_⟩
+    show (x : FqSub K q) * (x : FqSub K q)⁻¹ = 1
+    exact mul_inv_cancel₀ hx0
+
+include hq0 hq1 in
+theorem ringAt_isDVR {α : Omega K} (hα : α ≠ 0) : IsDiscreteValuationRing (ringAt q hα) := by
+  obtain ⟨t, htF, ht1⟩ := (exists_periodic_function_with_valuation K q hq0 hq1 α hα).1
+  have htmem : (⟨t, htF⟩ : FqSub K q) ∈ ringAt q hα := by
+    rw [mem_ringAt]; show 0 ≤ anVal K α t; rw [ht1]; norm_num
+  set T : ringAt q hα := ⟨⟨t, htF⟩, htmem⟩
+  have hT1 : anVal K α (((T : FqSub K q)) : MeroRing K) = 1 := ht1
+  have hT0 : (T : FqSub K q) ≠ 0 := by
+    intro h; rw [h, show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K α hα] at hT1
+    exact WithTop.top_ne_one hT1
+  apply IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
+  refine ⟨T, ⟨fun hu => ?_, fun a b hab => ?_⟩, fun {x} hx => ?_⟩
+  · rw [isUnit_ringAt_iff, hT1] at hu; exact one_ne_zero hu
+  · have h1 := congrArg (fun y : ringAt q hα => anVal K α (((y : FqSub K q)) : MeroRing K)) hab
+    simp only at h1
+    change anVal K α ((T : FqSub K q) : MeroRing K) =
+      anVal K α (((a : FqSub K q) : MeroRing K) * ((b : FqSub K q) : MeroRing K)) at h1
+    rw [hT1, (anVal_isValuation K α hα).2.2.1] at h1
+    rw [isUnit_ringAt_iff, isUnit_ringAt_iff]
+    have ha := a.2
+    have hb := b.2
+    rw [mem_ringAt] at ha hb
+    generalize anVal K α (((a : FqSub K q)) : MeroRing K) = x at ha h1 ⊢
+    generalize anVal K α (((b : FqSub K q)) : MeroRing K) = y at hb h1 ⊢
+    induction x using WithTop.recTopCoe with
+    | top => simp at h1
+    | coe x =>
+      induction y using WithTop.recTopCoe with
+      | top => simp at h1
+      | coe y =>
+        have h1' : 1 = x + y := by exact_mod_cast h1
+        have : 0 ≤ x := by exact_mod_cast ha
+        have : 0 ≤ y := by exact_mod_cast hb
+        rcases (by omega : x = 0 ∨ y = 0) with h | h
+        · left; exact_mod_cast h
+        · right; exact_mod_cast h
+  · have hx0 : (x : FqSub K q) ≠ 0 := fun h => hx (Subtype.ext h)
+    have hx' : ((x : FqSub K q) : MeroRing K) ≠ 0 := fun h => hx0 (Subtype.ext h)
+    obtain ⟨n, hn⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hα hx')
+    have hn0 : 0 ≤ n := by have := x.2; rw [mem_ringAt, ← hn] at this; exact_mod_cast this
+    have hT' : ((T : FqSub K q) : MeroRing K) ≠ 0 := fun h => hT0 (Subtype.ext h)
+    set u : FqSub K q := (x : FqSub K q) * ((T : FqSub K q) ^ n.toNat)⁻¹
+    have hu0 : anVal K α (u : MeroRing K) = 0 := by
+      show anVal K α (((x : FqSub K q) : MeroRing K) * (((T : FqSub K q) : MeroRing K) ^ n.toNat)⁻¹) = 0
+      rw [(anVal_isValuation K α hα).2.2.1, anVal_inv_of hα (pow_ne_zero _ hT')
+        (anVal_pow_of hα hT1 n.toNat), ← hn]
+      rw [← WithTop.coe_add]
+      exact_mod_cast (by rw [Int.toNat_of_nonneg hn0]; ring : n + -(n.toNat * 1 : ℤ) = 0)
+    have hu : u ∈ ringAt q hα := by rw [mem_ringAt, hu0]
+    have hU : IsUnit (⟨u, hu⟩ : ringAt q hα) := (isUnit_ringAt_iff hα _).mpr hu0
+    refine ⟨n.toNat, hU.unit, Subtype.ext ?_⟩
+    show (T : FqSub K q) ^ n.toNat * u = x
+    rw [mul_comm, mul_assoc, inv_mul_cancel₀ (pow_ne_zero _ hT0), mul_one]
+
+/-- The prime divisor of `F_K(q) | K` attached to `α`. -/
+noncomputable def primeAt {α : Omega K} (hα : α ≠ 0) : PrimeDivisor K (FqSub K q) where
+  ring := ringAt q hα
+  isDVR := ringAt_isDVR hq0 hq1 hα
+  contains := fun c => anVal_algebraMap_nonneg hα c
+
+end primeAt
+
 end AnalyticTheory
