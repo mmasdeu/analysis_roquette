@@ -13,6 +13,8 @@ import AnalyticTheory.WeierstrassPrep
 import AnalyticTheory.Zeros
 import AnalyticTheory.Valuation
 import AnalyticTheory.Rationality
+import AnalyticTheory.PolyHol
+import AnalyticTheory.Normalize
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
 import AnalyticTheory.Weierstrass

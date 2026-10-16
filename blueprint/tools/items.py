@@ -510,7 +510,7 @@ add('proposition', 'prop:finite-order', 'Finite order of vanishing', ['exists_or
     r'A holomorphic function that is not identically zero has, at every $\alpha\in\Omega^\times$, a finite order $k$: $f(x)/(x-\alpha)^k$ has a nonzero limit as $x\to\alpha$.')
 
 _addlean('def:analytic-valuation', 'quotFun', 'HasOrd', 'hasOrd_exists', 'hasOrd_unique', 'tendsto_quot_zero', 'hasOrd_mul',
-         'anOrdHol_zero', 'anOrdHol_one', 'anOrdHol_mul', 'anOrdHol_add_ge', 'anVal_eq_of_rep', 'anVal_ne_top', 'omega_nhdsNE_neBot')
+         'anOrdHol_zero', 'anOrdHol_one', 'anOrdHol_mul', 'anOrdHol_add_ge', 'anPt_eq_of_rep', 'anPt_isValuation', 'anPt_ne_top', 'anOrdHol_minpoly', 'hasOrd_minpoly', 'exists_phi_factor', 'anOrdHol_eq_mul_e', 'anPt_eq_e_mul', 'anVal_of_anPt', 'anVal_isValuation', 'omega_nhdsNE_neBot')
 _adduses('def:analytic-valuation', 'prop:finite-order')
 _addlean('def:divisor-of', 'divisorOf_mul', 'divisorOf_one')
 _upd('def:divisor-of', text=r'The divisor $(f)$ of a meromorphic function: $m_\alpha=w_\alpha(f)$ for $\alpha\in\Omega^\times$ (and $0$ at $\alpha=0$); it is multiplicative: $(fg)=(f)+(g)$.')
@@ -524,7 +524,7 @@ add('proposition', 'prop:tie-structure', 'Zeros on a sphere with tied dominant t
 add('proposition', 'prop:zeros-finite', 'Finiteness of zeros', ['zeros_sphere_finite', 'zeros_annulus_finite', 'bad_radii_finite_Icc', 'exists_tie_of_not_good', 'holZeros_finite', 'hol_rep'],
     ['prop:tie-structure', 'lem:H-K-domain'], False,
     r'A nonzero holomorphic function over $K$ has only finitely many zeros in every closed annulus $r\le|x|\le r'+"'"+r'$.')
-add('proposition', 'prop:rationality', 'Invariance of $w_\\alpha$ under conjugation', ['aut_isometry', 'hol_apply_aut', 'quotFun_aut', 'hasOrd_aut', 'anOrdHol_aut', 'anVal_aut', 'divisorOf_rational'],
+add('proposition', 'prop:rationality', 'Invariance of $w_\\alpha$ under conjugation', ['aut_isometry', 'hol_apply_aut', 'quotFun_aut', 'hasOrd_aut', 'anOrdHol_aut', 'anPt_aut', 'anVal_aut', 'eIdx_aut', 'divisorOf_rational'],
     ['def:analytic-valuation'], False,
     r'$K$-automorphisms of $\Omega$ are isometries, commute with evaluation of holomorphic functions, and hence $w_{\sigma\alpha}=w_\alpha$ (rationality condition (ii) for divisors).')
 add('proposition', 'prop:divisor-finite', 'Divisors of meromorphic functions are divisors', ['divisorOf_finite', 'divisorOf_mem_Divisors', 'principalDivisors_le'],
@@ -549,3 +549,4 @@ add('proposition', 'prop:null-family-sum', 'Sums of null families of holomorphic
 add('proposition', 'prop:phi-division', 'Division by the minimal polynomial', ['polyHol', 'hol_phi_division', 'phi_dvd_iff', 'polyHol_minpoly_prime', 'exists_coord_bound', 'exists_quot', 'phi_quot_bound', 'coord_bound', 'wt_le_of_conv', 'holCoeff_polyHol', 'polyHol_apply'],
     ['prop:laurent-coefficients', 'prop:null-family-sum'], False,
     r'Let $\alpha\in\Omega^\times$ with minimal polynomial $\varphi$ over $K$. Every $f\in H_K$ can be written $f=\varphi g+r$ with $g\in H_K$ and $r\in K[X]$ of degree $<\deg\varphi$; and $\varphi\mid f$ in $H_K$ iff $f(\alpha)=0$. In particular $\varphi$ is a prime element of $H_K$. (The coordinates of $X^k$ modulo $\varphi$ are bounded by $C|\alpha|^k$, since $K(\alpha)$ is a finite-dimensional normed space; the Gauss lemma bounds the quotients.)')
+_upd('def:analytic-valuation', text=r'For $\alpha\in\Omega^\times$ with minimal polynomial $\varphi_\alpha$, every $0\ne f\in H_K$ is uniquely $f=\varphi_\alpha^m g$ with $g(\alpha)\ne0$; $w_\alpha(f)=m$ ($w_\alpha(0)=\infty$), extended to $M_K$ as a valuation. Formally $w_\alpha=\mathrm{ord}_\alpha/e_\alpha$, where $\mathrm{ord}_\alpha$ is the order of vanishing at the point $\alpha$ and $e_\alpha$ the degree of inseparability of $\alpha$ ($\mathrm{ord}_\alpha\varphi_\alpha=e_\alpha$, and $e_\alpha\mid\mathrm{ord}_\alpha f$ by the $\varphi$-division of the previous step).')

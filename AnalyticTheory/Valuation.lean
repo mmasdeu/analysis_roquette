@@ -257,12 +257,12 @@ private theorem alg_ne_zero {h : holSubring K} (hh : h ≠ 0) :
     algebraMap (holSubring K) (MeroRing K) h ≠ 0 :=
   (map_ne_zero_iff _ (IsFractionRing.injective (holSubring K) (MeroRing K))).mpr hh
 
-theorem anVal_eq_of_rep {α : Omega K} (hα : α ≠ 0) (f : MeroRing K) (g h : holSubring K)
+theorem anPt_eq_of_rep {α : Omega K} (hα : α ≠ 0) (f : MeroRing K) (g h : holSubring K)
     (hh : h ≠ 0) (hf : f = algebraMap (holSubring K) (MeroRing K) g /
       algebraMap (holSubring K) (MeroRing K) h) :
-    anVal K α f = anOrdHol K α g - anOrdHol K α h := by
+    anPt K α f = anOrdHol K α g - anOrdHol K α h := by
   classical
-  unfold anVal
+  unfold anPt
   set p : holSubring K × holSubring K := Classical.epsilon fun p : holSubring K × holSubring K =>
     p.2 ≠ 0 ∧ f = algebraMap (holSubring K) (MeroRing K) p.1 /
       algebraMap (holSubring K) (MeroRing K) p.2 with hp
@@ -362,19 +362,19 @@ private theorem wt_aux3 (A B : WithTop ℤ) (c : ℤ) (h : A ≤ B) :
 /-- Book, §2: `w_α` is an additive valuation of `M_K` with `w_α(0) = +∞`:
 `w_α(fg) = w_α(f) + w_α(g)`, `w_α(f + g) ≥ min`, `w_α(1) = 0`.
 Blueprint: `def:analytic-valuation`. -/
-theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
-    anVal K α 0 = ⊤ ∧ anVal K α 1 = 0 ∧
-      (∀ f g : MeroRing K, anVal K α (f * g) = anVal K α f + anVal K α g) ∧
-      (∀ f g : MeroRing K, min (anVal K α f) (anVal K α g) ≤ anVal K α (f + g)) := by
+theorem anPt_isValuation (α : Omega K) (hα : α ≠ 0) :
+    anPt K α 0 = ⊤ ∧ anPt K α 1 = 0 ∧
+      (∀ f g : MeroRing K, anPt K α (f * g) = anPt K α f + anPt K α g) ∧
+      (∀ f g : MeroRing K, min (anPt K α f) (anPt K α g) ≤ anPt K α (f + g)) := by
   have rep : ∀ f : MeroRing K, ∃ g h : holSubring K, h ≠ 0 ∧
       f = algebraMap (holSubring K) (MeroRing K) g / algebraMap (holSubring K) (MeroRing K) h := by
     intro f
     obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring K) f
     exact ⟨x, y, nonZeroDivisors.ne_zero hy, hxy.symm⟩
   refine ⟨?_, ?_, ?_, ?_⟩
-  · rw [anVal_eq_of_rep K hα 0 0 1 one_ne_zero (by simp)]
+  · rw [anPt_eq_of_rep K hα 0 0 1 one_ne_zero (by simp)]
     simp [anOrdHol_zero, anOrdHol_one K hα]
-  · rw [anVal_eq_of_rep K hα 1 1 1 one_ne_zero (by simp)]
+  · rw [anPt_eq_of_rep K hα 1 1 1 one_ne_zero (by simp)]
     simp [anOrdHol_one K hα]
   · intro f f'
     obtain ⟨g, h, hh, hf⟩ := rep f
@@ -383,8 +383,8 @@ theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
     have hff : f * f' = algebraMap (holSubring K) (MeroRing K) (g * g') /
         algebraMap (holSubring K) (MeroRing K) (h * h') := by
       rw [hf, hf', div_mul_div_comm, map_mul, map_mul]
-    rw [anVal_eq_of_rep K hα _ _ _ hhh hff, anVal_eq_of_rep K hα f g h hh hf,
-      anVal_eq_of_rep K hα f' g' h' hh' hf', anOrdHol_mul K α hα, anOrdHol_mul K α hα]
+    rw [anPt_eq_of_rep K hα _ _ _ hhh hff, anPt_eq_of_rep K hα f g h hh hf,
+      anPt_eq_of_rep K hα f' g' h' hh' hf', anOrdHol_mul K α hα, anOrdHol_mul K α hα]
     obtain ⟨a, ha, -⟩ := exists_anOrd K hα hh
     obtain ⟨b, hb, -⟩ := exists_anOrd K hα hh'
     rw [ha, hb, ← WithTop.coe_add]
@@ -399,8 +399,8 @@ theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
       have h2 := alg_ne_zero K hh'
       rw [hf, hf', div_add_div _ _ h1 h2, map_add, map_mul, map_mul, map_mul,
         mul_comm (algebraMap (holSubring K) (MeroRing K) g')]
-    rw [anVal_eq_of_rep K hα _ _ _ hhh hff, anVal_eq_of_rep K hα f g h hh hf,
-      anVal_eq_of_rep K hα f' g' h' hh' hf', anOrdHol_mul K α hα]
+    rw [anPt_eq_of_rep K hα _ _ _ hhh hff, anPt_eq_of_rep K hα f g h hh hf,
+      anPt_eq_of_rep K hα f' g' h' hh' hf', anOrdHol_mul K α hα]
     obtain ⟨a, ha, -⟩ := exists_anOrd K hα hh
     obtain ⟨b, hb, -⟩ := exists_anOrd K hα hh'
     rw [ha, hb, ← WithTop.coe_add, ← wt_aux2]
@@ -410,37 +410,17 @@ theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
     exact this
 
 
-theorem anVal_ne_top {α : Omega K} (hα : α ≠ 0) {f : MeroRing K} (hf : f ≠ 0) :
-    anVal K α f ≠ ⊤ := by
+theorem anPt_ne_top {α : Omega K} (hα : α ≠ 0) {f : MeroRing K} (hf : f ≠ 0) :
+    anPt K α f ≠ ⊤ := by
   obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring K) f
   have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
   have hx0 : x ≠ 0 := by
     rintro rfl
     apply hf; rw [← hxy]; simp
-  rw [anVal_eq_of_rep K hα f x y hy0 hxy.symm]
+  rw [anPt_eq_of_rep K hα f x y hy0 hxy.symm]
   obtain ⟨n, hn, -⟩ := exists_anOrd K hα hx0
   obtain ⟨m, hm, -⟩ := exists_anOrd K hα hy0
   rw [hn, hm]; simp
-
-theorem divisorOf_mul {f g : MeroRing K} (hf : f ≠ 0) (hg : g ≠ 0) :
-    divisorOf K (f * g) = divisorOf K f + divisorOf K g := by
-  classical
-  funext α
-  by_cases hα : α = 0
-  · simp [divisorOf, hα]
-  · simp only [divisorOf, if_neg hα, Pi.add_apply]
-    have h1 := anVal_ne_top K hα hf
-    have h2 := anVal_ne_top K hα hg
-    obtain ⟨x, hx⟩ := WithTop.ne_top_iff_exists.mp h1
-    obtain ⟨y, hy⟩ := WithTop.ne_top_iff_exists.mp h2
-    rw [(anVal_isValuation K α hα).2.2.1, ← hx, ← hy]
-    simp
-
-theorem divisorOf_one : divisorOf K (1 : MeroRing K) = 0 := by
-  funext α
-  by_cases hα : α = 0
-  · simp [divisorOf, hα]
-  · simp [divisorOf, hα, (anVal_isValuation K α hα).2.1]
 
 end Mero
 

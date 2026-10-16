@@ -169,15 +169,28 @@ noncomputable def anOrdHol (α : Omega K) (f : holSubring K) : WithTop ℤ :=
       Tendsto (fun x : Omega K => if h : x ≠ 0 then f.1 ⟨x, h⟩ / (x - α) ^ n else 0)
         (𝓝[≠] α) (𝓝 c) : ℤ) : WithTop ℤ)
 
-/-- The analytic valuation `w_α` belonging to `α ∈ Ω^×` (book, §2): `w_α(g/h) = ord_α g − ord_α h`
-for a representation of `f ∈ M_K` as a quotient of holomorphic functions; `w_α(0) = +∞`.
-That this is an additive valuation of `M_K` is `anVal_isValuation`.
-Blueprint: `def:analytic-valuation`. -/
-noncomputable def anVal (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
+/-- The *point order* at `α ∈ Ω^×`: `ord_α g − ord_α h` for a representation of `f ∈ M_K` as a quotient
+of holomorphic functions (`ord_α` the order of vanishing at the point `α`); `+∞` for `f = 0`.
+The analytic valuation `w_α` of the book is the point order divided by `e_α`
+(the degree of inseparability, `anVal`). Blueprint: `def:analytic-valuation`. -/
+noncomputable def anPt (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
   open Classical in
   let p : holSubring K × holSubring K := Classical.epsilon fun p : holSubring K × holSubring K =>
     p.2 ≠ 0 ∧ f = algebraMap (holSubring K) (MeroRing K) p.1 / algebraMap (holSubring K) (MeroRing K) p.2
   anOrdHol K α p.1 - anOrdHol K α p.2
+
+/-- The degree of inseparability `e_α` of `α` over `K`: the multiplicity of `α` as a root of its
+minimal polynomial `φ_α`, so that `φ_α = ∏ (X − β)^{e_α}` over the distinct conjugates `β`. -/
+noncomputable def eIdx (α : Omega K) : ℕ :=
+  Polynomial.rootMultiplicity α ((minpoly K α).map (algebraMap K (Omega K)))
+
+/-- Book, §2: the analytic valuation `w_α` belonging to `α ∈ Ω^×`: the exponent of the minimal
+polynomial `φ_α` in the factorisation `f = φ_α^m g`, `g(α) ≠ 0` (extended to `M_K`); it is the
+point order `anPt` divided by `e_α` (`e_α ∣ anPt α f`, see `eIdx_dvd_anPt`). `w_α(0) = +∞`.
+That this is an additive valuation of `M_K` is `anVal_isValuation`.
+Blueprint: `def:analytic-valuation`. -/
+noncomputable def anVal (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
+  (anPt K α f).map (fun n => n / (eIdx K α : ℤ))
 
 /-- The nonzero element `c α` of `Ω`. -/
 noncomputable def scalePt (c : Kˣ) (α : OmegaX K) : OmegaX K :=
