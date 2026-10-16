@@ -15,6 +15,8 @@ import AnalyticTheory.Valuation
 import AnalyticTheory.Rationality
 import AnalyticTheory.PolyHol
 import AnalyticTheory.Normalize
+import AnalyticTheory.GaussNorm
+import AnalyticTheory.HolDiv
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
 import AnalyticTheory.Weierstrass
