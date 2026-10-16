@@ -932,6 +932,7 @@ See the Lean proof of \texttt{exists\_rel, InL\_rel, Uf, Vf, refl\_wpAlg, refl\_
 $\wp,\wp'$ generate $F_K(q)$; their poles are $2\mathfrak p_1$ and $3\mathfrak p_1$; they satisfy $\wp'^2+\wp\wp'=\wp^3+B\wp+C$; the reflection acts by $\wp\mapsto\wp$, $\wp'\mapsto-\wp'-\wp$. (The four parts are the nodes below.)
 \end{theorem}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{thmVI\_generation, thmVI\_poles, thmVI\_relation, thmVI\_reflection}.
 \end{proof}
 
@@ -961,13 +962,14 @@ See the Lean proof of \texttt{thmVI\_poles}.
 
 \begin{theorem}[Theorem VI (iii): the cubic relation]
 \label{thm:VI-relation}
-\lean{AnalyticTheory.thmVI_relation}
+\lean{AnalyticTheory.thmVI_relation, AnalyticTheory.coeffs_of_rel, AnalyticTheory.relK, AnalyticTheory.expand_U, AnalyticTheory.expand_V, AnalyticTheory.coeff_vanish, AnalyticTheory.hasSum_split, AnalyticTheory.Erel_decomp, AnalyticTheory.coeffB_eq, AnalyticTheory.coeffC_eq, AnalyticTheory.summandB, AnalyticTheory.summandC, AnalyticTheory.idB, AnalyticTheory.idC, AnalyticTheory.gC, AnalyticTheory.twelve_mul_gC}
 \uses{prop:wp-structural-relation, lem:wp-q-expansions, def:coeffB, def:coeffC}
 \leanok
-$\wp'^2+\wp\wp'=\wp^3+B\wp+C$ with $B=-5s_3$, $C=-\frac1{12}(5s_3+7s_5)$. (Remaining step: comparing the coefficients of $h^0,\dots,h^6$ in the expansion at $X=1+h$ gives $A=0$, $B=-2\pi_1-3\rho_2$, $C=-\pi_1-3\pi_2-2\pi_3-5\rho_2-7\rho_3-3\rho_4$, and termwise integer identities identify these with $-5s_3$ and $-\frac1{12}(5s_3+7s_5)$.)
+$\wp'^2+\wp\wp'=\wp^3+B\wp+C$ with $B=-5s_3$, $C=-\frac1{12}(5s_3+7s_5)$. At $X=1+h$, $h=q^{j+1}$, the functions $U=h^2\wp$, $V=h^3\wp'$ are $U=1+h+\rho_2h^4+\rho_3h^5+\rho_4h^6+O(h^7)$, $V=-(1+h)^2+\pi_1h^4+\pi_2h^5+\pi_3h^6+O(h^7)$; the relation $V^2+hUV=U^3+Ah^2U^2+Bh^4U+Ch^6$ forces the coefficients of $h^0,\dots,h^6$ to vanish: $A=0$, $B=-2\pi_1-3\rho_2$, $C=-\pi_1-3\pi_2-2\pi_3-5\rho_2-7\rho_3-3\rho_4$. Termwise integer identities give $-2\pi_1-3\rho_2=\sum_m(-5m^3)Q_m$ and $\dots=\sum_m-\frac{5m^3+7m^5}{12}Q_m$, and the Lambert series identifies these with $B$ and $C$.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmVI\_relation}.
+\leanok
+See the Lean proof of \texttt{thmVI\_relation, coeffs\_of\_rel, relK, expand\_U, expand\_V, coeff\_vanish, hasSum\_split, Erel\_decomp, coeffB\_eq, coeffC\_eq, summandB, summandC, idB, idC, gC, twelve\_mul\_gC}.
 \end{proof}
 
 \begin{theorem}[Theorem VI (iv): reflection]

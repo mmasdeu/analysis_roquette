@@ -364,4 +364,128 @@ theorem coeffs_of_rel {A B C : K}
 
 end main
 
+section identify
+
+theorem cast_choose_two_q (n : ℕ) : ((n.choose 2 : ℕ) : ℚ) = n * (n - 1) / 2 := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [Nat.choose_succ_succ, Nat.cast_add, ih, Nat.choose_one_right]; push_cast; ring
+
+theorem cast_choose_three_q (n : ℕ) : ((n.choose 3 : ℕ) : ℚ) = n * (n - 1) * (n - 2) / 6 := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [Nat.choose_succ_succ, Nat.cast_add, ih, cast_choose_two_q]; push_cast; ring
+
+theorem cast_choose_four_q (n : ℕ) :
+    ((n.choose 4 : ℕ) : ℚ) = n * (n - 1) * (n - 2) * (n - 3) / 24 := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [Nat.choose_succ_succ, Nat.cast_add, ih, cast_choose_three_q]; push_cast; ring
+
+theorem binomZ_neg_succ (m' k : ℕ) :
+    binomZ (-((m' + 1 : ℕ) : ℤ)) k = (-1) ^ k * ((k + m').choose k : ℤ) := by
+  rw [binomZ_neg_nat (Nat.succ_pos m')]
+  congr 3
+
+/-- `c(m) = −(5m³ + 7m⁵)/12`, an integer. -/
+def gC (m : ℕ) : ℤ := -(5 * (m : ℤ) ^ 3 + 7 * (m : ℤ) ^ 5) / 12
+
+theorem twelve_mul_gC (m : ℕ) : 12 * gC m = -(5 * (m : ℤ) ^ 3 + 7 * (m : ℤ) ^ 5) := by
+  have h : ∀ x : ZMod 12, -(5 * x ^ 3 + 7 * x ^ 5) = 0 := by decide
+  have hd := (ZMod.intCast_zmod_eq_zero_iff_dvd (-(5 * (m : ℤ) ^ 3 + 7 * (m : ℤ) ^ 5)) 12).mp
+    (by push_cast; exact h _)
+  exact Int.mul_ediv_cancel' (by exact_mod_cast hd)
+
+theorem idB (m' : ℕ) : -2 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 1 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 1 * ((1 + m').choose 1 : ℤ))) - 3 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 2 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) = -5 * ((m' + 1 : ℕ) : ℤ) ^ 3 := by
+  qify
+  simp only [cast_choose_two_q, cast_choose_three_q, cast_choose_four_q, Nat.choose_one_right]
+  push_cast; ring
+
+theorem idC (m' : ℕ) : -(((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 1 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 1 * ((1 + m').choose 1 : ℤ))) - 3 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 2 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) - 2 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 3 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 3 * ((3 + m').choose 3 : ℤ))) - 5 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 2 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) - 7 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 3 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 3 * ((3 + m').choose 3 : ℤ))) - 3 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 4 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 4 * ((4 + m').choose 4 : ℤ))) = gC (m' + 1) := by
+  have h12 : 12 * (-(((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 1 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 1 * ((1 + m').choose 1 : ℤ))) - 3 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 2 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) - 2 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 3 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 3 * ((3 + m').choose 3 : ℤ))) - 5 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 2 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) - 7 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 3 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 3 * ((3 + m').choose 3 : ℤ))) - 3 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 4 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 4 * ((4 + m').choose 4 : ℤ)))) = -(5 * ((m' + 1 : ℕ) : ℤ) ^ 3 + 7 * ((m' + 1 : ℕ) : ℤ) ^ 5) := by
+    qify
+    simp only [cast_choose_two_q, cast_choose_three_q, cast_choose_four_q, Nat.choose_one_right]
+    push_cast; ring
+  exact mul_left_cancel₀ (by norm_num : (12 : ℤ) ≠ 0) (h12.trans (twelve_mul_gC _).symm)
+
+/-- The summands of `rhoC`. -/
+noncomputable def rhoS (q : K) (k m : ℕ) : K :=
+  (m : K) * Qn q m * (binomZ (m : ℤ) k : K) + (m : K) * Qn q m * (binomZ (-(m : ℤ)) k : K)
+
+/-- The summands of `piC`. -/
+noncomputable def piS (q : K) (k m : ℕ) : K :=
+  ((m.choose 2 : ℕ) : K) * Qn q m * (binomZ (m : ℤ) k : K) +
+    (-((((m + 1).choose 2 : ℕ) : K) * Qn q m)) * (binomZ (-(m : ℤ)) k : K)
+
+variable {q : K} (hq1 : ‖q‖ < 1)
+
+include hq1 in
+theorem hasSum_rhoS (k : ℕ) : HasSum (rhoS q k) (rhoC q k) := by
+  have hbz : ∀ (n : ℤ) (k : ℕ), ‖(binomZ n k : K)‖ ≤ 1 := fun n k =>
+    IsUltrametricDist.norm_intCast_le_one K _
+  exact ((summable_bounded_coeff hq1 _ (norm_mQn hq1) _ (fun m => hbz (m : ℤ) k)).add
+    (summable_bounded_coeff hq1 _ (norm_mQn hq1) _ (fun m => hbz (-(m : ℤ)) k))).hasSum
+
+include hq1 in
+theorem hasSum_piS (k : ℕ) : HasSum (piS q k) (piC q k) := by
+  have hbz : ∀ (n : ℤ) (k : ℕ), ‖(binomZ n k : K)‖ ≤ 1 := fun n k =>
+    IsUltrametricDist.norm_intCast_le_one K _
+  have hn2 : ∀ m, ‖-((((m + 1).choose 2 : ℕ) : K) * Qn q m)‖ ≤ ‖q‖ ^ m := fun m => by
+    rw [norm_neg]; exact norm_cQn hq1 ((m + 1).choose 2) m
+  exact ((summable_bounded_coeff hq1 _ (fun m => norm_cQn hq1 (m.choose 2) m) _
+    (fun m => hbz (m : ℤ) k)).add (summable_bounded_coeff hq1 _ hn2 _ (fun m => hbz (-(m : ℤ)) k))).hasSum
+
+omit [IsUltrametricDist K] [CompleteSpace K] in
+theorem summandB (m : ℕ) : -2 * piS q 1 m - 3 * rhoS q 2 m = -5 * ((m : K) ^ 3 * Qn q m) := by
+  rcases m with _ | m'
+  · simp [piS, rhoS, Qn_zero]
+  · simp only [rhoS, piS, binomZ_nat, binomZ_neg_succ]
+    have h := congrArg (Int.cast : ℤ → K) (idB m')
+    push_cast at h ⊢
+    linear_combination Qn q (m' + 1) * h
+
+omit [IsUltrametricDist K] [CompleteSpace K] in
+theorem summandC (m : ℕ) : -piS q 1 m - 3 * piS q 2 m - 2 * piS q 3 m - 5 * rhoS q 2 m -
+    7 * rhoS q 3 m - 3 * rhoS q 4 m = (gC m : K) * Qn q m := by
+  rcases m with _ | m'
+  · simp [piS, rhoS]; exact Or.inr (by simp [Qn])
+  · simp only [rhoS, piS, binomZ_nat, binomZ_neg_succ]
+    have h := congrArg (Int.cast : ℤ → K) (idC m')
+    push_cast at h ⊢
+    linear_combination Qn q (m' + 1) * h
+
+include hq1 in
+theorem coeffB_eq : -2 * piC q 1 - 3 * rhoC q 2 = coeffB K q := by
+  have h := ((hasSum_piS hq1 1).mul_left (-2)).sub ((hasSum_rhoS hq1 2).mul_left 3)
+  have h' := (hasSum_sK hq1 3).mul_left (-5)
+  rw [coeffB]
+  refine h.unique ?_
+  convert h' using 1
+  funext m; exact summandB m
+
+include hq1 in
+theorem coeffC_eq : -piC q 1 - 3 * piC q 2 - 2 * piC q 3 - 5 * rhoC q 2 - 7 * rhoC q 3 -
+    3 * rhoC q 4 = coeffC K q := by
+  have h := (((((hasSum_piS hq1 1).neg.sub ((hasSum_piS hq1 2).mul_left 3)).sub
+    ((hasSum_piS hq1 3).mul_left 2)).sub ((hasSum_rhoS hq1 2).mul_left 5)).sub
+    ((hasSum_rhoS hq1 3).mul_left 7)).sub ((hasSum_rhoS hq1 4).mul_left 3)
+  have h' := lambertZ hq1 gC
+  have hv : ∑' n : ℕ, ((∑ d ∈ n.divisors, gC d : ℤ) : K) * q ^ n = coeffC K q := by
+    rw [coeffC]
+    refine tsum_congr (fun n => ?_)
+    congr 2
+    have e : -(5 * (∑ d ∈ n.divisors, (d : ℤ) ^ 3) + 7 * (∑ d ∈ n.divisors, (d : ℤ) ^ 5)) =
+        12 * ∑ d ∈ n.divisors, gC d := by
+      calc _ = ∑ d ∈ n.divisors, -(5 * (d : ℤ) ^ 3 + 7 * (d : ℤ) ^ 5) := by
+            simp [Finset.sum_add_distrib, Finset.mul_sum]
+        _ = ∑ d ∈ n.divisors, 12 * gC d := Finset.sum_congr rfl (fun d _ => (twelve_mul_gC d).symm)
+        _ = _ := (Finset.mul_sum _ _ _).symm
+    rw [e, Int.mul_ediv_cancel_left _ (by norm_num)]
+  rw [← hv]
+  refine h.unique ?_
+  convert h' using 1
+  funext m; exact summandC m
+
+end identify
+
 end AnalyticTheory

@@ -99,10 +99,10 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 * §2: Proposition 1 (Abel–Jacobi), its Corollary, Proposition 2 (Riemann–Roch for `q`-periodic
   divisors), formula (12) for `deg_q` (independent of the system of representatives).
 * §3: `℘`, `℘′` constructed as quotients of explicit holomorphic functions by `Θ²`, `Θ³`;
-  Theorem VI parts (i) `F_K(q) = K(℘, ℘′)`, (ii) poles `2𝔭₁`, `3𝔭₁`, (iv) reflection; the cubic
-  relation `℘′² + ℘℘′ = ℘³ + A℘² + B℘ + C` with some `A, B, C ∈ K`; Lemma 1 (inversion).
-* In progress: Theorem VI (iii), i.e. `A = 0`, `B = −5s₃`, `C = −(5s₃+7s₅)/12`
-  (`QSeries.lean`: Lambert series and expansions of `℘`, `℘′` at `X = 1+h`).
+  **Theorem VI** completely: (i) `F_K(q) = K(℘, ℘′)`, (ii) poles `2𝔭₁`, `3𝔭₁`, (iii) the relation
+  `℘′² + ℘℘′ = ℘³ + B℘ + C` with `B = −5s₃`, `C = −(5s₃+7s₅)/12` (in every characteristic: the
+  coefficients are compared at `X = 1+h` in `K`, `QSeries.lean`, `CubicCoeffs.lean`), (iv) reflection;
+  Lemma 1 (inversion).
 * Not started (statements only): items I–V of §2 and Corollaries Va, Vb; Theorems VII–VIIIa;
   §§4–6; Appendices A1, A2; Remarks of §2.
 

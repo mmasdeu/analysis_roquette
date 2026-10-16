@@ -1,4 +1,5 @@
 import AnalyticTheory.Relation
+import AnalyticTheory.CubicCoeffs
 
 /-!
 # Theorem VI (book, §3)
@@ -45,7 +46,11 @@ theorem thmVI_relation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     wpPrimeM K q ^ 2 + wpM K q * wpPrimeM K q =
       wpM K q ^ 3 + algebraMap K (MeroRing K) (coeffB K q) * wpM K q +
         algebraMap K (MeroRing K) (coeffC K q) := by
-  sorry
+  obtain ⟨A, B, C, hrel⟩ := exists_rel hq0 hq1
+  obtain ⟨hA, hB, hC⟩ := coeffs_of_rel hq0 hq1 hrel
+  rw [hA, hB, coeffB_eq hq1, hC, coeffC_eq hq1, map_zero, zero_mul, add_zero] at hrel
+  rw [wpM_eq hq0 hq1, wpPrimeM_eq hq0 hq1]
+  exact hrel
 
 
 /-- Book, §3, (20)–(21): the reflection fixes `℘` and sends `℘′ ↦ −℘′ − ℘`. Blueprint: `thm:VI`. -/

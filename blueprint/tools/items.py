@@ -627,3 +627,5 @@ _moved = {i['label']: i for i in ITEMS if i['label'] in _vi_pre + _vi_post}
 ITEMS[:] = [i for i in ITEMS if i['label'] not in _moved]
 _k = next(n for n, i in enumerate(ITEMS) if i['label'] == 'thm:VI')
 ITEMS[_k:_k + 1] = [_moved[l] for l in _vi_pre] + [ITEMS[_k]] + [_moved[l] for l in _vi_post]
+_upd('thm:VI-relation', text=r'$\wp'+"'"+r'^2+\wp\wp'+"'"+r'=\wp^3+B\wp+C$ with $B=-5s_3$, $C=-\frac1{12}(5s_3+7s_5)$. At $X=1+h$, $h=q^{j+1}$, the functions $U=h^2\wp$, $V=h^3\wp'+"'"+r'$ are $U=1+h+\rho_2h^4+\rho_3h^5+\rho_4h^6+O(h^7)$, $V=-(1+h)^2+\pi_1h^4+\pi_2h^5+\pi_3h^6+O(h^7)$; the relation $V^2+hUV=U^3+Ah^2U^2+Bh^4U+Ch^6$ forces the coefficients of $h^0,\dots,h^6$ to vanish: $A=0$, $B=-2\pi_1-3\rho_2$, $C=-\pi_1-3\pi_2-2\pi_3-5\rho_2-7\rho_3-3\rho_4$. Termwise integer identities give $-2\pi_1-3\rho_2=\sum_m(-5m^3)Q_m$ and $\dots=\sum_m-\frac{5m^3+7m^5}{12}Q_m$, and the Lambert series identifies these with $B$ and $C$.')
+_addlean('thm:VI-relation', 'coeffs_of_rel', 'relK', 'expand_U', 'expand_V', 'coeff_vanish', 'hasSum_split', 'Erel_decomp', 'coeffB_eq', 'coeffC_eq', 'summandB', 'summandC', 'idB', 'idC', 'gC', 'twelve_mul_gC')
