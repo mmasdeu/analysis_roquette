@@ -17,6 +17,8 @@ import AnalyticTheory.PolyHol
 import AnalyticTheory.Normalize
 import AnalyticTheory.GaussNorm
 import AnalyticTheory.HolDiv
+import AnalyticTheory.InfProd
+import AnalyticTheory.Theta
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
 import AnalyticTheory.Weierstrass
