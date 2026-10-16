@@ -695,6 +695,18 @@ The units of $H_K$ are the functions $cX^n$ with $c\in K^\times$, $n\in\mathbb Z
 See the Lean proof of \texttt{hol\_unit}.
 \end{proof}
 
+\begin{proposition}[Sums of null families of holomorphic functions]
+\label{prop:null-family-sum}
+\lean{AnalyticTheory.NullFamily, AnalyticTheory.tail_norm_le, AnalyticTheory.hol_hasSum_family, AnalyticTheory.NullFamily.exists_finite, AnalyticTheory.NullFamily.tendsto_prod, AnalyticTheory.NullFamily.hasSum_coeff, AnalyticTheory.NullFamily.sum, AnalyticTheory.NullFamily.hasSum_sum, AnalyticTheory.NullFamily.approx, AnalyticTheory.NullFamily.sum_convergent}
+\uses{prop:laurent-coefficients}
+\leanok
+Let $(f_i)$ be elements of $H_K$ whose Gauss norms $\|f_i\|_r$ tend to $0$ along the cofinite filter for every $r>0$. Then the coefficientwise sums define a holomorphic $g$ with $g(\alpha)=\sum_if_i(\alpha)$ for every $\alpha\neq0$; $H_K$ is complete for the Gauss norms.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{NullFamily, tail\_norm\_le, hol\_hasSum\_family, exists\_finite, tendsto\_prod, hasSum\_coeff, sum, hasSum\_sum, approx, sum\_convergent}.
+\end{proof}
+
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
 
 \begin{definition}[Derivation $D$]

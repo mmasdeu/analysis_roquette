@@ -543,3 +543,6 @@ add('proposition', 'prop:laurent-coefficients', 'Laurent coefficients of holomor
 add('corollary', 'cor:hol-units', 'Units of $H_K$', ['hol_unit'],
     ['lem:unit-convolution', 'prop:laurent-coefficients'], False,
     r'The units of $H_K$ are the functions $cX^n$ with $c\in K^\times$, $n\in\mathbb Z$.')
+add('proposition', 'prop:null-family-sum', 'Sums of null families of holomorphic functions', ['NullFamily', 'tail_norm_le', 'hol_hasSum_family', 'NullFamily.exists_finite', 'NullFamily.tendsto_prod', 'NullFamily.hasSum_coeff', 'NullFamily.sum', 'NullFamily.hasSum_sum', 'NullFamily.approx', 'NullFamily.sum_convergent'],
+    ['prop:laurent-coefficients'], False,
+    r'Let $(f_i)$ be elements of $H_K$ whose Gauss norms $\|f_i\|_r$ tend to $0$ along the cofinite filter for every $r>0$. Then the coefficientwise sums define a holomorphic $g$ with $g(\alpha)=\sum_if_i(\alpha)$ for every $\alpha\neq0$; $H_K$ is complete for the Gauss norms.')
