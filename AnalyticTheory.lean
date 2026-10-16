@@ -30,6 +30,7 @@ import AnalyticTheory.Relation
 import AnalyticTheory.RelationCoeffs
 import AnalyticTheory.QSeries
 import AnalyticTheory.CubicCoeffs
+import AnalyticTheory.FqPlaces
 import AnalyticTheory.FqStructure
 import AnalyticTheory.TheoremVI
 import AnalyticTheory.Structure
