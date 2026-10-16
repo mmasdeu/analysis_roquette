@@ -418,19 +418,6 @@ theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
   congr 1
   exact Units.ext rfl
 
-/-- Book, §2: the degree and Jacobi image do not depend on the choice of the system of
-representatives (formula (12)). Blueprint: `prop:deg-q-formula`. -/
-theorem degQ_eq_of_system (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m : Omega K → ℤ)
-    (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K))
-    (hR : ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
-      ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧ ConjModQ K q α β) :
-    PhiQ K q (norm_pos_iff.mp hq0) m =
-      (open Classical in
-        let x : K := ∏ᶠ α ∈ {α ∈ R | ‖q‖ < omegaNorm K α ∧ omegaNorm K α ≤ 1},
-          (Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)) ^ (m α)
-        if h : x ≠ 0 then QuotientGroup.mk (Units.mk0 x h) else 1) := by
-  sorry
-
 /-- Book, §2: the fundamental theta function
 `Θ(X) = ∏_{n≥0}(1 − qⁿX⁻¹) ∏_{n<0}(1 − q^{-n}X)`, as a function on `Ω^×`.
 Blueprint: `def:theta`. -/
@@ -501,57 +488,5 @@ theorem theta_functional_equation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1
       intro h; apply h1; have := sub_eq_zero.mp h; simpa using this.symm
     have h3 : 1 - α = -α * (1 - α⁻¹) := by field_simp; ring
     rw [hA2, h3]; ring
-
-/-- Book, §2, Proposition 1 (Abel–Jacobi theorem, analytic form). A `q`-periodic divisor
-`m` is the divisor of a `q`-periodic function iff `deg_q(m) = 0` and `Φ_q(m) ≡ 1 mod^× q`;
-in that case the function is unique up to a factor in `K^×`.
-Blueprint: `prop:abel-jacobi-1`. -/
-theorem abel_jacobi_one (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (m : Omega K → ℤ) (hm : m ∈ DivisorsPeriodic K q) :
-    (∃ f : MeroRing K, f ∈ Fq K q ∧ f ≠ 0 ∧ divisorOf K f = m) ↔
-      (degQ K q m = 0 ∧ PhiQ K q (norm_pos_iff.mp hq0) m = 1) := by
-  sorry
-
-/-- Book, §2, corollary to Proposition 1: for every `α ∈ Ω^×` there is a `q`-periodic
-function with `w_α(f) = 1`, and `f` can be chosen with `w_β(f) = 0` whenever `β` is not
-`K`-conjugate to `α mod^× q`. Blueprint: `cor:periodic-with-prescribed-zero`. -/
-theorem exists_periodic_function_with_valuation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (α : Omega K) (hα : α ≠ 0) :
-    ∃ f : MeroRing K, f ∈ Fq K q ∧ anVal K α f = 1 ∧
-      ∀ β : Omega K, β ≠ 0 → ¬ ConjModQ K q α β → anVal K β f = 0 := by
-  sorry
-
-/-- Book, §2: the set `L_K(q | 𝔪)` of `q`-periodic functions `f` with `(f) ≥ −𝔪` (including `0`).
-Blueprint: `prop:abel-jacobi-2`. -/
-def LSet (q : K) (m : Omega K → ℤ) : Set (MeroRing K) :=
-  {f | f ∈ Fq K q ∧ ∀ α : Omega K, α ≠ 0 → ((-(m α) : ℤ) : WithTop ℤ) ≤ anVal K α f}
-
-/-- Book, §2, Proposition 2 (Riemann–Roch theorem) together with the remarks preceding it: for a
-`q`-periodic divisor `𝔪`, `L_K(q|𝔪) = 0` if `deg_q 𝔪 < 0`; if `deg_q 𝔪 = 0` it is `0` unless
-`Φ_q(𝔪) ≡ 1`, in which case it has dimension `1`; and `dim L_K(q|𝔪) = deg_q(𝔪)` if `deg_q 𝔪 > 0`.
-Blueprint: `prop:abel-jacobi-2`. -/
-theorem riemann_roch_analytic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (m : Omega K → ℤ) (hm : m ∈ DivisorsPeriodic K q) :
-    (degQ K q m < 0 → LSet K q m = {0}) ∧
-    (degQ K q m = 0 →
-      (PhiQ K q (norm_pos_iff.mp hq0) m = 1 →
-        Module.finrank K (Submodule.span K (LSet K q m)) = 1) ∧
-      (PhiQ K q (norm_pos_iff.mp hq0) m ≠ 1 → LSet K q m = {0})) ∧
-    (0 < degQ K q m →
-      ((Module.finrank K (Submodule.span K (LSet K q m)) : ℕ) : ℤ) = degQ K q m) := by
-  sorry
-
-/-- Book, §2, formula (12): `deg_q(m) = ∑ [K(α):K] m_α`, the sum over a system `R` of
-representatives of the `K`-conjugacy classes mod `^× q` in the annulus `|q| < |α| ≤ 1`.
-Blueprint: `prop:deg-q-formula`. -/
-theorem degQ_formula (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (R : Set (Omega K))
-    (hR : ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
-      ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧ ConjModQ K q α β)
-    (m : Omega K → ℤ) (hm : m ∈ DivisorsPeriodic K q) :
-    degQ K q m =
-      ∑ᶠ α ∈ {α ∈ R | ‖q‖ < omegaNorm K α ∧ omegaNorm K α ≤ 1},
-        (Module.finrank K (IntermediateField.adjoin K ({α} : Set (Omega K))) : ℤ) *
-          m α := by
-  sorry
 
 end AnalyticTheory
