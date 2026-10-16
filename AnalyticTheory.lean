@@ -26,6 +26,7 @@ import AnalyticTheory.PeriodicSol
 import AnalyticTheory.AbelJacobi
 import AnalyticTheory.WpConstruct
 import AnalyticTheory.Generation
+import AnalyticTheory.Relation
 import AnalyticTheory.TheoremVI
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
