@@ -809,6 +809,42 @@ theorem anVal_galAct {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (h�
 
 end galDiv
 
+section descent
+
+variable {K L}
+
+theorem galAct_fix_holExt {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (hρ : IsGalAct K L σ ρ)
+    (x : holSubring K) :
+    ρ (algebraMap (holSubring L) (MeroRing L) (holExt x)) =
+      algebraMap (holSubring L) (MeroRing L) (holExt x) := by
+  obtain ⟨g'', hg'', hsum⟩ := hρ.2 (holExt x) (holCoeff L (holExt x)) (holCoeff_convergent L _)
+    (holCoeff_hasSum L _)
+  rw [hg'']
+  congr 1
+  apply holCoeff_injective L
+  refine holCoeff_eq L (holCoeff_convergent L (holExt x)) (fun α => ?_)
+  have e : (fun n => algebraMap L (Omega L) (σ (holCoeff L (holExt x) n)) * α.1 ^ n) =
+      (fun n => algebraMap L (Omega L) (holCoeff L (holExt x) n) * α.1 ^ n) := by
+    funext n; rw [holCoeff_holExt]; simp only [AlgEquiv.commutes]
+  rw [← e]; exact hsum α
+
+theorem hol_descend {g : holSubring L} (hg : ∀ σ : L ≃ₐ[K] L, holGal σ g = g) :
+    ∃ g₀ : holSubring K, holExt g₀ = g := by
+  have hc : ∀ n, holCoeff L g n ∈ Set.range (algebraMap K L) := fun n =>
+    (IsGalois.mem_range_algebraMap_iff_fixed _).mpr (fun σ => by
+      have := congrFun (congrArg (holCoeff L) (hg σ)) n
+      rwa [holCoeff_holGal] at this)
+  choose b hb using hc
+  have hbconv : IsConvergentLaurent K b := by
+    intro r hr
+    have := holCoeff_convergent L g r hr
+    simpa [← hb, norm_algebraMap'] using this
+  refine ⟨holOfSeq K b hbconv, holCoeff_injective L ?_⟩
+  rw [holCoeff_holExt, holCoeff_holOfSeq]
+  funext n; exact hb n
+
+end descent
+
 /-- Book, §2, Remark 2: for `f ∈ M_L` and `σ ∈ G`, `(σ f)(σ α) = σ(f(α))`, where `σ` acts on the
 coefficients of `f` and `σ'` is any extension of `σ` to `Ω_L`. Blueprint: `rem:S2-galois`. -/
 theorem remark_galois_action_eval (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L)
@@ -824,7 +860,45 @@ theorem remark_galois_fixed_field :
     ∃ ι : MeroRing K →+* MeroRing L, IsCoeffInclusion K L ι ∧
       ∀ f : MeroRing L, (∀ (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L),
         IsGalAct K L σ ρ → ρ f = f) ↔ f ∈ ι.range := by
-  sorry
+  classical
+  refine ⟨meroExt, fun g a ha hsum => ⟨holExt g, meroExt_alg g, fun β => ?_⟩, fun f => ⟨fun hf => ?_, ?_⟩⟩
+  · have hcoeff : holCoeff K g = a := holCoeff_eq K ha hsum
+    have := holOfSeq_hasSum L (fun n => algebraMap K L (holCoeff K g n))
+      (isConvergentLaurent_map (holCoeff_convergent K g)) β
+    have e : (fun n => algebraMap L (Omega L) (algebraMap K L (holCoeff K g n)) * β.1 ^ n) =
+        (fun n => algebraMap L (Omega L) (algebraMap K L (a n)) * β.1 ^ n) := by
+      funext n; rw [hcoeff]
+    rw [← e]; exact this
+  · obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring L) f
+    have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
+    set R := ∏ σ ∈ (Finset.univ : Finset (L ≃ₐ[K] L)).erase 1, holGal σ y with hR
+    set Y := ∏ σ : L ≃ₐ[K] L, holGal σ y with hY
+    have hYR : Y = y * R := by
+      rw [hY, hR, ← Finset.mul_prod_erase _ _ (Finset.mem_univ (1 : L ≃ₐ[K] L)), holGal_one]
+    have hY0 : Y ≠ 0 := Finset.prod_ne_zero_iff.mpr (fun σ _ =>
+      (map_ne_zero_iff _ (holGalEquiv σ).injective).mpr hy0)
+    have hYfix : ∀ τ : L ≃ₐ[K] L, holGal τ Y = Y := by
+      intro τ
+      rw [hY, map_prod]
+      simp only [holGal_holGal]
+      exact Fintype.prod_equiv (Equiv.mulLeft τ) _ _ (fun σ => rfl)
+    set X := x * R with hX
+    have hXf : algebraMap (holSubring L) (MeroRing L) X =
+        f * algebraMap (holSubring L) (MeroRing L) Y := by
+      rw [← hxy, hX, hYR, map_mul, map_mul]
+      field_simp [alg_hol_ne_zero hy0]
+    have hXfix : ∀ τ : L ≃ₐ[K] L, holGal τ X = X := by
+      intro τ
+      apply IsFractionRing.injective (holSubring L) (MeroRing L)
+      rw [← meroGal_alg, hXf, map_mul, hf τ _ (isGalAct_meroGal τ), meroGal_alg, hYfix]
+    obtain ⟨X₀, hX₀⟩ := hol_descend hXfix
+    obtain ⟨Y₀, hY₀⟩ := hol_descend hYfix
+    refine ⟨algebraMap (holSubring K) (MeroRing K) X₀ / algebraMap (holSubring K) (MeroRing K) Y₀, ?_⟩
+    rw [map_div₀, meroExt_alg, meroExt_alg, hX₀, hY₀, hXf]
+    field_simp [alg_hol_ne_zero hY0]
+  · rintro ⟨h, rfl⟩ σ ρ hρ
+    obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := holSubring K) h
+    rw [map_div₀, map_div₀, meroExt_alg, meroExt_alg, galAct_fix_holExt hρ, galAct_fix_holExt hρ]
 
 /-- Book, §2, Remark 2: the divisor of `σ f` is the `σ`-transform of the divisor of `f`:
 `(σ f)(σ α) = (f)(α)`. Blueprint: `rem:S2-galois`. -/
@@ -844,7 +918,62 @@ theorem remark_galois_fixed_divisors (ψ : Omega K ≃ₐ[K] Omega L) (ι : Divi
     {m : Divisors L | ∀ (σ : GalGroup K L) (σ' : Omega L ≃+* Omega L), IsExtension K L σ σ' →
         ∀ α : Omega L, (m : Omega L → ℤ) (σ' α) = (m : Omega L → ℤ) α} =
       Set.range ι := by
-  sorry
+  classical
+  have hι' : ∀ (m : Divisors K) (α : Omega K), α ≠ 0 →
+      ((ι m : Divisors L) : Omega L → ℤ) (ψ α) = (m : Omega K → ℤ) α := by
+    intro m α hα
+    rw [hι m α hα, ramIndex_eq_one_of_separable K L ψ α, Nat.cast_one, one_mul]
+  ext m
+  constructor
+  · intro hm
+    set m₀ : Omega K → ℤ := fun α => (m : Omega L → ℤ) (ψ α) with hm₀
+    have hmem : m₀ ∈ Divisors K := by
+      refine ⟨by simp [hm₀, m.2.1], fun r r' hr hrr' => ?_, fun α α' h => ?_⟩
+      · refine ((m.2.2.1 r r' hr hrr').image ψ.symm).subset (fun α ⟨h1, h2, h3⟩ => ?_)
+        refine ⟨ψ α, ⟨?_, ?_, h3⟩, AlgEquiv.symm_apply_apply ψ α⟩
+        · show r ≤ ‖ψ α‖; rw [psi_norm K L ψ]; exact h1
+        · show ‖ψ α‖ ≤ r'; rw [psi_norm K L ψ]; exact h2
+      · by_cases hα : α = 0
+        · have hα' : α' = 0 := by
+            have : minpoly K α' = Polynomial.X := by rw [← h, hα, minpoly.zero]
+            have h2 := minpoly.aeval K α'
+            rw [this] at h2; simpa using h2
+          rw [hα, hα']
+        have hroot : Polynomial.aeval α (minpoly K α') = 0 := by rw [← h]; exact minpoly.aeval K α
+        obtain ⟨χ, hχ⟩ := minpoly.exists_algEquiv_of_root (Algebra.IsAlgebraic.isAlgebraic α') hroot
+        set σ'' : Omega L ≃ₐ[K] Omega L := (ψ.symm.trans χ).trans ψ
+        have hext : IsExtension K L (σ''.restrictNormal L) (σ'' : Omega L ≃+* Omega L) := by
+          intro x
+          exact (AlgEquiv.restrictNormal_commutes σ'' L x).symm
+        have := hm (σ''.restrictNormal L) σ'' hext (ψ α)
+        show (m : Omega L → ℤ) (ψ α) = (m : Omega L → ℤ) (ψ α')
+        have e : σ'' (ψ α) = ψ α' := by
+          show ψ (χ (ψ.symm (ψ α))) = ψ α'
+          rw [AlgEquiv.symm_apply_apply, hχ]
+        rw [← this]
+        show (m : Omega L → ℤ) (σ'' (ψ α)) = _
+        rw [e]
+    refine ⟨⟨m₀, hmem⟩, Subtype.ext (funext fun β => ?_)⟩
+    by_cases hβ : β = 0
+    · rw [hβ, (ι ⟨m₀, hmem⟩).2.1, m.2.1]
+    · have hα : ψ.symm β ≠ 0 := (map_ne_zero _).mpr hβ
+      have := hι' ⟨m₀, hmem⟩ (ψ.symm β) hα
+      rw [AlgEquiv.apply_symm_apply] at this
+      rw [this]
+      show (m : Omega L → ℤ) (ψ (ψ.symm β)) = _
+      rw [AlgEquiv.apply_symm_apply]
+  · rintro ⟨m₀, rfl⟩ σ σ' hσ' β
+    by_cases hβ : β = 0
+    · rw [hβ, map_zero]
+    have hα : ψ.symm β ≠ 0 := (map_ne_zero _).mpr hβ
+    set χ : Omega K ≃ₐ[K] Omega K := (ψ.trans (extAlgEquiv K L hσ')).trans ψ.symm
+    have hσβ : σ' β = ψ (χ (ψ.symm β)) := by
+      show σ' β = ψ (ψ.symm (σ' (ψ (ψ.symm β))))
+      rw [AlgEquiv.apply_symm_apply, AlgEquiv.apply_symm_apply]
+    have hχ0 : χ (ψ.symm β) ≠ 0 := (map_ne_zero _).mpr hα
+    rw [hσβ, hι' m₀ _ hχ0]
+    conv_rhs => rw [← AlgEquiv.apply_symm_apply ψ β, hι' m₀ _ hα]
+    exact m₀.2.2.2 _ _ (minpoly.algEquiv_eq χ _)
 
 /-- Book, §2, Remark 2: `deg_q(σ 𝔪) = deg_q(𝔪)` and `Φ_q(σ 𝔪) ≡ σ Φ_q(𝔪) mod^× q`, where
 `(σ 𝔪)(σ' α) = 𝔪(α)`; i.e. `deg_q` and `Φ_q` are `G`-equivariant. Blueprint: `rem:S2-galois`. -/
