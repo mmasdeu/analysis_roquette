@@ -743,6 +743,30 @@ If $A,B\in H_K$, $B\ne0$, and $w_\alpha(A)\ge w_\alpha(B)$ for all $\alpha\in\Om
 See the Lean proof of \texttt{hol\_dvd\_of\_anVal\_le, hol\_dvd\_of\_pow\_dvd, local\_approx, exists\_limit\_coeff, exists\_factor\_annulus, exists\_exact\_pow, dvd\_pow\_of\_anVal\_le, isCoprime\_minpoly\_pow}.
 \end{proof}
 
+\begin{proposition}[Infinite products in $H_K$]
+\label{prop:infinite-products}
+\lean{AnalyticTheory.exists_infprod, AnalyticTheory.exists_infprod_tail, AnalyticTheory.partial_prod_bound, AnalyticTheory.norm_eval_le_gnorm, AnalyticTheory.prod_apply_hol}
+\uses{prop:null-family-sum, lem:dominant-annulus}
+\leanok
+If $g_j\in H_K$ and $\|g_j\|_\rho\to0$ for every $\rho>0$, the partial products $\prod_{j<J}(1+g_j)$ converge pointwise on $\Omega^\times$ to an element of $H_K$; removing finitely many factors leaves a factor not vanishing at a given point.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_infprod, exists\_infprod\_tail, partial\_prod\_bound, norm\_eval\_le\_gnorm, prod\_apply\_hol}.
+\end{proof}
+
+\begin{proposition}[The theta function of a minimal polynomial]
+\label{prop:theta-phi}
+\lean{AnalyticTheory.theta_spec, AnalyticTheory.exists_theta, AnalyticTheory.thF, AnalyticTheory.thG, AnalyticTheory.psi, AnalyticTheory.gcoef, AnalyticTheory.tendsto_gnorm_thF, AnalyticTheory.tendsto_gnorm_thG, AnalyticTheory.anVal_thF, AnalyticTheory.anVal_thG, AnalyticTheory.chi, AnalyticTheory.chi_unique, AnalyticTheory.conjModQ_iff_chi, AnalyticTheory.psi_eq_minpoly, AnalyticTheory.anVal_polyHol_minpoly, AnalyticTheory.thF_scale, AnalyticTheory.thG_scale}
+\uses{prop:infinite-products, thm:division-hol, def:theta, def:conj-mod-q}
+\leanok
+Let $\alpha\in\Omega^\times$ have minimal polynomial $\varphi$ of degree $N$ over $K$ and $0<|q|<1$. Then $T_\varphi=\prod_{n\ge0}q^{nN}\varphi(q^{-n}X)X^{-N}\prod_{n\ge1}\varphi(q^nX)/\varphi(0)\in H_K$ is a nonzero holomorphic function with $T_\varphi(q^{-1}X)=\varphi(0)^{-1}X^NT_\varphi(X)$ and $w_\xi(T_\varphi)=1$ if $\xi$ is $K$-conjugate to $\alpha q^k$ for some $k\in\mathbb Z$, $0$ otherwise (the factors are the minimal polynomials of $q^k\alpha$).
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{theta\_spec, exists\_theta, thF, thG, psi, gcoef, tendsto\_gnorm\_thF, tendsto\_gnorm\_thG, anVal\_thF, anVal\_thG, chi, chi\_unique, conjModQ\_iff\_chi, psi\_eq\_minpoly, anVal\_polyHol\_minpoly, thF\_scale, thG\_scale}.
+\end{proof}
+
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
 
 \begin{definition}[Derivation $D$]
