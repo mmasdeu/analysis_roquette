@@ -823,4 +823,160 @@ theorem isIntegral_of_AD {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
 
 end integral
 
+section classify
+
+variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+theorem withTop_neg_nonneg {x : WithTop ℤ} (h : x ≤ 0) : 0 ≤ -x := by
+  induction x using WithTop.recTopCoe with
+  | top => exact absurd h (by simp)
+  | coe a =>
+    have : a ≤ 0 := by exact_mod_cast h
+    rw [← WithTop.LinearOrderedAddCommGroup.coe_neg]; exact_mod_cast (by omega : (0 : ℤ) ≤ -a)
+
+theorem withTop_neg_pos {x : WithTop ℤ} (h : x < 0) : 0 < -x := by
+  induction x using WithTop.recTopCoe with
+  | top => exact absurd h (by simp)
+  | coe a =>
+    have : a < 0 := by exact_mod_cast h
+    rw [← WithTop.LinearOrderedAddCommGroup.coe_neg]; exact_mod_cast (by omega : (0 : ℤ) < -a)
+
+theorem withTop_neg_neg {x : WithTop ℤ} (h : 0 < x) (hx : x ≠ ⊤) : -x < 0 := by
+  obtain ⟨a, rfl⟩ := WithTop.ne_top_iff_exists.mp hx
+  have : 0 < a := by exact_mod_cast h
+  rw [← WithTop.LinearOrderedAddCommGroup.coe_neg]; exact_mod_cast (by omega : -a < (0 : ℤ))
+
+/-- Valuations are nonnegative on integral elements over a subring where they are nonnegative. -/
+theorem AddValuation_nonneg_of_isIntegral {F : Type*} [Field F] [Algebra K F]
+    (v : AddValuation F (WithTop ℤ)) (R : Subalgebra K F) (hR : ∀ r ∈ R, 0 ≤ v r) {f : F}
+    (hf : IsIntegral R f) : 0 ≤ v f := by
+  obtain ⟨p, hmon, heval⟩ := hf
+  by_contra hneg
+  push_neg at hneg
+  have hf0 : f ≠ 0 := by rintro rfl; rw [v.map_zero] at hneg; exact not_top_lt hneg
+  obtain ⟨a, ha⟩ := WithTop.ne_top_iff_exists.mp ((v.ne_top_iff).mpr hf0)
+  rw [← ha] at hneg
+  have ha0 : a < 0 := by exact_mod_cast hneg
+  set n := p.natDegree with hndef
+  have hn : 0 < n := by
+    by_contra h0
+    push_neg at h0
+    have : p = 1 := (Polynomial.Monic.natDegree_eq_zero_iff_eq_one hmon).mp (by omega)
+    rw [this, Polynomial.eval₂_one] at heval
+    exact one_ne_zero heval
+  rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finset_sum] at heval
+  have hsum : (((((n - 1 : ℕ) : ℤ) * a : ℤ)) : WithTop ℤ) ≤ v (∑ i ∈ Finset.range n,
+      Polynomial.eval₂ (algebraMap R F) f (Polynomial.C (p.coeff i) * Polynomial.X ^ i)) := by
+    refine v.map_le_sum (fun i hi => ?_)
+    have hi' : i ≤ n - 1 := by have := Finset.mem_range.mp hi; omega
+    rw [Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_X_pow, v.map_mul, v.map_pow, ← ha]
+    have hc : 0 ≤ v (algebraMap R F (p.coeff i)) := hR _ (p.coeff i).2
+    have h2 : (((((n - 1 : ℕ) : ℤ) * a : ℤ)) : WithTop ℤ) ≤ i • (a : WithTop ℤ) := by
+      rw [← WithTop.coe_nsmul, nsmul_eq_mul]
+      have : (i : ℤ) ≤ ((n - 1 : ℕ) : ℤ) := by exact_mod_cast hi'
+      exact_mod_cast (by nlinarith : ((n - 1 : ℕ) : ℤ) * a ≤ (i : ℤ) * a)
+    calc _ ≤ 0 + i • (a : WithTop ℤ) := by rw [zero_add]; exact h2
+      _ ≤ _ := add_le_add_left hc _
+  have hfn : f ^ n = -(∑ i ∈ Finset.range n,
+      Polynomial.eval₂ (algebraMap R F) f (Polynomial.C (p.coeff i) * Polynomial.X ^ i)) :=
+    eq_neg_of_add_eq_zero_left heval
+  have h4 := v.map_pow f n
+  rw [hfn, v.map_neg, ← ha, ← WithTop.coe_nsmul, nsmul_eq_mul] at h4
+  rw [h4] at hsum
+  have h3 : ((n - 1 : ℕ) : ℤ) * a ≤ (n : ℤ) * a := by exact_mod_cast hsum
+  have : ((n - 1 : ℕ) : ℤ) = (n : ℤ) - 1 := by omega
+  rw [this] at h3
+  linarith
+
+theorem anVal_algebraMap_ne_zero {ξ : Omega K} (hξ : ξ ≠ 0) {c : K} (hc : c ≠ 0) :
+    anVal K ξ (algebraMap K (MeroRing K) c) = 0 := by
+  rw [← algebraMap_hol_mero]; exact anVal_algebraMap_hol hξ hc
+
+include hq0 hq1 in
+/-- A nonconstant function has a pole divisor of positive degree. -/
+theorem degQ_polePart_pos {y : FqSub K q} (hy0 : y ≠ 0) {α : Omega K} (hα : α ≠ 0)
+    (hyα : anVal K α (y : MeroRing K) ≠ 0) :
+    0 < degQ K q (polePart (divisorOf K (y : MeroRing K))) := by
+  by_contra hle
+  push_neg at hle
+  have hP := polePart_mem (q := q) (divisorOf_periodic hq0 y.2)
+  have hP0 : ∀ α, 0 ≤ polePart (divisorOf K (y : MeroRing K)) α := fun α => le_max_right _ _
+  have hzero : ∀ β : Omega K, β ≠ 0 → polePart (divisorOf K (y : MeroRing K)) β = 0 := fun β hβ =>
+    le_antisymm ((le_degQ hq0 hq1 hP hP0 hβ).trans hle) (hP0 β)
+  have hnn : ∀ β : Omega K, β ≠ 0 → 0 ≤ anVal K β (y : MeroRing K) := fun β hβ => by
+    have := anVal_ge_neg_polePart hy0 hβ
+    rw [hzero β hβ] at this
+    simpa using this
+  obtain ⟨c, hc⟩ := InL_one_const hq0 hq1 ⟨y.2, le_trans (by exact_mod_cast (by norm_num : (-1 : ℤ) ≤ 0))
+    (hnn 1 one_ne_zero), fun β hβ _ => hnn β hβ⟩
+  have hc0 : c ≠ 0 := by
+    rintro rfl
+    apply hy0
+    apply Subtype.ext
+    rw [hc, map_zero]; rfl
+  exact hyα (by rw [hc]; exact anVal_algebraMap_ne_zero hα hc0)
+
+theorem anVal_prod {ξ : Omega K} (hξ : ξ ≠ 0) {ι : Type*} (s : Finset ι) (g : ι → MeroRing K) :
+    anVal K ξ (∏ i ∈ s, g i) = ∑ i ∈ s, anVal K ξ (g i) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => rw [Finset.prod_empty, Finset.sum_empty, (anVal_isValuation K ξ hξ).2.1]
+  | insert a s ha ih =>
+    rw [Finset.prod_insert ha, Finset.sum_insert ha, (anVal_isValuation K ξ hξ).2.2.1, ih]
+
+theorem anVal_pow' {ξ : Omega K} (hξ : ξ ≠ 0) (f : MeroRing K) (n : ℕ) :
+    anVal K ξ (f ^ n) = n • anVal K ξ f := by
+  induction n with
+  | zero => rw [pow_zero, zero_smul, (anVal_isValuation K ξ hξ).2.1]
+  | succ n ih => rw [pow_succ, (anVal_isValuation K ξ hξ).2.2.1, ih, succ_nsmul]
+
+theorem AddValuation_prod {F : Type*} [Field F] (v : AddValuation F (WithTop ℤ)) {ι : Type*}
+    (s : Finset ι) (g : ι → F) : v (∏ i ∈ s, g i) = ∑ i ∈ s, v (g i) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => rw [Finset.prod_empty, Finset.sum_empty, v.map_one]
+  | insert a s ha ih => rw [Finset.prod_insert ha, Finset.sum_insert ha, v.map_mul, ih]
+
+include hq0 hq1 in
+/-- Nonzero denominators for arbitrary elements. -/
+theorem exists_denominator_ne {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K q)
+    (hD0 : ∀ α, 0 ≤ D α) (hdeg : 0 < degQ K q D) (x : FqSub K q) :
+    ∃ h ∈ AD q D, h ≠ 0 ∧ h * x ∈ AD q D := by
+  classical
+  by_cases hx0 : x = 0
+  · exact ⟨1, (AD q D).one_mem, one_ne_zero, by rw [hx0, mul_zero]; exact (AD q D).zero_mem⟩
+  set P := polePart (divisorOf K (x : MeroRing K)) with hPdef
+  have hP := polePart_mem (q := q) (divisorOf_periodic hq0 x.2)
+  have hP0 : ∀ α, 0 ≤ P α := fun α => le_max_right _ _
+  set n := (degQ K q P).toNat + 1 with hn
+  set m := n • D - P with hmdef
+  have hmP : m ∈ DivisorsPeriodic K q := (DivisorsPeriodic K q).sub_mem
+    ((DivisorsPeriodic K q).nsmul_mem hD n) hP
+  have hdP := degQ_nonneg_of_nonneg (q := q) hP0
+  have hpos : 0 < degQ K q m := by
+    rw [hmdef, degQ_sub hq0 hq1 ((DivisorsPeriodic K q).nsmul_mem hD n) hP, degQ_nsmul hq0 hq1 hD, hn]
+    push_cast
+    rw [Int.toNat_of_nonneg hdP]
+    nlinarith
+  have hfr := finrank_LS hq0 hq1 hmP hpos
+  obtain ⟨h, hh, hh0⟩ : ∃ h ∈ LS q m, h ≠ 0 := by
+    by_contra hcon
+    push_neg at hcon
+    have : LS q m = ⊥ := (Submodule.eq_bot_iff _).mpr hcon
+    rw [this, finrank_bot] at hfr
+    omega
+  refine ⟨h, fun α hα hDα => ?_, hh0, fun α hα hDα => ?_⟩
+  · have := hh α hα
+    simp only [hmdef, Pi.sub_apply, Pi.smul_apply, hDα, smul_zero, zero_sub, neg_neg] at this
+    exact le_trans (by exact_mod_cast hP0 α) this
+  · have h1 := hh α hα
+    simp only [hmdef, Pi.sub_apply, Pi.smul_apply, hDα, smul_zero, zero_sub, neg_neg] at h1
+    have h2 := anVal_ge_neg_polePart hx0 hα
+    have := anVal_le_add hα h1 h2
+    show 0 ≤ anVal K α ((h : MeroRing K) * x)
+    refine le_trans ?_ this
+    rw [hPdef]; simp
+
+end classify
+
 end AnalyticTheory
