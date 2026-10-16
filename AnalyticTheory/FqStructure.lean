@@ -127,11 +127,11 @@ theorem fq_valuation_surjective (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 `w_α`, i.e. has the same valuation ring. Blueprint: `thm:fq-valuations`. -/
 theorem fq_valuations_classified (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (v : AddValuation (FqSub K q) (WithTop ℤ))
-    (hv : ∀ c : K, v (algebraMap K (FqSub K q) c) = 0)
+    (hv : ∀ c : K, c ≠ 0 → v (algebraMap K (FqSub K q) c) = 0)
     (hnt : ∃ x : FqSub K q, x ≠ 0 ∧ v x ≠ 0) :
     ∃ α : Omega K, α ≠ 0 ∧
-      ∀ x : FqSub K q, 0 ≤ v x ↔ 0 ≤ anVal K α (x : MeroRing K) := by
-  sorry
+      ∀ x : FqSub K q, 0 ≤ v x ↔ 0 ≤ anVal K α (x : MeroRing K) :=
+  classify_valuation hq0 hq1 v hv hnt
 
 /-- Book, §2, item III: the valuation ring `{x ∈ F_K(q) | w_α(x) ≥ 0}` of `w_α` is the ring of a
 prime divisor of `F_K(q) | K` whose degree (the degree of its residue field over `K`) is `[K(α):K]`.

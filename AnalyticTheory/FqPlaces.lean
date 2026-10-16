@@ -1095,6 +1095,104 @@ theorem exists_center (v : AddValuation (FqSub K q) (WithTop ℤ)) {D : Omega K 
   rw [sub_add_cancel, v.map_one] at this
   exact absurd (lt_of_lt_of_le (lt_min hv1' hvuf) this) (lt_irrefl _)
 
+include hq0 hq1 in
+/-- Book, §2, item II (via Artin–Whaples): every nontrivial valuation of `F_K(q)` trivial on `K` has
+the valuation ring of some `w_β`. -/
+theorem classify_valuation (v : AddValuation (FqSub K q) (WithTop ℤ))
+    (hv : ∀ c : K, c ≠ 0 → v (algebraMap K (FqSub K q) c) = 0)
+    (hnt : ∃ x : FqSub K q, x ≠ 0 ∧ v x ≠ 0) :
+    ∃ β : Omega K, β ≠ 0 ∧ ∀ x : FqSub K q, 0 ≤ v x ↔ 0 ≤ anVal K β (x : MeroRing K) := by
+  classical
+  set P : FqSub K q := ⟨wpAlg hq0 hq1, wpAlg_mem_Fq hq0 hq1⟩ with hPdef
+  have hP1 : anVal K 1 (P : MeroRing K) = ((-2 : ℤ) : WithTop ℤ) := anVal_wpAlg_one hq0 hq1
+  have hP0 : P ≠ 0 := by
+    intro h
+    rw [h, show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K 1 one_ne_zero] at hP1
+    exact WithTop.top_ne_coe hP1
+  obtain ⟨y, hy0, hyv, hy1⟩ : ∃ y : FqSub K q, y ≠ 0 ∧ 0 ≤ v y ∧
+      anVal K 1 (y : MeroRing K) ≠ 0 := by
+    by_cases h : 0 ≤ v P
+    · exact ⟨P, hP0, h, by rw [hP1]; exact WithTop.coe_ne_zero.mpr (by norm_num)⟩
+    · push_neg at h
+      refine ⟨P⁻¹, inv_ne_zero hP0, by rw [v.map_inv]; exact withTop_neg_nonneg h.le, ?_⟩
+      have hP' : (P : MeroRing K) ≠ 0 := fun h' => hP0 (Subtype.ext h')
+      rw [show ((P⁻¹ : FqSub K q) : MeroRing K) = (P : MeroRing K)⁻¹ from rfl,
+        anVal_inv_of one_ne_zero hP' hP1]
+      exact WithTop.coe_ne_zero.mpr (by norm_num)
+  set D := polePart (divisorOf K (y : MeroRing K)) with hDdef
+  have hDP : D ∈ DivisorsPeriodic K q := polePart_mem (divisorOf_periodic hq0 y.2)
+  have hD0 : ∀ α, 0 ≤ D α := fun α => le_max_right _ _
+  have hdeg : 0 < degQ K q D := degQ_polePart_pos hq0 hq1 hy0 one_ne_zero hy1
+  have hRv : ∀ r ∈ Algebra.adjoin K ({y} : Set (FqSub K q)), 0 ≤ v r := by
+    intro r hr
+    induction hr using Algebra.adjoin_induction with
+    | mem x hx => rw [Set.mem_singleton_iff.mp hx]; exact hyv
+    | algebraMap c =>
+      by_cases hc : c = 0
+      · rw [hc, map_zero, v.map_zero]; exact le_top
+      · rw [hv c hc]
+    | add x z _ _ hx hz => exact le_trans (le_min hx hz) (v.map_add x z)
+    | mul x z _ _ hx hz => rw [v.map_mul]; exact add_nonneg hx hz
+  have hAv : ∀ f ∈ AD q D, 0 ≤ v f := fun f hf =>
+    AddValuation_nonneg_of_isIntegral v _ hRv (isIntegral_of_AD hq0 hq1 hy0 hDdef hdeg hf)
+  obtain ⟨x, hx0, hxv⟩ : ∃ x : FqSub K q, x ≠ 0 ∧ 0 < v x := by
+    obtain ⟨x, hx0, hxv⟩ := hnt
+    rcases lt_or_gt_of_ne hxv with h | h
+    · refine ⟨x⁻¹, inv_ne_zero hx0, ?_⟩
+      rw [v.map_inv]; exact withTop_neg_pos h
+    · exact ⟨x, hx0, h⟩
+  obtain ⟨h, hhA, hh0, hhxA⟩ := exists_denominator_ne hq0 hq1 hDP hD0 hdeg x
+  have hgv : 0 < v (h * x) := by
+    rw [v.map_mul]; exact lt_of_lt_of_le hxv (le_add_of_nonneg_left (hAv h hhA))
+  obtain ⟨β, hβ0, hDβ, hβ⟩ :=
+    exists_center hq0 hq1 v hDP hD0 hdeg hAv hv hhxA (mul_ne_zero hh0 hx0) hgv
+  have hden : ∀ z : FqSub K q, 0 ≤ anVal K β (z : MeroRing K) →
+      ∃ h ∈ AD q D, v h = 0 ∧ anVal K β (h : MeroRing K) = 0 ∧ h * z ∈ AD q D := by
+    intro z hz
+    obtain ⟨n, h, hh, hhβ, hhz⟩ := exists_denominator hq0 hq1 hDP hD0 hdeg hβ0 hDβ hz
+    have hhA := LS_le_AD n hh
+    refine ⟨h, hhA, le_antisymm ?_ (hAv h hhA), hhβ, hhz⟩
+    by_contra hpos
+    push_neg at hpos
+    have := (hβ h hhA).mpr hpos
+    rw [hhβ] at this
+    exact lt_irrefl _ this
+  have hpos : ∀ z : FqSub K q, 0 < anVal K β (z : MeroRing K) → 0 < v z := by
+    intro z hz
+    obtain ⟨h, hhA, hhv, hhβ, hhz⟩ := hden z hz.le
+    have h1 : 0 < anVal K β ((h * z : FqSub K q) : MeroRing K) := by
+      show 0 < anVal K β ((h : MeroRing K) * z)
+      rw [(anVal_isValuation K β hβ0).2.2.1, hhβ, zero_add]; exact hz
+    have h2 := (hβ _ hhz).mp h1
+    rw [v.map_mul, hhv, zero_add] at h2
+    exact h2
+  refine ⟨β, hβ0, fun z => ⟨fun hz => ?_, fun hz => ?_⟩⟩
+  · by_contra hneg
+    push_neg at hneg
+    have hz0 : z ≠ 0 := by
+      rintro rfl
+      rw [show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K β hβ0] at hneg
+      exact not_top_lt hneg
+    have hz' : (z : MeroRing K) ≠ 0 := fun h => hz0 (Subtype.ext h)
+    have hinv : 0 < anVal K β ((z⁻¹ : FqSub K q) : MeroRing K) := by
+      obtain ⟨t, ht⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hβ0 hz')
+      rw [show ((z⁻¹ : FqSub K q) : MeroRing K) = (z : MeroRing K)⁻¹ from rfl,
+        anVal_inv_of hβ0 hz' ht.symm]
+      rw [← ht] at hneg
+      have : t < 0 := by exact_mod_cast hneg
+      exact_mod_cast (by omega : (0 : ℤ) < -t)
+    have h3 := hpos _ hinv
+    rw [v.map_inv] at h3
+    obtain ⟨a, ha⟩ := WithTop.ne_top_iff_exists.mp ((v.ne_top_iff).mpr hz0)
+    rw [← ha] at h3 hz
+    rw [← WithTop.LinearOrderedAddCommGroup.coe_neg] at h3
+    have h1 : 0 < -a := by exact_mod_cast h3
+    have h2 : 0 ≤ a := by exact_mod_cast hz
+    omega
+  · obtain ⟨h, hhA, hhv, -, hhz⟩ := hden z hz
+    have := hAv _ hhz
+    rwa [v.map_mul, hhv, zero_add] at this
+
 end classify2
 
 end AnalyticTheory
