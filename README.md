@@ -30,8 +30,7 @@ lake build                       # compiles all statements (sorry-proofs give wa
 leanblueprint pdf                # builds blueprint/print/print.pdf
 ```
 
-`leanblueprint` requires the repository to be a git repository (`git init` has been done;
-nothing has been committed).
+`leanblueprint` requires the repository to be a git repository.
 
 The blueprint is generated from `blueprint/tools/items.py`:
 
@@ -55,7 +54,8 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Blueprint nodes: 148 (definitions, lemmas, propositions, theorems, corollaries, remarks).
+* Blueprint nodes: 175 (80 definitions, 95 lemmas/propositions/theorems/corollaries/remarks, of which
+  39 are completely proved; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
 * **No placeholder objects remain**: there is no `opaque` constant, no `sorry`-bodied definition,
   instance or structure field, and no statement recorded as `True`. Every `sorry` is the proof of
   a theorem (all statements compile; `lake build` reports them as warnings).
@@ -87,6 +87,24 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   `F_K(q̄|Xᵐ) ⊆ F_K(q)` requires `m` to be a multiple of the order of `q mod^× q̄`; in Theorem XVII (iii)
   the group `U` is defined through `q̄` (as in the proof and Corollary XIXa; the printed `q` appears
   to be a misprint).
+
+## Proved so far (sorry-free)
+
+* §2, analytic part: `H_K` is a domain closed under products; Laurent coefficients, units of `H_K`;
+  Taylor expansion, identity theorem, finite order of vanishing, Weierstraß preparation on the unit
+  circle, finiteness of zeros in annuli; the valuations `w_α` (normalized by the degree of
+  inseparability) and their invariance under conjugation; divisors of meromorphic functions;
+  division theorem in `H_K`; infinite products and the theta functions `T_φ`, `Θ_𝔪` with formulas
+  (10), (11); functional equation (7) of `Θ`.
+* §2: Proposition 1 (Abel–Jacobi), its Corollary, Proposition 2 (Riemann–Roch for `q`-periodic
+  divisors), formula (12) for `deg_q` (independent of the system of representatives).
+* §3: `℘`, `℘′` constructed as quotients of explicit holomorphic functions by `Θ²`, `Θ³`;
+  Theorem VI parts (i) `F_K(q) = K(℘, ℘′)`, (ii) poles `2𝔭₁`, `3𝔭₁`, (iv) reflection; the cubic
+  relation `℘′² + ℘℘′ = ℘³ + A℘² + B℘ + C` with some `A, B, C ∈ K`; Lemma 1 (inversion).
+* In progress: Theorem VI (iii), i.e. `A = 0`, `B = −5s₃`, `C = −(5s₃+7s₅)/12`
+  (`QSeries.lean`: Lambert series and expansions of `℘`, `℘′` at `X = 1+h`).
+* Not started (statements only): items I–V of §2 and Corollaries Va, Vb; Theorems VII–VIIIa;
+  §§4–6; Appendices A1, A2; Remarks of §2.
 
 ## Zero theory of holomorphic functions (third step)
 

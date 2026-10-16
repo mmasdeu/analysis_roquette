@@ -578,3 +578,52 @@ add('proposition', 'prop:theta-divisor', 'The theta function $\\Theta_{\\mathfra
 add('proposition', 'prop:periodic-solutions', 'Holomorphic solutions of $G(q^{-1}X)=\\kappa X^dG(X)$', ['solSpace', 'mem_solSpace_iff', 'solSpace_eq_bot_of_neg', 'solSpace_zero_eq_bot', 'solSpace_zero_finrank', 'solSpace_finrank_pos', 'seqOf', 'seqOf_rec', 'seqOf_convergent', 'finite_quad', 'triZ', 'solEval', 'holCoeff_holScale', 'mem_hol_of_anVal_nonneg'],
     ['prop:laurent-coefficients', 'thm:division-hol'], False,
     r'The coefficients satisfy $g_n=\kappa q^ng_{n-d}$. For $d>0$ the solutions are $g_{i+jd}=c_i\kappa^jq^{ij+dj(j+1)/2}$, a space of dimension $d$; for $d<0$ there is none but $0$; for $d=0$ there is a nonzero solution iff $\kappa\in q^{\mathbb Z}$, and then a one-dimensional space.')
+
+# --- Theorem VI (third chapter): construction of wp, wp' and the four parts of the theorem
+_upd('def:reflection', text=r'$\varepsilon:f(X)\mapsto f(X^{-1})$, the ring automorphism of $M_K$ induced by $\sum a_nX^n\mapsto\sum a_nX^{-n}$ on $H_K$.')
+add('proposition', 'prop:wp-construction', 'Construction of $\\wp$ and $\\wp\'$ as quotients',
+    ['Th', 'Th_ne_zero', 'anVal_Th', 'linF', 'Rq', 'Rq_spec', 'tP', "tP'", 'tP_null', "tP'_null", 'GP', "GP'",
+     'GP_hasSum', "GP'_hasSum", 'wpSeries_hasSum', 'wpPrimeSeries_hasSum', 'wpAlg', 'wpPrimeAlg',
+     'wpAlg_evalsTo', 'wpPrimeAlg_evalsTo', 'evalsTo_unique', 'wpM_eq', 'wpPrimeM_eq', 'Gw', "Gw'", 'wpAlg_eq_Gw', "wpPrimeAlg_eq_Gw'"],
+    ['def:wp', 'def:wp-prime', 'prop:theta-phi', 'prop:null-family-sum', 'thm:division-hol'], False,
+    r'Let $\Theta=T_{X-1}$ and $R_n=\Theta/(X-q^{-n})\in H_K$. The families $q^{-n}XR_n^2$ and $-q^{-n}X^2R_n^3$ are null families, with sums $G,G'+"'"+r'\in H_K$, and $\wp=G/\Theta^2-2s_1$, $\wp'+"'"+r'=G'+"'"+r'/\Theta^3+s_1$: these elements of $M_K$ have the values of the defining series at every point where $\Theta\ne0$, and are the unique such elements.')
+add('proposition', 'prop:wp-valuations', 'Periodicity and poles of $\\wp,\\wp\'$',
+    ['anVal_wpAlg_one', 'anVal_wpPrimeAlg_one', 'anVal_wpAlg_nonneg', 'anVal_wpPrimeAlg_nonneg', 'evalsTo_translation',
+     'anVal_periodic', 'wpAlg_mem_Fq', 'wpPrimeAlg_mem_Fq', 'evalsTo_reflection', 'Th_ne_zero_at', 'pDiv', 'degQ_pDiv'],
+    ['prop:wp-construction', 'def:analytic-valuation', 'def:Fq', 'def:deg-q'], False,
+    r'$\wp,\wp'+"'"+r'\in F_K(q)$; $w_1(\wp)=-2$, $w_1(\wp'+"'"+r')=-3$, and $w_\alpha(\wp),w_\alpha(\wp'+"'"+r')\ge0$ for $\alpha$ not conjugate to $1$ mod$^\times q$. The divisor $\mathfrak p_1$ (multiplicity $1$ on $q^{\mathbb Z}$) has $\deg_q\mathfrak p_1=1$.')
+add('proposition', 'prop:wp-generation', 'Generation of $L(n\\mathfrak p_1)$ by $\\wp^i\\wp\'^j$',
+    ['InL', 'InL_iff', 'mono', 'spanMono', 'InL_mem_spanMono', 'InL_mem_adjoin', 'Fq_le_adjoin', 'exact_factor_one',
+     'exists_const_approx', 'polePart', 'divisorOf_periodic'],
+    ['prop:wp-valuations', 'prop:abel-jacobi-2', 'cor:periodic-with-prescribed-zero'], False,
+    r'Every $f\in F_K(q)$ with poles only on $q^{\mathbb Z}$, of order $\le n$, lies in the $K$-span of $\wp^i\wp'+"'"+r'^j$ ($j\le1$, $2i+3j\le n$) (subtracting suitable monomials lowers the pole order; a function without poles is constant by Proposition 2). Every $f\in F_K(q)$ is a quotient of two such functions, hence $F_K(q)\subseteq K(\wp,\wp'+"'"+r')$.')
+add('proposition', 'prop:wp-structural-relation', 'Structure of the cubic relation',
+    ['exists_rel', 'InL_rel', 'Uf', 'Vf', 'refl_wpAlg', 'refl_wpPrimeAlg', 'refl_algebraMap', 'wpAlg_ne_const',
+     'two_wpPrime_add_wp_ne_zero', 'rel_pointwise'],
+    ['prop:wp-generation', 'def:reflection'], False,
+    r'$\wp\circ\varepsilon=\wp$ and $\wp'+"'"+r'\circ\varepsilon=-\wp'+"'"+r'-\wp$. Since $\wp'+"'"+r'^2+\wp\wp'+"'"+r'-\wp^3\in L(5\mathfrak p_1)$ is $\varepsilon$-invariant, there are $A,B,C\in K$ with $\wp'+"'"+r'^2+\wp\wp'+"'"+r'=\wp^3+A\wp^2+B\wp+C$; the relation also holds pointwise at every $x$ with $\Theta(x)\neq0$.')
+add('lemma', 'lem:wp-q-expansions', '$q$-expansions of $\\wp$ and $\\wp\'$ near $X=1$',
+    ['lambert', 'lambertZ', 'hasSum_sK', 'Qn', 'tW', 'tPp', 'hasSum_tW_int', 'hasSum_tPp_int', 'hasSum_binom_two',
+     'rhoC', 'piC', 'hasSum_rhoC', 'hasSum_piC', 'norm_rhoC_le', 'norm_piC_le', 'rhoC_zero', 'rhoC_one', 'piC_zero'],
+    ['def:s-k', 'lem:binomial-expansion', 'prop:wp-construction'], False,
+    r'Lambert: $\sum_mF(m)\frac{q^m}{1-q^m}=\sum_n\big(\sum_{d\mid n}F(d)\big)q^n$, so $s_k=\sum_m m^kQ_m$ with $Q_m=q^m/(1-q^m)$. For $|y|=1$, $\wp(y)+2s_1=\frac{y}{(1-y)^2}+\sum_m mQ_m(y^m+y^{-m})$ and $\wp'+"'"+r'(y)-s_1=\frac{y^2}{(1-y)^3}+\sum_mQ_m\big(\binom m2y^m-\binom{m+1}2y^{-m}\big)$; with $y=1+h$ the sums are power series $\sum_k\rho_kh^k$, $\sum_k\pi_kh^k$ with $|\rho_k|,|\pi_k|\le1$, $\rho_0=2s_1$, $\rho_1=0$, $\pi_0=-s_1$.')
+_upd('thm:VI', text=r'$\wp,\wp'+"'"+r'$ generate $F_K(q)$; their poles are $2\mathfrak p_1$ and $3\mathfrak p_1$; they satisfy $\wp'+"'"+r'^2+\wp\wp'+"'"+r'=\wp^3+B\wp+C$; the reflection acts by $\wp\mapsto\wp$, $\wp'+"'"+r'\mapsto-\wp'+"'"+r'-\wp$. (The four parts are the nodes below.)')
+_adduses('thm:VI', 'thm:VI-generation', 'thm:VI-poles', 'thm:VI-relation', 'thm:VI-reflection')
+add('theorem', 'thm:VI-generation', 'Theorem VI (i): generation', ['thmVI_generation'],
+    ['prop:wp-generation', 'prop:wp-valuations'], False,
+    r'$F_K(q)=K(\wp,\wp'+"'"+r')$.')
+add('theorem', 'thm:VI-poles', 'Theorem VI (ii): poles', ['thmVI_poles'], ['prop:wp-valuations'], False,
+    r'$w_1(\wp)=-2$ and $w_1(\wp'+"'"+r')=-3$; these are the only poles mod$^\times q$.')
+add('theorem', 'thm:VI-relation', 'Theorem VI (iii): the cubic relation', ['thmVI_relation'],
+    ['prop:wp-structural-relation', 'lem:wp-q-expansions', 'def:coeffB', 'def:coeffC'], False,
+    r'$\wp'+"'"+r'^2+\wp\wp'+"'"+r'=\wp^3+B\wp+C$ with $B=-5s_3$, $C=-\frac1{12}(5s_3+7s_5)$. (Remaining step: comparing the coefficients of $h^0,\dots,h^6$ in the expansion at $X=1+h$ gives $A=0$, $B=-2\pi_1-3\rho_2$, $C=-\pi_1-3\pi_2-2\pi_3-5\rho_2-7\rho_3-3\rho_4$, and termwise integer identities identify these with $-5s_3$ and $-\frac1{12}(5s_3+7s_5)$.)')
+add('theorem', 'thm:VI-reflection', 'Theorem VI (iv): reflection', ['thmVI_reflection'],
+    ['prop:wp-structural-relation'], False,
+    r'$\wp(X^{-1})=\wp(X)$ and $\wp'+"'"+r'(X^{-1})=-\wp'+"'"+r'(X)-\wp(X)$.')
+# place the Theorem VI nodes next to the theorem
+_vi_pre = ['prop:wp-construction', 'prop:wp-valuations', 'lem:wp-q-expansions', 'prop:wp-generation', 'prop:wp-structural-relation']
+_vi_post = ['thm:VI-generation', 'thm:VI-poles', 'thm:VI-relation', 'thm:VI-reflection']
+_moved = {i['label']: i for i in ITEMS if i['label'] in _vi_pre + _vi_post}
+ITEMS[:] = [i for i in ITEMS if i['label'] not in _moved]
+_k = next(n for n, i in enumerate(ITEMS) if i['label'] == 'thm:VI')
+ITEMS[_k:_k + 1] = [_moved[l] for l in _vi_pre] + [ITEMS[_k]] + [_moved[l] for l in _vi_post]

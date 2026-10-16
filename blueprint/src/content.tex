@@ -864,15 +864,122 @@ $B=-5s_3$ (formula (37)).
 $C=-\tfrac1{12}(5s_3+7s_5)$, an integral power series in $q$ (formula (38)).
 \end{definition}
 
+\begin{proposition}[Construction of $\wp$ and $\wp'$ as quotients]
+\label{prop:wp-construction}
+\lean{AnalyticTheory.Th, AnalyticTheory.Th_ne_zero, AnalyticTheory.anVal_Th, AnalyticTheory.linF, AnalyticTheory.Rq, AnalyticTheory.Rq_spec, AnalyticTheory.tP, AnalyticTheory.tP', AnalyticTheory.tP_null, AnalyticTheory.tP'_null, AnalyticTheory.GP, AnalyticTheory.GP', AnalyticTheory.GP_hasSum, AnalyticTheory.GP'_hasSum, AnalyticTheory.wpSeries_hasSum, AnalyticTheory.wpPrimeSeries_hasSum, AnalyticTheory.wpAlg, AnalyticTheory.wpPrimeAlg, AnalyticTheory.wpAlg_evalsTo, AnalyticTheory.wpPrimeAlg_evalsTo, AnalyticTheory.evalsTo_unique, AnalyticTheory.wpM_eq, AnalyticTheory.wpPrimeM_eq, AnalyticTheory.Gw, AnalyticTheory.Gw', AnalyticTheory.wpAlg_eq_Gw, AnalyticTheory.wpPrimeAlg_eq_Gw'}
+\uses{def:wp, def:wp-prime, prop:theta-phi, prop:null-family-sum, thm:division-hol}
+\leanok
+Let $\Theta=T_{X-1}$ and $R_n=\Theta/(X-q^{-n})\in H_K$. The families $q^{-n}XR_n^2$ and $-q^{-n}X^2R_n^3$ are null families, with sums $G,G'\in H_K$, and $\wp=G/\Theta^2-2s_1$, $\wp'=G'/\Theta^3+s_1$: these elements of $M_K$ have the values of the defining series at every point where $\Theta\ne0$, and are the unique such elements.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{Th, Th\_ne\_zero, anVal\_Th, linF, Rq, Rq\_spec, tP, tP', tP\_null, tP'\_null, GP, GP', GP\_hasSum, GP'\_hasSum, wpSeries\_hasSum, wpPrimeSeries\_hasSum, wpAlg, wpPrimeAlg, wpAlg\_evalsTo, wpPrimeAlg\_evalsTo, evalsTo\_unique, wpM\_eq, wpPrimeM\_eq, Gw, Gw', wpAlg\_eq\_Gw, wpPrimeAlg\_eq\_Gw'}.
+\end{proof}
+
+\begin{proposition}[Periodicity and poles of $\wp,\wp'$]
+\label{prop:wp-valuations}
+\lean{AnalyticTheory.anVal_wpAlg_one, AnalyticTheory.anVal_wpPrimeAlg_one, AnalyticTheory.anVal_wpAlg_nonneg, AnalyticTheory.anVal_wpPrimeAlg_nonneg, AnalyticTheory.evalsTo_translation, AnalyticTheory.anVal_periodic, AnalyticTheory.wpAlg_mem_Fq, AnalyticTheory.wpPrimeAlg_mem_Fq, AnalyticTheory.evalsTo_reflection, AnalyticTheory.Th_ne_zero_at, AnalyticTheory.pDiv, AnalyticTheory.degQ_pDiv}
+\uses{prop:wp-construction, def:analytic-valuation, def:Fq, def:deg-q}
+\leanok
+$\wp,\wp'\in F_K(q)$; $w_1(\wp)=-2$, $w_1(\wp')=-3$, and $w_\alpha(\wp),w_\alpha(\wp')\ge0$ for $\alpha$ not conjugate to $1$ mod$^\times q$. The divisor $\mathfrak p_1$ (multiplicity $1$ on $q^{\mathbb Z}$) has $\deg_q\mathfrak p_1=1$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{anVal\_wpAlg\_one, anVal\_wpPrimeAlg\_one, anVal\_wpAlg\_nonneg, anVal\_wpPrimeAlg\_nonneg, evalsTo\_translation, anVal\_periodic, wpAlg\_mem\_Fq, wpPrimeAlg\_mem\_Fq, evalsTo\_reflection, Th\_ne\_zero\_at, pDiv, degQ\_pDiv}.
+\end{proof}
+
+\begin{lemma}[$q$-expansions of $\wp$ and $\wp'$ near $X=1$]
+\label{lem:wp-q-expansions}
+\lean{AnalyticTheory.lambert, AnalyticTheory.lambertZ, AnalyticTheory.hasSum_sK, AnalyticTheory.Qn, AnalyticTheory.tW, AnalyticTheory.tPp, AnalyticTheory.hasSum_tW_int, AnalyticTheory.hasSum_tPp_int, AnalyticTheory.hasSum_binom_two, AnalyticTheory.rhoC, AnalyticTheory.piC, AnalyticTheory.hasSum_rhoC, AnalyticTheory.hasSum_piC, AnalyticTheory.norm_rhoC_le, AnalyticTheory.norm_piC_le, AnalyticTheory.rhoC_zero, AnalyticTheory.rhoC_one, AnalyticTheory.piC_zero}
+\uses{def:s-k, lem:binomial-expansion, prop:wp-construction}
+\leanok
+Lambert: $\sum_mF(m)\frac{q^m}{1-q^m}=\sum_n\big(\sum_{d\mid n}F(d)\big)q^n$, so $s_k=\sum_m m^kQ_m$ with $Q_m=q^m/(1-q^m)$. For $|y|=1$, $\wp(y)+2s_1=\frac{y}{(1-y)^2}+\sum_m mQ_m(y^m+y^{-m})$ and $\wp'(y)-s_1=\frac{y^2}{(1-y)^3}+\sum_mQ_m\big(\binom m2y^m-\binom{m+1}2y^{-m}\big)$; with $y=1+h$ the sums are power series $\sum_k\rho_kh^k$, $\sum_k\pi_kh^k$ with $|\rho_k|,|\pi_k|\le1$, $\rho_0=2s_1$, $\rho_1=0$, $\pi_0=-s_1$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{lambert, lambertZ, hasSum\_sK, Qn, tW, tPp, hasSum\_tW\_int, hasSum\_tPp\_int, hasSum\_binom\_two, rhoC, piC, hasSum\_rhoC, hasSum\_piC, norm\_rhoC\_le, norm\_piC\_le, rhoC\_zero, rhoC\_one, piC\_zero}.
+\end{proof}
+
+\begin{proposition}[Generation of $L(n\mathfrak p_1)$ by $\wp^i\wp'^j$]
+\label{prop:wp-generation}
+\lean{AnalyticTheory.InL, AnalyticTheory.InL_iff, AnalyticTheory.mono, AnalyticTheory.spanMono, AnalyticTheory.InL_mem_spanMono, AnalyticTheory.InL_mem_adjoin, AnalyticTheory.Fq_le_adjoin, AnalyticTheory.exact_factor_one, AnalyticTheory.exists_const_approx, AnalyticTheory.polePart, AnalyticTheory.divisorOf_periodic}
+\uses{prop:wp-valuations, prop:abel-jacobi-2, cor:periodic-with-prescribed-zero}
+\leanok
+Every $f\in F_K(q)$ with poles only on $q^{\mathbb Z}$, of order $\le n$, lies in the $K$-span of $\wp^i\wp'^j$ ($j\le1$, $2i+3j\le n$) (subtracting suitable monomials lowers the pole order; a function without poles is constant by Proposition 2). Every $f\in F_K(q)$ is a quotient of two such functions, hence $F_K(q)\subseteq K(\wp,\wp')$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{InL, InL\_iff, mono, spanMono, InL\_mem\_spanMono, InL\_mem\_adjoin, Fq\_le\_adjoin, exact\_factor\_one, exists\_const\_approx, polePart, divisorOf\_periodic}.
+\end{proof}
+
+\begin{proposition}[Structure of the cubic relation]
+\label{prop:wp-structural-relation}
+\lean{AnalyticTheory.exists_rel, AnalyticTheory.InL_rel, AnalyticTheory.Uf, AnalyticTheory.Vf, AnalyticTheory.refl_wpAlg, AnalyticTheory.refl_wpPrimeAlg, AnalyticTheory.refl_algebraMap, AnalyticTheory.wpAlg_ne_const, AnalyticTheory.two_wpPrime_add_wp_ne_zero, AnalyticTheory.rel_pointwise}
+\uses{prop:wp-generation, def:reflection}
+\leanok
+$\wp\circ\varepsilon=\wp$ and $\wp'\circ\varepsilon=-\wp'-\wp$. Since $\wp'^2+\wp\wp'-\wp^3\in L(5\mathfrak p_1)$ is $\varepsilon$-invariant, there are $A,B,C\in K$ with $\wp'^2+\wp\wp'=\wp^3+A\wp^2+B\wp+C$; the relation also holds pointwise at every $x$ with $\Theta(x)\neq0$.
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_rel, InL\_rel, Uf, Vf, refl\_wpAlg, refl\_wpPrimeAlg, refl\_algebraMap, wpAlg\_ne\_const, two\_wpPrime\_add\_wp\_ne\_zero, rel\_pointwise}.
+\end{proof}
+
 \begin{theorem}[Theorem VI]
 \label{thm:VI}
 \lean{AnalyticTheory.thmVI_generation, AnalyticTheory.thmVI_poles, AnalyticTheory.thmVI_relation, AnalyticTheory.thmVI_reflection}
-\uses{def:wp, def:wp-prime, def:coeffB, def:coeffC, def:Fq, def:reflection}
+\uses{def:wp, def:wp-prime, def:coeffB, def:coeffC, def:Fq, def:reflection, thm:VI-generation, thm:VI-poles, thm:VI-relation, thm:VI-reflection}
 \leanok
-$\wp,\wp\'$ generate $F_K(q)$; the poles are $2\mathfrak p_1$ and $3\mathfrak p_1$; they satisfy $\wp\'^2+\wp\wp\'=\wp^3+B\wp+C$; the reflection acts as stated.
+$\wp,\wp'$ generate $F_K(q)$; their poles are $2\mathfrak p_1$ and $3\mathfrak p_1$; they satisfy $\wp'^2+\wp\wp'=\wp^3+B\wp+C$; the reflection acts by $\wp\mapsto\wp$, $\wp'\mapsto-\wp'-\wp$. (The four parts are the nodes below.)
 \end{theorem}
 \begin{proof}
 See the Lean proof of \texttt{thmVI\_generation, thmVI\_poles, thmVI\_relation, thmVI\_reflection}.
+\end{proof}
+
+\begin{theorem}[Theorem VI (i): generation]
+\label{thm:VI-generation}
+\lean{AnalyticTheory.thmVI_generation}
+\uses{prop:wp-generation, prop:wp-valuations}
+\leanok
+$F_K(q)=K(\wp,\wp')$.
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{thmVI\_generation}.
+\end{proof}
+
+\begin{theorem}[Theorem VI (ii): poles]
+\label{thm:VI-poles}
+\lean{AnalyticTheory.thmVI_poles}
+\uses{prop:wp-valuations}
+\leanok
+$w_1(\wp)=-2$ and $w_1(\wp')=-3$; these are the only poles mod$^\times q$.
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{thmVI\_poles}.
+\end{proof}
+
+\begin{theorem}[Theorem VI (iii): the cubic relation]
+\label{thm:VI-relation}
+\lean{AnalyticTheory.thmVI_relation}
+\uses{prop:wp-structural-relation, lem:wp-q-expansions, def:coeffB, def:coeffC}
+\leanok
+$\wp'^2+\wp\wp'=\wp^3+B\wp+C$ with $B=-5s_3$, $C=-\frac1{12}(5s_3+7s_5)$. (Remaining step: comparing the coefficients of $h^0,\dots,h^6$ in the expansion at $X=1+h$ gives $A=0$, $B=-2\pi_1-3\rho_2$, $C=-\pi_1-3\pi_2-2\pi_3-5\rho_2-7\rho_3-3\rho_4$, and termwise integer identities identify these with $-5s_3$ and $-\frac1{12}(5s_3+7s_5)$.)
+\end{theorem}
+\begin{proof}
+See the Lean proof of \texttt{thmVI\_relation}.
+\end{proof}
+
+\begin{theorem}[Theorem VI (iv): reflection]
+\label{thm:VI-reflection}
+\lean{AnalyticTheory.thmVI_reflection}
+\uses{prop:wp-structural-relation}
+\leanok
+$\wp(X^{-1})=\wp(X)$ and $\wp'(X^{-1})=-\wp'(X)-\wp(X)$.
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{thmVI\_reflection}.
 \end{proof}
 
 \begin{definition}[Reflection]
@@ -880,7 +987,7 @@ See the Lean proof of \texttt{thmVI\_generation, thmVI\_poles, thmVI\_relation, 
 \lean{AnalyticTheory.reflectionM}
 \uses{def:M-K}
 \leanok
-$\varepsilon:f(X)\mapsto f(X^{-1})$. Placeholder.
+$\varepsilon:f(X)\mapsto f(X^{-1})$, the ring automorphism of $M_K$ induced by $\sum a_nX^n\mapsto\sum a_nX^{-n}$ on $H_K$.
 \end{definition}
 
 \begin{remark}[Weierstraß form (char $\ne 2,3$)]
