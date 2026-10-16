@@ -679,4 +679,148 @@ theorem exists_denominator {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K 
 
 end affine
 
+section integral
+
+variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+theorem mem_LS_polePart {y : FqSub K q} (hy0 : y ≠ 0) :
+    y ∈ LS q (polePart (divisorOf K (y : MeroRing K))) :=
+  fun _ hα => anVal_ge_neg_polePart hy0 hα
+
+include hq0 hq1 in
+/-- `L((n+1)D) ⊆ y L(nD) + L(2D)` for `n ≥ 1`, `D` the pole divisor of `y`. -/
+theorem LS_succ_le {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
+    (hDdef : D = polePart (divisorOf K (y : MeroRing K))) (hdeg : 0 < degQ K q D) {n : ℕ}
+    (hn : 1 ≤ n) :
+    LS q ((n + 1) • D) ≤ (LS q (n • D)).map (LinearMap.mulLeft K y) ⊔ LS q (2 • D) := by
+  have hDP : D ∈ DivisorsPeriodic K q := hDdef ▸ polePart_mem (divisorOf_periodic hq0 y.2)
+  have hD0 : ∀ α, 0 ≤ D α := fun α => hDdef ▸ le_max_right _ _
+  have hyD : y ∈ LS q D := hDdef ▸ mem_LS_polePart hy0
+  have hmem : ∀ k : ℕ, k • D ∈ DivisorsPeriodic K q := fun k => (DivisorsPeriodic K q).nsmul_mem hDP k
+  have hfr : ∀ k : ℕ, 1 ≤ k → (Module.finrank K (LS q (k • D)) : ℤ) = k * degQ K q D := fun k hk => by
+    rw [finrank_LS hq0 hq1 (hmem k) (by rw [degQ_nsmul hq0 hq1 hDP]; positivity),
+      degQ_nsmul hq0 hq1 hDP]
+  haveI := fun k : ℕ => finiteDimensional_LS hq0 hq1 (hmem k)
+  haveI : FiniteDimensional K (LS q D) := finiteDimensional_LS hq0 hq1 hDP
+  have hinj : Function.Injective (LinearMap.mulLeft K y) := mul_right_injective₀ hy0
+  set Y := (LS q (n • D)).map (LinearMap.mulLeft K y) with hYdef
+  haveI : FiniteDimensional K Y :=
+    LinearEquiv.finiteDimensional (Submodule.equivMapOfInjective _ hinj _)
+  have hY : Module.finrank K Y = Module.finrank K (LS q (n • D)) :=
+    (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ hinj _)).symm
+  have hYle : Y ≤ LS q ((n + 1) • D) := by
+    rintro _ ⟨h, hh, rfl⟩
+    have := mul_mem_LS hyD hh
+    rwa [show D + n • D = (n + 1) • D by rw [succ_nsmul, add_comm]] at this
+  have hL2le : LS q (2 • D) ≤ LS q ((n + 1) • D) := LS_mono (fun α => by
+    simp only [Pi.smul_apply, nsmul_eq_mul]
+    have := hD0 α
+    have : (2 : ℤ) ≤ ((n + 1 : ℕ) : ℤ) := by exact_mod_cast (by omega : 2 ≤ n + 1)
+    push_cast at this ⊢
+    nlinarith)
+  have hinf : Y ⊓ LS q (2 • D) ≤ (LS q D).map (LinearMap.mulLeft K y) := by
+    rintro g ⟨⟨h, hh, rfl⟩, hg⟩
+    refine ⟨h, fun α hα => ?_, rfl⟩
+    by_cases hDα : D α = 0
+    · have := hh α hα
+      simp only [Pi.smul_apply, hDα, smul_zero, neg_zero] at this
+      rw [hDα, neg_zero]; exact this
+    · have hgα := hg α hα
+      have hy' : (y : MeroRing K) ≠ 0 := fun h => hy0 (Subtype.ext h)
+      have hyα := anVal_of_divisorOf hy' rfl hα
+      have hDv : D α = -(divisorOf K (y : MeroRing K) α) := by
+        have := hD0 α; rw [hDdef] at hDα this ⊢; unfold polePart at hDα this ⊢; omega
+      change _ ≤ anVal K α ((y : MeroRing K) * h) at hgα
+      rw [(anVal_isValuation K α hα).2.2.1, hyα] at hgα
+      simp only [Pi.smul_apply, smul_eq_mul] at hgα
+      by_cases htop : anVal K α (h : MeroRing K) = ⊤
+      · rw [htop]; exact le_top
+      · obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp htop
+        rw [← hv] at hgα ⊢
+        have : -(2 * D α) ≤ divisorOf K (y : MeroRing K) α + v := by exact_mod_cast hgα
+        exact_mod_cast (by omega : -(D α) ≤ v)
+  have hsum := Submodule.finrank_sup_add_finrank_inf_eq Y (LS q (2 • D))
+  have hinfle : Module.finrank K ↥(Y ⊓ LS q (2 • D)) ≤ Module.finrank K (LS q D) := by
+    calc _ ≤ Module.finrank K ((LS q D).map (LinearMap.mulLeft K y)) := Submodule.finrank_mono hinf
+      _ = _ := (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ hinj _)).symm
+  have hD1 := finrank_LS hq0 hq1 hDP hdeg
+  have hn1 := hfr n hn
+  have hn2 := hfr 2 (by norm_num)
+  have hn3 := hfr (n + 1) (by omega)
+  have hle : Y ⊔ LS q (2 • D) ≤ LS q ((n + 1) • D) := sup_le hYle hL2le
+  have heq := Submodule.eq_of_le_of_finrank_le hle (by
+    push_cast at hn1 hn2 hn3
+    have : (Module.finrank K (LS q ((n + 1) • D)) : ℤ) ≤ Module.finrank K ↥(Y ⊔ LS q (2 • D)) := by
+      have h1 : (Module.finrank K ↥(Y ⊔ LS q (2 • D)) : ℤ) + Module.finrank K ↥(Y ⊓ LS q (2 • D)) =
+          Module.finrank K Y + Module.finrank K (LS q (2 • D)) := by exact_mod_cast hsum
+      have h2 : (Module.finrank K ↥(Y ⊓ LS q (2 • D)) : ℤ) ≤ Module.finrank K (LS q D) := by
+        exact_mod_cast hinfle
+      rw [hY] at h1
+      nlinarith
+    exact_mod_cast this)
+  rw [heq]
+
+include hq0 hq1 in
+/-- Functions with poles only at the poles of `y` are integral over `K[y]`. -/
+theorem isIntegral_of_AD {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
+    (hDdef : D = polePart (divisorOf K (y : MeroRing K))) (hdeg : 0 < degQ K q D)
+    {f : FqSub K q} (hf : f ∈ AD q D) :
+    IsIntegral (Algebra.adjoin K ({y} : Set (FqSub K q))) f := by
+  classical
+  set R := Algebra.adjoin K ({y} : Set (FqSub K q))
+  have hDP : D ∈ DivisorsPeriodic K q := hDdef ▸ polePart_mem (divisorOf_periodic hq0 y.2)
+  have hD0 : ∀ α, 0 ≤ D α := fun α => hDdef ▸ le_max_right _ _
+  have hyD : y ∈ LS q D := hDdef ▸ mem_LS_polePart hy0
+  have hyR : y ∈ R := Algebra.subset_adjoin rfl
+  set N : Submodule R (FqSub K q) := Submodule.span R (LS q (2 • D) : Set (FqSub K q))
+  have hyAD : y ∈ AD q D := by
+    have := LS_le_AD (q := q) (D := D) 1
+    rw [one_smul] at this
+    exact this hyD
+  have hRAD : R ≤ AD q D := Algebra.adjoin_le (by simpa using hyAD)
+  have hNAD : ∀ x ∈ N, x ∈ AD q D := by
+    intro x hx
+    induction hx using Submodule.span_induction with
+    | mem x hx => exact LS_le_AD 2 hx
+    | zero => exact (AD q D).zero_mem
+    | add x z _ _ hx hz => exact (AD q D).add_mem hx hz
+    | smul r x _ hx => exact (AD q D).mul_mem (hRAD r.2) hx
+  have hLN : ∀ k : ℕ, (LS q (k • D) : Set (FqSub K q)) ⊆ N := by
+    intro k
+    induction k using Nat.strong_induction_on with
+    | _ k ih =>
+      by_cases hk : k ≤ 2
+      · intro x hx
+        refine Submodule.subset_span (LS_mono (fun α => ?_) hx)
+        simp only [Pi.smul_apply, nsmul_eq_mul]
+        have := hD0 α
+        have : (k : ℤ) ≤ 2 := by exact_mod_cast hk
+        push_cast
+        nlinarith
+      · obtain ⟨n, rfl⟩ : ∃ n, k = n + 1 := ⟨k - 1, by omega⟩
+        intro x hx
+        have hx' := LS_succ_le hq0 hq1 hy0 hDdef hdeg (n := n) (by omega) hx
+        obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hx'
+        refine N.add_mem ?_ (Submodule.subset_span hb)
+        obtain ⟨h, hh, rfl⟩ := ha
+        have hhN := ih n (by omega) hh
+        exact N.smul_mem (⟨y, hyR⟩ : R) hhN
+  have hfg : N.FG := by
+    haveI := finiteDimensional_LS hq0 hq1 ((DivisorsPeriodic K q).nsmul_mem hDP 2)
+    obtain ⟨s, hs⟩ := (Submodule.fg_iff_finiteDimensional (LS q (2 • D))).mpr inferInstance
+    refine ⟨s, ?_⟩
+    show Submodule.span R (s : Set (FqSub K q)) = Submodule.span R (LS q (2 • D) : Set (FqSub K q))
+    rw [← hs, Submodule.span_span_of_tower]
+  have hN0 : N ≠ ⊥ := by
+    intro h
+    have h1 : (1 : FqSub K q) ∈ N := Submodule.subset_span (one_mem_LS (fun α => by
+      simp only [Pi.smul_apply, nsmul_eq_mul]; have := hD0 α; positivity))
+    rw [h] at h1
+    exact one_ne_zero ((Submodule.mem_bot R).mp h1)
+  refine isIntegral_of_smul_mem_submodule N hN0 hfg f (fun x hx => ?_)
+  obtain ⟨k, hk⟩ := exists_LS_of_AD hq0 hq1 hD0 ((AD q D).mul_mem hf (hNAD x hx))
+  exact hLN k hk
+
+end integral
+
 end AnalyticTheory
