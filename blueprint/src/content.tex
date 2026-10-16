@@ -707,6 +707,18 @@ Let $(f_i)$ be elements of $H_K$ whose Gauss norms $\|f_i\|_r$ tend to $0$ along
 See the Lean proof of \texttt{NullFamily, tail\_norm\_le, hol\_hasSum\_family, exists\_finite, tendsto\_prod, hasSum\_coeff, sum, hasSum\_sum, approx, sum\_convergent}.
 \end{proof}
 
+\begin{proposition}[Division by the minimal polynomial]
+\label{prop:phi-division}
+\lean{AnalyticTheory.polyHol, AnalyticTheory.hol_phi_division, AnalyticTheory.phi_dvd_iff, AnalyticTheory.polyHol_minpoly_prime, AnalyticTheory.exists_coord_bound, AnalyticTheory.exists_quot, AnalyticTheory.phi_quot_bound, AnalyticTheory.coord_bound, AnalyticTheory.wt_le_of_conv, AnalyticTheory.holCoeff_polyHol, AnalyticTheory.polyHol_apply}
+\uses{prop:laurent-coefficients, prop:null-family-sum}
+\leanok
+Let $\alpha\in\Omega^\times$ with minimal polynomial $\varphi$ over $K$. Every $f\in H_K$ can be written $f=\varphi g+r$ with $g\in H_K$ and $r\in K[X]$ of degree $<\deg\varphi$; and $\varphi\mid f$ in $H_K$ iff $f(\alpha)=0$. In particular $\varphi$ is a prime element of $H_K$. (The coordinates of $X^k$ modulo $\varphi$ are bounded by $C|\alpha|^k$, since $K(\alpha)$ is a finite-dimensional normed space; the Gauss lemma bounds the quotients.)
+\end{proposition}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{polyHol, hol\_phi\_division, phi\_dvd\_iff, polyHol\_minpoly\_prime, exists\_coord\_bound, exists\_quot, phi\_quot\_bound, coord\_bound, wt\_le\_of\_conv, holCoeff\_polyHol, polyHol\_apply}.
+\end{proof}
+
 \section{The Weierstra\ss\ function and the absolute invariant (\S 3)}
 
 \begin{definition}[Derivation $D$]

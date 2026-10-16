@@ -8,6 +8,7 @@ import AnalyticTheory.Identity
 import AnalyticTheory.Gauss
 import AnalyticTheory.HolSeq
 import AnalyticTheory.FrechetLaurent
+import AnalyticTheory.PolyHol
 import AnalyticTheory.WeierstrassPrep
 import AnalyticTheory.Zeros
 import AnalyticTheory.Valuation
