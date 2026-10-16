@@ -295,18 +295,142 @@ theorem anVal_meroExt {α : Omega K} (hα : α ≠ 0) {f : MeroRing K} (hf : f �
 
 end valLaw
 
+section divExt
+
+variable {K L}
+variable (ψ : Omega K ≃ₐ[K] Omega L)
+
+/-- The divisor `m'` of Remark 1: `m'_{ψα} = e(α) m_α`. -/
+noncomputable def divExtFun (m : Omega K → ℤ) : Omega L → ℤ :=
+  open Classical in
+  fun β => if β = 0 then 0 else (ramIndex K L ψ (ψ.symm β) : ℤ) * m (ψ.symm β)
+
+theorem divExtFun_apply (m : Omega K → ℤ) {α : Omega K} (hα : α ≠ 0) :
+    divExtFun ψ m (ψ α) = (ramIndex K L ψ α : ℤ) * m α := by
+  unfold divExtFun
+  rw [if_neg ((map_ne_zero ψ).mpr hα), AlgEquiv.symm_apply_apply]
+
+theorem divExtFun_zero_pt (m : Omega K → ℤ) : divExtFun ψ m 0 = 0 := by
+  simp [divExtFun]
+
+theorem divExtFun_add (m n : Omega K → ℤ) :
+    divExtFun ψ (m + n) = divExtFun ψ m + divExtFun ψ n := by
+  funext β; unfold divExtFun; by_cases h : β = 0 <;> simp [h, mul_add]
+
+theorem ramIndex_conj {β β' : Omega L} (hβ : β ≠ 0) (h : minpoly L β = minpoly L β') :
+    ramIndex K L ψ (ψ.symm β) = ramIndex K L ψ (ψ.symm β') ∧
+      minpoly K (ψ.symm β) = minpoly K (ψ.symm β') := by
+  have hroot : Polynomial.aeval β' (minpoly L β) = 0 := by rw [h]; exact minpoly.aeval L β'
+  obtain ⟨τ, hτ⟩ := minpoly.exists_algEquiv_of_root (Algebra.IsAlgebraic.isAlgebraic β) hroot
+  -- `τ β' = β`
+  have hβ' : β' ≠ 0 := by rintro rfl; rw [map_zero] at hτ; exact hβ hτ.symm
+  let χ : Omega K ≃ₐ[K] Omega K := (ψ.trans (τ.restrictScalars K)).trans ψ.symm
+  have hχ : χ (ψ.symm β') = ψ.symm β := by
+    show ψ.symm (τ (ψ (ψ.symm β'))) = _
+    rw [AlgEquiv.apply_symm_apply]; exact congrArg ψ.symm hτ
+  have h0 : ψ.symm β' ≠ 0 := (map_ne_zero _).mpr hβ'
+  have h0' : ψ.symm β ≠ 0 := (map_ne_zero _).mpr hβ
+  refine ⟨?_, ?_⟩
+  · rw [ramIndex_eq_eIdx ψ h0', ramIndex_eq_eIdx ψ h0, AlgEquiv.apply_symm_apply,
+      AlgEquiv.apply_symm_apply, ← hχ, eIdx_aut K χ h0, ← hτ, eIdx_aut L τ hβ']
+  · rw [← hχ, minpoly.algEquiv_eq]
+
+theorem divExtFun_mem {m : Omega K → ℤ} (hm : m ∈ Divisors K) : divExtFun ψ m ∈ Divisors L := by
+  classical
+  refine ⟨divExtFun_zero_pt ψ m, fun r r' hr hrr' => ?_, fun β β' h => ?_⟩
+  · refine ((hm.2.1 r r' hr hrr').image ψ).subset (fun β ⟨h1, h2, h3⟩ => ?_)
+    have hβ : β ≠ 0 := by rintro rfl; exact h3 (divExtFun_zero_pt ψ m)
+    refine ⟨ψ.symm β, ⟨?_, ?_, ?_⟩, AlgEquiv.apply_symm_apply ψ β⟩
+    · show r ≤ ‖ψ.symm β‖
+      rw [← psi_norm K L ψ, AlgEquiv.apply_symm_apply]; exact h1
+    · show ‖ψ.symm β‖ ≤ r'
+      rw [← psi_norm K L ψ, AlgEquiv.apply_symm_apply]; exact h2
+    · intro h0; apply h3
+      unfold divExtFun; rw [if_neg hβ, h0, mul_zero]
+  · by_cases hβ : β = 0
+    · have hβ' : β' = 0 := by
+        have : minpoly L β' = Polynomial.X := by rw [← h, hβ, minpoly.zero]
+        have h2 := minpoly.aeval L β'
+        rw [this] at h2; simpa using h2
+      rw [hβ, hβ']
+    · obtain ⟨h1, h2⟩ := ramIndex_conj ψ hβ h
+      have hβ' : β' ≠ 0 := by
+        rintro rfl
+        rw [minpoly.zero] at h
+        have h3 := minpoly.aeval L β
+        rw [h] at h3; simp at h3; exact hβ h3
+      unfold divExtFun
+      rw [if_neg hβ, if_neg hβ', h1, hm.2.2 _ _ h2]
+
+theorem divExtFun_periodic {q : K} {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) :
+    divExtFun ψ m ∈ DivisorsPeriodic L (algebraMap K L q) := by
+  classical
+  refine ⟨divExtFun_mem ψ hm.1, fun β => ?_⟩
+  have e : ψ.symm (algebraMap L (Omega L) (algebraMap K L q) * β) =
+      algebraMap K (Omega K) q * ψ.symm β := by
+    rw [map_mul, ← IsScalarTower.algebraMap_apply, AlgEquiv.commutes]
+  by_cases hq : q = 0
+  · unfold divExtFun
+    simp only [hq, map_zero, zero_mul, ite_true]
+    split_ifs with h
+    · rfl
+    · have := hm.2 (ψ.symm β); rw [hq, map_zero, zero_mul] at this
+      rw [← this]
+      have h0 := hm.1.1
+      rw [h0]; simp
+  have hqΩ : algebraMap K (Omega K) q ≠ 0 := (map_ne_zero _).mpr hq
+  have hqΩ' : algebraMap L (Omega L) (algebraMap K L q) ≠ 0 :=
+    (map_ne_zero _).mpr ((map_ne_zero _).mpr hq)
+  unfold divExtFun
+  by_cases hβ : β = 0
+  · simp [hβ]
+  rw [if_neg (mul_ne_zero hqΩ' hβ), if_neg hβ, e, hm.2]
+  congr 2
+  unfold ramIndex
+  rw [map_mul, AlgEquiv.commutes, AlgEquiv.apply_symm_apply,
+    IsScalarTower.algebraMap_apply K L (Omega L)]
+  have e1 : IntermediateField.adjoin K ({algebraMap K (Omega K) q * ψ.symm β} : Set (Omega K)) =
+      IntermediateField.adjoin K ({ψ.symm β} : Set (Omega K)) := by
+    apply le_antisymm
+    · rw [IntermediateField.adjoin_simple_le_iff]
+      exact mul_mem (IntermediateField.algebraMap_mem _ _) (IntermediateField.mem_adjoin_simple_self _ _)
+    · rw [IntermediateField.adjoin_simple_le_iff]
+      have : ψ.symm β = algebraMap K (Omega K) q⁻¹ * (algebraMap K (Omega K) q * ψ.symm β) := by
+        rw [← mul_assoc, ← map_mul, inv_mul_cancel₀ hq, map_one, one_mul]
+      have h1 := mul_mem (IntermediateField.algebraMap_mem
+        (IntermediateField.adjoin K ({algebraMap K (Omega K) q * ψ.symm β} : Set (Omega K))) q⁻¹)
+        (IntermediateField.mem_adjoin_simple_self K (algebraMap K (Omega K) q * ψ.symm β))
+      rwa [← this] at h1
+  have e2 : IntermediateField.adjoin L ({algebraMap L (Omega L) (algebraMap K L q) * β} : Set (Omega L)) =
+      IntermediateField.adjoin L ({β} : Set (Omega L)) := by
+    have hqL : algebraMap K L q ≠ 0 := (map_ne_zero _).mpr hq
+    apply le_antisymm
+    · rw [IntermediateField.adjoin_simple_le_iff]
+      exact mul_mem (IntermediateField.algebraMap_mem _ _) (IntermediateField.mem_adjoin_simple_self _ _)
+    · rw [IntermediateField.adjoin_simple_le_iff]
+      have : β = algebraMap L (Omega L) (algebraMap K L q)⁻¹ *
+          (algebraMap L (Omega L) (algebraMap K L q) * β) := by
+        rw [← mul_assoc, ← map_mul, inv_mul_cancel₀ hqL, map_one, one_mul]
+      have h1 := mul_mem (IntermediateField.algebraMap_mem (IntermediateField.adjoin L
+        ({algebraMap L (Omega L) (algebraMap K L q) * β} : Set (Omega L))) (algebraMap K L q)⁻¹)
+        (IntermediateField.mem_adjoin_simple_self L (algebraMap L (Omega L) (algebraMap K L q) * β))
+      rwa [← this] at h1
+  rw [e1, e2]
+
+end divExt
+
 /-- Book, §2, Remark 1: there is a natural embedding `D_K ⊂ D_L`, `m'_{ψ α} = e(α) m_α`, which maps
 `D_K(q)` into `D_L(q)` and preserves `deg_q` and `Φ_q`. Blueprint: `rem:S2-ext-const`. -/
 theorem remark_ext_const_divisors (ψ : Omega K ≃ₐ[K] Omega L) :
     ∃ ι : Divisors K →+ Divisors L, Function.Injective ι ∧
       (∀ (m : Divisors K) (α : Omega K), α ≠ 0 →
         ((ι m : Divisors L) : Omega L → ℤ) (ψ α) = (ramIndex K L ψ α : ℤ) * (m : Omega K → ℤ) α) ∧
-      ∀ (q : K) (hq : q ≠ 0) (hqL : algebraMap K L q ≠ 0) (m : Divisors K),
+      ∀ (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqL : algebraMap K L q ≠ 0) (m : Divisors K),
         (m : Omega K → ℤ) ∈ DivisorsPeriodic K q →
         ((ι m : Divisors L) : Omega L → ℤ) ∈ DivisorsPeriodic L (algebraMap K L q) ∧
         degQ L (algebraMap K L q) ((ι m : Divisors L) : Omega L → ℤ) = degQ K q m ∧
         PhiQ L (algebraMap K L q) hqL ((ι m : Divisors L) : Omega L → ℤ) =
-          quotIncl K L q hq hqL (PhiQ K q hq m) := by
+          quotIncl K L q (norm_pos_iff.mp hq0) hqL (PhiQ K q (norm_pos_iff.mp hq0) m) := by
   sorry
 
 /-- Book, §2, Remark 1: if `L | K` is separable then `e(α) = 1` for all `α`
