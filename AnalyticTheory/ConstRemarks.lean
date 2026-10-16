@@ -21,6 +21,60 @@ variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 variable (L : Type u) [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
 variable [NormedAlgebra K L] [FiniteDimensional K L]
 
+section insep
+
+variable {K}
+
+/-- The multiplicity `e_α` of `α` in its minimal polynomial is the degree of inseparability
+`[K(α) : K]ᵢ`. -/
+theorem eIdx_eq_finInsepDegree {α : Omega K} (hα : α ≠ 0) :
+    eIdx K α = Field.finInsepDegree K (IntermediateField.adjoin K ({α} : Set (Omega K))) := by
+  classical
+  have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
+  set f := minpoly K α with hf
+  set F := f.map (algebraMap K (Omega K)) with hF
+  have hF0 : F ≠ 0 := ((minpoly.monic hint).map _).ne_zero
+  have hroot : ∀ β ∈ F.roots, β ≠ 0 ∧ minpoly K β = f := by
+    intro β hβ
+    rw [Polynomial.mem_roots hF0, Polynomial.IsRoot, hF, Polynomial.eval_map_algebraMap] at hβ
+    have hmin : minpoly K β = f := (minpoly.eq_of_irreducible_of_monic (minpoly.irreducible hint) hβ
+      (minpoly.monic hint)).symm
+    refine ⟨fun h0 => ?_, hmin⟩
+    rw [h0, minpoly.zero] at hmin
+    have := minpoly.aeval K α
+    rw [← hf, ← hmin, Polynomial.aeval_X] at this
+    exact hα this
+  have hmult : ∀ β ∈ F.roots.toFinset, F.roots.count β = eIdx K α := by
+    intro β hβ
+    rw [Multiset.mem_toFinset] at hβ
+    obtain ⟨hβ0, hmin⟩ := hroot β hβ
+    rw [Polynomial.count_roots]
+    have hroot' : Polynomial.aeval β (minpoly K α) = 0 := by
+      rw [← hf, ← hmin]; exact minpoly.aeval K β
+    obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root (Algebra.IsAlgebraic.isAlgebraic α) hroot'
+    have := eIdx_aut K σ hβ0
+    rw [hσ] at this
+    rw [this]
+    unfold eIdx
+    rw [hmin]
+  have hdeg : f.natDegree = f.natSepDegree * eIdx K α := by
+    have h1 : f.natDegree = F.roots.card := by
+      rw [IsAlgClosed.card_roots_eq_natDegree, hF, Polynomial.natDegree_map]
+    rw [h1, ← Multiset.toFinset_sum_count_eq, Finset.sum_congr rfl hmult, Finset.sum_const,
+      smul_eq_mul, Polynomial.natSepDegree_eq_of_isAlgClosed (Omega K), Polynomial.aroots_def]
+  have h2 := Field.finSepDegree_mul_finInsepDegree K (IntermediateField.adjoin K ({α} : Set (Omega K)))
+  rw [IntermediateField.adjoin.finrank hint,
+    IntermediateField.finSepDegree_adjoin_simple_eq_natSepDegree (F := K) (E := Omega K)
+      (Algebra.IsAlgebraic.isAlgebraic α),
+    ← hf, hdeg] at h2
+  have hpos : 0 < f.natSepDegree := by
+    rw [Polynomial.natSepDegree_eq_of_isAlgClosed (Omega K), Finset.card_pos, Polynomial.aroots_def]
+    refine ⟨α, Multiset.mem_toFinset.mpr ((Polynomial.mem_roots hF0).mpr ?_)⟩
+    rw [Polynomial.IsRoot, hF, Polynomial.eval_map_algebraMap]; exact minpoly.aeval K α
+  exact (Nat.eq_of_mul_eq_mul_left hpos h2).symm
+
+end insep
+
 section transfer
 
 variable {K₁ K₂ : Type u} [NontriviallyNormedField K₁] [IsUltrametricDist K₁] [CompleteSpace K₁]
@@ -150,6 +204,96 @@ theorem ext_isometry {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : 
   rw [minpoly.algEquiv_eq]
 
 end isometry
+
+section valLaw
+
+variable {K L}
+variable (ψ : Omega K ≃ₐ[K] Omega L)
+
+theorem holRel_holExt (g : holSubring K) : HolRel (ψ : Omega K ≃+* Omega L) g (holExt (L := L) g) := by
+  intro x hx
+  have h1 := holOfSeq_hasSum L (fun n => algebraMap K L (holCoeff K g n))
+    (isConvergentLaurent_map (holCoeff_convergent K g)) ⟨ψ x, (map_ne_zero _).mpr hx⟩
+  have h2 := (holCoeff_hasSum K g ⟨x, hx⟩).map (ψ : Omega K →+ Omega L) (psi_isometry K L ψ).continuous
+  refine h1.unique ?_
+  convert h2 using 1
+  funext n
+  simp only [Function.comp, AddMonoidHom.coe_coe, map_mul, map_zpow₀, AlgEquiv.commutes]
+  rw [IsScalarTower.algebraMap_apply K L (Omega L)]
+
+theorem holExt_monoHol (n : ℤ) : holExt (L := L) (monoHol K n) = monoHol L n := by
+  apply holCoeff_injective L
+  rw [holCoeff_holExt]
+  funext k
+  rw [holCoeff_monoHol, holCoeff_monoHol]
+  split_ifs <;> simp
+
+theorem meroExt_Xm (n : ℤ) : meroExt (L := L) (Xm (K := K) n) = Xm n := by
+  unfold Xm; rw [meroExt_alg, holExt_monoHol]
+
+theorem anPt_meroExt {α : Omega K} (hα : α ≠ 0) (f : MeroRing K) :
+    anPt L (ψ α) (meroExt (L := L) f) = anPt K α f := by
+  obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring K) f
+  have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
+  exact anPt_transfer (ψ : Omega K ≃+* Omega L) (psi_isometry K L ψ) hα (holRel_holExt ψ x)
+    (holRel_holExt ψ y) hy0 hxy.symm (by rw [← hxy, map_div₀, meroExt_alg, meroExt_alg])
+
+theorem eIdx_dvd {α : Omega K} (hα : α ≠ 0) : eIdx L (ψ α) ∣ eIdx K α := by
+  have hψ : ψ α ≠ 0 := (map_ne_zero ψ).mpr hα
+  set f := algebraMap (holSubring K) (MeroRing K) (polyHol K (minpoly K α))
+  have hf1 : anVal K α f = 1 := by
+    rw [anVal_polyHol_minpoly hα hα, if_pos rfl]
+  have hf0 : f ≠ 0 := by
+    intro h; rw [h, anVal_zero K α hα] at hf1; exact WithTop.top_ne_one hf1
+  obtain ⟨k, hk⟩ := anPt_eq_e_mul K hα hf0
+  have hk1 := anVal_of_anPt K hα hk
+  rw [hf1] at hk1
+  have hk1' : k = 1 := by exact_mod_cast hk1.symm
+  have hf0' : meroExt (L := L) f ≠ 0 := (map_ne_zero _).mpr hf0
+  obtain ⟨k', hk'⟩ := anPt_eq_e_mul L hψ hf0'
+  rw [anPt_meroExt ψ hα, hk, hk1', mul_one] at hk'
+  have : (eIdx K α : ℤ) = (eIdx L (ψ α) : ℤ) * k' := by exact_mod_cast hk'
+  have hdvd : (eIdx L (ψ α) : ℤ) ∣ (eIdx K α : ℤ) := ⟨k', this⟩
+  exact_mod_cast hdvd
+
+/-- `e(α) = e_{α,K} / e_{ψα,L}`. -/
+theorem ramIndex_eq_eIdx {α : Omega K} (hα : α ≠ 0) :
+    ramIndex K L ψ α = eIdx K α / eIdx L (ψ α) := by
+  unfold ramIndex
+  rw [← eIdx_eq_finInsepDegree hα, ← eIdx_eq_finInsepDegree ((map_ne_zero ψ).mpr hα)]
+
+theorem ramIndex_mul {α : Omega K} (hα : α ≠ 0) :
+    ramIndex K L ψ α * eIdx L (ψ α) = eIdx K α := by
+  rw [ramIndex_eq_eIdx ψ hα]; exact Nat.div_mul_cancel (eIdx_dvd ψ hα)
+
+theorem ramIndex_pos {α : Omega K} (hα : α ≠ 0) : 0 < ramIndex K L ψ α := by
+  have h := ramIndex_mul ψ hα
+  have := eIdx_pos K (α := α)
+  rcases Nat.eq_zero_or_pos (ramIndex K L ψ α) with h0 | h0
+  · rw [h0, zero_mul] at h; omega
+  · exact h0
+
+/-- The valuations of `L` restrict to `e(α)` times those of `K`. -/
+theorem anVal_meroExt {α : Omega K} (hα : α ≠ 0) {f : MeroRing K} (hf : f ≠ 0) {k : ℤ}
+    (hk : anVal K α f = (k : WithTop ℤ)) :
+    anVal L (ψ α) (meroExt (L := L) f) = (((ramIndex K L ψ α : ℤ) * k : ℤ) : WithTop ℤ) := by
+  have hψ : ψ α ≠ 0 := (map_ne_zero ψ).mpr hα
+  obtain ⟨k₀, hk₀⟩ := anPt_eq_e_mul K hα hf
+  obtain ⟨k', hk'⟩ := anPt_eq_e_mul L hψ ((map_ne_zero (meroExt (K := K) (L := L))).mpr hf)
+  have hkk : k₀ = k := by
+    have := anVal_of_anPt K hα hk₀; rw [hk] at this; exact_mod_cast this.symm
+  rw [anVal_of_anPt L hψ hk']
+  rw [anPt_meroExt ψ hα, hk₀] at hk'
+  have h1 : (eIdx K α : ℤ) * k₀ = (eIdx L (ψ α) : ℤ) * k' := by exact_mod_cast hk'
+  have h2 : (eIdx K α : ℤ) = (ramIndex K L ψ α : ℤ) * eIdx L (ψ α) := by
+    exact_mod_cast (ramIndex_mul ψ hα).symm
+  have hpos : (0 : ℤ) < eIdx L (ψ α) := by exact_mod_cast eIdx_pos L (α := ψ α)
+  have : k' = (ramIndex K L ψ α : ℤ) * k := by
+    rw [h2, hkk] at h1
+    exact mul_left_cancel₀ hpos.ne' (by linarith)
+  rw [this]
+
+end valLaw
 
 /-- Book, §2, Remark 1: there is a natural embedding `D_K ⊂ D_L`, `m'_{ψ α} = e(α) m_α`, which maps
 `D_K(q)` into `D_L(q)` and preserves `deg_q` and `Φ_q`. Blueprint: `rem:S2-ext-const`. -/
