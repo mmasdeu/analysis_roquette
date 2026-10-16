@@ -103,30 +103,6 @@ noncomputable def coeffC (q : K) : K :=
   ∑' n : ℕ, ((-(5 * (∑ d ∈ n.divisors, (d : ℤ) ^ 3) + 7 * (∑ d ∈ n.divisors, (d : ℤ) ^ 5)) / 12 :
     ℤ) : K) * q ^ n
 
-/-- Book, §3, Theorem VI: the functions `℘, ℘′` generate `F_K(q)` over `K`, the pole divisors
-are `2𝔭₁` and `3𝔭₁`, and they satisfy the relation (32)/(39). Blueprint: `thm:VI`. -/
-theorem thmVI_generation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    (IntermediateField.adjoin K ({wpM K q, wpPrimeM K q} : Set (MeroRing K)) :
-        Set (MeroRing K)) = (FqSub K q : Set (MeroRing K)) := by
-  sorry
-
-theorem thmVI_poles (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    anVal K 1 (wpM K q) = ((-2 : ℤ) : WithTop ℤ) ∧
-      anVal K 1 (wpPrimeM K q) = ((-3 : ℤ) : WithTop ℤ) := by
-  sorry
-
-theorem thmVI_relation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    wpPrimeM K q ^ 2 + wpM K q * wpPrimeM K q =
-      wpM K q ^ 3 + algebraMap K (MeroRing K) (coeffB K q) * wpM K q +
-        algebraMap K (MeroRing K) (coeffC K q) := by
-  sorry
-
-/-- Book, §3, (20)–(21): the reflection fixes `℘` and sends `℘′ ↦ −℘′ − ℘`. Blueprint: `thm:VI`. -/
-theorem thmVI_reflection (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    reflectionM K (wpM K q) = wpM K q ∧
-      reflectionM K (wpPrimeM K q) = -wpPrimeM K q - wpM K q := by
-  sorry
-
 /-- Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with
 `g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
 Blueprint: `rem:normal-form-3`. -/

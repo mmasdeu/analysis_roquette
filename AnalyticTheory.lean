@@ -25,6 +25,7 @@ import AnalyticTheory.ThetaDiv
 import AnalyticTheory.PeriodicSol
 import AnalyticTheory.AbelJacobi
 import AnalyticTheory.WpConstruct
+import AnalyticTheory.TheoremVI
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
 import AnalyticTheory.Weierstrass

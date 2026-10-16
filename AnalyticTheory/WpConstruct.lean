@@ -413,6 +413,159 @@ theorem wpPrimeM_eq : wpPrimeM K q = wpPrimeAlg hq0 hq1 := by
       + algebraMap K (Omega K) (sK K 1 q)) ⟨_, wpPrimeAlg_evalsTo hq0 hq1⟩
   exact evalsTo_unique hq0 hq1 h (wpPrimeAlg_evalsTo hq0 hq1)
 
+
 end theta1
+
+theorem anVal_neg_one {ξ : Omega K} (hξ : ξ ≠ 0) : anVal K ξ (-1 : MeroRing K) = 0 := by
+  have h := (anVal_isValuation K ξ hξ).2.2.1 (-1) (-1)
+  rw [neg_one_mul, neg_neg, (anVal_isValuation K ξ hξ).2.1] at h
+  obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hξ (neg_ne_zero.mpr one_ne_zero))
+  rw [← hv] at h ⊢
+  have : (0 : ℤ) = v + v := by exact_mod_cast h
+  have : v = 0 := by omega
+  rw [this]; rfl
+
+theorem anVal_neg {ξ : Omega K} (hξ : ξ ≠ 0) (f : MeroRing K) : anVal K ξ (-f) = anVal K ξ f := by
+  rw [show -f = (-1) * f by ring, (anVal_isValuation K ξ hξ).2.2.1, anVal_neg_one hξ, zero_add]
+
+theorem anVal_add_eq_of_lt {ξ : Omega K} (hξ : ξ ≠ 0) {f g : MeroRing K}
+    (h : anVal K ξ f < anVal K ξ g) : anVal K ξ (f + g) = anVal K ξ f := by
+  have h1 := (anVal_isValuation K ξ hξ).2.2.2 f g
+  rw [min_eq_left h.le] at h1
+  refine le_antisymm ?_ h1
+  have h2 := (anVal_isValuation K ξ hξ).2.2.2 (f + g) (-g)
+  rw [add_neg_cancel_right, anVal_neg hξ] at h2
+  by_contra hcon
+  push_neg at hcon
+  have : anVal K ξ f < min (anVal K ξ (f + g)) (anVal K ξ g) := lt_min hcon h
+  exact absurd h2 (not_le.mpr this)
+
+theorem anVal_algebraMap_nonneg {ξ : Omega K} (hξ : ξ ≠ 0) (c : K) :
+    0 ≤ anVal K ξ (algebraMap K (MeroRing K) c) := by
+  rw [← algebraMap_hol_mero]; exact anVal_hol_nonneg hξ _
+
+theorem hol_ne_zero_at_of_anVal_zero {f : holSubring K} (hf : f ≠ 0) {ξ : Omega K} (hξ : ξ ≠ 0)
+    (h : anVal K ξ (algebraMap (holSubring K) (MeroRing K) f) = 0) : f.1 ⟨ξ, hξ⟩ ≠ 0 := by
+  intro h0
+  obtain ⟨m, hm1, hm2, hm3⟩ := exists_exact_pow K hξ hf
+  have hd := (phi_dvd_iff K hξ f).mpr h0
+  have : 1 ≤ m := by
+    by_contra hcon
+    push_neg at hcon
+    have : m = 0 := by omega
+    subst this
+    exact hm2 (by simpa using hd)
+  rw [hm3] at h
+  have : (m : ℤ) = 0 := by exact_mod_cast h
+  omega
+
+
+section poles
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+/-- The point `1 ∈ Ω^×`. -/
+noncomputable def oneX : OmegaX K := ⟨1, one_ne_zero⟩
+
+theorem anVal_Th_one :
+    anVal K 1 (algebraMap (holSubring K) (MeroRing K) (Th hq0 hq1)) = 1 := by
+  rw [anVal_Th hq0 hq1 one_ne_zero, if_pos (conjModQ_refl q 1)]
+
+theorem Rq_ne_zero (n : ℤ) : Rq hq0 hq1 n ≠ 0 := by
+  intro h
+  have := Rq_spec hq0 hq1 n
+  rw [h, mul_zero] at this
+  exact Th_ne_zero hq0 hq1 this
+
+theorem anVal_R0_one :
+    anVal K 1 (algebraMap (holSubring K) (MeroRing K) (Rq hq0 hq1 0)) = 0 := by
+  have h := congrArg (fun y => anVal K 1 (algebraMap (holSubring K) (MeroRing K) y)) (Rq_spec hq0 hq1 0)
+  simp only at h
+  rw [map_mul, (anVal_isValuation K 1 one_ne_zero).2.2.1, anVal_Th_one hq0 hq1] at h
+  have hl : anVal K 1 (algebraMap (holSubring K) (MeroRing K) (linF (q := q) 0)) = 1 := by
+    have e : linF (q := q) 0 = polyHol K (minpoly K (1 : Omega K)) := by
+      rw [linF, show (1 : Omega K) = algebraMap K (Omega K) 1 from (map_one _).symm, minpoly_alg]
+      simp
+    rw [e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, if_pos rfl]
+  rw [hl] at h
+  obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K one_ne_zero
+    (alg_hol_ne_zero (Rq_ne_zero hq0 hq1 0)))
+  rw [← hv] at h ⊢
+  have : (1 : ℤ) = 1 + v := by exact_mod_cast h
+  have : v = 0 := by omega
+  rw [this]; rfl
+
+theorem R0_one_ne_zero : (Rq hq0 hq1 0).1 oneX ≠ 0 :=
+  hol_ne_zero_at_of_anVal_zero (Rq_ne_zero hq0 hq1 0) one_ne_zero (anVal_R0_one hq0 hq1)
+
+theorem Th_one : (Th hq0 hq1).1 oneX = 0 := by
+  have := Th_zero hq0 hq1 0
+  simpa [ptQ, oneX] using this
+
+theorem Rq_one {n : ℤ} (hn : n ≠ 0) : (Rq hq0 hq1 n).1 oneX = 0 := by
+  have h := congrArg (fun y : holSubring K => y.1 oneX) (Rq_spec hq0 hq1 n)
+  simp only [mul_apply_hol, linF_apply, Th_one hq0 hq1] at h
+  have hne : (oneX : OmegaX K).1 - algebraMap K (Omega K) (q ^ (-n)) ≠ 0 := by
+    intro h0
+    have h1 : algebraMap K (Omega K) (q ^ (-n)) = algebraMap K (Omega K) 1 := by
+      rw [map_one]; simp only [oneX] at h0; linear_combination -h0
+    have h2 := congrArg norm ((algebraMap K (Omega K)).injective h1)
+    rw [norm_zpow, norm_one] at h2
+    have := zpow_right_injective₀ hq0 hq1.ne (h2.trans (zpow_zero _).symm)
+    omega
+  exact (mul_eq_zero.mp h.symm).resolve_left hne
+
+theorem GP_one : (GP hq0 hq1).1 oneX = (Rq hq0 hq1 0).1 oneX ^ 2 := by
+  have h := GP_hasSum hq0 hq1 oneX
+  have h2 := hasSum_single (f := fun n => (tP hq0 hq1 n).1 oneX) 0 (fun n hn => by
+    simp only [tP, mul_apply_hol, pow_apply_hol, Rq_one hq0 hq1 hn]; ring)
+  rw [h.unique h2]
+  simp [tP, mul_apply_hol, algebraMap_apply_hol, monoHol_apply, pow_apply_hol, oneX]
+
+theorem GP'_one : (GP' hq0 hq1).1 oneX = -(Rq hq0 hq1 0).1 oneX ^ 3 := by
+  have h := GP'_hasSum hq0 hq1 oneX
+  have h2 := hasSum_single (f := fun n => (tP' hq0 hq1 n).1 oneX) 0 (fun n hn => by
+    simp only [tP', mul_apply_hol, pow_apply_hol, Rq_one hq0 hq1 hn]; ring)
+  rw [h.unique h2]
+  simp [tP', mul_apply_hol, algebraMap_apply_hol, monoHol_apply, pow_apply_hol, oneX]
+
+theorem anVal_GP_one : anVal K 1 (algebraMap (holSubring K) (MeroRing K) (GP hq0 hq1)) = 0 := by
+  have hne : (GP hq0 hq1).1 oneX ≠ 0 := by
+    rw [GP_one]; exact pow_ne_zero 2 (R0_one_ne_zero hq0 hq1)
+  have hGP : GP hq0 hq1 ≠ 0 := by rintro h; rw [h] at hne; exact hne rfl
+  exact anVal_hol_nonvanishing one_ne_zero hGP hne
+
+theorem anVal_GP'_one : anVal K 1 (algebraMap (holSubring K) (MeroRing K) (GP' hq0 hq1)) = 0 := by
+  have hne : (GP' hq0 hq1).1 oneX ≠ 0 := by
+    rw [GP'_one]; exact neg_ne_zero.mpr (pow_ne_zero 3 (R0_one_ne_zero hq0 hq1))
+  have hGP : GP' hq0 hq1 ≠ 0 := by rintro h; rw [h] at hne; exact hne rfl
+  exact anVal_hol_nonvanishing one_ne_zero hGP hne
+
+
+theorem anVal_quot_one (G : holSubring K) (hG : anVal K 1 (algebraMap (holSubring K) (MeroRing K) G) = 0)
+    (k : ℕ) : anVal K 1 (algebraMap (holSubring K) (MeroRing K) G /
+      algebraMap (holSubring K) (MeroRing K) (Th hq0 hq1) ^ k) = ((-(k : ℤ) : ℤ) : WithTop ℤ) := by
+  have hΘ := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
+  rw [div_eq_mul_inv, (anVal_isValuation K 1 one_ne_zero).2.2.1, hG, zero_add,
+    anVal_inv_of one_ne_zero (pow_ne_zero k hΘ) (anVal_pow_of one_ne_zero (anVal_Th_one hq0 hq1) k)]
+  simp
+
+theorem anVal_wpAlg_one : anVal K 1 (wpAlg hq0 hq1) = ((-2 : ℤ) : WithTop ℤ) := by
+  unfold wpAlg
+  rw [sub_eq_add_neg, anVal_add_eq_of_lt one_ne_zero, anVal_quot_one hq0 hq1 _ (anVal_GP_one hq0 hq1)]
+  · rfl
+  · rw [anVal_quot_one hq0 hq1 _ (anVal_GP_one hq0 hq1), anVal_neg one_ne_zero]
+    exact lt_of_lt_of_le (by exact_mod_cast (by norm_num : (-(2 : ℕ) : ℤ) < 0))
+      (anVal_algebraMap_nonneg one_ne_zero _)
+
+theorem anVal_wpPrimeAlg_one : anVal K 1 (wpPrimeAlg hq0 hq1) = ((-3 : ℤ) : WithTop ℤ) := by
+  unfold wpPrimeAlg
+  rw [anVal_add_eq_of_lt one_ne_zero, anVal_quot_one hq0 hq1 _ (anVal_GP'_one hq0 hq1)]
+  · rfl
+  · rw [anVal_quot_one hq0 hq1 _ (anVal_GP'_one hq0 hq1)]
+    exact lt_of_lt_of_le (by exact_mod_cast (by norm_num : (-(3 : ℕ) : ℤ) < 0))
+      (anVal_algebraMap_nonneg one_ne_zero _)
+
+end poles
 
 end AnalyticTheory
