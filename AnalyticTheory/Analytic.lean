@@ -330,7 +330,8 @@ mod `^× q` of elements of the annulus `|q| < |α| ≤ 1` (each class meets the 
 Blueprint: `def:deg-q`. -/
 noncomputable def repSystem (q : K) : Set (Omega K) :=
   Classical.epsilon fun R : Set (Omega K) => ∀ α : Omega K, ‖q‖ < omegaNorm K α →
-    omegaNorm K α ≤ 1 → ∃! β, β ∈ R ∧ ConjModQ K q α β
+    omegaNorm K α ≤ 1 → ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧
+      ConjModQ K q α β
 
 /-- The representatives of `repSystem` lying in the annulus `|q| < |α| ≤ 1`. -/
 noncomputable def repAnnulus (q : K) : Set (Omega K) :=
@@ -422,7 +423,7 @@ representatives (formula (12)). Blueprint: `prop:deg-q-formula`. -/
 theorem degQ_eq_of_system (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m : Omega K → ℤ)
     (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K))
     (hR : ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
-      ∃! β, β ∈ R ∧ ConjModQ K q α β) :
+      ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧ ConjModQ K q α β) :
     PhiQ K q (norm_pos_iff.mp hq0) m =
       (open Classical in
         let x : K := ∏ᶠ α ∈ {α ∈ R | ‖q‖ < omegaNorm K α ∧ omegaNorm K α ≤ 1},
@@ -545,7 +546,7 @@ representatives of the `K`-conjugacy classes mod `^× q` in the annulus `|q| < |
 Blueprint: `prop:deg-q-formula`. -/
 theorem degQ_formula (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (R : Set (Omega K))
     (hR : ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
-      ∃! β, β ∈ R ∧ ConjModQ K q α β)
+      ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧ ConjModQ K q α β)
     (m : Omega K → ℤ) (hm : m ∈ DivisorsPeriodic K q) :
     degQ K q m =
       ∑ᶠ α ∈ {α ∈ R | ‖q‖ < omegaNorm K α ∧ omegaNorm K α ≤ 1},

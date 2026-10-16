@@ -93,11 +93,12 @@ theorem conjModQ_of_shift (q : K) (α : Omega K) (k : ℤ) :
 /-- The chosen system of representatives has the defining property. -/
 theorem repSystem_spec {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
-      ∃! β, β ∈ repSystem K q ∧ ConjModQ K q α β := by
+      ∃! β, β ∈ repSystem K q ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧
+        ConjModQ K q α β := by
   classical
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
   have hex : ∃ R : Set (Omega K), ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
-      ∃! β, β ∈ R ∧ ConjModQ K q α β := by
+      ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧ ConjModQ K q α β := by
     let ann : Omega K → Prop := fun γ => ‖q‖ < omegaNorm K γ ∧ omegaNorm K γ ≤ 1
     let rep : Omega K → Omega K := fun α =>
       Classical.epsilon (fun γ => ann γ ∧ ConjModQ K q γ α)
@@ -117,8 +118,8 @@ theorem repSystem_spec {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
       · rintro ⟨h1, h2⟩; exact ⟨h1, conjModQ_trans hq0' h2 (conjModQ_symm hq0' h)⟩
     refine ⟨{β | ∃ α, ann α ∧ β = rep α}, fun α h1 h2 => ?_⟩
     have hα : ann α := ⟨h1, h2⟩
-    refine ⟨rep α, ⟨⟨α, hα, rfl⟩, conjModQ_symm hq0' (hrep α hα).2⟩, ?_⟩
-    rintro β ⟨⟨α', hα', rfl⟩, hαβ⟩
+    refine ⟨rep α, ⟨⟨α, hα, rfl⟩, (hrep α hα).1, conjModQ_symm hq0' (hrep α hα).2⟩, ?_⟩
+    rintro β ⟨⟨α', hα', rfl⟩, -, hαβ⟩
     have h3 : ConjModQ K q α α' :=
       conjModQ_trans hq0' hαβ (hrep α' hα').2
     exact (hrep_eq α α' h3).symm
