@@ -20,18 +20,6 @@ theorem wp_eq_neg_D_zeta (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     wpM K q = -Dop K (zetaM K q) - 2 * algebraMap K (MeroRing K) (sK K 1 q) := by
   sorry
 
-/-- Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with
-`g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
-Blueprint: `rem:normal-form-3`. -/
-theorem thmVI_weierstrass_form (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hchar2 : ringChar K ≠ 2) (hchar3 : ringChar K ≠ 3) :
-    (Dop K (wpM K q)) ^ 2 =
-      4 * (wpM K q + algebraMap K (MeroRing K) (1 / 12)) ^ 3 -
-        algebraMap K (MeroRing K) (1 / 12 + 20 * sK K 3 q) *
-          (wpM K q + algebraMap K (MeroRing K) (1 / 12)) -
-        algebraMap K (MeroRing K) (-(1 / 216) + (7 / 3) * sK K 5 q) := by
-  sorry
-
 /-- Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic.
 Blueprint: `rem:delta-product`. -/
 theorem remark3_delta_product (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :

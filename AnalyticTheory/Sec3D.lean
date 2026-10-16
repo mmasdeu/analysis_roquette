@@ -1,4 +1,5 @@
 import AnalyticTheory.DOperator
+import AnalyticTheory.Sec3VII
 
 /-!
 # Formula (18): `2℘′ = D℘ − ℘`
@@ -8,7 +9,7 @@ Termwise: with `T = Θ`, `cₙ = q⁻ⁿ`, `Rₙ = T/(X − cₙ)`, the identity
 (`D` commutes with sums of null families) gives `2G′ = T·DG − 2G·DT − T·G`.
 -/
 
-open Filter Topology
+open Filter Topology PowerSeries
 
 namespace AnalyticTheory
 
@@ -140,5 +141,88 @@ theorem wpPrime_spec : 2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
   field_simp
   simp only [map_pow] at *
   linear_combination hid
+
+
+theorem natCast_ne_zero_of_char {p : ℕ} (hp : p.Prime) (h : ringChar K ≠ p) : ((p : ℕ) : K) ≠ 0 := by
+  intro h0
+  have := (Nat.dvd_prime hp).mp (ringChar.dvd h0)
+  rcases this with h1 | h1
+  · exact CharP.ringChar_ne_one h1
+  · exact h h1
+
+theorem twelve_cCoef (n : ℕ) : 12 * cCoef n = -(5 * (∑ d ∈ n.divisors, (d : ℤ) ^ 3) +
+    7 * ∑ d ∈ n.divisors, (d : ℤ) ^ 5) := by
+  have e : -(5 * (∑ d ∈ n.divisors, (d : ℤ) ^ 3) + 7 * (∑ d ∈ n.divisors, (d : ℤ) ^ 5)) =
+      12 * ∑ d ∈ n.divisors, gC d := by
+    calc _ = ∑ d ∈ n.divisors, -(5 * (d : ℤ) ^ 3 + 7 * (d : ℤ) ^ 5) := by
+          simp [Finset.sum_add_distrib, Finset.mul_sum]
+      _ = ∑ d ∈ n.divisors, 12 * gC d := Finset.sum_congr rfl (fun d _ => (twelve_mul_gC d).symm)
+      _ = _ := (Finset.mul_sum _ _ _).symm
+  unfold cCoef
+  rw [e, Int.mul_ediv_cancel_left _ (by norm_num)]
+
+theorem twelve_serC : C 12 * serC = C (-5) * sigmaS 3 + C (-7) * sigmaS 5 := by
+  ext n
+  simp only [coeff_C_mul, map_add, serC, sigmaS, coeff_mk]
+  rw [twelve_cCoef]; ring
+
+theorem twelve_coeffC (hq1 : ‖q‖ < 1) : 12 * coeffC K q = -5 * sK K 3 q - 7 * sK K 5 q := by
+  rw [← evalZ_serC (q := q), sK_eq, sK_eq]
+  have h := congrArg (evalZ q) (twelve_serC)
+  rw [evalZ_mul hq1, evalZ_add hq1, evalZ_mul hq1, evalZ_mul hq1, evalZ_C hq1, evalZ_C hq1,
+    evalZ_C hq1] at h
+  push_cast at h
+  linear_combination h
+
+
+/-- Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with
+`g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
+Blueprint: `rem:normal-form-3`. -/
+theorem thmVI_weierstrass_form (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hchar2 : ringChar K ≠ 2) (hchar3 : ringChar K ≠ 3) :
+    (Dop K (wpM K q)) ^ 2 =
+      4 * (wpM K q + algebraMap K (MeroRing K) (1 / 12)) ^ 3 -
+        algebraMap K (MeroRing K) (1 / 12 + 20 * sK K 3 q) *
+          (wpM K q + algebraMap K (MeroRing K) (1 / 12)) -
+        algebraMap K (MeroRing K) (-(1 / 216) + (7 / 3) * sK K 5 q) := by
+  have h2 : (2 : K) ≠ 0 := by exact_mod_cast natCast_ne_zero_of_char (K := K) Nat.prime_two hchar2
+  have h3 : (3 : K) ≠ 0 := by exact_mod_cast natCast_ne_zero_of_char (K := K) Nat.prime_three hchar3
+  have h12K : (12 : K) ≠ 0 := by
+    have : (12 : K) = 2 * 2 * 3 := by norm_num
+    rw [this]; exact mul_ne_zero (mul_ne_zero h2 h2) h3
+  have hspec := wpPrime_spec hq0 hq1
+  have hrel := thmVI_relation (K := K) q hq0 hq1
+  have hC := twelve_coeffC (K := K) hq1
+  have hCK : coeffC K q = (-5 * sK K 3 q - 7 * sK K 5 q) / 12 := by
+    rw [eq_div_iff h12K]; linear_combination hC
+  set P := wpM K q
+  set P' := wpPrimeM K q
+  have hD : Dop K P = 2 * P' + P := by linear_combination -hspec
+  have e1 : algebraMap K (MeroRing K) (1 / 12 + 20 * sK K 3 q) =
+      1 / 12 + 20 * algebraMap K (MeroRing K) (sK K 3 q) := by
+    simp [map_add, map_mul, map_div₀, map_ofNat]
+  have e2 : algebraMap K (MeroRing K) (-(1 / 216) + (7 / 3) * sK K 5 q) =
+      -(1 / 216) + (7 / 3) * algebraMap K (MeroRing K) (sK K 5 q) := by
+    simp [map_add, map_mul, map_div₀, map_ofNat]
+  have e3 : algebraMap K (MeroRing K) (1 / 12 : K) = 1 / 12 := by simp [map_div₀, map_ofNat]
+  have hB : algebraMap K (MeroRing K) (coeffB K q) = -5 * algebraMap K (MeroRing K) (sK K 3 q) := by
+    unfold coeffB; rw [map_mul, map_neg, map_ofNat]
+  have hC' : algebraMap K (MeroRing K) (coeffC K q) =
+      (-5 * algebraMap K (MeroRing K) (sK K 3 q) - 7 * algebraMap K (MeroRing K) (sK K 5 q)) / 12 := by
+    rw [hCK]; simp [map_div₀, map_sub, map_mul, map_ofNat]
+  rw [e1, e2, e3, hD]
+  rw [hB, hC'] at hrel
+  have h12 : (12 : MeroRing K) ≠ 0 := by
+    have : algebraMap K (MeroRing K) (12 : K) ≠ 0 := (map_ne_zero _).mpr h12K
+    simpa [map_ofNat] using this
+  have h2M : (2 : MeroRing K) ≠ 0 := by
+    have := (map_ne_zero (algebraMap K (MeroRing K))).mpr h2; rwa [map_ofNat] at this
+  have h3M : (3 : MeroRing K) ≠ 0 := by
+    have := (map_ne_zero (algebraMap K (MeroRing K))).mpr h3; rwa [map_ofNat] at this
+  have h216M : (216 : MeroRing K) ≠ 0 := by
+    have : (216 : MeroRing K) = 2 ^ 3 * 3 ^ 3 := by norm_num
+    rw [this]; exact mul_ne_zero (pow_ne_zero _ h2M) (pow_ne_zero _ h3M)
+  field_simp at hrel ⊢
+  linear_combination 373248 * hrel
 
 end AnalyticTheory
