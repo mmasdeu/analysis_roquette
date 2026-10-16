@@ -75,6 +75,80 @@ theorem eIdx_eq_finInsepDegree {α : Omega K} (hα : α ≠ 0) :
 
 end insep
 
+section compare
+
+variable {F : Type u} [NontriviallyNormedField F] [IsUltrametricDist F] [CompleteSpace F]
+
+/-- A function with divisor `n` and `G(q⁻¹X) = b⁻¹ X^d G(X)` determines `deg_q n` and `Φ_q(n)`. -/
+theorem degQ_PhiQ_of_fun {q : F} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {n : Omega F → ℤ}
+    (hn : n ∈ DivisorsPeriodic F q) {G : MeroRing F} (hG0 : G ≠ 0)
+    (hGv : ∀ β : Omega F, β ≠ 0 → anVal F β G = (n β : WithTop ℤ)) {b : F} (hb : b ≠ 0) {d : ℤ}
+    (hτ : translation F (Units.mk0 q (norm_pos_iff.mp hq0)) G =
+      algebraMap F (MeroRing F) b⁻¹ * Xm d * G) :
+    degQ F q n = d ∧ ∃ h : (-1 : F) ^ d * b ≠ 0,
+      PhiQ F q (norm_pos_iff.mp hq0) n = QuotientGroup.mk (Units.mk0 _ h) := by
+  classical
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  set Θ := thetaDiv hq0 hq1 hn with hΘ
+  have hΘ0 := thetaDiv_ne_zero hq0 hq1 hn
+  set f : MeroRing F := G / Θ with hfdef
+  have hf0 : f ≠ 0 := div_ne_zero hG0 hΘ0
+  have hf : ∀ β : Omega F, β ≠ 0 → anVal F β f = 0 := by
+    intro β hβ
+    rw [hfdef, div_eq_mul_inv, (anVal_isValuation F β hβ).2.2.1, hGv β hβ,
+      anVal_inv_of hβ hΘ0 (anVal_thetaDiv hq0 hq1 hn hβ), ← WithTop.coe_add, add_neg_cancel]
+    rfl
+  obtain ⟨c, k, hc, hck⟩ := mero_unit_of_anVal_zero hf0 hf
+  set Q := Units.mk0 q hq0'
+  have hτΘ := translation_thetaDiv hq0 hq1 hn
+  set a := aTheta hq0 hq1 hn
+  set dΘ := dTheta hq0 hq1 hn
+  have ha := aTheta_ne_zero hq0 hq1 hn
+  have hτf : translation F Q f = algebraMap F (MeroRing F) (q ^ (-k)) * f := by
+    rw [hck, map_mul, translation_algebraMap, translation_Xm]
+    simp only [Q, Units.val_mk0]; ring
+  have hτf' : translation F Q f * translation F Q Θ = translation F Q G := by
+    rw [← map_mul, hfdef, div_mul_cancel₀ _ hΘ0]
+  rw [hτf, hτΘ, hτ] at hτf'
+  set e : F := b * q ^ (-k) * a⁻¹ with he
+  have hfΘ : f * Θ = G := by rw [hfdef, div_mul_cancel₀ _ hΘ0]
+  have key : algebraMap F (MeroRing F) e * Xm (dΘ - d) = 1 := by
+    have hX : Xm (K := F) (dΘ - d) * Xm d = Xm dΘ := by rw [← Xm_add, sub_add_cancel]
+    rw [← hfΘ, ← hX] at hτf'
+    have hfΘ0 : f * Θ ≠ 0 := mul_ne_zero hf0 hΘ0
+    have hXd := Xm_ne_zero (K := F) d
+    have h2 : (algebraMap F (MeroRing F) (q ^ (-k)) * algebraMap F (MeroRing F) a⁻¹ *
+        Xm (dΘ - d)) * (Xm d * (f * Θ)) = algebraMap F (MeroRing F) b⁻¹ * (Xm d * (f * Θ)) := by
+      linear_combination hτf'
+    have h3 := mul_right_cancel₀ (mul_ne_zero hXd hfΘ0) h2
+    have hB : algebraMap F (MeroRing F) b ≠ 0 := (map_ne_zero _).mpr hb
+    rw [he, map_mul, map_mul]
+    calc algebraMap F (MeroRing F) b * algebraMap F (MeroRing F) (q ^ (-k)) *
+          algebraMap F (MeroRing F) a⁻¹ * Xm (dΘ - d) =
+        algebraMap F (MeroRing F) b * (algebraMap F (MeroRing F) (q ^ (-k)) *
+          algebraMap F (MeroRing F) a⁻¹ * Xm (dΘ - d)) := by ring
+      _ = algebraMap F (MeroRing F) b * (algebraMap F (MeroRing F) b)⁻¹ := by rw [h3, map_inv₀]
+      _ = 1 := mul_inv_cancel₀ hB
+  have hd : dΘ - d = 0 := exists_const_of_mul_Xm (by
+    intro h0; rw [h0, map_zero, zero_mul] at key; exact zero_ne_one key) key
+  have he1 : e = 1 := by
+    rw [hd, Xm_zero, mul_one] at key
+    exact (algebraMap F (MeroRing F)).injective (key.trans (map_one _).symm)
+  have hdd : dTheta hq0 hq1 hn = d := by omega
+  have hab : aTheta hq0 hq1 hn = b * q ^ (-k) := by
+    have h := he1
+    rw [he, mul_inv_eq_one₀ ha] at h
+    exact h.symm
+  refine ⟨by rw [degQ_eq_dTheta hq0 hq1 hn, hdd], mul_ne_zero (zpow_ne_zero _ (by norm_num)) hb, ?_⟩
+  obtain ⟨h1, hP⟩ := PhiQ_eq_mk hq0 hq1 hn hq0'
+  rw [hP, QuotientGroup.eq, Subgroup.mem_zpowers_iff]
+  refine ⟨k, Units.ext ?_⟩
+  simp only [Units.val_zpow_eq_zpow_val, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0]
+  rw [hdd, hab, zpow_neg]
+  field_simp
+
+end compare
+
 section transfer
 
 variable {K₁ K₂ : Type u} [NontriviallyNormedField K₁] [IsUltrametricDist K₁] [CompleteSpace K₁]
@@ -975,14 +1049,88 @@ theorem remark_galois_fixed_divisors (ψ : Omega K ≃ₐ[K] Omega L) (ι : Divi
     conv_rhs => rw [← AlgEquiv.apply_symm_apply ψ β, hι' m₀ _ hα]
     exact m₀.2.2.2 _ _ (minpoly.algEquiv_eq χ _)
 
+section galTransl
+
+variable {K L}
+
+theorem holGal_holScale (σ : L ≃ₐ[K] L) (c : Lˣ) (g : holSubring L) :
+    holGal σ (holScale L c g) = holScale L (Units.map (σ : L →* L) c) (holGal σ g) := by
+  apply holCoeff_injective L
+  rw [holCoeff_holGal, holCoeff_holScale, holCoeff_holScale, holCoeff_holGal]
+  funext n
+  simp [map_zpow₀]
+
+theorem meroGal_translation (σ : L ≃ₐ[K] L) (c : Lˣ) (f : MeroRing L) :
+    meroGal σ (translation L c f) = translation L (Units.map (σ : L →* L) c) (meroGal σ f) := by
+  obtain ⟨x, y, -, rfl⟩ := IsFractionRing.div_surjective (A := holSubring L) f
+  simp only [map_div₀, translation_alg, meroGal_alg, holGal_holScale, map_inv]
+
+theorem meroGal_Xm (σ : L ≃ₐ[K] L) (n : ℤ) : meroGal σ (Xm (K := L) n) = Xm n := by
+  unfold Xm
+  rw [meroGal_alg]
+  congr 1
+  apply holCoeff_injective L
+  rw [holCoeff_holGal]
+  funext k
+  rw [holCoeff_monoHol]
+  split_ifs <;> simp
+
+end galTransl
+
 /-- Book, §2, Remark 2: `deg_q(σ 𝔪) = deg_q(𝔪)` and `Φ_q(σ 𝔪) ≡ σ Φ_q(𝔪) mod^× q`, where
 `(σ 𝔪)(σ' α) = 𝔪(α)`; i.e. `deg_q` and `Φ_q` are `G`-equivariant. Blueprint: `rem:S2-galois`. -/
-theorem remark_galois_equivariance (q : K) (hq : q ≠ 0) (hqL : algebraMap K L q ≠ 0)
+theorem remark_galois_equivariance (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqL : algebraMap K L q ≠ 0)
     (σ : GalGroup K L) (σ' : Omega L ≃+* Omega L) (hσ' : IsExtension K L σ σ')
     (m : Omega L → ℤ) (hm : m ∈ DivisorsPeriodic L (algebraMap K L q)) :
     degQ L (algebraMap K L q) (fun α => m (σ'.symm α)) = degQ L (algebraMap K L q) m ∧
       Additive.ofMul (PhiQ L (algebraMap K L q) hqL (fun α => m (σ'.symm α))) =
         sigmaOnQuot K L q hqL σ (Additive.ofMul (PhiQ L (algebraMap K L q) hqL m)) := by
-  sorry
+  classical
+  have hn : ‖algebraMap K L q‖ = ‖q‖ := norm_algebraMap' L q
+  have hq0L : 0 < ‖algebraMap K L q‖ := by rw [hn]; exact hq0
+  have hq1L : ‖algebraMap K L q‖ < 1 := by rw [hn]; exact hq1
+  set q' := algebraMap K L q
+  set n : Omega L → ℤ := fun α => m (σ'.symm α) with hndef
+  set Θ := thetaDiv hq0L hq1L hm
+  have hΘ0 := thetaDiv_ne_zero hq0L hq1L hm
+  set G := meroGal σ Θ
+  have hG0 : G ≠ 0 := (map_ne_zero _).mpr hΘ0
+  have hσq : σ q' = q' := AlgEquiv.commutes σ q
+  have hσ'q : σ'.symm (algebraMap L (Omega L) q') = algebraMap L (Omega L) q' := by
+    rw [RingEquiv.symm_apply_eq, hσ', hσq]
+  have hGv : ∀ β : Omega L, β ≠ 0 → anVal L β G = (n β : WithTop ℤ) := by
+    intro β hβ
+    have hα : σ'.symm β ≠ 0 := (map_ne_zero _).mpr hβ
+    have := anVal_galAct (isGalAct_meroGal σ) hσ' hα Θ
+    rw [RingEquiv.apply_symm_apply] at this
+    rw [this, anVal_thetaDiv hq0L hq1L hm hα]
+  have hnP : n ∈ DivisorsPeriodic L q' := by
+    have heq : n = divisorOf L G := by
+      funext β
+      by_cases hβ : β = 0
+      · simp [hndef, hβ, divisorOf, hm.1.1]
+      · simp only [divisorOf, if_neg hβ, hGv β hβ, WithTop.untopD_coe]
+    refine ⟨heq ▸ divisorOf_mem_Divisors L G, fun β => ?_⟩
+    simp only [hndef, map_mul, hσ'q]
+    exact hm.2 _
+  have hQ : Units.map (σ : L →* L) (Units.mk0 q' (norm_pos_iff.mp hq0L)) =
+      Units.mk0 q' (norm_pos_iff.mp hq0L) := Units.ext (by simp [hσq])
+  have hτ : translation L (Units.mk0 q' (norm_pos_iff.mp hq0L)) G =
+      algebraMap L (MeroRing L) (σ (aTheta hq0L hq1L hm))⁻¹ * Xm (dTheta hq0L hq1L hm) * G := by
+    show translation L _ (meroGal σ Θ) = _
+    rw [← hQ, ← meroGal_translation, translation_thetaDiv hq0L hq1L hm, map_mul, map_mul,
+      meroGal_Xm, (isGalAct_meroGal σ).1, map_inv₀]
+  have hb : σ (aTheta hq0L hq1L hm) ≠ 0 := (map_ne_zero _).mpr (aTheta_ne_zero hq0L hq1L hm)
+  obtain ⟨hdeg, h1, hP⟩ := degQ_PhiQ_of_fun hq0L hq1L hnP hG0 hGv hb hτ
+  refine ⟨by rw [hdeg, degQ_eq_dTheta hq0L hq1L hm], ?_⟩
+  obtain ⟨h2, hP2⟩ := PhiQ_eq_mk hq0L hq1L hm hqL
+  show Additive.ofMul (PhiQ L q' hqL n) = _
+  rw [hP, hP2]
+  show _ = Additive.ofMul (QuotientGroup.map _ _ (Units.map ((σ : L →+* L) : L →* L)) _
+    (QuotientGroup.mk _))
+  rw [QuotientGroup.map_mk]
+  congr 2
+  apply Units.ext
+  simp [map_mul, map_zpow₀]
 
 end AnalyticTheory
