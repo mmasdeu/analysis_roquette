@@ -568,4 +568,65 @@ theorem anVal_wpPrimeAlg_one : anVal K 1 (wpPrimeAlg hq0 hq1) = ((-3 : ℤ) : Wi
 
 end poles
 
+
+/-- Uniqueness of meromorphic functions with prescribed values outside the zeros of `D ≠ 0`. -/
+theorem evalsTo_unique' {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {f f' : MeroRing K}
+    {F F' : OmegaX K → Omega K} (hf : EvalsTo K f F) (hf' : EvalsTo K f' F')
+    {D : holSubring K} (hD : D ≠ 0) (hFF : ∀ x, D.1 x ≠ 0 → F x = F' x) : f = f' := by
+  classical
+  obtain ⟨g, h, hh, rfl, hgh⟩ := hf
+  obtain ⟨g', h', hh', rfl, hgh'⟩ := hf'
+  have key : g * h' = g' * h := by
+    by_contra hne
+    have hP : (g * h' - g' * h) * (h * h' * D) ≠ 0 :=
+      mul_ne_zero (sub_ne_zero.mpr hne) (mul_ne_zero (mul_ne_zero hh hh') hD)
+    have hfin := holZeros_finite K hP one_pos le_rfl
+    apply sphere_infinite hq0 hq1
+    refine hfin.subset (fun x ⟨hx0, hx1, hx2⟩ => ⟨hx0, hx1, hx2, ?_⟩)
+    rw [mul_apply_hol, sub_apply_hol, mul_apply_hol, mul_apply_hol, mul_apply_hol, mul_apply_hol]
+    by_cases hhx : h.1 ⟨x, hx0⟩ = 0
+    · simp [hhx]
+    by_cases hhx' : h'.1 ⟨x, hx0⟩ = 0
+    · simp [hhx']
+    by_cases hDx : D.1 ⟨x, hx0⟩ = 0
+    · simp [hDx]
+    have e := (hgh ⟨x, hx0⟩ hhx).symm.trans ((hFF _ hDx).trans (hgh' ⟨x, hx0⟩ hhx'))
+    rw [div_eq_div_iff hhx hhx'] at e
+    rw [e]; ring
+  have h1 := alg_hol_ne_zero hh
+  have h2 := alg_hol_ne_zero hh'
+  rw [div_eq_div_iff h1 h2, ← map_mul, ← map_mul, key]
+
+/-- Values of the reflection. -/
+theorem evalsTo_reflection {f : MeroRing K} {F : OmegaX K → Omega K} (hf : EvalsTo K f F) :
+    EvalsTo K (reflectionM K f) (fun α => F ⟨α.1⁻¹, inv_ne_zero α.2⟩) := by
+  obtain ⟨g, h, hh, rfl, hgh⟩ := hf
+  refine ⟨holReflectHom K g, holReflectHom K h, (map_ne_zero_iff _ (holReflectHom K).injective).mpr hh, ?_, fun α hα => ?_⟩
+  · unfold reflectionM
+    rw [map_div₀, IsFractionRing.ringEquivOfRingEquiv_algebraMap,
+      IsFractionRing.ringEquivOfRingEquiv_algebraMap]
+  · exact hgh _ hα
+
+theorem evalsTo_add {f f' : MeroRing K} {F F' : OmegaX K → Omega K} (hf : EvalsTo K f F)
+    (hf' : EvalsTo K f' F') : EvalsTo K (f + f') (fun α => F α + F' α) := by
+  obtain ⟨g, h, hh, rfl, hgh⟩ := hf
+  obtain ⟨g', h', hh', rfl, hgh'⟩ := hf'
+  refine ⟨g * h' + g' * h, h * h', mul_ne_zero hh hh', ?_, fun α hα => ?_⟩
+  · have h1 := alg_hol_ne_zero hh
+    have h2 := alg_hol_ne_zero hh'
+    rw [map_add, map_mul, map_mul, map_mul]; field_simp
+  · rw [mul_apply_hol] at hα
+    have h1 : h.1 α ≠ 0 := left_ne_zero_of_mul hα
+    have h2 : h'.1 α ≠ 0 := right_ne_zero_of_mul hα
+    dsimp only
+    rw [hgh α h1, hgh' α h2, add_apply_hol, mul_apply_hol, mul_apply_hol, mul_apply_hol]
+    field_simp
+
+theorem evalsTo_neg {f : MeroRing K} {F : OmegaX K → Omega K} (hf : EvalsTo K f F) :
+    EvalsTo K (-f) (fun α => -F α) := by
+  obtain ⟨g, h, hh, rfl, hgh⟩ := hf
+  refine ⟨-g, h, hh, by rw [map_neg, neg_div], fun α hα => ?_⟩
+  dsimp only
+  rw [hgh α hα, show (-g).1 α = -g.1 α from rfl, neg_div]
+
 end AnalyticTheory
