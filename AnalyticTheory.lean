@@ -22,6 +22,7 @@ import AnalyticTheory.Theta
 import AnalyticTheory.ThetaOrder
 import AnalyticTheory.Classes
 import AnalyticTheory.ThetaDiv
+import AnalyticTheory.PeriodicSol
 import AnalyticTheory.AbelJacobi
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1

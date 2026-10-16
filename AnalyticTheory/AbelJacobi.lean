@@ -1,4 +1,4 @@
-import AnalyticTheory.ThetaDiv
+import AnalyticTheory.PeriodicSol
 
 /-!
 # The Abel–Jacobi theorem and the Riemann–Roch theorem for periodic divisors
