@@ -19,10 +19,143 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
+section ff
+
+variable {K}
+
+theorem anVal_sum_ge {ξ : Omega K} (hξ : ξ ≠ 0) {ι : Type*} (s : Finset ι) (g : ι → MeroRing K)
+    {n : ℤ} (h : ∀ i ∈ s, ((n : ℤ) : WithTop ℤ) ≤ anVal K ξ (g i)) :
+    ((n : ℤ) : WithTop ℤ) ≤ anVal K ξ (∑ i ∈ s, g i) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => rw [Finset.sum_empty, anVal_zero K ξ hξ]; exact le_top
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha]
+    exact anVal_ge_add hξ (h a (Finset.mem_insert_self a s))
+      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+
+/-- Elements of `M_K` integral over `K` have no poles. -/
+theorem anVal_nonneg_of_isIntegral {f : MeroRing K} (hf : IsIntegral K f) {ξ : Omega K}
+    (hξ : ξ ≠ 0) : 0 ≤ anVal K ξ f := by
+  by_cases hf0 : f = 0
+  · rw [hf0, anVal_zero K ξ hξ]; exact le_top
+  obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hξ hf0)
+  rw [← hv]
+  by_contra hneg
+  have hv0 : v < 0 := by
+    by_contra h; push_neg at h; exact hneg (by exact_mod_cast h)
+  have hmon := minpoly.monic hf
+  have hn : 0 < (minpoly K f).natDegree := minpoly.natDegree_pos hf
+  have hroot := minpoly.aeval K f
+  rw [hmon.as_sum, map_add, map_pow, Polynomial.aeval_X, map_sum] at hroot
+  set n := (minpoly K f).natDegree with hndef
+  have hsum : ((((n - 1 : ℕ) : ℤ) * v : ℤ) : WithTop ℤ) ≤ anVal K ξ (∑ i ∈ Finset.range n,
+      Polynomial.aeval f (Polynomial.C ((minpoly K f).coeff i) * Polynomial.X ^ i)) := by
+    apply anVal_sum_ge hξ
+    intro i hi
+    have hi' : i ≤ n - 1 := by have := Finset.mem_range.mp hi; omega
+    rw [map_mul, Polynomial.aeval_C, map_pow, Polynomial.aeval_X]
+    have h1 : ((0 : ℤ) : WithTop ℤ) ≤ anVal K ξ (algebraMap K (MeroRing K) ((minpoly K f).coeff i)) := by
+      exact_mod_cast anVal_algebraMap_nonneg hξ _
+    have h2 := anVal_le_add hξ h1 (le_of_eq (anVal_pow_of hξ hv.symm i).symm)
+    refine le_trans ?_ h2
+    have : ((n - 1 : ℕ) : ℤ) * v ≤ 0 + (i : ℤ) * v := by
+      have : (i : ℤ) ≤ ((n - 1 : ℕ) : ℤ) := by exact_mod_cast hi'
+      nlinarith
+    exact_mod_cast this
+  have hfn : f ^ n = -(∑ i ∈ Finset.range n,
+      Polynomial.aeval f (Polynomial.C ((minpoly K f).coeff i) * Polynomial.X ^ i)) :=
+    eq_neg_of_add_eq_zero_left hroot
+  have h4 := anVal_pow_of hξ hv.symm n
+  rw [hfn, anVal_neg hξ] at h4
+  rw [h4] at hsum
+  have h3 : ((n - 1 : ℕ) : ℤ) * v ≤ (n : ℤ) * v := by exact_mod_cast hsum
+  have : ((n - 1 : ℕ) : ℤ) = (n : ℤ) - 1 := by omega
+  rw [this] at h3
+  linarith
+
+end ff
+
 /-- Book, §2, item I: `F_K(q)` is a function field over `K`. Blueprint: `thm:fq-function-field`. -/
 theorem fq_is_function_field (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     IsFunctionFieldOver K (FqSub K q) := by
-  sorry
+  classical
+  let P : FqSub K q := ⟨wpM K q, by rw [wpM_eq hq0 hq1]; exact wpAlg_mem_Fq hq0 hq1⟩
+  let P' : FqSub K q := ⟨wpPrimeM K q, by rw [wpPrimeM_eq hq0 hq1]; exact wpPrimeAlg_mem_Fq hq0 hq1⟩
+  let ι : FqSub K q →ₐ[K] MeroRing K := { (FqSub K q).subtype with commutes' := fun c => rfl }
+  have hι : Function.Injective ι := Subtype.val_injective
+  have hclosed : ∀ x : FqSub K q, IsIntegral K x → ∃ k : K, algebraMap K (FqSub K q) k = x := by
+    intro x hx
+    have hx' : IsIntegral K (x : MeroRing K) := hx.map ι
+    have hL : InL (q := q) 1 (x : MeroRing K) :=
+      ⟨x.2, le_trans (by exact_mod_cast (by norm_num : (-1 : ℤ) ≤ 0))
+        (anVal_nonneg_of_isIntegral hx' one_ne_zero), fun α hα _ => anVal_nonneg_of_isIntegral hx' hα⟩
+    obtain ⟨c, hc⟩ := InL_one_const hq0 hq1 hL
+    exact ⟨c, Subtype.ext hc.symm⟩
+  have htop : IntermediateField.adjoin K ({P, P'} : Set (FqSub K q)) = ⊤ := by
+    rw [eq_top_iff]
+    intro x _
+    have hx : (x : MeroRing K) ∈ (IntermediateField.adjoin K ({wpM K q, wpPrimeM K q} :
+        Set (MeroRing K)) : Set (MeroRing K)) := by
+      rw [thmVI_generation K q hq0 hq1]; exact x.2
+    have himg : ι '' ({P, P'} : Set (FqSub K q)) = {wpM K q, wpPrimeM K q} := by
+      rw [Set.image_insert_eq, Set.image_singleton]; rfl
+    rw [← himg, ← IntermediateField.adjoin_map] at hx
+    obtain ⟨y, hy, hyx⟩ := hx
+    rw [← hι hyx]; exact hy
+  refine ⟨⟨{P, P'}, by rw [Finset.coe_insert, Finset.coe_singleton]; exact htop⟩, ⟨P, ?_⟩, hclosed⟩
+  have htr : Transcendental K P := by
+    intro halg
+    obtain ⟨c, hc⟩ := hclosed P halg.isIntegral
+    have h1 := (thmVI_poles K q hq0 hq1).1
+    have e : wpM K q = algebraMap K (MeroRing K) c := (congrArg Subtype.val hc).symm
+    rw [e] at h1
+    have := anVal_algebraMap_nonneg (K := K) one_ne_zero c
+    rw [h1] at this
+    exact absurd this (by exact_mod_cast (by norm_num : ¬ (0 : ℤ) ≤ -2))
+  have hind : AlgebraicIndependent K (fun _ : Unit => P) := algebraicIndependent_unique_type_iff.mpr htr
+  rw [hind.isTranscendenceBasis_iff_isAlgebraic]
+  set A := Algebra.adjoin K (Set.range fun _ : Unit => P) with hA
+  have hPA : P ∈ A := Algebra.subset_adjoin (Set.mem_range_self ())
+  let T := Subalgebra.algebraicClosure A (FqSub K q)
+  have hTinv : ∀ y ∈ T, y⁻¹ ∈ T := fun y hy => IsAlgebraic.inv_iff.mpr hy
+  let E : IntermediateField K (FqSub K q) :=
+    { carrier := T
+      mul_mem' := T.mul_mem
+      add_mem' := T.add_mem
+      algebraMap_mem' := fun c => by
+        have : algebraMap K (FqSub K q) c = algebraMap A (FqSub K q) (algebraMap K A c) := rfl
+        rw [this]; exact T.algebraMap_mem _
+      inv_mem' := hTinv }
+  have hP_E : P ∈ E := by
+    show IsAlgebraic A P
+    have : P = algebraMap A (FqSub K q) ⟨P, hPA⟩ := rfl
+    rw [this]; exact isAlgebraic_algebraMap _
+  have hP'_E : P' ∈ E := by
+    show IsAlgebraic A P'
+    have hrel := thmVI_relation K q hq0 hq1
+    have a0mem : (P ^ 3 + algebraMap K (FqSub K q) (coeffB K q) * P +
+        algebraMap K (FqSub K q) (coeffC K q)) ∈ A :=
+      A.add_mem (A.add_mem (A.pow_mem hPA 3) (A.mul_mem (A.algebraMap_mem _) hPA)) (A.algebraMap_mem _)
+    refine IsIntegral.isAlgebraic ⟨Polynomial.X ^ 2 + (Polynomial.C ⟨P, hPA⟩ * Polynomial.X -
+      Polynomial.C ⟨_, a0mem⟩), ?_, ?_⟩
+    · refine Polynomial.monic_X_pow_add ?_
+      refine lt_of_le_of_lt (Polynomial.degree_sub_le _ _) (max_lt ?_ ?_)
+      · exact lt_of_le_of_lt (Polynomial.degree_C_mul_X_le _) (by decide)
+      · exact lt_of_le_of_lt Polynomial.degree_C_le (by decide)
+    · simp only [Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_sub,
+        Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_X]
+      apply Subtype.ext
+      show wpPrimeM K q ^ 2 + (wpM K q * wpPrimeM K q - (wpM K q ^ 3 +
+        algebraMap K (MeroRing K) (coeffB K q) * wpM K q + algebraMap K (MeroRing K) (coeffC K q))) = 0
+      rw [← hrel]; ring
+  have hle : IntermediateField.adjoin K ({P, P'} : Set (FqSub K q)) ≤ E := by
+    rw [IntermediateField.adjoin_le_iff]
+    rintro y (rfl | rfl)
+    · exact hP_E
+    · exact hP'_E
+  rw [htop] at hle
+  exact ⟨fun y => hle (IntermediateField.mem_top (x := y))⟩
 
 section helpers
 
