@@ -629,4 +629,129 @@ theorem evalsTo_neg {f : MeroRing K} {F : OmegaX K → Omega K} (hf : EvalsTo K 
   dsimp only
   rw [hgh α hα, show (-g).1 α = -g.1 α from rfl, neg_div]
 
+
+section transport
+
+variable {q : K} (hq0 : q ≠ 0)
+
+theorem polyHol_minpoly_shift (ξ : Omega K) :
+    polyHol K (minpoly K (algebraMap K (Omega K) q * ξ)) =
+      algebraMap K (holSubring K) (q ^ (minpoly K ξ).natDegree) *
+        holScale K (Units.mk0 q hq0)⁻¹ (polyHol K (minpoly K ξ)) := by
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0
+  have e : minpoly K (algebraMap K (Omega K) q * ξ) = psi q (minpoly K ξ) 1 := by
+    rw [psi_eq_minpoly hq0, zpow_one]
+  refine Subtype.ext (funext fun x => ?_)
+  rw [e, polyHol_psi_apply q hq0, mul_apply_hol, algebraMap_apply_hol, holScale_apply,
+    polyHol_apply, scalePt_val hq0]
+  simp only [zpow_one, map_pow, phiOm]
+  rw [div_eq_inv_mul]
+
+theorem anVal_holScale_shift {ξ : Omega K} (hξ : ξ ≠ 0) {g : holSubring K} (hg : g ≠ 0) :
+    anVal K (algebraMap K (Omega K) q * ξ)
+        (algebraMap (holSubring K) (MeroRing K) (holScale K (Units.mk0 q hq0)⁻¹ g)) =
+      anVal K ξ (algebraMap (holSubring K) (MeroRing K) g) := by
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0
+  have hξ' : algebraMap K (Omega K) q * ξ ≠ 0 := mul_ne_zero hQ hξ
+  set S := holScale K (Units.mk0 q hq0)⁻¹ with hS
+  have hSg : S g ≠ 0 := (map_ne_zero_iff _ S.injective).mpr hg
+  obtain ⟨m, hm1, hm2, hm3⟩ := exists_exact_pow K hξ hg
+  obtain ⟨m', hm1', hm2', hm3'⟩ := exists_exact_pow K hξ' hSg
+  rw [hm3, hm3']
+  have hunit : IsUnit (algebraMap K (holSubring K) (q ^ (minpoly K ξ).natDegree)) :=
+    (IsUnit.mk0 _ (pow_ne_zero _ hq0)).map _
+  have hiff : ∀ k : ℕ, polyHol K (minpoly K (algebraMap K (Omega K) q * ξ)) ^ k ∣ S g ↔
+      polyHol K (minpoly K ξ) ^ k ∣ g := by
+    intro k
+    rw [polyHol_minpoly_shift hq0, mul_pow, (hunit.pow k).mul_left_dvd, ← map_pow, map_dvd_iff]
+  have h1 : m ≤ m' := (pow_dvd_iff_le K hξ' hSg ⟨hm1', hm2'⟩ m).mp ((hiff m).mpr hm1)
+  have h2 : m' ≤ m := (pow_dvd_iff_le K hξ hg ⟨hm1, hm2⟩ m').mp ((hiff m').mp hm1')
+  have : m = m' := le_antisymm h1 h2
+  rw [this]
+
+theorem anVal_translation_shift {ξ : Omega K} (hξ : ξ ≠ 0) (f : MeroRing K) :
+    anVal K (algebraMap K (Omega K) q * ξ) (translation K (Units.mk0 q hq0) f) = anVal K ξ f := by
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0
+  have hξ' : algebraMap K (Omega K) q * ξ ≠ 0 := mul_ne_zero hQ hξ
+  by_cases hf : f = 0
+  · subst hf; rw [map_zero, anVal_zero K _ hξ', anVal_zero K _ hξ]
+  obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring K) f
+  have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
+  have hx0 : x ≠ 0 := by rintro rfl; apply hf; rw [← hxy]; simp
+  rw [← hxy, map_div₀, translation_alg, translation_alg, div_eq_mul_inv, div_eq_mul_inv,
+    (anVal_isValuation K _ hξ').2.2.1, (anVal_isValuation K _ hξ).2.2.1,
+    anVal_holScale_shift hq0 hξ hx0]
+  obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hξ (alg_hol_ne_zero hy0))
+  rw [anVal_inv_of hξ' (alg_hol_ne_zero ((map_ne_zero_iff _ (holScale K _).injective).mpr hy0))
+      ((anVal_holScale_shift hq0 hξ hy0).trans hv.symm),
+    anVal_inv_of hξ (alg_hol_ne_zero hy0) hv.symm]
+
+include hq0 in
+/-- Valuations of periodic functions are periodic. -/
+theorem anVal_periodic {f : MeroRing K} (hf : f ∈ Fq K q) {ξ : Omega K} (hξ : ξ ≠ 0) (k : ℤ) :
+    anVal K (algebraMap K (Omega K) q ^ k * ξ) f = anVal K ξ f := by
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0
+  have hfq := (mem_Fq_iff hq0 f).mp hf
+  have step : ∀ η : Omega K, η ≠ 0 → anVal K (algebraMap K (Omega K) q * η) f = anVal K η f := by
+    intro η hη
+    have := anVal_translation_shift hq0 hη f
+    rwa [hfq] at this
+  induction k using Int.induction_on with
+  | zero => simp
+  | succ i ih =>
+    rw [zpow_add_one₀ hQ, mul_comm _ (algebraMap K (Omega K) q), mul_assoc,
+      step _ (mul_ne_zero (zpow_ne_zero _ hQ) hξ), ih]
+  | pred i ih =>
+    have e : algebraMap K (Omega K) q ^ (-(i : ℤ)) * ξ =
+        algebraMap K (Omega K) q * (algebraMap K (Omega K) q ^ (-(i : ℤ) - 1) * ξ) := by
+      rw [zpow_sub_one₀ hQ]; field_simp
+    rw [e, step _ (mul_ne_zero (zpow_ne_zero _ hQ) hξ)] at ih
+    exact ih
+
+end transport
+
+
+theorem evalsTo_translation (u : Kˣ) {f : MeroRing K} {F : OmegaX K → Omega K}
+    (hf : EvalsTo K f F) : EvalsTo K (translation K u f) (fun x => F (scalePt K u⁻¹ x)) := by
+  obtain ⟨g, h, hh, rfl, hgh⟩ := hf
+  refine ⟨holScale K u⁻¹ g, holScale K u⁻¹ h, (map_ne_zero_iff _ (holScale K _).injective).mpr hh,
+    ?_, fun x hx => hgh _ hx⟩
+  rw [map_div₀, translation_alg, translation_alg]
+
+section periodic
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+theorem wpAlg_mem_Fq : wpAlg hq0 hq1 ∈ Fq K q := by
+  have hq0' := norm_pos_iff.mp hq0
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0'
+  rw [mem_Fq_iff hq0']
+  refine evalsTo_unique hq0 hq1 ?_ (wpAlg_evalsTo hq0 hq1)
+  convert evalsTo_translation (Units.mk0 q hq0') (wpAlg_evalsTo hq0 hq1) using 2
+  rename_i x
+  rw [scalePt_val hq0' x]
+  congr 1
+  rw [← (Equiv.subRight (1 : ℤ)).tsum_eq]
+  refine tsum_congr (fun n => ?_)
+  simp only [Equiv.subRight_apply]
+  rw [zpow_sub_one₀ hQ]
+  ring_nf
+
+theorem wpPrimeAlg_mem_Fq : wpPrimeAlg hq0 hq1 ∈ Fq K q := by
+  have hq0' := norm_pos_iff.mp hq0
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0'
+  rw [mem_Fq_iff hq0']
+  refine evalsTo_unique hq0 hq1 ?_ (wpPrimeAlg_evalsTo hq0 hq1)
+  convert evalsTo_translation (Units.mk0 q hq0') (wpPrimeAlg_evalsTo hq0 hq1) using 2
+  rename_i x
+  rw [scalePt_val hq0' x]
+  congr 1
+  rw [← (Equiv.subRight (1 : ℤ)).tsum_eq]
+  refine tsum_congr (fun n => ?_)
+  simp only [Equiv.subRight_apply]
+  rw [show 2 * (n - 1) = 2 * n - 2 by ring, zpow_sub₀ hQ, zpow_sub_one₀ hQ]
+  field_simp
+
+end periodic
+
 end AnalyticTheory
