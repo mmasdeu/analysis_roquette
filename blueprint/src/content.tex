@@ -315,6 +315,7 @@ See the Lean proof of \texttt{theta\_functional\_equation, multipliable\_one\_su
 A $q$-periodic divisor is the divisor of a $q$-periodic function iff $\deg_q(\mathfrak m)=0$ and $\Phi_q(\mathfrak m)\equiv 1\bmod^\times q$; then the function is unique up to $K^\times$.
 \end{proposition}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{abel\_jacobi\_one}.
 \end{proof}
 
@@ -326,6 +327,7 @@ See the Lean proof of \texttt{abel\_jacobi\_one}.
 For every $\alpha\in\Omega^\times$ there is a $q$-periodic $f$ with $w_\alpha(f)=1$, and $w_\beta(f)=0$ for $\beta$ not conjugate to $\alpha$ mod$^\times q$.
 \end{corollary}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{exists\_periodic\_function\_with\_valuation}.
 \end{proof}
 
@@ -530,6 +532,7 @@ See the Lean proof of \texttt{isHolomorphicOver\_mul}.
 For a $q$-periodic divisor $\mathfrak m$, the space $L_K(q\,|\,\mathfrak m)$ of $q$-periodic functions $f$ with $(f)\ge-\mathfrak m$ is $0$ if $\deg_q\mathfrak m<0$ (and also if $\deg_q\mathfrak m=0$, $\Phi_q(\mathfrak m)\not\equiv1$); it has dimension $1$ if $\deg_q\mathfrak m=0$, $\Phi_q(\mathfrak m)\equiv1$; and $\dim L_K(q\,|\,\mathfrak m)=\deg_q(\mathfrak m)$ if $\deg_q\mathfrak m>0$.
 \end{proposition}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{LSet, riemann\_roch\_analytic}.
 \end{proof}
 
@@ -829,7 +832,7 @@ $C=-\tfrac1{12}(5s_3+7s_5)$, an integral power series in $q$ (formula (38)).
 \lean{AnalyticTheory.thmVI_generation, AnalyticTheory.thmVI_poles, AnalyticTheory.thmVI_relation, AnalyticTheory.thmVI_reflection}
 \uses{def:wp, def:wp-prime, def:coeffB, def:coeffC, def:Fq, def:reflection}
 \leanok
-$\wp,\wp'$ generate $F_K(q)$; the poles are $2\mathfrak p_1$ and $3\mathfrak p_1$; they satisfy $\wp'^2+\wp\wp'=\wp^3+B\wp+C$; the reflection acts as stated.
+$\wp,\wp\'$ generate $F_K(q)$; the poles are $2\mathfrak p_1$ and $3\mathfrak p_1$; they satisfy $\wp\'^2+\wp\wp\'=\wp^3+B\wp+C$; the reflection acts as stated.
 \end{theorem}
 \begin{proof}
 See the Lean proof of \texttt{thmVI\_generation, thmVI\_poles, thmVI\_relation, thmVI\_reflection}.

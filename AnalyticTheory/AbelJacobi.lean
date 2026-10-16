@@ -423,6 +423,87 @@ Blueprint: `prop:abel-jacobi-2`. -/
 def LSet (q : K) (m : Omega K → ℤ) : Set (MeroRing K) :=
   {f | f ∈ Fq K q ∧ ∀ α : Omega K, α ≠ 0 → ((-(m α) : ℤ) : WithTop ℤ) ≤ anVal K α f}
 
+section rr
+
+variable {K}
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q)
+
+/-- `L_K(q|𝔪) ≅ {G ∈ H_K | G(q⁻¹X) = a⁻¹ X^d G(X)}` via `G ↦ G / Θ_𝔪`. -/
+noncomputable def solToL :
+    solSpace q (norm_pos_iff.mp hq0) (aTheta hq0 hq1 hm)⁻¹ (dTheta hq0 hq1 hm) →ₗ[K] MeroRing K where
+  toFun G := algebraMap (holSubring K) (MeroRing K) (G : holSubring K) * (thetaDiv hq0 hq1 hm)⁻¹
+  map_add' G H := by simp only [Submodule.coe_add, map_add, add_mul]
+  map_smul' c G := by
+    simp only [Submodule.coe_smul, Algebra.smul_def, map_mul, RingHom.id_apply, algebraMap_hol_mero]
+    ring
+
+theorem solToL_injective : Function.Injective (solToL hq0 hq1 hm) := by
+  intro G H h
+  have hΘ := thetaDiv_ne_zero hq0 hq1 hm
+  simp only [solToL, LinearMap.coe_mk, AddHom.coe_mk] at h
+  have h2 := mul_right_cancel₀ (inv_ne_zero hΘ) h
+  exact Subtype.ext (IsFractionRing.injective (holSubring K) (MeroRing K) h2)
+
+theorem translation_hol_mero (G : holSubring K) :
+    translation K (Units.mk0 q (norm_pos_iff.mp hq0)) (algebraMap (holSubring K) (MeroRing K) G) =
+      algebraMap (holSubring K) (MeroRing K) (holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ G) :=
+  translation_alg _ G
+
+theorem mem_LSet_iff_range (f : MeroRing K) :
+    f ∈ LSet K q m ↔ f ∈ LinearMap.range (solToL hq0 hq1 hm) := by
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hΘ := thetaDiv_ne_zero hq0 hq1 hm
+  have htr := translation_thetaDiv hq0 hq1 hm
+  have hane := aTheta_ne_zero hq0 hq1 hm
+  set Θ := thetaDiv hq0 hq1 hm
+  set a := aTheta hq0 hq1 hm
+  set d := dTheta hq0 hq1 hm
+  set u := Units.mk0 q hq0'
+  have hcX : algebraMap K (MeroRing K) a⁻¹ * Xm d ≠ 0 :=
+    mul_ne_zero ((_root_.map_ne_zero _).mpr (inv_ne_zero hane)) (Xm_ne_zero d)
+  constructor
+  · rintro ⟨hfF, hfv⟩
+    have hfq := (mem_Fq_iff hq0' f).mp hfF
+    have hnn : ∀ ξ : Omega K, ξ ≠ 0 → 0 ≤ anVal K ξ (f * Θ) := by
+      intro ξ hξ
+      rw [(anVal_isValuation K ξ hξ).2.2.1, anVal_thetaDiv hq0 hq1 hm hξ]
+      have h1 := hfv ξ hξ
+      by_cases hf : f = 0
+      · subst hf; rw [anVal_zero K ξ hξ]; exact le_top
+      obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hξ hf)
+      rw [← hv] at h1 ⊢
+      have : -(m ξ) ≤ v := by exact_mod_cast h1
+      exact_mod_cast (by omega : (0 : ℤ) ≤ v + m ξ)
+    obtain ⟨G, hG⟩ := mem_hol_of_anVal_nonneg hnn
+    have hGmem : G ∈ solSpace q hq0' a⁻¹ d := by
+      show holScale K u⁻¹ G = algebraMap K (holSubring K) a⁻¹ * monoHol K d * G
+      apply IsFractionRing.injective (holSubring K) (MeroRing K)
+      rw [← translation_hol_mero hq0, ← hG, map_mul, hfq, htr, map_mul, map_mul, algebraMap_hol_mero, ← hG]
+      unfold Xm; ring
+    refine ⟨⟨G, hGmem⟩, ?_⟩
+    simp only [solToL, LinearMap.coe_mk, AddHom.coe_mk]
+    rw [← hG]; exact mul_inv_cancel_right₀ hΘ f
+  · rintro ⟨G, rfl⟩
+    simp only [solToL, LinearMap.coe_mk, AddHom.coe_mk]
+    have hGs : holScale K u⁻¹ (G : holSubring K) =
+        algebraMap K (holSubring K) a⁻¹ * monoHol K d * G := G.2
+    refine ⟨(mem_Fq_iff hq0' _).mpr ?_, fun ξ hξ => ?_⟩
+    · rw [map_mul, map_inv₀, translation_hol_mero hq0, htr, hGs, map_mul, map_mul,
+        algebraMap_hol_mero]
+      have : algebraMap (holSubring K) (MeroRing K) (monoHol K d) = Xm d := rfl
+      rw [this]
+      calc algebraMap K (MeroRing K) a⁻¹ * Xm d * algebraMap (holSubring K) (MeroRing K) G *
+            (algebraMap K (MeroRing K) a⁻¹ * Xm d * Θ)⁻¹
+          = (algebraMap K (MeroRing K) a⁻¹ * Xm d * (algebraMap K (MeroRing K) a⁻¹ * Xm d)⁻¹) *
+            (algebraMap (holSubring K) (MeroRing K) G * Θ⁻¹) := by rw [mul_inv]; ring
+        _ = _ := by rw [mul_inv_cancel₀ hcX, one_mul]
+    · rw [(anVal_isValuation K ξ hξ).2.2.1, anVal_inv_of hξ hΘ (anVal_thetaDiv hq0 hq1 hm hξ)]
+      have h0 := anVal_hol_nonneg hξ (G : holSubring K)
+      calc ((-(m ξ) : ℤ) : WithTop ℤ) = 0 + ((-(m ξ) : ℤ) : WithTop ℤ) := (zero_add _).symm
+        _ ≤ _ := add_le_add_left h0 _
+
+end rr
+
 /-- Book, §2, Proposition 2 (Riemann–Roch theorem) together with the remarks preceding it: for a
 `q`-periodic divisor `𝔪`, `L_K(q|𝔪) = 0` if `deg_q 𝔪 < 0`; if `deg_q 𝔪 = 0` it is `0` unless
 `Φ_q(𝔪) ≡ 1`, in which case it has dimension `1`; and `dim L_K(q|𝔪) = deg_q(𝔪)` if `deg_q 𝔪 > 0`.
@@ -436,7 +517,52 @@ theorem riemann_roch_analytic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
       (PhiQ K q (norm_pos_iff.mp hq0) m ≠ 1 → LSet K q m = {0})) ∧
     (0 < degQ K q m →
       ((Module.finrank K (Submodule.span K (LSet K q m)) : ℕ) : ℤ) = degQ K q m) := by
-  sorry
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hdeg := degQ_eq_dTheta hq0 hq1 hm
+  have hane := aTheta_ne_zero hq0 hq1 hm
+  have hκ : (aTheta hq0 hq1 hm)⁻¹ ≠ 0 := inv_ne_zero hane
+  have hL := mem_LSet_iff_range hq0 hq1 hm
+  have hspan : Submodule.span K (LSet K q m) = LinearMap.range (solToL hq0 hq1 hm) := by
+    have : LSet K q m = (LinearMap.range (solToL hq0 hq1 hm) : Set (MeroRing K)) := Set.ext hL
+    rw [this, Submodule.span_eq]
+  have hfin : Module.finrank K (Submodule.span K (LSet K q m)) =
+      Module.finrank K (solSpace q hq0' (aTheta hq0 hq1 hm)⁻¹ (dTheta hq0 hq1 hm)) := by
+    rw [hspan, LinearMap.finrank_range_of_inj (solToL_injective hq0 hq1 hm)]
+  have hbot : solSpace q hq0' (aTheta hq0 hq1 hm)⁻¹ (dTheta hq0 hq1 hm) = ⊥ → LSet K q m = {0} := by
+    intro hb
+    ext f
+    rw [hL, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨G, rfl⟩
+      have h1 : (G : holSubring K) = 0 := by
+        have : (G : holSubring K) ∈ (⊥ : Submodule K (holSubring K)) := by rw [← hb]; exact G.2
+        exact (Submodule.mem_bot K).mp this
+      have hG0 : G = 0 := Subtype.ext h1
+      rw [hG0, map_zero]
+    · rintro rfl; exact Submodule.zero_mem _
+  obtain ⟨hx, hPhi⟩ := PhiQ_eq_mk hq0 hq1 hm hq0'
+  refine ⟨fun h => hbot (solSpace_eq_bot_of_neg hq0 hq1 hκ (by rw [← hdeg]; exact h)),
+    fun h0 => ⟨fun hΦ => ?_, fun hΦ => ?_⟩, fun hpos => ?_⟩
+  · have hd0 : dTheta hq0 hq1 hm = 0 := by rw [← hdeg]; exact h0
+    rw [hPhi, QuotientGroup.eq_one_iff, Subgroup.mem_zpowers_iff] at hΦ
+    obtain ⟨k, hk⟩ := hΦ
+    have ha : aTheta hq0 hq1 hm = q ^ k := by
+      have := congrArg Units.val hk
+      simp only [Units.val_zpow_eq_zpow_val, Units.val_mk0, hd0, zpow_zero, one_mul] at this
+      exact this.symm
+    rw [hfin, hd0]
+    exact solSpace_zero_finrank hq0 hq1 (k := -k) (by rw [ha, zpow_neg])
+  · have hd0 : dTheta hq0 hq1 hm = 0 := by rw [← hdeg]; exact h0
+    apply hbot
+    rw [hd0]
+    refine solSpace_zero_eq_bot hq0' (fun k hk => hΦ ?_)
+    rw [hPhi, QuotientGroup.eq_one_iff, Subgroup.mem_zpowers_iff]
+    refine ⟨-k, Units.ext ?_⟩
+    simp only [Units.val_zpow_eq_zpow_val, Units.val_mk0, hd0, zpow_zero, one_mul]
+    rw [zpow_neg, ← hk, inv_inv]
+  · rw [hfin, solSpace_finrank_pos hq0 hq1 hκ (by rw [← hdeg]; exact hpos), hdeg]
+    have : 0 ≤ dTheta hq0 hq1 hm := by rw [← hdeg]; exact hpos.le
+    exact Int.toNat_of_nonneg this
 
 /-- Book, §2, formula (12): `deg_q(m) = ∑ [K(α):K] m_α`, the sum over a system `R` of
 representatives of the `K`-conjugacy classes mod `^× q` in the annulus `|q| < |α| ≤ 1`.
