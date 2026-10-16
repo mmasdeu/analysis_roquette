@@ -1519,4 +1519,284 @@ theorem primeAt_degree {α : Omega K} (hα : α ≠ 0) :
 
 end degreeAt
 
+section mclassify
+
+variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+variable {Γ₀ : Type*} [LinearOrderedCommGroupWithZero Γ₀]
+
+omit [IsUltrametricDist K] [CompleteSpace K] in
+theorem Valuation_le_one_of_isIntegral {F : Type*} [Field F] [Algebra K F]
+    (v : Valuation F Γ₀) (R : Subalgebra K F) (hR : ∀ r ∈ R, v r ≤ 1) {f : F}
+    (hf : IsIntegral R f) : v f ≤ 1 := by
+  obtain ⟨p, hmon, heval⟩ := hf
+  by_contra hgt
+  push_neg at hgt
+  set n := p.natDegree with hndef
+  have hn : 0 < n := by
+    by_contra h0
+    push_neg at h0
+    have : p = 1 := (Polynomial.Monic.natDegree_eq_zero_iff_eq_one hmon).mp (by omega)
+    rw [this, Polynomial.eval₂_one] at heval
+    exact one_ne_zero heval
+  rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finset_sum] at heval
+  have hsum : v (∑ i ∈ Finset.range n,
+      Polynomial.eval₂ (algebraMap R F) f (Polynomial.C (p.coeff i) * Polynomial.X ^ i)) ≤
+        v f ^ (n - 1) := by
+    refine Valuation.map_sum_le v (fun i hi => ?_)
+    have hi' : i ≤ n - 1 := by have := Finset.mem_range.mp hi; omega
+    rw [Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_X_pow, v.map_mul, v.map_pow]
+    have hc : v (algebraMap R F (p.coeff i)) ≤ 1 := hR _ (p.coeff i).2
+    calc _ ≤ 1 * v f ^ i := mul_le_mul_right' hc _
+      _ = v f ^ i := one_mul _
+      _ ≤ v f ^ (n - 1) := pow_le_pow_right' hgt.le hi'
+  have hfn : f ^ n = -(∑ i ∈ Finset.range n,
+      Polynomial.eval₂ (algebraMap R F) f (Polynomial.C (p.coeff i) * Polynomial.X ^ i)) :=
+    eq_neg_of_add_eq_zero_left heval
+  have h4 := v.map_pow f n
+  rw [hfn, Valuation.map_neg] at h4
+  rw [h4] at hsum
+  have hne : v f ^ (n - 1) ≠ 0 := pow_ne_zero _ (ne_of_gt (lt_trans zero_lt_one hgt))
+  have hsucc : v f ^ n = v f ^ (n - 1) * v f := by
+    rw [← pow_succ, show n - 1 + 1 = n by omega]
+  have hle' : v f ^ (n - 1) ≤ v f ^ n := pow_le_pow_right' hgt.le (by omega)
+  have heq : v f ^ n = v f ^ (n - 1) := le_antisymm hsum hle'
+  rw [hsucc] at heq
+  have h1 : v f = 1 := mul_left_cancel₀ hne (heq.trans (mul_one _).symm)
+  exact absurd h1 (ne_of_gt hgt)
+
+include hq0 hq1 in
+theorem exists_center_v (v : Valuation (FqSub K q) Γ₀) {D : Omega K → ℤ}
+    (hD : D ∈ DivisorsPeriodic K q) (hD0 : ∀ α, 0 ≤ D α) (hdeg : 0 < degQ K q D)
+    (hAv : ∀ f ∈ AD q D, v f ≤ 1)
+    {g : FqSub K q} (hgA : g ∈ AD q D) (hg0 : g ≠ 0) (hgv : v g < 1) :
+    ∃ β : Omega K, β ≠ 0 ∧ D β = 0 ∧
+      ∀ f ∈ AD q D, (0 < anVal K β (f : MeroRing K) ↔ v f < 1) := by
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  have hg' : (g : MeroRing K) ≠ 0 := fun h => hg0 (Subtype.ext h)
+  have hgP := divisorOf_periodic hq0 g.2
+  have hfin := annPart_support_finite hq0 hq1 hgP (repSystem K q)
+  set Z := hfin.toFinset.filter (fun β => D β = 0 ∧ 0 < divisorOf K (g : MeroRing K) β) with hZ
+  have hZmem : ∀ β ∈ Z, β ∈ repAnnulus K q ∧ D β = 0 ∧ 0 < divisorOf K (g : MeroRing K) β := by
+    intro β hβ
+    rw [hZ, Finset.mem_filter, Set.Finite.mem_toFinset] at hβ
+    exact ⟨hβ.1.1, hβ.2.1, hβ.2.2⟩
+  have hrep0 : ∀ β ∈ repAnnulus K q, β ≠ 0 := fun β hβ h0 => by
+    have := hβ.2.1; rw [h0] at this
+    have h00 : omegaNorm K (0 : Omega K) = 0 := spectralNorm_zero
+    linarith
+  have hstep1 : ∃ β ∈ Z, ∀ f ∈ AD q D, 0 < anVal K β (f : MeroRing K) → v f < 1 := by
+    by_contra hcon
+    push_neg at hcon
+    choose! fs hfsA hfsβ hfsv using hcon
+    set N : ℕ := ∑ β ∈ Z, (divisorOf K (g : MeroRing K) β).toNat with hN
+    set Fp : FqSub K q := ∏ β ∈ Z, fs β ^ N with hFp
+    have hvF : v Fp = 1 := by
+      rw [hFp, map_prod]
+      refine Finset.prod_eq_one (fun β hβ => ?_)
+      rw [v.map_pow, le_antisymm (hAv _ (hfsA β hβ)) (hfsv β hβ), one_pow]
+    have hFA : Fp ∈ AD q D := Subalgebra.prod_mem _ (fun β hβ => Subalgebra.pow_mem _ (hfsA β hβ) _)
+    have hGA : Fp * g⁻¹ ∈ AD q D := by
+      intro α hα hDα
+      obtain ⟨w, hw⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hα hg')
+      have hgα : anVal K α (g : MeroRing K) = (w : WithTop ℤ) := hw.symm
+      show 0 ≤ anVal K α ((Fp : MeroRing K) * (g : MeroRing K)⁻¹)
+      rw [(anVal_isValuation K α hα).2.2.1, anVal_inv_of hα hg' hgα]
+      by_cases hw' : w = 0
+      · rw [hw', neg_zero, WithTop.coe_zero, add_zero]; exact hFA α hα hDα
+      · obtain ⟨β', hβ', hcβ, -⟩ := repAnnulus_pt hq0 hq1 hα
+        have hβ'0 := hrep0 β' hβ'
+        have hDβ' : D β' = 0 := by rw [← periodic_conj hq0' hD hcβ, hDα]
+        have hgβ' : divisorOf K (g : MeroRing K) β' = w := by
+          rw [← periodic_conj hq0' hgP hcβ]
+          have := anVal_of_divisorOf hg' rfl hα
+          rw [hgα] at this; exact_mod_cast this.symm
+        have hw0 : 0 ≤ w := by have := hgA α hα hDα; rw [hgα] at this; exact_mod_cast this
+        have hβZ : β' ∈ Z := by
+          rw [hZ, Finset.mem_filter, Set.Finite.mem_toFinset]
+          exact ⟨⟨hβ', by rw [hgβ']; exact hw'⟩, hDβ', by rw [hgβ']; omega⟩
+        rw [anVal_conjModQ hq0' Fp.2 hα hcβ]
+        have hcoe : ((Fp : FqSub K q) : MeroRing K) = ∏ β ∈ Z, ((fs β : MeroRing K)) ^ N := by
+          rw [hFp]; push_cast; rfl
+        rw [hcoe, anVal_prod hβ'0]
+        have hterm : ∀ β ∈ Z, 0 ≤ anVal K β' ((fs β : MeroRing K) ^ N) := fun β hβ => by
+          rw [anVal_pow' hβ'0]; exact nsmul_nonneg (hfsA β hβ β' hβ'0 hDβ') N
+        have hsingle := Finset.single_le_sum hterm hβZ
+        have hfβ' : (1 : WithTop ℤ) ≤ anVal K β' (fs β' : MeroRing K) :=
+          withTop_pos_iff_one_le.mp (hfsβ β' hβZ)
+        have hwN : (w : ℤ) ≤ N := by
+          have : (divisorOf K (g : MeroRing K) β').toNat ≤ N :=
+            Finset.single_le_sum (f := fun β => (divisorOf K (g : MeroRing K) β).toNat)
+              (fun _ _ => Nat.zero_le _) hβZ
+          rw [hgβ'] at this; omega
+        have hge : ((w : ℤ) : WithTop ℤ) ≤ ∑ β ∈ Z, anVal K β' ((fs β : MeroRing K) ^ N) := by
+          refine le_trans ?_ hsingle
+          rw [anVal_pow' hβ'0]
+          calc ((w : ℤ) : WithTop ℤ) ≤ ((N : ℤ) : WithTop ℤ) := by exact_mod_cast hwN
+            _ = N • (1 : WithTop ℤ) := by rw [nsmul_one]; norm_cast
+            _ ≤ N • anVal K β' (fs β' : MeroRing K) := nsmul_le_nsmul_right hfβ' N
+        generalize (∑ β ∈ Z, anVal K β' ((fs β : MeroRing K) ^ N)) = X at hge ⊢
+        induction X using WithTop.recTopCoe with
+        | top => simp
+        | coe x =>
+          have : w ≤ x := by exact_mod_cast hge
+          rw [← WithTop.coe_add]
+          exact_mod_cast (by omega : (0 : ℤ) ≤ x + -w)
+    have hdec : Fp = g * (Fp * g⁻¹) := by field_simp
+    have h2 := congrArg v hdec
+    rw [v.map_mul, hvF] at h2
+    have h1 := hAv _ hGA
+    have h3 : v g * v (Fp * g⁻¹) < 1 := lt_of_le_of_lt (mul_le_of_le_one_right' h1) hgv
+    rw [← h2] at h3
+    exact lt_irrefl _ h3
+  obtain ⟨β, hβZ, hβ⟩ := hstep1
+  obtain ⟨hβR, hDβ, -⟩ := hZmem β hβZ
+  have hβ0 := hrep0 β hβR
+  refine ⟨β, hβ0, hDβ, fun f hf => ⟨hβ f hf, fun hfv => ?_⟩⟩
+  by_contra hfβ
+  have hfβ0 : anVal K β (f : MeroRing K) = 0 :=
+    le_antisymm (not_lt.mp hfβ) (hf β hβ0 hDβ)
+  obtain ⟨k, hk⟩ := exists_LS_of_AD hq0 hq1 hD0 hf
+  obtain ⟨n, u, hu, hu1⟩ := exists_inverse_mod hq0 hq1 hD hD0 hdeg hβ0 hDβ hk hfβ0
+  have huA : u ∈ AD q D := LS_le_AD n hu
+  have h1A : 1 - u * f ∈ AD q D := (AD q D).sub_mem (AD q D).one_mem ((AD q D).mul_mem huA hf)
+  have hv1' := hβ _ h1A hu1
+  have hvuf : v (u * f) < 1 := by
+    rw [v.map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (hAv u huA)) hfv
+  have := v.map_add (1 - u * f) (u * f)
+  rw [sub_add_cancel, v.map_one] at this
+  exact absurd (lt_of_le_of_lt this (max_lt hv1' hvuf)) (lt_irrefl _)
+
+include hq0 hq1 in
+/-- Every nontrivial valuation of `F_K(q)` (with values in a linearly ordered group with zero) which is
+trivial on `K` has the valuation ring of some `w_β`. -/
+theorem classify_mvaluation (v : Valuation (FqSub K q) Γ₀)
+    (hv : ∀ c : K, c ≠ 0 → v (algebraMap K (FqSub K q) c) = 1)
+    (hnt : ∃ x : FqSub K q, x ≠ 0 ∧ v x ≠ 1) :
+    ∃ β : Omega K, β ≠ 0 ∧ ∀ x : FqSub K q, v x ≤ 1 ↔ 0 ≤ anVal K β (x : MeroRing K) := by
+  classical
+  set P : FqSub K q := ⟨wpAlg hq0 hq1, wpAlg_mem_Fq hq0 hq1⟩ with hPdef
+  have hP1 : anVal K 1 (P : MeroRing K) = ((-2 : ℤ) : WithTop ℤ) := anVal_wpAlg_one hq0 hq1
+  have hP0 : P ≠ 0 := by
+    intro h
+    rw [h, show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K 1 one_ne_zero] at hP1
+    exact WithTop.top_ne_coe hP1
+  obtain ⟨y, hy0, hyv, hy1⟩ : ∃ y : FqSub K q, y ≠ 0 ∧ v y ≤ 1 ∧
+      anVal K 1 (y : MeroRing K) ≠ 0 := by
+    by_cases h : v P ≤ 1
+    · exact ⟨P, hP0, h, by rw [hP1]; exact WithTop.coe_ne_zero.mpr (by norm_num)⟩
+    · push_neg at h
+      refine ⟨P⁻¹, inv_ne_zero hP0, by rw [map_inv₀]; exact (inv_lt_one₀ (lt_trans zero_lt_one h)).mpr h |>.le, ?_⟩
+      have hP' : (P : MeroRing K) ≠ 0 := fun h' => hP0 (Subtype.ext h')
+      rw [show ((P⁻¹ : FqSub K q) : MeroRing K) = (P : MeroRing K)⁻¹ from rfl,
+        anVal_inv_of one_ne_zero hP' hP1]
+      exact WithTop.coe_ne_zero.mpr (by norm_num)
+  set D := polePart (divisorOf K (y : MeroRing K)) with hDdef
+  have hDP : D ∈ DivisorsPeriodic K q := polePart_mem (divisorOf_periodic hq0 y.2)
+  have hD0 : ∀ α, 0 ≤ D α := fun α => le_max_right _ _
+  have hdeg : 0 < degQ K q D := degQ_polePart_pos hq0 hq1 hy0 one_ne_zero hy1
+  have hRv : ∀ r ∈ Algebra.adjoin K ({y} : Set (FqSub K q)), v r ≤ 1 := by
+    intro r hr
+    induction hr using Algebra.adjoin_induction with
+    | mem x hx => rw [Set.mem_singleton_iff.mp hx]; exact hyv
+    | algebraMap c =>
+      by_cases hc : c = 0
+      · rw [hc, map_zero, v.map_zero]; exact zero_le'
+      · rw [hv c hc]
+    | add x z _ _ hx hz => exact v.map_add_le hx hz
+    | mul x z _ _ hx hz => rw [v.map_mul]; exact mul_le_one' hx hz
+  have hAv : ∀ f ∈ AD q D, v f ≤ 1 := fun f hf =>
+    Valuation_le_one_of_isIntegral v _ hRv (isIntegral_of_AD hq0 hq1 hy0 hDdef hdeg hf)
+  obtain ⟨x, hx0, hxv⟩ : ∃ x : FqSub K q, x ≠ 0 ∧ v x < 1 := by
+    obtain ⟨x, hx0, hxv⟩ := hnt
+    rcases lt_or_gt_of_ne hxv with h | h
+    · exact ⟨x, hx0, h⟩
+    · refine ⟨x⁻¹, inv_ne_zero hx0, ?_⟩
+      rw [map_inv₀]; exact (inv_lt_one₀ (lt_trans zero_lt_one h)).mpr h
+  obtain ⟨h, hhA, hh0, hhxA⟩ := exists_denominator_ne hq0 hq1 hDP hD0 hdeg x
+  have hgv : v (h * x) < 1 := by
+    rw [v.map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (hAv h hhA)) hxv
+  obtain ⟨β, hβ0, hDβ, hβ⟩ :=
+    exists_center_v hq0 hq1 v hDP hD0 hdeg hAv hhxA (mul_ne_zero hh0 hx0) hgv
+  have hden : ∀ z : FqSub K q, 0 ≤ anVal K β (z : MeroRing K) →
+      ∃ h ∈ AD q D, v h = 1 ∧ anVal K β (h : MeroRing K) = 0 ∧ h * z ∈ AD q D := by
+    intro z hz
+    obtain ⟨n, h, hh, hhβ, hhz⟩ := exists_denominator hq0 hq1 hDP hD0 hdeg hβ0 hDβ hz
+    have hhA := LS_le_AD n hh
+    refine ⟨h, hhA, le_antisymm (hAv h hhA) ?_, hhβ, hhz⟩
+    by_contra hlt
+    push_neg at hlt
+    have := (hβ h hhA).mpr hlt
+    rw [hhβ] at this
+    exact lt_irrefl _ this
+  have hpos : ∀ z : FqSub K q, 0 < anVal K β (z : MeroRing K) → v z < 1 := by
+    intro z hz
+    obtain ⟨h, hhA, hhv, hhβ, hhz⟩ := hden z hz.le
+    have h1 : 0 < anVal K β ((h * z : FqSub K q) : MeroRing K) := by
+      show 0 < anVal K β ((h : MeroRing K) * z)
+      rw [(anVal_isValuation K β hβ0).2.2.1, hhβ, zero_add]; exact hz
+    have h2 := (hβ _ hhz).mp h1
+    rw [v.map_mul, hhv, one_mul] at h2
+    exact h2
+  refine ⟨β, hβ0, fun z => ⟨fun hz => ?_, fun hz => ?_⟩⟩
+  · by_contra hneg
+    push_neg at hneg
+    have hz0 : z ≠ 0 := by
+      rintro rfl
+      rw [show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K β hβ0] at hneg
+      exact not_top_lt hneg
+    have hz' : (z : MeroRing K) ≠ 0 := fun h => hz0 (Subtype.ext h)
+    have hinv : 0 < anVal K β ((z⁻¹ : FqSub K q) : MeroRing K) := by
+      obtain ⟨t, ht⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hβ0 hz')
+      rw [show ((z⁻¹ : FqSub K q) : MeroRing K) = (z : MeroRing K)⁻¹ from rfl,
+        anVal_inv_of hβ0 hz' ht.symm]
+      rw [← ht] at hneg
+      have : t < 0 := by exact_mod_cast hneg
+      exact_mod_cast (by omega : (0 : ℤ) < -t)
+    have h3 := hpos _ hinv
+    rw [map_inv₀] at h3
+    have hvz0 : v z ≠ 0 := (Valuation.ne_zero_iff v).mpr hz0
+    have : 1 < v z := (inv_lt_one₀ (zero_lt_iff.mpr hvz0)).mp h3
+    exact absurd hz (not_le.mpr this)
+  · obtain ⟨h, hhA, hhv, -, hhz⟩ := hden z hz
+    have := hAv _ hhz
+    rwa [v.map_mul, hhv, one_mul] at this
+
+include hq0 hq1 in
+/-- Every prime divisor of `F_K(q) | K` is the valuation ring of some `w_β`. -/
+theorem primeDivisor_classify (P : PrimeDivisor K (FqSub K q)) :
+    ∃ β : Omega K, β ≠ 0 ∧ ∀ x : FqSub K q, x ∈ P.ring ↔ 0 ≤ anVal K β (x : MeroRing K) := by
+  classical
+  haveI := P.isDVR
+  set A := P.ring
+  have hne : A ≠ ⊤ := by
+    intro htop
+    apply IsDiscreteValuationRing.not_isField (R := A)
+    refine ⟨⟨0, 1, zero_ne_one⟩, mul_comm, fun {a} ha => ?_⟩
+    have hinv : (a : FqSub K q)⁻¹ ∈ A := by
+      rw [SetLike.ext_iff] at htop; exact (htop _).mpr trivial
+    refine ⟨⟨_, hinv⟩, Subtype.ext ?_⟩
+    show (a : FqSub K q) * (a : FqSub K q)⁻¹ = 1
+    exact mul_inv_cancel₀ (fun h => ha (Subtype.ext h))
+  obtain ⟨x, hx⟩ : ∃ x : FqSub K q, x ∉ A := by
+    by_contra h; push_neg at h; exact hne (eq_top_iff.mpr fun x _ => h x)
+  have hx0 : x ≠ 0 := by rintro rfl; exact hx A.zero_mem
+  have hv : ∀ c : K, c ≠ 0 → A.valuation (algebraMap K (FqSub K q) c) = 1 := by
+    intro c hc
+    have h1 : algebraMap K (FqSub K q) c ∈ A := P.contains c
+    have h2 : (algebraMap K (FqSub K q) c)⁻¹ ∈ A := by
+      rw [← map_inv₀]; exact P.contains c⁻¹
+    have hle1 := (A.valuation_le_one_iff _).mpr h1
+    have hle2 := (A.valuation_le_one_iff _).mpr h2
+    rw [map_inv₀] at hle2
+    have hne0 : A.valuation (algebraMap K (FqSub K q) c) ≠ 0 :=
+      (Valuation.ne_zero_iff _).mpr ((map_ne_zero _).mpr hc)
+    exact le_antisymm hle1 ((inv_le_one₀ (zero_lt_iff.mpr hne0)).mp hle2)
+  have hnt : ∃ y : FqSub K q, y ≠ 0 ∧ A.valuation y ≠ 1 := by
+    refine ⟨x, hx0, fun h => hx ((A.valuation_le_one_iff x).mp h.le)⟩
+  obtain ⟨β, hβ0, hβ⟩ := classify_mvaluation hq0 hq1 A.valuation hv hnt
+  exact ⟨β, hβ0, fun z => by rw [← A.valuation_le_one_iff]; exact hβ z⟩
+
+end mclassify
+
 end AnalyticTheory
