@@ -20,11 +20,6 @@ theorem wp_eq_neg_D_zeta (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     wpM K q = -Dop K (zetaM K q) - 2 * algebraMap K (MeroRing K) (sK K 1 q) := by
   sorry
 
-/-- `D` is a derivation of `M_K`. Blueprint: `def:D-operator`. -/
-theorem Dop_derivation : ∀ f g : MeroRing K, Dop K (f + g) = Dop K f + Dop K g ∧
-    Dop K (f * g) = f * Dop K g + g * Dop K f := by
-  sorry
-
 /-- Book, §3, (18): `2℘′ = D℘ − ℘`. Blueprint: `def:wp-prime`. -/
 theorem wpPrime_spec (q : K) :
     2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
