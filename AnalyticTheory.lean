@@ -29,6 +29,7 @@ import AnalyticTheory.Generation
 import AnalyticTheory.Relation
 import AnalyticTheory.RelationCoeffs
 import AnalyticTheory.QSeries
+import AnalyticTheory.CubicCoeffs
 import AnalyticTheory.TheoremVI
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA1
