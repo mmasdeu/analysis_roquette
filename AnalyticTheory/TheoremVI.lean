@@ -20,7 +20,20 @@ are `2𝔭₁` and `3𝔭₁`, and they satisfy the relation (32)/(39). Blueprin
 theorem thmVI_generation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     (IntermediateField.adjoin K ({wpM K q, wpPrimeM K q} : Set (MeroRing K)) :
         Set (MeroRing K)) = (FqSub K q : Set (MeroRing K)) := by
-  sorry
+  rw [wpM_eq hq0 hq1, wpPrimeM_eq hq0 hq1]
+  ext f
+  constructor
+  · intro hf
+    have hle : IntermediateField.adjoin K ({wpAlg hq0 hq1, wpPrimeAlg hq0 hq1} : Set (MeroRing K)) ≤
+        Subfield.toIntermediateField (FqSub K q) (fun c => Fq_algebraMap c) := by
+      rw [IntermediateField.adjoin_le_iff]
+      intro g hg
+      rcases hg with rfl | rfl
+      · exact wpAlg_mem_Fq hq0 hq1
+      · exact wpPrimeAlg_mem_Fq hq0 hq1
+    exact hle hf
+  · intro hf
+    exact Fq_le_adjoin hq0 hq1 hf
 
 theorem thmVI_poles (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     anVal K 1 (wpM K q) = ((-2 : ℤ) : WithTop ℤ) ∧

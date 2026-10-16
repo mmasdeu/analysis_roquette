@@ -429,6 +429,129 @@ theorem InL_mem_spanMono : ∀ (n : ℕ) (f : MeroRing K), InL (q := q) n f → 
       rw [hfe]
       exact Submodule.add_mem _ hgS (Submodule.smul_mem _ c hμS)
 
+
+include hq0 in
+theorem divisorOf_periodic {f : MeroRing K} (hf : f ∈ Fq K q) :
+    divisorOf K f ∈ DivisorsPeriodic K q := by
+  have hq0' := norm_pos_iff.mp hq0
+  refine ⟨divisorOf_mem_Divisors K f, fun α => ?_⟩
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0'
+  by_cases hα : α = 0
+  · simp [hα]
+  have := anVal_periodic hq0' hf hα 1
+  rw [zpow_one] at this
+  simp only [divisorOf, if_neg hα, if_neg (mul_ne_zero hQ hα), this]
+
+/-- The pole divisor `max(-m, 0)`. -/
+def polePart (m : Omega K → ℤ) : Omega K → ℤ := fun α => max (-(m α)) 0
+
+theorem polePart_mem {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) :
+    polePart m ∈ DivisorsPeriodic K q := by
+  refine ⟨⟨by simp [polePart, hm.1.1], fun r r' hr hrr' => (hm.1.2.1 r r' hr hrr').subset
+    (fun α ⟨h1, h2, h3⟩ => ⟨h1, h2, fun h0 => h3 (by simp [polePart, h0])⟩),
+    fun α β h => by simp [polePart, hm.1.2.2 α β h]⟩, fun α => by simp [polePart, hm.2 α]⟩
+
+omit hq0 hq1 in
+theorem degQ_nonneg_of_nonneg {m : Omega K → ℤ} (hm : ∀ α, 0 ≤ m α) : 0 ≤ degQ K q m := by
+  unfold degQ
+  exact finsum_nonneg (fun α => finsum_nonneg (fun _ => mul_nonneg (by positivity) (hm α)))
+
+include hq0 hq1 in
+theorem degQ_neg {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) : degQ K q (-m) = -degQ K q m := by
+  have h := degQ_add K q hq0 hq1 m (-m) hm ((DivisorsPeriodic K q).neg_mem hm)
+  rw [add_neg_cancel] at h
+  have h0 : degQ K q 0 = 0 := by unfold degQ; simp
+  linarith
+
+
+theorem InL_mem_adjoin {n : ℕ} {g : MeroRing K} (hg : InL (q := q) n g) :
+    g ∈ IntermediateField.adjoin K ({wpAlg hq0 hq1, wpPrimeAlg hq0 hq1} : Set (MeroRing K)) := by
+  set A := IntermediateField.adjoin K ({wpAlg hq0 hq1, wpPrimeAlg hq0 hq1} : Set (MeroRing K))
+  have h1 : wpAlg hq0 hq1 ∈ A := IntermediateField.subset_adjoin K _ (by simp)
+  have h2 : wpPrimeAlg hq0 hq1 ∈ A := IntermediateField.subset_adjoin K _ (by simp)
+  have hle : spanMono hq0 hq1 n ≤ A.toSubalgebra.toSubmodule := by
+    refine Submodule.span_le.mpr ?_
+    rintro f ⟨i, j, -, -, rfl⟩
+    exact A.mul_mem (A.pow_mem h1 i) (A.pow_mem h2 j)
+  exact hle (InL_mem_spanMono hq0 hq1 n g hg)
+
+theorem anVal_le_add {ξ : Omega K} (hξ : ξ ≠ 0) {f g : MeroRing K} {a b : ℤ}
+    (hf : ((a : ℤ) : WithTop ℤ) ≤ anVal K ξ f) (hg : ((b : ℤ) : WithTop ℤ) ≤ anVal K ξ g) :
+    (((a + b : ℤ)) : WithTop ℤ) ≤ anVal K ξ (f * g) := by
+  rw [(anVal_isValuation K ξ hξ).2.2.1, WithTop.coe_add]
+  exact add_le_add hf hg
+
+open scoped Classical in
+/-- `F_K(q) = K(℘, ℘′)`. -/
+theorem Fq_le_adjoin {f : MeroRing K} (hf : f ∈ Fq K q) :
+    f ∈ IntermediateField.adjoin K ({wpAlg hq0 hq1, wpPrimeAlg hq0 hq1} : Set (MeroRing K)) := by
+  set A := IntermediateField.adjoin K ({wpAlg hq0 hq1, wpPrimeAlg hq0 hq1} : Set (MeroRing K))
+  by_cases hf0 : f = 0
+  · rw [hf0]; exact A.zero_mem
+  set m := divisorOf K f with hmdef
+  have hm := divisorOf_periodic hq0 hf
+  set D := polePart m with hD
+  have hDm := polePart_mem hm
+  have hD0 : ∀ α, 0 ≤ D α := fun α => le_max_right _ _
+  set N : ℕ := (degQ K q D).toNat + 1 with hN
+  set E := pDiv (q := q) N + -D with hE
+  have hEm : E ∈ DivisorsPeriodic K q :=
+    (DivisorsPeriodic K q).add_mem (pDiv_mem hq0 hq1 N) ((DivisorsPeriodic K q).neg_mem hDm)
+  have hdegE : degQ K q E = N - degQ K q D := by
+    rw [hE, degQ_add K q hq0 hq1 _ _ (pDiv_mem hq0 hq1 N) ((DivisorsPeriodic K q).neg_mem hDm),
+      degQ_pDiv hq0 hq1, degQ_neg hq0 hq1 hDm]; ring
+  have hdD := degQ_nonneg_of_nonneg (q := q) hD0
+  have hpos : 0 < degQ K q E := by rw [hdegE, hN]; push_cast; omega
+  have hRR := (riemann_roch_analytic K q hq0 hq1 E hEm).2.2 hpos
+  obtain ⟨h, hhL, hh0⟩ : ∃ h ∈ LSet K q E, h ≠ 0 := by
+    by_contra hcon
+    push_neg at hcon
+    have : Submodule.span K (LSet K q E) = ⊥ := by
+      rw [eq_bot_iff, Submodule.span_le]
+      intro x hx; rw [hcon x hx]; exact (⊥ : Submodule K (MeroRing K)).zero_mem
+    rw [this, finrank_bot] at hRR
+    omega
+  obtain ⟨hhF, hhv⟩ := hhL
+  have hInLh : InL (q := q) N h := by
+    refine ⟨hhF, ?_, fun α hα hc => ?_⟩
+    · have := hhv 1 one_ne_zero
+      refine le_trans ?_ this
+      have : -(E 1) ≥ -(N : ℤ) := by
+        simp only [hE, Pi.add_apply, Pi.neg_apply, pDiv, ne_eq, one_ne_zero, not_false_eq_true,
+          conjModQ_refl, and_self, if_true]
+        linarith [hD0 1]
+      exact_mod_cast this
+    · have := hhv α hα
+      refine le_trans ?_ this
+      have : (0 : ℤ) ≤ -(E α) := by
+        simp only [hE, Pi.add_apply, Pi.neg_apply, pDiv, hc, and_false, if_false]
+        linarith [hD0 α]
+      exact_mod_cast this
+  have hInLfh : InL (q := q) N (f * h) := by
+    refine ⟨(FqSub K q).mul_mem hf hhF, ?_, fun α hα hc => ?_⟩
+    · have hfv := anVal_of_divisorOf hf0 hmdef.symm (one_ne_zero (α := Omega K))
+      have h1 := anVal_le_add one_ne_zero (le_of_eq hfv.symm) (hhv 1 one_ne_zero)
+      refine le_trans ?_ h1
+      have : -(N : ℤ) ≤ m 1 + -(E 1) := by
+        simp only [hE, hD, polePart, Pi.add_apply, Pi.neg_apply, pDiv, ne_eq, one_ne_zero,
+          not_false_eq_true, conjModQ_refl, and_self, if_true]
+        have := le_max_left (-(m 1)) 0
+        linarith
+      exact_mod_cast this
+    · have hfv := anVal_of_divisorOf hf0 hmdef.symm hα
+      have h1 := anVal_le_add hα (le_of_eq hfv.symm) (hhv α hα)
+      refine le_trans ?_ h1
+      have : (0 : ℤ) ≤ m α + -(E α) := by
+        simp only [hE, hD, polePart, Pi.add_apply, Pi.neg_apply, pDiv, hc, and_false, if_false]
+        have := le_max_left (-(m α)) 0
+        linarith
+      exact_mod_cast this
+  have h1 := InL_mem_adjoin hq0 hq1 hInLh
+  have h2 := InL_mem_adjoin hq0 hq1 hInLfh
+  have : f = (f * h) / h := by field_simp
+  rw [this]
+  exact A.div_mem h2 h1
+
 end gen
 
 end AnalyticTheory
