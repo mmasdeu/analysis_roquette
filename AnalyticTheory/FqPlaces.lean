@@ -548,4 +548,135 @@ theorem exists_inverse_mod {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K 
 
 end pointLS
 
+section affine
+
+variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+/-- The ring `A_D` of `q`-periodic functions with poles only in the support of `D`. -/
+noncomputable def AD (q : K) (D : Omega K → ℤ) : Subalgebra K (FqSub K q) where
+  carrier := {f | ∀ α : Omega K, α ≠ 0 → D α = 0 → 0 ≤ anVal K α (f : MeroRing K)}
+  mul_mem' := fun {f g} hf hg α hα hD => by
+    show 0 ≤ anVal K α ((f : MeroRing K) * g)
+    rw [(anVal_isValuation K α hα).2.2.1]
+    exact add_nonneg (hf α hα hD) (hg α hα hD)
+  add_mem' := fun {f g} hf hg α hα hD => by
+    have := anVal_ge_add hα (n := 0) (by exact_mod_cast hf α hα hD) (by exact_mod_cast hg α hα hD)
+    exact_mod_cast this
+  algebraMap_mem' := fun c α hα _ => anVal_algebraMap_nonneg hα c
+
+theorem LS_le_AD {D : Omega K → ℤ} (n : ℕ) : (LS q (n • D) : Set (FqSub K q)) ⊆ AD q D := by
+  intro f hf α hα hD
+  have := hf α hα
+  simp only [Pi.smul_apply, hD, smul_zero, neg_zero] at this
+  exact_mod_cast this
+
+include hq0 hq1 in
+/-- An effective periodic divisor is bounded by its degree. -/
+theorem le_degQ {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) (hm0 : ∀ α, 0 ≤ m α)
+    {α : Omega K} (hα : α ≠ 0) : m α ≤ degQ K q m := by
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  obtain ⟨β', hβ', hcβ, -⟩ := repAnnulus_pt hq0 hq1 hα
+  rw [periodic_conj hq0' hm hcβ]
+  by_cases h0 : m β' = 0
+  · rw [h0]; exact degQ_nonneg_of_nonneg hm0
+  have hfin := annPart_support_finite hq0 hq1 hm (repSystem K q)
+  unfold degQ
+  rw [finsum_mem_eq_sum_of_inter_support_eq (t := hfin.toFinset)]
+  · have hmem : β' ∈ hfin.toFinset := by rw [Set.Finite.mem_toFinset]; exact ⟨hβ', h0⟩
+    have hc : (1 : ℤ) ≤ (Module.finrank K (IntermediateField.adjoin K ({β'} : Set (Omega K))) : ℤ) := by
+      rw [IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral _)]
+      exact_mod_cast natDegree_minpoly_pos β'
+    calc m β' ≤ (Module.finrank K (IntermediateField.adjoin K ({β'} : Set (Omega K))) : ℤ) * m β' := by
+          nlinarith [hm0 β']
+      _ ≤ _ := Finset.single_le_sum (f := fun x => (Module.finrank K
+          (IntermediateField.adjoin K ({x} : Set (Omega K))) : ℤ) * m x)
+          (fun x _ => mul_nonneg (by positivity) (hm0 x)) hmem
+  · ext x
+    simp only [Set.mem_inter_iff, Function.mem_support, Set.Finite.coe_toFinset, Set.mem_setOf_eq]
+    constructor
+    · rintro ⟨hx, hne⟩
+      exact ⟨⟨hx, fun h => hne (by rw [h, mul_zero])⟩, hne⟩
+    · rintro ⟨⟨hx, -⟩, hne⟩
+      exact ⟨hx, hne⟩
+
+theorem anVal_ge_neg_polePart {f : FqSub K q} (hf : f ≠ 0) {α : Omega K} (hα : α ≠ 0) :
+    ((-(polePart (divisorOf K (f : MeroRing K)) α) : ℤ) : WithTop ℤ) ≤
+      anVal K α (f : MeroRing K) := by
+  have hf' : (f : MeroRing K) ≠ 0 := fun h => hf (Subtype.ext h)
+  rw [anVal_of_divisorOf hf' rfl hα]
+  have := le_max_left (-(divisorOf K (f : MeroRing K) α)) 0
+  exact_mod_cast (by unfold polePart; omega)
+
+include hq0 hq1 in
+/-- `A_D = ⋃ₙ L(nD)`. -/
+theorem exists_LS_of_AD {D : Omega K → ℤ} (hD0 : ∀ α, 0 ≤ D α) {f : FqSub K q} (hf : f ∈ AD q D) :
+    ∃ n : ℕ, f ∈ LS q (n • D) := by
+  by_cases hf0 : f = 0
+  · exact ⟨0, hf0 ▸ (LS q _).zero_mem⟩
+  have hP := polePart_mem (q := q) (divisorOf_periodic hq0 f.2)
+  have hP0 : ∀ α, 0 ≤ polePart (divisorOf K (f : MeroRing K)) α := fun α => le_max_right _ _
+  refine ⟨(degQ K q (polePart (divisorOf K (f : MeroRing K)))).toNat, fun α hα => ?_⟩
+  by_cases hDα : D α = 0
+  · simp only [Pi.smul_apply, hDα, smul_zero, neg_zero]
+    exact_mod_cast hf α hα hDα
+  · refine le_trans ?_ (anVal_ge_neg_polePart hf0 hα)
+    have h1 := le_degQ hq0 hq1 hP hP0 hα
+    have h2 : 1 ≤ D α := by have := hD0 α; omega
+    have h3 : (0 : ℤ) ≤ degQ K q (polePart (divisorOf K (f : MeroRing K))) := le_trans (hP0 α) h1
+    simp only [Pi.smul_apply, nsmul_eq_mul]
+    have : polePart (divisorOf K (f : MeroRing K)) α ≤
+        ((degQ K q (polePart (divisorOf K (f : MeroRing K)))).toNat : ℤ) * D α := by
+      rw [Int.toNat_of_nonneg h3]; nlinarith
+    exact_mod_cast neg_le_neg this
+
+include hq0 hq1 in
+/-- Denominators: for `f` without pole at `β ∉ supp D` there is `h ∈ A_D` with `w_β(h) = 0` and
+`hf ∈ A_D`. -/
+theorem exists_denominator {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K q) (hD0 : ∀ α, 0 ≤ D α)
+    (hdeg : 0 < degQ K q D) {β : Omega K} (hβ : β ≠ 0) (hDβ : D β = 0) {f : FqSub K q}
+    (hfβ : 0 ≤ anVal K β (f : MeroRing K)) :
+    ∃ n : ℕ, ∃ h ∈ LS q (n • D), anVal K β (h : MeroRing K) = 0 ∧ h * f ∈ AD q D := by
+  classical
+  by_cases hf0 : f = 0
+  · refine ⟨0, 1, one_mem_LS (fun α => by simp), by
+      rw [show ((1 : FqSub K q) : MeroRing K) = 1 from rfl, (anVal_isValuation K β hβ).2.1], ?_⟩
+    rw [hf0, mul_zero]; exact (AD q D).zero_mem
+  have hq0' := norm_pos_iff.mp hq0
+  set P := polePart (divisorOf K (f : MeroRing K)) with hPdef
+  have hP := polePart_mem (q := q) (divisorOf_periodic hq0 f.2)
+  have hP0 : ∀ α, 0 ≤ P α := fun α => le_max_right _ _
+  have hPβ : P β = 0 := by
+    have hf' : (f : MeroRing K) ≠ 0 := fun h => hf0 (Subtype.ext h)
+    have := anVal_of_divisorOf hf' rfl hβ
+    rw [this] at hfβ
+    have : 0 ≤ divisorOf K (f : MeroRing K) β := by exact_mod_cast hfβ
+    simp only [hPdef, polePart]; omega
+  have hpt := pointDivisor_mem hq0 hq1 hβ
+  set n := (degQ K q P).toNat + (minpoly K β).natDegree + 1 with hn
+  set m := n • D - P with hmdef
+  have hmP : m ∈ DivisorsPeriodic K q := (DivisorsPeriodic K q).sub_mem
+    ((DivisorsPeriodic K q).nsmul_mem hD n) hP
+  have hdP := degQ_nonneg_of_nonneg (q := q) hP0
+  have hpos : 0 < degQ K q (m - pointDivisor K q β) := by
+    rw [degQ_sub hq0 hq1 hmP hpt, hmdef, degQ_sub hq0 hq1 ((DivisorsPeriodic K q).nsmul_mem hD n) hP,
+      degQ_nsmul hq0 hq1 hD, degQ_pointDivisor hq0 hq1 hβ, hn]
+    push_cast
+    rw [Int.toNat_of_nonneg hdP]
+    nlinarith
+  obtain ⟨h, hh, hhβ⟩ := exists_exact_LS hq0 hq1 hmP hβ hpos
+  have hmβ : m β = 0 := by simp [hmdef, hDβ, hPβ]
+  rw [hmβ, neg_zero] at hhβ
+  refine ⟨n, h, LS_mono (fun α => by simp only [hmdef, Pi.sub_apply]; linarith [hP0 α]) hh,
+    by exact_mod_cast hhβ, fun α hα hDα => ?_⟩
+  have h1 := hh α hα
+  simp only [hmdef, Pi.sub_apply, Pi.smul_apply, hDα, smul_zero, zero_sub, neg_neg] at h1
+  have h2 := anVal_ge_neg_polePart hf0 hα
+  have := anVal_le_add hα h1 h2
+  show 0 ≤ anVal K α ((h : MeroRing K) * f)
+  refine le_trans ?_ this
+  rw [hPdef]; simp
+
+end affine
+
 end AnalyticTheory
