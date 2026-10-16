@@ -10,6 +10,7 @@ For a finite extension `L | K` (with its extended absolute value) the coefficien
 -/
 
 open Filter Topology
+open scoped TensorProduct
 
 namespace AnalyticTheory
 
@@ -304,5 +305,120 @@ theorem mero_decomp (f : MeroRing L) : ∃ e : ι → MeroRing K, f = mcombo b e
   exact (hmemV _).mp hfA
 
 end mbasis
+
+section fqext
+
+variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
+  [NormedAlgebra K L]
+
+theorem meroExt_mem_Fq {q : K} (hq0 : q ≠ 0) {f : MeroRing K} (hf : f ∈ FqSub K q) :
+    meroExt (L := L) f ∈ FqSub L (algebraMap K L q) := by
+  intro a ha
+  have : a = Units.map (algebraMap K L : K →* L) (Units.mk0 q hq0) := Units.ext (by simp [ha])
+  rw [this, ← meroExt_translation, (mem_Fq_iff hq0 f).mp hf]
+
+/-- `F_K(q) → F_L(q)`. -/
+noncomputable def fqExt {q : K} (hq0 : q ≠ 0) : FqSub K q →+* FqSub L (algebraMap K L q) :=
+  ((meroExt (L := L)).comp (FqSub K q).subtype).codRestrict _ (fun f => meroExt_mem_Fq hq0 f.2)
+
+variable [FiniteDimensional K L] {ι : Type*} [Fintype ι] (b : Module.Basis ι K L)
+
+/-- `F_L(q) = ⊕ bᵢ F_K(q)`. -/
+theorem fq_decomp {q : K} (hq0 : q ≠ 0) (f : FqSub L (algebraMap K L q)) :
+    ∃ e : ι → FqSub K q, (f : MeroRing L) = mcombo b (fun i => (e i : MeroRing K)) := by
+  obtain ⟨e, he⟩ := mero_decomp b (f : MeroRing L)
+  set Q := Units.map (algebraMap K L : K →* L) (Units.mk0 q hq0)
+  have hfQ : translation L Q f = f := f.2 Q (by simp [Q])
+  have htr : translation L Q (mcombo b e) =
+      mcombo b (fun i => translation K (Units.mk0 q hq0) (e i)) := by
+    simp only [mcombo, map_sum, map_mul, translation_algebraMap, meroExt_translation, Q]
+  have heq : mcombo b e = mcombo b (fun i => translation K (Units.mk0 q hq0) (e i)) := by
+    rw [← htr, ← he, hfQ]
+  have := mcombo_injective b heq
+  exact ⟨fun i => ⟨e i, (mem_Fq_iff hq0 _).mpr (congrFun this i).symm⟩, he⟩
+
+omit b in
+/-- Every constant field extension of `F_K(q)` by `L` is `L`-isomorphic to `F_L(q)`. -/
+theorem exists_algEquiv_constExt {q : K} (hq0 : q ≠ 0) (FL : Type u) [Field FL]
+    [Algebra (FqSub K q) FL] [Algebra L FL] [Algebra K FL] [IsScalarTower K (FqSub K q) FL]
+    [IsScalarTower K L FL] (hFL : IsConstantExtension K (FqSub K q) L FL) :
+    Nonempty (FL ≃ₐ[L] FqSub L (algebraMap K L q)) := by
+  classical
+  letI : Algebra K (FqSub L (algebraMap K L q)) :=
+    ((algebraMap L (FqSub L (algebraMap K L q))).comp (algebraMap K L)).toAlgebra
+  haveI : IsScalarTower K L (FqSub L (algebraMap K L q)) := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  let b := Module.finBasis K L
+  let ιF : FqSub K q →ₐ[K] FqSub L (algebraMap K L q) :=
+    { fqExt hq0 with
+      commutes' := fun c => Subtype.ext (by
+        show meroExt (L := L) (algebraMap K (MeroRing K) c) = algebraMap L (MeroRing L) (algebraMap K L c)
+        exact meroExt_algebraMap c) }
+  let φ : L ⊗[K] FqSub K q →ₐ[L] FqSub L (algebraMap K L q) :=
+    Algebra.TensorProduct.lift (Algebra.ofId L _) ιF (fun _ _ => Commute.all _ _)
+  have hdec : ∀ t : L ⊗[K] FqSub K q, ∃ e : Fin (Module.finrank K L) → FqSub K q,
+      t = ∑ i, b i ⊗ₜ e i := by
+    intro t
+    induction t using TensorProduct.induction_on with
+    | zero => exact ⟨0, by simp⟩
+    | tmul l f =>
+      refine ⟨fun i => b.repr l i • f, ?_⟩
+      conv_lhs => rw [← b.sum_repr l]
+      rw [TensorProduct.sum_tmul]
+      refine Finset.sum_congr rfl (fun i _ => ?_)
+      rw [TensorProduct.smul_tmul]
+    | add x y hx hy =>
+      obtain ⟨e, rfl⟩ := hx
+      obtain ⟨e', rfl⟩ := hy
+      exact ⟨e + e', by simp [TensorProduct.tmul_add, Finset.sum_add_distrib]⟩
+  have hφ : ∀ e : Fin (Module.finrank K L) → FqSub K q,
+      ((φ (∑ i, b i ⊗ₜ e i) : FqSub L (algebraMap K L q)) : MeroRing L) =
+        mcombo b (fun i => (e i : MeroRing K)) := by
+    intro e
+    rw [map_sum, mcombo]
+    push_cast
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    rw [Algebra.TensorProduct.lift_tmul]
+    rfl
+  have hinj : Function.Injective φ := by
+    rw [injective_iff_map_eq_zero]
+    intro t ht
+    obtain ⟨e, rfl⟩ := hdec t
+    have h0 : mcombo b (fun i => (e i : MeroRing K)) = 0 := by
+      rw [← hφ, ht]; rfl
+    have : ∀ i, e i = 0 := fun i => Subtype.ext (mcombo_eq_zero b h0 i)
+    simp [this]
+  have hsurj : Function.Surjective φ := by
+    intro f
+    obtain ⟨e, he⟩ := fq_decomp b hq0 f
+    exact ⟨∑ i, b i ⊗ₜ e i, Subtype.ext (by rw [hφ, he])⟩
+  let Φ := AlgEquiv.ofBijective φ ⟨hinj, hsurj⟩
+  let ψ : L ⊗[K] FqSub K q →ₐ[L] FL :=
+    Algebra.TensorProduct.lift (Algebra.ofId L FL) (IsScalarTower.toAlgHom K (FqSub K q) FL)
+      (fun _ _ => Commute.all _ _)
+  let χ : FqSub L (algebraMap K L q) →ₐ[L] FL := ψ.comp Φ.symm.toAlgHom
+  have hχψ : ∀ t, χ (φ t) = ψ t := fun t => by
+    show ψ (Φ.symm (Φ t)) = ψ t
+    rw [AlgEquiv.symm_apply_apply]
+  have hχinj : Function.Injective χ := χ.toRingHom.injective
+  have hχsurj : Function.Surjective χ := by
+    have hle : Subfield.closure (Set.range (algebraMap (FqSub K q) FL) ∪ Set.range (algebraMap L FL)) ≤
+        χ.fieldRange.toSubfield := by
+      rw [Subfield.closure_le]
+      rintro x (⟨f, rfl⟩ | ⟨l, rfl⟩)
+      · refine ⟨φ (1 ⊗ₜ f), ?_⟩
+        show χ (φ (1 ⊗ₜ f)) = _
+        rw [hχψ, Algebra.TensorProduct.lift_tmul, map_one, one_mul]
+        rfl
+      · refine ⟨φ (l ⊗ₜ 1), ?_⟩
+        show χ (φ (l ⊗ₜ 1)) = _
+        rw [hχψ, Algebra.TensorProduct.lift_tmul, map_one, mul_one]
+        rfl
+    rw [hFL.generated] at hle
+    intro x
+    exact hle (Subfield.mem_top x)
+  exact ⟨(AlgEquiv.ofBijective χ ⟨hχinj, hχsurj⟩).symm⟩
+
+end fqext
 
 end AnalyticTheory
