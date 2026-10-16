@@ -419,6 +419,116 @@ theorem divExtFun_periodic {q : K} {m : Omega K → ℤ} (hm : m ∈ DivisorsPer
 
 end divExt
 
+section degPhi
+
+variable {K L}
+variable (ψ : Omega K ≃ₐ[K] Omega L)
+
+theorem degQ_PhiQ_divExt {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
+    (hm : m ∈ DivisorsPeriodic K q) (hqL : algebraMap K L q ≠ 0) :
+    degQ L (algebraMap K L q) (divExtFun ψ m) = degQ K q m ∧
+      PhiQ L (algebraMap K L q) hqL (divExtFun ψ m) =
+        quotIncl K L q (norm_pos_iff.mp hq0) hqL (PhiQ K q (norm_pos_iff.mp hq0) m) := by
+  classical
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hn : ‖algebraMap K L q‖ = ‖q‖ := norm_algebraMap' L q
+  have hq0L : 0 < ‖algebraMap K L q‖ := by rw [hn]; exact hq0
+  have hq1L : ‖algebraMap K L q‖ < 1 := by rw [hn]; exact hq1
+  have hnP := divExtFun_periodic ψ hm
+  set ΘK := thetaDiv hq0 hq1 hm with hΘK
+  set ΘL := thetaDiv hq0L hq1L hnP with hΘL
+  set Θ' : MeroRing L := meroExt ΘK with hΘ'
+  have hΘK0 := thetaDiv_ne_zero hq0 hq1 hm
+  have hΘL0 := thetaDiv_ne_zero hq0L hq1L hnP
+  have hΘ'0 : Θ' ≠ 0 := (map_ne_zero (meroExt (K := K) (L := L))).mpr hΘK0
+  have hval : ∀ β : Omega L, β ≠ 0 → anVal L β Θ' = (divExtFun ψ m β : WithTop ℤ) := by
+    intro β hβ
+    have hα : ψ.symm β ≠ 0 := (map_ne_zero _).mpr hβ
+    have h1 := anVal_meroExt ψ hα hΘK0 (anVal_thetaDiv hq0 hq1 hm hα)
+    rw [AlgEquiv.apply_symm_apply] at h1
+    rw [hΘ', h1]
+    conv_rhs => rw [← AlgEquiv.apply_symm_apply ψ β, divExtFun_apply ψ m hα]
+  set f : MeroRing L := Θ' / ΘL with hfdef
+  have hf0 : f ≠ 0 := div_ne_zero hΘ'0 hΘL0
+  have hf : ∀ β : Omega L, β ≠ 0 → anVal L β f = 0 := by
+    intro β hβ
+    rw [hfdef, div_eq_mul_inv, (anVal_isValuation L β hβ).2.2.1, hval β hβ,
+      anVal_inv_of hβ hΘL0 (anVal_thetaDiv hq0L hq1L hnP hβ), ← WithTop.coe_add, add_neg_cancel]
+    rfl
+  obtain ⟨c, k, hc, hck⟩ := mero_unit_of_anVal_zero hf0 hf
+  set Q : Lˣ := Units.mk0 (algebraMap K L q) (norm_pos_iff.mp hq0L) with hQ
+  have hQmap : Units.map (algebraMap K L : K →* L) (Units.mk0 q hq0') = Q := Units.ext rfl
+  have hτΘ' : translation L Q Θ' = algebraMap L (MeroRing L) (algebraMap K L (aTheta hq0 hq1 hm)⁻¹) *
+      Xm (dTheta hq0 hq1 hm) * Θ' := by
+    rw [hΘ', ← hQmap, ← meroExt_translation, translation_thetaDiv hq0 hq1 hm, map_mul, map_mul,
+      meroExt_algebraMap, meroExt_Xm, map_inv₀]
+  have hτΘL := translation_thetaDiv hq0L hq1L hnP
+  have hτf : translation L Q f = algebraMap L (MeroRing L) (algebraMap K L q ^ (-k)) * f := by
+    rw [hck, map_mul, translation_algebraMap, translation_Xm, hQ, Units.val_mk0]
+    ring
+  have hτf' : translation L Q f = translation L Q Θ' / translation L Q ΘL := by
+    rw [hfdef, map_div₀]
+  rw [hτf, hτΘ', hτΘL] at hτf'
+  set a := aTheta hq0 hq1 hm
+  set d := dTheta hq0 hq1 hm
+  set aL := aTheta hq0L hq1L hnP
+  set dL := dTheta hq0L hq1L hnP
+  have haL := aTheta_ne_zero hq0L hq1L hnP
+  have ha := aTheta_ne_zero hq0 hq1 hm
+  have haL' : algebraMap K L a ≠ 0 := (map_ne_zero _).mpr ha
+  set e : L := algebraMap K L a * algebraMap K L q ^ (-k) * aL⁻¹ with he
+  have key : algebraMap L (MeroRing L) e * Xm (dL - d) = 1 := by
+    have hX : Xm (K := L) (dL - d) * Xm d = Xm dL := by rw [← Xm_add, sub_add_cancel]
+    have hfΘ : f * ΘL = Θ' := by rw [hfdef, div_mul_cancel₀ _ hΘL0]
+    have h1 : algebraMap L (MeroRing L) (algebraMap K L q ^ (-k)) * f *
+        (algebraMap L (MeroRing L) aL⁻¹ * Xm dL * ΘL) =
+        algebraMap L (MeroRing L) (algebraMap K L a)⁻¹ * Xm d * Θ' := by
+      have hden : algebraMap L (MeroRing L) aL⁻¹ * Xm dL * ΘL ≠ 0 :=
+        mul_ne_zero (mul_ne_zero ((map_ne_zero _).mpr (inv_ne_zero haL)) (Xm_ne_zero dL)) hΘL0
+      rw [hτf', div_mul_cancel₀ _ hden, map_inv₀ (algebraMap K L), map_inv₀ (algebraMap L (MeroRing L))]
+    rw [← hfΘ, ← hX] at h1
+    have hfΘ0 : f * ΘL ≠ 0 := mul_ne_zero hf0 hΘL0
+    have hXd := Xm_ne_zero (K := L) d
+    have h2 : (algebraMap L (MeroRing L) (algebraMap K L q ^ (-k)) * algebraMap L (MeroRing L) aL⁻¹ *
+        Xm (dL - d)) * (Xm d * (f * ΘL)) = algebraMap L (MeroRing L) (algebraMap K L a)⁻¹ *
+        (Xm d * (f * ΘL)) := by
+      linear_combination h1
+    have h3 := mul_right_cancel₀ (mul_ne_zero hXd hfΘ0) h2
+    have hA : algebraMap L (MeroRing L) (algebraMap K L a) ≠ 0 := (map_ne_zero _).mpr haL'
+    rw [he, map_mul, map_mul]
+    calc algebraMap L (MeroRing L) (algebraMap K L a) * algebraMap L (MeroRing L)
+          (algebraMap K L q ^ (-k)) * algebraMap L (MeroRing L) aL⁻¹ * Xm (dL - d) =
+        algebraMap L (MeroRing L) (algebraMap K L a) * (algebraMap L (MeroRing L)
+          (algebraMap K L q ^ (-k)) * algebraMap L (MeroRing L) aL⁻¹ * Xm (dL - d)) := by ring
+      _ = algebraMap L (MeroRing L) (algebraMap K L a) *
+          (algebraMap L (MeroRing L) (algebraMap K L a))⁻¹ := by rw [h3, map_inv₀]
+      _ = 1 := mul_inv_cancel₀ hA
+  have hd : dL - d = 0 := exists_const_of_mul_Xm (K := L) (by
+    intro h0; rw [h0, map_zero, zero_mul] at key; exact zero_ne_one key) key
+  have he1 : e = 1 := by
+    rw [hd, Xm_zero, mul_one] at key
+    exact (algebraMap L (MeroRing L)).injective (key.trans (map_one _).symm)
+  refine ⟨?_, ?_⟩
+  · rw [degQ_eq_dTheta hq0L hq1L hnP, degQ_eq_dTheta hq0 hq1 hm]; omega
+  · obtain ⟨h1, hP1⟩ := PhiQ_eq_mk hq0L hq1L hnP hqL
+    obtain ⟨h2, hP2⟩ := PhiQ_eq_mk hq0 hq1 hm hq0'
+    rw [hP1, hP2, quotIncl, QuotientGroup.map_mk, QuotientGroup.eq, Subgroup.mem_zpowers_iff]
+    refine ⟨k, Units.ext ?_⟩
+    have hdd : dTheta hq0L hq1L hnP = dTheta hq0 hq1 hm := by omega
+    have he' : aTheta hq0L hq1L hnP =
+        algebraMap K L (aTheta hq0 hq1 hm) * algebraMap K L q ^ (-k) := by
+      have h := he1
+      rw [he, mul_inv_eq_one₀ haL] at h
+      exact h.symm
+    simp only [Units.val_zpow_eq_zpow_val, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0,
+      Units.coe_map, MonoidHom.coe_coe, map_mul, map_zpow₀, map_neg, map_one]
+    rw [hdd, he', zpow_neg]
+    have hq'0 : algebraMap K L q ≠ 0 := hqL
+    field_simp
+    exact (div_self haL').symm
+
+end degPhi
+
 /-- Book, §2, Remark 1: there is a natural embedding `D_K ⊂ D_L`, `m'_{ψ α} = e(α) m_α`, which maps
 `D_K(q)` into `D_L(q)` and preserves `deg_q` and `Φ_q`. Blueprint: `rem:S2-ext-const`. -/
 theorem remark_ext_const_divisors (ψ : Omega K ≃ₐ[K] Omega L) :
@@ -431,13 +541,85 @@ theorem remark_ext_const_divisors (ψ : Omega K ≃ₐ[K] Omega L) :
         degQ L (algebraMap K L q) ((ι m : Divisors L) : Omega L → ℤ) = degQ K q m ∧
         PhiQ L (algebraMap K L q) hqL ((ι m : Divisors L) : Omega L → ℤ) =
           quotIncl K L q (norm_pos_iff.mp hq0) hqL (PhiQ K q (norm_pos_iff.mp hq0) m) := by
-  sorry
+  classical
+  let ι : Divisors K →+ Divisors L :=
+    { toFun := fun m => ⟨divExtFun ψ m, divExtFun_mem ψ m.2⟩
+      map_zero' := Subtype.ext (by funext β; simp [divExtFun])
+      map_add' := fun m n => Subtype.ext (divExtFun_add ψ m n) }
+  refine ⟨ι, ?_, fun m α hα => divExtFun_apply ψ m hα, fun q hq0 hq1 hqL m hm =>
+    ⟨divExtFun_periodic ψ hm, (degQ_PhiQ_divExt ψ hq0 hq1 hm hqL).1,
+      (degQ_PhiQ_divExt ψ hq0 hq1 hm hqL).2⟩⟩
+  intro m n h
+  apply Subtype.ext
+  funext α
+  by_cases hα : α = 0
+  · rw [hα, m.2.1, n.2.1]
+  · have := congrFun (congrArg Subtype.val h) (ψ α)
+    change divExtFun ψ m (ψ α) = divExtFun ψ n (ψ α) at this
+    rw [divExtFun_apply ψ _ hα, divExtFun_apply ψ _ hα] at this
+    exact mul_left_cancel₀ (by exact_mod_cast (ramIndex_pos ψ hα).ne') this
+
+theorem eIdx_le_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃ₐ[K] Omega L) {α : Omega K}
+    (hα : α ≠ 0) : eIdx K α ≤ eIdx L (ψ α) := by
+  classical
+  have hβ : ψ α ≠ 0 := (map_ne_zero ψ).mpr hα
+  rw [eIdx_eq_finInsepDegree hα, eIdx_eq_finInsepDegree hβ]
+  set E₁ := IntermediateField.adjoin K ({ψ α} : Set (Omega L)) with hE₁
+  set M := IntermediateField.adjoin L ({ψ α} : Set (Omega L)) with hM
+  set E₂ := M.restrictScalars K with hE₂
+  have e1 : Field.finInsepDegree K (IntermediateField.adjoin K ({α} : Set (Omega K))) =
+      Field.finInsepDegree K E₁ := by
+    have h := IntermediateField.adjoin_map K ({α} : Set (Omega K)) ψ.toAlgHom
+    rw [Set.image_singleton] at h
+    rw [hE₁]
+    exact Field.finInsepDegree_eq_of_equiv K _ _
+      ((IntermediateField.equivMap (IntermediateField.adjoin K ({α} : Set (Omega K))) ψ.toAlgHom).trans
+        (IntermediateField.equivOfEq h))
+  have hle : E₁ ≤ E₂ := by
+    rw [hE₁, IntermediateField.adjoin_simple_le_iff]
+    exact IntermediateField.mem_adjoin_simple_self L (ψ α)
+  letI : Algebra E₁ E₂ := (IntermediateField.inclusion hle).toAlgebra
+  haveI : IsScalarTower K E₁ E₂ := .of_algebraMap_eq' rfl
+  haveI : FiniteDimensional K E₁ :=
+    IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral (ψ α))
+  have htower := Field.finInsepDegree_mul_finInsepDegree_of_isAlgebraic K E₁ E₂
+  let eqv : E₂ ≃ₐ[K] M :=
+    { toFun := fun x => ⟨x.1, x.2⟩
+      invFun := fun x => ⟨x.1, x.2⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl
+      map_mul' := fun _ _ => rfl
+      map_add' := fun _ _ => rfl
+      commutes' := fun _ => rfl }
+  have h2 : Field.finInsepDegree K E₂ = Field.finInsepDegree L M := by
+    rw [Field.finInsepDegree_eq_of_equiv K E₂ M eqv, Field.finInsepDegree_def',
+      Field.finInsepDegree_def', Field.insepDegree_eq_of_isSeparable K L M]
+  have hpos : 0 < Field.finInsepDegree L M := by
+    rw [hM, ← eIdx_eq_finInsepDegree hβ]; exact eIdx_pos L
+  rw [e1, ← h2, ← htower]
+  rw [← h2, ← htower] at hpos
+  have : Field.finInsepDegree E₁ E₂ ≠ 0 := fun h0 => by rw [h0, mul_zero] at hpos; exact lt_irrefl _ hpos
+  calc Field.finInsepDegree K E₁ = Field.finInsepDegree K E₁ * 1 := (mul_one _).symm
+    _ ≤ _ := Nat.mul_le_mul_left _ (Nat.one_le_iff_ne_zero.mpr this)
 
 /-- Book, §2, Remark 1: if `L | K` is separable then `e(α) = 1` for all `α`
 (`F_L(q)` is unramified over `F_K(q)`). Blueprint: `rem:S2-ext-const`. -/
 theorem ramIndex_eq_one_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃ₐ[K] Omega L)
     (α : Omega K) : ramIndex K L ψ α = 1 := by
-  sorry
+  classical
+  by_cases hα : α = 0
+  · have h1 : ∀ (F : Type u) [Field F] {E : Type u} [Field E] [Algebra F E],
+        Field.finInsepDegree F (IntermediateField.adjoin F ({0} : Set E)) = 1 := by
+      intro F _ E _ _
+      rw [IntermediateField.adjoin_zero]; exact IntermediateField.finInsepDegree_bot F E
+    unfold ramIndex
+    rw [hα, map_zero, h1, h1]
+  have hβ : ψ α ≠ 0 := (map_ne_zero ψ).mpr hα
+  have hle := eIdx_le_of_separable K L ψ hα
+  have hdvd := eIdx_dvd ψ hα
+  have heq : eIdx L (ψ α) = eIdx K α :=
+    le_antisymm (Nat.le_of_dvd (eIdx_pos K) hdvd) hle
+  rw [ramIndex_eq_eIdx ψ hα, heq, Nat.div_self (eIdx_pos K)]
 
 variable [IsGalois K L]
 
