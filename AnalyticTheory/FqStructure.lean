@@ -1,4 +1,4 @@
-import AnalyticTheory.FqGenus
+import AnalyticTheory.ConstExt
 
 /-!
 # Structure of `F_K(q)` (book, §2: items I–V, Corollaries Va, Vb)
@@ -147,7 +147,22 @@ theorem fq_residue_degree (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (α : 
 constant field extensions `F_K(q) L = F_L(q)`). Blueprint: `thm:fq-elliptic`. -/
 theorem fq_is_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     IsEllipticOver K (FqSub K q) := by
-  sorry
+  refine ⟨fq_is_function_field K q hq0 hq1, fq_genus hq0 hq1, ?_⟩
+  intro L _ _ hfin FL _ _ _ _ _ _ hFL
+  haveI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  letI : NontriviallyNormedField L := spectralNorm.nontriviallyNormedField K L
+  letI : NormedAlgebra K L :=
+    { (inferInstance : Algebra K L) with
+      norm_smul_le := (spectralNorm.normedSpace K L).norm_smul_le }
+  haveI : IsUltrametricDist L :=
+    IsUltrametricDist.isUltrametricDist_of_isNonarchimedean_norm
+      (isNonarchimedean_spectralNorm (K := K) (L := L))
+  haveI : CompleteSpace L := FiniteDimensional.complete K L
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hn : ‖algebraMap K L q‖ = ‖q‖ := norm_algebraMap' L q
+  obtain ⟨e⟩ := exists_algEquiv_constExt (L := L) hq0' FL hFL
+  rw [genus_eq_of_algEquiv e, fq_genus (K := L) (by rw [hn]; exact hq0) (by rw [hn]; exact hq1),
+    fq_genus hq0 hq1]
 
 /-- Book, §2, item V (Abel–Jacobi isomorphism): the Jacobi map induces a group isomorphism
 `C⁰_K(q) ≅ K^×/q`. Blueprint: `thm:abel-jacobi-iso`. -/
