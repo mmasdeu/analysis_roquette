@@ -177,6 +177,93 @@ theorem anVal_thetaDiv {ξ : Omega K} (hξ : ξ ≠ 0) :
       exact hβS ((mem_thetaS hq0 hq1 hm).mpr ⟨⟨hβR, hβann⟩, h⟩)
     rw [this, zero_mul]
 
+
 end theta2
+
+theorem translation_alg (a : Kˣ) (f : holSubring K) :
+    translation K a (algebraMap (holSubring K) (MeroRing K) f) =
+      algebraMap (holSubring K) (MeroRing K) (holScale K a⁻¹ f) := by
+  unfold translation meroScale
+  rw [IsFractionRing.ringEquivOfRingEquiv_algebraMap]
+
+/-- `X^n` in `M_K`. -/
+noncomputable def Xm (n : ℤ) : MeroRing K := algebraMap (holSubring K) (MeroRing K) (monoHol K n)
+
+theorem Xm_add (n m : ℤ) : Xm (K := K) (n + m) = Xm n * Xm m := by
+  unfold Xm; rw [monoHol_add, map_mul]
+
+theorem Xm_zero : Xm (K := K) 0 = 1 := by
+  unfold Xm; rw [monoHol_zero, map_one]
+
+theorem Xm_ne_zero (n : ℤ) : Xm (K := K) n ≠ 0 := alg_hol_ne_zero (monoHol_ne_zero n)
+
+theorem Xm_zpow (n z : ℤ) : (Xm (K := K) n) ^ z = Xm (n * z) := by
+  have h1 : ∀ k : ℕ, (Xm (K := K) n) ^ k = Xm (n * k) := by
+    intro k
+    induction k with
+    | zero => simp [Xm_zero]
+    | succ k ih => rw [pow_succ, ih, ← Xm_add]; congr 1; push_cast; ring
+  rcases Int.eq_nat_or_neg z with ⟨k, rfl | rfl⟩
+  · rw [zpow_natCast, h1]
+  · rw [zpow_neg, zpow_natCast, h1]
+    have : Xm (K := K) (n * k) * Xm (n * -(k : ℤ)) = 1 := by
+      rw [← Xm_add]; simp [Xm_zero]
+    refine inv_eq_of_mul_eq_one_right ?_
+    exact this
+
+
+theorem Xm_sum {ι : Type*} (S : Finset ι) (f : ι → ℤ) :
+    ∏ i ∈ S, Xm (K := K) (f i) = Xm (∑ i ∈ S, f i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simp [Xm_zero]
+  | insert a S ha ih => rw [Finset.prod_insert ha, Finset.sum_insert ha, Xm_add, ih]
+
+theorem algebraMap_hol_mero (c : K) :
+    algebraMap (holSubring K) (MeroRing K) (algebraMap K (holSubring K) c) =
+      algebraMap K (MeroRing K) c :=
+  (IsScalarTower.algebraMap_apply K (holSubring K) (MeroRing K) c).symm
+
+section theta3
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q)
+
+/-- `d = ∑ deg(α) m_α`. -/
+noncomputable def dTheta : ℤ :=
+  ∑ α ∈ thetaS hq0 hq1 hm, ((minpoly K α).natDegree : ℤ) * m α
+
+/-- `a = ∏ φ_α(0)^{m_α}`. -/
+noncomputable def aTheta : K :=
+  ∏ α ∈ thetaS hq0 hq1 hm, ((minpoly K α).coeff 0) ^ (m α)
+
+theorem translation_thetaDiv :
+    translation K (Units.mk0 q (norm_pos_iff.mp hq0)) (thetaDiv hq0 hq1 hm) =
+      algebraMap K (MeroRing K) (aTheta hq0 hq1 hm)⁻¹ * Xm (dTheta hq0 hq1 hm) *
+        thetaDiv hq0 hq1 hm := by
+  classical
+  unfold thetaDiv
+  rw [map_prod]
+  have hfac : ∀ α ∈ thetaS hq0 hq1 hm,
+      translation K (Units.mk0 q (norm_pos_iff.mp hq0))
+        (algebraMap (holSubring K) (MeroRing K) (thetaFun hq0 hq1 α) ^ m α) =
+      algebraMap K (MeroRing K) (((minpoly K α).coeff 0)⁻¹ ^ m α) *
+        Xm (((minpoly K α).natDegree : ℤ) * m α) *
+        algebraMap (holSubring K) (MeroRing K) (thetaFun hq0 hq1 α) ^ m α := by
+    intro α hα
+    have hα0 := ne_zero_of_mem_thetaS hq0 hq1 hm hα
+    obtain ⟨-, hfe, -⟩ := thetaFun_spec hq0 hq1 hα0
+    rw [map_zpow₀, translation_alg, hfe, map_mul, map_mul, algebraMap_hol_mero, mul_zpow, mul_zpow,
+      map_zpow₀]
+    rw [show algebraMap (holSubring K) (MeroRing K) (monoHol K ((minpoly K α).natDegree : ℤ)) =
+      Xm ((minpoly K α).natDegree : ℤ) from rfl, Xm_zpow]
+  rw [Finset.prod_congr rfl hfac, Finset.prod_mul_distrib, Finset.prod_mul_distrib, Xm_sum,
+    ← map_prod, aTheta, dTheta]
+  have e : (∏ α ∈ thetaS hq0 hq1 hm, ((minpoly K α).coeff 0)⁻¹ ^ m α) =
+      (∏ α ∈ thetaS hq0 hq1 hm, (minpoly K α).coeff 0 ^ m α)⁻¹ := by
+    rw [← Finset.prod_inv_distrib]
+    exact Finset.prod_congr rfl (fun α _ => inv_zpow _ _)
+  rw [e, map_inv₀]
+
+end theta3
 
 end AnalyticTheory
