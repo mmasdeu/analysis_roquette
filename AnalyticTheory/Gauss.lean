@@ -264,4 +264,145 @@ theorem leftMax_mono {a : ℤ → K} {r r' : ℝ} (hr : 0 < r) (hrr : r < r') {N
     exact le_of_mul_le_mul_right this p2
   nlinarith
 
+
+theorem isLeftMax_unique {a : ℤ → K} {r : ℝ} {N N' : ℤ} (h : IsLeftMax K r a N)
+    (h' : IsLeftMax K r a N') : N = N' := by
+  by_contra hne
+  rcases lt_or_gt_of_ne hne with hl | hl
+  · exact absurd (h'.2 _ hl) (not_lt.mpr (h.1 N'))
+  · exact absurd (h.2 _ hl) (not_lt.mpr (h'.1 N))
+
+theorem isRightMax_unique {a : ℤ → K} {r : ℝ} {N N' : ℤ} (h : IsRightMax K r a N)
+    (h' : IsRightMax K r a N') : N = N' := by
+  by_contra hne
+  rcases lt_or_gt_of_ne hne with hl | hl
+  · exact absurd (h.2 _ hl) (not_lt.mpr (h'.1 N))
+  · exact absurd (h'.2 _ hl) (not_lt.mpr (h.1 N'))
+
+theorem leftMax_le_rightMax {a : ℤ → K} {r : ℝ} {L R : ℤ} (hL : IsLeftMax K r a L)
+    (hR : IsRightMax K r a R) : L ≤ R := by
+  by_contra h
+  push_neg at h
+  exact absurd (hL.2 _ h) (not_lt.mpr (hR.1 L))
+
+theorem exists_rightMax {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ} (hr : 0 < r)
+    (h0 : ∃ n, a n ≠ 0) : ∃ N, IsRightMax K r a N ∧ 0 < wt K r a N := by
+  have hr' : 0 < r⁻¹ := inv_pos.mpr hr
+  obtain ⟨n0, hn0⟩ := h0
+  obtain ⟨N, hN, hp⟩ := exists_leftMax K (reflSeq_convergent K ha) hr' ⟨-n0, by simpa [reflSeq] using hn0⟩
+  refine ⟨-N, (isRightMax_iff_refl K hr a (-N)).mpr (by rwa [neg_neg]), ?_⟩
+  have e : wt K r⁻¹ (reflSeq K a) N = wt K r a (-N) := by
+    simp only [wt, reflSeq, inv_zpow', zpow_neg, inv_inv]
+  rwa [e] at hp
+
+/-- The Kronecker sequence. -/
+def deltaSeq : ℤ → K := fun n => if n = 0 then 1 else 0
+
+theorem deltaSeq_wt {r : ℝ} (hr : 0 < r) (n : ℤ) :
+    wt K r (deltaSeq K) n = if n = 0 then 1 else 0 := by
+  by_cases h : n = 0 <;> simp [wt, deltaSeq, h]
+
+theorem deltaSeq_leftMax {r : ℝ} (hr : 0 < r) : IsLeftMax K r (deltaSeq K) 0 := by
+  refine ⟨fun n => ?_, fun n hn => ?_⟩
+  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr]; by_cases h : n = 0 <;> simp [h]
+  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr, if_neg hn.ne]; simp
+
+theorem deltaSeq_rightMax {r : ℝ} (hr : 0 < r) : IsRightMax K r (deltaSeq K) 0 := by
+  refine ⟨fun n => ?_, fun n hn => ?_⟩
+  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr]; by_cases h : n = 0 <;> simp [h]
+  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr, if_neg hn.ne']; simp
+
+theorem unit_aux {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsConvergentLaurent K b)
+    (hc : convCoeff K a b = deltaSeq K) {r : ℝ} (hr : 0 < r) :
+    ∃ N, 0 < wt K r a N ∧ IsLeftMax K r a N ∧ IsRightMax K r a N ∧ 0 < wt K r b (-N) ∧
+      IsLeftMax K r b (-N) := by
+  have hne : ∀ c : ℤ → K, convCoeff K a b = deltaSeq K → ∃ n, c n ≠ 0 ∨ True := fun _ _ => ⟨0, Or.inr trivial⟩
+  have h0a : ∃ n, a n ≠ 0 := by
+    by_contra h; push_neg at h
+    have : convCoeff K a b 0 = 0 := by simp [convCoeff, h]
+    rw [hc] at this; simp [deltaSeq] at this
+  have h0b : ∃ n, b n ≠ 0 := by
+    by_contra h; push_neg at h
+    have : convCoeff K a b 0 = 0 := by simp [convCoeff, h]
+    rw [hc] at this; simp [deltaSeq] at this
+  obtain ⟨La, hLa, hpa⟩ := exists_leftMax K ha hr h0a
+  obtain ⟨Lb, hLb, hpb⟩ := exists_leftMax K hb hr h0b
+  obtain ⟨Ra, hRa, hqa⟩ := exists_rightMax K ha hr h0a
+  obtain ⟨Rb, hRb, hqb⟩ := exists_rightMax K hb hr h0b
+  have h1 := (leftMax_conv K ha hb hr hLa hLb hpa hpb).1
+  have h2 := (rightMax_conv K ha hb hr hRa hRb hqa hqb).1
+  rw [hc] at h1 h2
+  have e1 : La + Lb = 0 := isLeftMax_unique K h1 (deltaSeq_leftMax K hr)
+  have e2 : Ra + Rb = 0 := isRightMax_unique K h2 (deltaSeq_rightMax K hr)
+  have l1 := leftMax_le_rightMax K hLa hRa
+  have l2 := leftMax_le_rightMax K hLb hRb
+  have eq : Ra = La := by omega
+  have eb : Lb = -La := by omega
+  subst eq
+  subst eb
+  exact ⟨Ra, hpa, hLa, hRa, hpb, hLb⟩
+
+/-- Units of the convolution algebra are monomials. -/
+theorem unit_monomial {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsConvergentLaurent K b)
+    (hc : convCoeff K a b = deltaSeq K) : ∃ N, a N ≠ 0 ∧ ∀ n, n ≠ N → a n = 0 := by
+  obtain ⟨N, hpN, hLN, hRN, hpb, hbN⟩ := unit_aux K ha hb hc one_pos
+  have hconst : ∀ r : ℝ, 0 < r → IsLeftMax K r a N ∧ IsRightMax K r a N := by
+    intro r hr
+    obtain ⟨M, hpM, hLM, hRM, hpbM, hbM⟩ := unit_aux K ha hb hc hr
+    have key : M = N := by
+      rcases lt_trichotomy r 1 with h | h | h
+      · have i1 := leftMax_mono K hr h hLM hLN hpM
+        have i2 := leftMax_mono K hr h hbM hbN hpbM
+        omega
+      · subst h; exact isLeftMax_unique K hLM hLN
+      · have i1 := leftMax_mono K one_pos h hLN hLM hpN
+        have i2 := leftMax_mono K one_pos h hbN hbM hpb
+        omega
+    subst key
+    exact ⟨hLM, hRM⟩
+  have haN : a N ≠ 0 := by
+    intro h; simp [wt, h] at hpN
+  refine ⟨N, haN, fun n hn => ?_⟩
+  by_contra han
+  have hpn : 0 < ‖a n‖ := norm_pos_iff.mpr han
+  have hpN' : 0 < ‖a N‖ := norm_pos_iff.mpr haN
+  set t := ‖a N‖ / ‖a n‖ with ht
+  have htpos : 0 < t := div_pos hpN' hpn
+  have hts : t * ‖a n‖ = ‖a N‖ := by rw [ht]; field_simp
+  set s := max 1 t with hs
+  have hs1 : 1 ≤ s := le_max_left _ _
+  have hst : t ≤ s := le_max_right _ _
+  have hspos : 0 < s := lt_of_lt_of_le one_pos hs1
+  rcases lt_or_gt_of_ne hn with hl | hl
+  · -- n < N
+    have hr : 0 < s⁻¹ := inv_pos.mpr hspos
+    have h := (hconst _ hr).1.2 n hl
+    simp only [wt] at h
+    have e : s⁻¹ ^ N = s⁻¹ ^ n * s⁻¹ ^ (N - n) := by
+      rw [← zpow_add₀ hr.ne']; congr 1; ring
+    rw [e] at h
+    have hk : s ≤ s ^ (N - n) := by simpa using zpow_le_zpow_right₀ hs1 (show (1:ℤ) ≤ _ by omega)
+    have hk' : s⁻¹ ^ (N - n) ≤ t⁻¹ := by
+      rw [inv_zpow']
+      have : s ^ (N - n) ≥ t := le_trans hst hk
+      have h2 : 0 < s ^ (-(N - n)) := zpow_pos hspos _
+      rw [zpow_neg]
+      exact inv_anti₀ htpos this
+    have hp : 0 < s⁻¹ ^ n := zpow_pos hr _
+    have : ‖a N‖ * s⁻¹ ^ (N - n) ≤ ‖a n‖ := by
+      calc ‖a N‖ * s⁻¹ ^ (N - n) ≤ ‖a N‖ * t⁻¹ := mul_le_mul_of_nonneg_left hk' hpN'.le
+        _ = ‖a n‖ := by rw [ht]; field_simp
+    nlinarith [mul_le_mul_of_nonneg_right this hp.le]
+  · have h := (hconst _ hspos).2.2 n hl
+    simp only [wt] at h
+    have e : s ^ n = s ^ N * s ^ (n - N) := by
+      rw [← zpow_add₀ hspos.ne']; congr 1; ring
+    rw [e] at h
+    have hk : s ≤ s ^ (n - N) := by simpa using zpow_le_zpow_right₀ hs1 (show (1:ℤ) ≤ _ by omega)
+    have hp : 0 < s ^ N := zpow_pos hspos _
+    have : ‖a N‖ ≤ ‖a n‖ * s ^ (n - N) := by
+      calc ‖a N‖ = ‖a n‖ * t := by rw [ht]; field_simp
+        _ ≤ ‖a n‖ * s ^ (n - N) := mul_le_mul_of_nonneg_left (le_trans hst hk) hpn.le
+    nlinarith [mul_le_mul_of_nonneg_right this hp.le]
+
 end AnalyticTheory
