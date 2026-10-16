@@ -282,21 +282,22 @@ noncomputable instance FqAlgebra (q : K) : Algebra K (FqSub K q) :=
 
 /-- Book, §2: a *divisor* is a collection `m = {m_α}` of integers over `Ω^×` with
 (i) finiteness in every annulus `0 < r ≤ |α| ≤ r'`, and (ii) rationality: `m_α = m_β`
-when `α`, `β` are conjugate over `K`. Blueprint: `def:divisor`. -/
+when `α`, `β` are conjugate over `K`. As the points of `Ω^×` only matter, we normalize `m_0 = 0`.
+Blueprint: `def:divisor`. -/
 noncomputable def Divisors : AddSubgroup (Omega K → ℤ) where
-  carrier := {m | (∀ r r' : ℝ, 0 < r → r ≤ r' →
+  carrier := {m | m 0 = 0 ∧ (∀ r r' : ℝ, 0 < r → r ≤ r' →
       {α : Omega K | r ≤ omegaNorm K α ∧ omegaNorm K α ≤ r' ∧ m α ≠ 0}.Finite) ∧
     (∀ α β : Omega K, minpoly K α = minpoly K β → m α = m β)}
-  zero_mem' := ⟨fun r r' _ _ => by simp, fun α β _ => rfl⟩
-  add_mem' := fun {m n} hm hn => ⟨fun r r' hr hrr' =>
-      ((hm.1 r r' hr hrr').union (hn.1 r r' hr hrr')).subset (fun α hα => by
+  zero_mem' := ⟨rfl, fun r r' _ _ => by simp, fun α β _ => rfl⟩
+  add_mem' := fun {m n} hm hn => ⟨by simp [hm.1, hn.1], fun r r' hr hrr' =>
+      ((hm.2.1 r r' hr hrr').union (hn.2.1 r r' hr hrr')).subset (fun α hα => by
         obtain ⟨h1, h2, h3⟩ := hα
         by_cases hm0 : m α = 0
         · exact Or.inr ⟨h1, h2, by simpa [Pi.add_apply, hm0] using h3⟩
         · exact Or.inl ⟨h1, h2, hm0⟩),
-    fun α β h => by simp [Pi.add_apply, hm.2 α β h, hn.2 α β h]⟩
-  neg_mem' := fun {m} hm => ⟨fun r r' hr hrr' => by simpa using hm.1 r r' hr hrr',
-    fun α β h => by simp [hm.2 α β h]⟩
+    fun α β h => by simp [Pi.add_apply, hm.2.2 α β h, hn.2.2 α β h]⟩
+  neg_mem' := fun {m} hm => ⟨by simp [hm.1], fun r r' hr hrr' => by simpa using hm.2.1 r r' hr hrr',
+    fun α β h => by simp [hm.2.2 α β h]⟩
 
 /-- Book, §2: the divisor of a meromorphic function (`(f)` in the book): `m_α = w_α(f)` for
 `α ∈ Ω^×` (and `0` at the irrelevant point `α = 0`). Blueprint: `def:divisor-of`. -/
@@ -358,7 +359,7 @@ theorem degQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
       (fun α : Omega K => (Module.finrank K (IntermediateField.adjoin K ({α} : Set (Omega K))) : ℤ)
         * m α)).Finite := by
     intro m hm
-    refine (hm.1.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ?_)
+    refine (hm.1.2.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ?_)
     refine ⟨hα.2.1.le, hα.2.2, ?_⟩
     intro h; apply hs; simp [h]
   unfold degQ
@@ -392,7 +393,7 @@ theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
   have hfin : ∀ m ∈ DivisorsPeriodic K q, (repAnnulus K q ∩ Function.mulSupport
       (fun α : Omega K => N α ^ m α)).Finite := by
     intro m hm
-    refine (hm.1.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ?_)
+    refine (hm.1.2.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ?_)
     refine ⟨hα.2.1.le, hα.2.2, ?_⟩
     intro h; apply hs; simp [h]
   have hx : ∀ m ∈ DivisorsPeriodic K q, (∏ᶠ α ∈ repAnnulus K q, N α ^ m α) ≠ 0 := by

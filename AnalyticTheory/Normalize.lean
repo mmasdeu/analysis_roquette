@@ -242,7 +242,8 @@ theorem divisorOf_finite (f : MeroRing K) {r r' : ℝ} (hr : 0 < r) (hrr' : r �
 
 /-- The divisor of a meromorphic function is a divisor. -/
 theorem divisorOf_mem_Divisors (f : MeroRing K) : divisorOf K f ∈ Divisors K :=
-  ⟨fun r r' hr hrr' => divisorOf_finite K f hr hrr', fun α β h => divisorOf_rational K f h⟩
+  ⟨by simp [divisorOf], fun r r' hr hrr' => divisorOf_finite K f hr hrr',
+    fun α β h => divisorOf_rational K f h⟩
 
 theorem divisorOf_mul {f g : MeroRing K} (hf : f ≠ 0) (hg : g ≠ 0) :
     divisorOf K (f * g) = divisorOf K f + divisorOf K g := by
