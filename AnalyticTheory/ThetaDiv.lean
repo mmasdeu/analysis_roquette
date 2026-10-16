@@ -264,6 +264,75 @@ theorem translation_thetaDiv :
     exact Finset.prod_congr rfl (fun α _ => inv_zpow _ _)
   rw [e, map_inv₀]
 
+
+theorem norm_gen_eq {α : Omega K} (hint : IsIntegral K α) :
+    Algebra.norm K (IntermediateField.AdjoinSimple.gen K α) =
+      (-1) ^ (minpoly K α).natDegree * (minpoly K α).coeff 0 := by
+  have := Algebra.PowerBasis.norm_gen_eq_coeff_zero_minpoly (IntermediateField.adjoin.powerBasis hint)
+  rw [IntermediateField.adjoin.powerBasis_gen, IntermediateField.adjoin.powerBasis_dim,
+    IntermediateField.minpoly_gen] at this
+  exact this
+
+theorem prod_neg_one_zpow {ι : Type*} (S : Finset ι) (f : ι → ℤ) :
+    ∏ i ∈ S, ((-1 : K) ^ f i) = (-1 : K) ^ (∑ i ∈ S, f i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simp
+  | insert a S ha ih =>
+    rw [Finset.prod_insert ha, Finset.sum_insert ha, ih, zpow_add₀ (by norm_num)]
+
+theorem degQ_eq_dTheta : degQ K q m = dTheta hq0 hq1 hm := by
+  classical
+  unfold degQ dTheta
+  rw [finsum_mem_eq_sum_of_inter_support_eq (t := thetaS hq0 hq1 hm)]
+  · refine Finset.sum_congr rfl (fun α hα => ?_)
+    rw [IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral α)]
+  · ext α
+    simp only [Set.mem_inter_iff, Function.mem_support, Finset.mem_coe]
+    constructor
+    · rintro ⟨hα, hne⟩
+      refine ⟨(mem_thetaS hq0 hq1 hm).mpr ⟨hα, ?_⟩, hne⟩
+      intro h0; apply hne; simp [h0]
+    · rintro ⟨hα, hne⟩
+      exact ⟨((mem_thetaS hq0 hq1 hm).mp hα).1, hne⟩
+
+
+theorem aTheta_ne_zero : aTheta hq0 hq1 hm ≠ 0 := by
+  unfold aTheta
+  refine Finset.prod_ne_zero_iff.mpr (fun α hα => zpow_ne_zero _ ?_)
+  exact minpoly.coeff_zero_ne_zero (Algebra.IsIntegral.isIntegral α)
+    (ne_zero_of_mem_thetaS hq0 hq1 hm hα)
+
+theorem PhiQ_eq_mk (hq : q ≠ 0) :
+    ∃ h : (-1 : K) ^ dTheta hq0 hq1 hm * aTheta hq0 hq1 hm ≠ 0,
+      PhiQ K q hq m = QuotientGroup.mk (Units.mk0 _ h) := by
+  classical
+  have hx : (-1 : K) ^ dTheta hq0 hq1 hm * aTheta hq0 hq1 hm ≠ 0 :=
+    mul_ne_zero (zpow_ne_zero _ (by norm_num)) (aTheta_ne_zero hq0 hq1 hm)
+  refine ⟨hx, ?_⟩
+  unfold PhiQ
+  have hprod : (∏ᶠ α ∈ repAnnulus K q,
+      (Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)) ^ (m α)) =
+      (-1 : K) ^ dTheta hq0 hq1 hm * aTheta hq0 hq1 hm := by
+    rw [finprod_mem_eq_prod_of_inter_mulSupport_eq (t := thetaS hq0 hq1 hm)]
+    · have : ∀ α ∈ thetaS hq0 hq1 hm,
+          (Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)) ^ (m α) =
+          (-1 : K) ^ (((minpoly K α).natDegree : ℤ) * m α) * ((minpoly K α).coeff 0) ^ (m α) := by
+        intro α hα
+        rw [norm_gen_eq (Algebra.IsIntegral.isIntegral α), mul_zpow, ← zpow_natCast,
+          ← zpow_mul]
+      rw [Finset.prod_congr rfl this, Finset.prod_mul_distrib, prod_neg_one_zpow]
+      rfl
+    · ext α
+      simp only [Set.mem_inter_iff, Function.mem_mulSupport, Finset.mem_coe]
+      constructor
+      · rintro ⟨hα, hne⟩
+        refine ⟨(mem_thetaS hq0 hq1 hm).mpr ⟨hα, ?_⟩, hne⟩
+        intro h0; apply hne; simp [h0]
+      · rintro ⟨hα, hne⟩
+        exact ⟨((mem_thetaS hq0 hq1 hm).mp hα).1, hne⟩
+  rw [hprod, dif_pos hx]
+
 end theta3
 
 end AnalyticTheory
