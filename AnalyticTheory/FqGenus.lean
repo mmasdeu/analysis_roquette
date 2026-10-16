@@ -304,4 +304,125 @@ theorem fq_genus : genus K (FqSub K q) = 1 := by
 
 end genus2
 
+section transl
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+theorem holScale_comm (c d : Kˣ) (g : holSubring K) :
+    holScale K c (holScale K d g) = holScale K d (holScale K c g) := by
+  refine Subtype.ext (funext fun x => ?_)
+  show g.1 (scalePt K d (scalePt K c x)) = g.1 (scalePt K c (scalePt K d x))
+  have : scalePt K d (scalePt K c x) = scalePt K c (scalePt K d x) := Subtype.ext (by
+    show algebraMap K (Omega K) (d : K) * (algebraMap K (Omega K) (c : K) * x.1) =
+      algebraMap K (Omega K) (c : K) * (algebraMap K (Omega K) (d : K) * x.1)
+    ring)
+  rw [this]
+
+theorem translation_comm (a b : Kˣ) (f : MeroRing K) :
+    translation K a (translation K b f) = translation K b (translation K a f) := by
+  obtain ⟨x, y, -, rfl⟩ := IsFractionRing.div_surjective (A := holSubring K) f
+  simp only [map_div₀, translation_alg, holScale_comm]
+
+/-- The translation `τ_a` as an automorphism of `F_K(q)`. -/
+noncomputable def translationFq (q : K) (a : Kˣ) : FqSub K q ≃+* FqSub K q where
+  toFun f := ⟨translation K a f, fun b hb => by rw [translation_comm, f.2 b hb]⟩
+  invFun f := ⟨(translation K a).symm f, fun b hb => by
+    apply (translation K a).injective
+    rw [translation_comm, RingEquiv.apply_symm_apply, f.2 b hb]⟩
+  left_inv f := Subtype.ext ((translation K a).symm_apply_apply f)
+  right_inv f := Subtype.ext ((translation K a).apply_symm_apply f)
+  map_mul' f g := Subtype.ext (map_mul _ _ _)
+  map_add' f g := Subtype.ext (map_add _ _ _)
+
+include hq0 hq1 in
+/-- At a `K`-rational point, every function without pole is congruent to a constant. -/
+theorem exists_const_approx_K {b : K} (hb : b ≠ 0) {x : FqSub K q}
+    (hx : 0 ≤ anVal K (algebraMap K (Omega K) b) (x : MeroRing K)) :
+    ∃ c : K, 0 < anVal K (algebraMap K (Omega K) b)
+      ((x - algebraMap K (FqSub K q) c : FqSub K q) : MeroRing K) := by
+  classical
+  have hβ : algebraMap K (Omega K) b ≠ 0 := (_root_.map_ne_zero _).mpr hb
+  set P := primeAt (q := q) hq0 hq1 hβ
+  have hdeg := primeAt_degree hq0 hq1 hβ
+  rw [minpoly_alg, Polynomial.natDegree_X_sub_C] at hdeg
+  unfold PrimeDivisor.degree at hdeg
+  letI : Algebra K (IsLocalRing.ResidueField P.ring) :=
+    ((IsLocalRing.residue P.ring).comp P.toRing).toAlgebra
+  obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' (1 : IsLocalRing.ResidueField P.ring)
+    one_ne_zero).mp hdeg (IsLocalRing.residue P.ring ⟨x, hx⟩)
+  refine ⟨c, ?_⟩
+  rw [Algebra.smul_def, mul_one, RingHom.algebraMap_toAlgebra, RingHom.comp_apply] at hc
+  have h0 : IsLocalRing.residue P.ring (⟨x, hx⟩ - P.toRing c) = 0 := by rw [map_sub, hc, sub_self]
+  rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff] at h0
+  have hmem := (⟨x, hx⟩ - P.toRing c : P.ring).2
+  change 0 ≤ anVal K _ _ at hmem
+  rw [show IsUnit (⟨x, hx⟩ - P.toRing c : P.ring) ↔ _ from
+    isUnit_ringAt_iff hβ (⟨x, hx⟩ - P.toRing c)] at h0
+  exact lt_of_le_of_ne hmem (Ne.symm h0)
+
+include hq0 hq1 in
+/-- An automorphism of `F_K(q) | K` is determined by its action on the valuations at `K`-points. -/
+theorem ringEquiv_eq_of_anVal (τ τ' : FqSub K q ≃+* FqSub K q)
+    (hτ : ∀ c : K, τ (algebraMap K (FqSub K q) c) = algebraMap K (FqSub K q) c)
+    (hτ' : ∀ c : K, τ' (algebraMap K (FqSub K q) c) = algebraMap K (FqSub K q) c)
+    (h : ∀ b : K, b ≠ 0 → ∀ f : FqSub K q, anVal K (algebraMap K (Omega K) b) ((τ f : FqSub K q) :
+      MeroRing K) = anVal K (algebraMap K (Omega K) b) ((τ' f : FqSub K q) : MeroRing K)) :
+    τ = τ' := by
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  refine RingEquiv.ext (fun f => ?_)
+  by_contra hne
+  set g : FqSub K q := τ f - τ' f with hgdef
+  have hg0 : g ≠ 0 := sub_ne_zero.mpr hne
+  have hg' : (g : MeroRing K) ≠ 0 := fun h' => hg0 (Subtype.ext h')
+  set k : FqSub K q := τ' f with hkdef
+  have hfin1 := annPart_support_finite hq0 hq1 (divisorOf_periodic hq0 g.2) (repSystem K q)
+  have hfin2 := annPart_support_finite hq0 hq1 (divisorOf_periodic hq0 k.2) (repSystem K q)
+  obtain ⟨n, hn⟩ := exists_good_index hq0 hq1 [1] (by simp) (hfin1.toFinset ∪ hfin2.toFinset).toList
+  set b : K := 1 * (1 + q ^ (n + 1)) with hb
+  have hb0 : b ≠ 0 := by rw [hb, one_mul]; exact one_add_ne_zero hq1 n
+  have hβ : algebraMap K (Omega K) b ≠ 0 := (_root_.map_ne_zero _).mpr hb0
+  have hgood : ∀ γ ∈ repAnnulus K q, (divisorOf K (g : MeroRing K) γ ≠ 0 ∨
+      divisorOf K (k : MeroRing K) γ ≠ 0) → ¬ ConjModQ K q γ (algebraMap K (Omega K) b) := by
+    intro γ hγ hne'
+    apply hn 1 (List.mem_singleton_self 1) γ
+    rw [Finset.mem_toList, Finset.mem_union, Set.Finite.mem_toFinset, Set.Finite.mem_toFinset]
+    rcases hne' with h1 | h1
+    · exact Or.inl ⟨hγ, h1⟩
+    · exact Or.inr ⟨hγ, h1⟩
+  obtain ⟨β', hβ', hcβ, -⟩ := repAnnulus_pt hq0 hq1 hβ
+  have hcβ' := conjModQ_symm hq0' hcβ
+  have hgβ : divisorOf K (g : MeroRing K) (algebraMap K (Omega K) b) = 0 := by
+    rw [periodic_conj hq0' (divisorOf_periodic hq0 g.2) hcβ]
+    by_contra h0
+    exact hgood β' hβ' (Or.inl h0) hcβ'
+  have hkβ : divisorOf K (k : MeroRing K) (algebraMap K (Omega K) b) = 0 := by
+    rw [periodic_conj hq0' (divisorOf_periodic hq0 k.2) hcβ]
+    by_contra h0
+    exact hgood β' hβ' (Or.inr h0) hcβ'
+  have hk0 : 0 ≤ anVal K (algebraMap K (Omega K) b) (k : MeroRing K) := by
+    by_cases hk : (k : MeroRing K) = 0
+    · rw [hk, anVal_zero K _ hβ]; exact le_top
+    · rw [anVal_of_divisorOf hk rfl hβ, hkβ]; rfl
+  obtain ⟨c, hc⟩ := exists_const_approx_K hq0 hq1 hb0 hk0
+  have e1 : τ f - algebraMap K (FqSub K q) c = τ (f - algebraMap K (FqSub K q) c) := by
+    rw [map_sub, hτ]
+  have e2 : τ' f - algebraMap K (FqSub K q) c = τ' (f - algebraMap K (FqSub K q) c) := by
+    rw [map_sub, hτ']
+  have hc' : 0 < anVal K (algebraMap K (Omega K) b)
+      ((τ f - algebraMap K (FqSub K q) c : FqSub K q) : MeroRing K) := by
+    rw [e1, h b hb0, ← e2]; exact hc
+  have hgsum : (g : MeroRing K) = ((τ f - algebraMap K (FqSub K q) c : FqSub K q) : MeroRing K) +
+      (-((τ' f - algebraMap K (FqSub K q) c : FqSub K q) : MeroRing K)) := by
+    rw [hgdef]; push_cast; ring
+  have hpos : 0 < anVal K (algebraMap K (Omega K) b) (g : MeroRing K) := by
+    rw [hgsum]
+    refine lt_of_lt_of_le ?_ ((anVal_isValuation K _ hβ).2.2.2 _ _)
+    rw [anVal_neg hβ]
+    exact lt_min hc' hc
+  rw [anVal_of_divisorOf hg' rfl hβ, hgβ] at hpos
+  exact lt_irrefl _ hpos
+
+end transl
+
 end AnalyticTheory

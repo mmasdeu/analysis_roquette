@@ -242,6 +242,86 @@ theorem translation_analytic_eq_algebraic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖
     (x : FqSub K q) :
     ((translationOfClass K q c x : FqSub K q) : MeroRing K) =
       translation K (Units.mk0 a ha) (x : MeroRing K) := by
-  sorry
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  haveI : (Subgroup.zpowers (Units.mk0 q hq0')).Normal := Subgroup.normal_of_comm _
+  set a' := Units.mk0 a ha with ha'
+  have hΦ0 : PhiQ K q hq0' 0 = 1 := by
+    have := PhiQ_add K q hq0 hq1 0 0 (DivisorsPeriodic K q).zero_mem (DivisorsPeriodic K q).zero_mem
+    rw [add_zero] at this
+    exact mul_eq_left.mp this.symm
+  have hpt : ∀ u : Kˣ, pointDivisor K q (algebraMap K (Omega K) (u : K)) ∈ DivisorsPeriodic K q :=
+    fun u => pointDivisor_mem hq0 hq1 ((_root_.map_ne_zero _).mpr u.ne_zero)
+  have hPhi : ∀ α β : Kˣ, PhiQ K q hq0' (pointDivisor K q (algebraMap K (Omega K) (β : K)) -
+      pointDivisor K q (algebraMap K (Omega K) (α : K))) =
+        (QuotientGroup.mk (β * α⁻¹) : Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq0')) := by
+    intro α β
+    have hneg := PhiQ_add K q hq0 hq1 _ _ (hpt α) ((DivisorsPeriodic K q).neg_mem (hpt α))
+    rw [add_neg_cancel, hΦ0] at hneg
+    rw [sub_eq_add_neg, PhiQ_add K q hq0 hq1 _ _ (hpt β) ((DivisorsPeriodic K q).neg_mem (hpt α)),
+      eq_inv_of_mul_eq_one_right hneg.symm, PhiQ_pointDivisor_K hq0 hq1 β.ne_zero,
+      PhiQ_pointDivisor_K hq0 hq1 α.ne_zero, Units.mk0_val, Units.mk0_val, QuotientGroup.mk_mul,
+      QuotientGroup.mk_inv]
+  set Pc : (FqSub K q ≃+* FqSub K q) → Prop := fun τ =>
+    (∀ x : K, τ (algebraMap K (FqSub K q) x) = algebraMap K (FqSub K q) x) ∧
+    ∀ α β : Kˣ, (∃ m : divisorsDegZero K q,
+        (QuotientAddGroup.mk m : classGroupDegZero K q) = c ∧
+        (m : Omega K → ℤ) = pointDivisor K q (algebraMap K (Omega K) β) -
+          pointDivisor K q (algebraMap K (Omega K) α)) →
+      ∀ f : FqSub K q, anVal K (algebraMap K (Omega K) β) ((τ f : FqSub K q) : MeroRing K) =
+        anVal K (algebraMap K (Omega K) α) (f : MeroRing K) with hPc
+  have hτa : Pc (translationFq q a') := by
+    refine ⟨fun x => Subtype.ext (translation_algebraMap K a' x), fun α β ⟨m, hm1, hm2⟩ f => ?_⟩
+    have hΦm := hc m hm1
+    rw [hm2, hPhi, QuotientGroup.eq, Subgroup.mem_zpowers_iff] at hΦm
+    obtain ⟨k, hk⟩ := hΦm
+    have hk' := congrArg (fun u : Kˣ => (u : K)) hk
+    simp only [Units.val_zpow_eq_zpow_val, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0,
+      mul_inv_rev, inv_inv, ha'] at hk'
+    have hα0 : (α : K) ≠ 0 := α.ne_zero
+    have hβ0 : (β : K) ≠ 0 := β.ne_zero
+    have hkβ : (β : K) = a * (q ^ (-k) * α) := by
+      rw [zpow_neg, hk']; field_simp
+    have hαΩ : algebraMap K (Omega K) (α : K) ≠ 0 := (_root_.map_ne_zero _).mpr hα0
+    have e : algebraMap K (Omega K) (β : K) = algebraMap K (Omega K) a *
+        (algebraMap K (Omega K) q ^ (-k) * algebraMap K (Omega K) (α : K)) := by
+      rw [hkβ, map_mul, map_mul, map_zpow₀]
+    show anVal K (algebraMap K (Omega K) (β : K)) (translation K a' (f : MeroRing K)) = _
+    rw [e, anVal_translation_shift ha (mul_ne_zero (zpow_ne_zero _ ((_root_.map_ne_zero _).mpr hq0'))
+      hαΩ) (f : MeroRing K), anVal_periodic hq0' f.2 hαΩ (-k)]
+  have hspec : Pc (translationOfClass K q c) := by
+    unfold translationOfClass
+    exact Classical.epsilon_spec (p := Pc) ⟨_, hτa⟩
+  have hval : ∀ τ, Pc τ → ∀ b : K, b ≠ 0 → ∀ f : FqSub K q,
+      anVal K (algebraMap K (Omega K) b) ((τ f : FqSub K q) : MeroRing K) =
+        anVal K (algebraMap K (Omega K) (b / a)) (f : MeroRing K) := by
+    intro τ hτ b hb f
+    set β := Units.mk0 b hb
+    set α := Units.mk0 (b / a) (div_ne_zero hb ha)
+    have hm : pointDivisor K q (algebraMap K (Omega K) (β : K)) -
+        pointDivisor K q (algebraMap K (Omega K) (α : K)) ∈ divisorsDegZero K q := by
+      rw [mem_divisorsDegZero_iff K q hq0 hq1]
+      refine ⟨(DivisorsPeriodic K q).sub_mem (hpt β) (hpt α), ?_⟩
+      rw [degQ_sub hq0 hq1 (hpt β) (hpt α), degQ_pointDivisor_K hq0 hq1 β.ne_zero,
+        degQ_pointDivisor_K hq0 hq1 α.ne_zero, sub_self]
+    have hβα : β * α⁻¹ = a' := Units.ext (by
+      simp only [β, α, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0, ha']
+      field_simp)
+    have hcls : (QuotientAddGroup.mk ⟨_, hm⟩ : classGroupDegZero K q) = c := by
+      obtain ⟨e, he⟩ := abel_jacobi_iso K q hq0 hq1
+      obtain ⟨m0, hm0⟩ := QuotientAddGroup.mk_surjective c
+      have h1 := he ⟨_, hm⟩
+      have h2 := he m0
+      rw [hPhi, hβα] at h1
+      rw [hc m0 hm0] at h2
+      apply Multiplicative.ofAdd.injective
+      apply e.injective
+      rw [h1, ← hm0, h2]
+    exact hτ.2 α β ⟨⟨_, hm⟩, hcls, rfl⟩ f
+  have heq : translationOfClass K q c = translationFq q a' :=
+    ringEquiv_eq_of_anVal hq0 hq1 _ _ hspec.1 hτa.1 (fun b hb f => by
+      rw [hval _ hspec b hb f, hval _ hτa b hb f])
+  rw [heq]
+  rfl
 
 end AnalyticTheory
