@@ -313,12 +313,14 @@ theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
     (hc0 : φ.coeff 0 ≠ 0) : ∃ T : holSubring K,
     holScale K (Units.mk0 q hq0)⁻¹ T =
       algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * monoHol K (φ.natDegree : ℤ) * T ∧
-    ∀ ξ : OmegaX K, ∃ J0 : ℕ, ∀ J1, J0 ≤ J1 → ∃ R : holSubring K, R.1 ξ ≠ 0 ∧
-      T = (∏ n ∈ Finset.range J1, thF q φ n) * (∏ n ∈ Finset.range J1, thG q φ (n + 1)) * R := by
+    (∀ ξ : OmegaX K, ∃ J0 : ℕ, ∀ J1, J0 ≤ J1 → ∃ R : holSubring K, R.1 ξ ≠ 0 ∧
+      T = (∏ n ∈ Finset.range J1, thF q φ n) * (∏ n ∈ Finset.range J1, thG q φ (n + 1)) * R) ∧
+    ∀ x : OmegaX K, Tendsto (fun J : ℕ => (∏ n ∈ Finset.range J, (thF q φ n).1 x) *
+      ∏ n ∈ Finset.range J, (thG q φ (n + 1)).1 x) atTop (𝓝 (T.1 x)) := by
   classical
   obtain ⟨PF, hgF, hPF⟩ := exists_prodF hq hφ
   obtain ⟨PG, hgG, hPG⟩ := exists_prodG hq0 hq hc0
-  refine ⟨PF * PG, ?_, ?_⟩
+  refine ⟨PF * PG, ?_, ?_, fun x => ?_⟩
   · set c := (Units.mk0 q hq0)⁻¹ with hc
     have hF : ∀ x : OmegaX K, (thF q φ 0).1 x * PF.1 (scalePt K c x) = PF.1 x := by
       intro x
@@ -386,5 +388,7 @@ theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
         ∏ n ∈ Finset.range J1, (thG q φ (n + 1)).1 x :=
       Finset.prod_congr rfl (fun j _ => one_add_sub_apply _ x)
     rw [e1, e2]; ring
+  · rw [mul_apply_hol]
+    exact (hPF x).mul (hPG x)
 
 end AnalyticTheory

@@ -258,14 +258,16 @@ theorem theta_spec {q : K} (hq0 : 0 < ‖q‖) (hq : ‖q‖ < 1) {α : Omega K}
       holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ T =
         algebraMap K (holSubring K) ((minpoly K α).coeff 0)⁻¹ *
           monoHol K ((minpoly K α).natDegree : ℤ) * T ∧
-      ∀ ξ : Omega K, ξ ≠ 0 → anVal K ξ (algebraMap (holSubring K) (MeroRing K) T) =
-        if ConjModQ K q α ξ then 1 else 0 := by
+      (∀ ξ : Omega K, ξ ≠ 0 → anVal K ξ (algebraMap (holSubring K) (MeroRing K) T) =
+        if ConjModQ K q α ξ then 1 else 0) ∧
+      ∀ x : OmegaX K, Tendsto (fun J : ℕ => (∏ n ∈ Finset.range J, (thF q (minpoly K α) n).1 x) *
+        ∏ n ∈ Finset.range J, (thG q (minpoly K α) (n + 1)).1 x) atTop (𝓝 (T.1 x)) := by
   classical
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
   have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
   have hmon := minpoly.monic hint
   have hc0 : (minpoly K α).coeff 0 ≠ 0 := minpoly.coeff_zero_ne_zero hint hα
-  obtain ⟨T, hfe, htail⟩ := exists_theta hq0' hq hmon hc0
+  obtain ⟨T, hfe, htail, hpt⟩ := exists_theta hq0' hq hmon hc0
   -- the valuation as a finite sum
   have hS : ∀ ξ : Omega K, ∀ hξ : ξ ≠ 0, ∃ J0 : ℕ, ∀ J1, J0 ≤ J1 →
       anVal K ξ (algebraMap (holSubring K) (MeroRing K) T) =
@@ -290,7 +292,7 @@ theorem theta_spec {q : K} (hq0 : 0 < ‖q‖) (hq : ‖q‖ < 1) {α : Omega K}
     refine mul_ne_zero (mul_ne_zero ?_ ?_) hRne
     · exact Finset.prod_ne_zero_iff.mpr (fun n _ => thF_ne_zero hq0' hmon n)
     · exact Finset.prod_ne_zero_iff.mpr (fun n _ => thG_ne_zero hq0' hmon hc0 (n + 1))
-  refine ⟨T, hTne, hfe, fun ξ hξ => ?_⟩
+  refine ⟨T, hTne, hfe, fun ξ hξ => ?_, hpt⟩
   obtain ⟨J0, hJ0⟩ := hS ξ hξ
   have hzero : ∀ n : ℕ, J0 ≤ n → chi q α ξ n = 0 ∧ chi q α ξ (-((n + 1 : ℕ) : ℤ)) = 0 := by
     intro n hn

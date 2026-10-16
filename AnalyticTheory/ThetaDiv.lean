@@ -85,9 +85,12 @@ theorem thetaFun_spec {α : Omega K} (hα : α ≠ 0) :
       holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ (thetaFun hq0 hq1 α) =
         algebraMap K (holSubring K) ((minpoly K α).coeff 0)⁻¹ *
           monoHol K ((minpoly K α).natDegree : ℤ) * thetaFun hq0 hq1 α ∧
-      ∀ ξ : Omega K, ξ ≠ 0 →
+      (∀ ξ : Omega K, ξ ≠ 0 →
         anVal K ξ (algebraMap (holSubring K) (MeroRing K) (thetaFun hq0 hq1 α)) =
-          if ConjModQ K q α ξ then 1 else 0 := by
+          if ConjModQ K q α ξ then 1 else 0) ∧
+      ∀ x : OmegaX K, Tendsto (fun J : ℕ => (∏ n ∈ Finset.range J, (thF q (minpoly K α) n).1 x) *
+        ∏ n ∈ Finset.range J, (thG q (minpoly K α) (n + 1)).1 x) atTop
+          (𝓝 ((thetaFun hq0 hq1 α).1 x)) := by
   classical
   unfold thetaFun
   rw [dif_pos hα]
@@ -144,7 +147,7 @@ theorem anVal_thetaDiv {ξ : Omega K} (hξ : ξ ≠ 0) :
       (algebraMap (holSubring K) (MeroRing K) (thetaFun hq0 hq1 α)) =
         ((if ConjModQ K q α ξ then 1 else 0 : ℤ) : WithTop ℤ) := by
     intro α hα
-    rw [(thetaFun_spec hq0 hq1 (ne_zero_of_mem_thetaS hq0 hq1 hm hα)).2.2 ξ hξ]
+    rw [(thetaFun_spec hq0 hq1 (ne_zero_of_mem_thetaS hq0 hq1 hm hα)).2.2.1 ξ hξ]
     split_ifs <;> simp
   unfold thetaDiv
   rw [anVal_prod_zpow hξ _ _ (fun α => if ConjModQ K q α ξ then 1 else 0) m

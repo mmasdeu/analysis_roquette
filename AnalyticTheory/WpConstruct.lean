@@ -94,7 +94,7 @@ open scoped Classical in
 theorem anVal_Th {ξ : Omega K} (hξ : ξ ≠ 0) :
     anVal K ξ (algebraMap (holSubring K) (MeroRing K) (Th hq0 hq1)) =
       if ConjModQ K q 1 ξ then 1 else 0 :=
-  (thetaFun_spec hq0 hq1 one_ne_zero).2.2 ξ hξ
+  (thetaFun_spec hq0 hq1 one_ne_zero).2.2.1 ξ hξ
 
 /-- The point `q⁻ⁿ`. -/
 noncomputable def ptQ (n : ℤ) : Omega K := algebraMap K (Omega K) (q ^ (-n))

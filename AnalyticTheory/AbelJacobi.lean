@@ -258,7 +258,7 @@ theorem anVal_thM_zpow {y : Omega K} (hy : y ≠ 0) (z : ℤ) {ξ : Omega K} (h�
     anVal K ξ (thM hq0 hq1 y ^ z) =
       ((z * (if ConjModQ K q y ξ then 1 else 0) : ℤ) : WithTop ℤ) := by
   refine anVal_zpow_of hξ (thM_ne_zero hq0 hq1 hy) ?_ z
-  rw [thM, (thetaFun_spec hq0 hq1 hy).2.2 ξ hξ]
+  rw [thM, (thetaFun_spec hq0 hq1 hy).2.2.1 ξ hξ]
   split_ifs <;> simp
 
 omit hq1 in
