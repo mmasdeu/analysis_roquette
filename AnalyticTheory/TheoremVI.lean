@@ -1,4 +1,4 @@
-import AnalyticTheory.WpConstruct
+import AnalyticTheory.Generation
 
 /-!
 # Theorem VI (book, §3)
