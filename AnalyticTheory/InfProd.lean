@@ -117,4 +117,51 @@ theorem exists_infprod {g : ℕ → holSubring K}
   exact (tendsto_const_nhds.add hs).congr' (by filter_upwards with J; rfl) |> fun h => by
     simpa [add_apply_hol, one_apply_hol] using h
 
+
+theorem norm_eval_le_gnorm (f : holSubring K) (x : OmegaX K) :
+    ‖f.1 x‖ ≤ gnorm K ‖x.1‖ f := by
+  have hρ : 0 < ‖x.1‖ := norm_pos_iff.mpr x.2
+  refine hasSum_norm_le (holCoeff_hasSum K f x) (gnorm_nonneg hρ f) (fun n => ?_)
+  rw [norm_mul, norm_algebraMap_omega, norm_zpow]
+  exact wt_le_gnorm hρ f n
+
+theorem exists_infprod_tail {g : ℕ → holSubring K}
+    (hg : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0))
+    {P : holSubring K}
+    (hP : ∀ x : OmegaX K, Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop
+      (𝓝 (P.1 x))) (ξ : OmegaX K) :
+    ∃ J0 : ℕ, ∀ J1, J0 ≤ J1 → ∃ R : holSubring K,
+      (∀ x : OmegaX K, P.1 x = (∏ j ∈ Finset.range J1, (1 + (g j).1 x)) * R.1 x) ∧ R.1 ξ ≠ 0 := by
+  have hρ : 0 < ‖ξ.1‖ := norm_pos_iff.mpr ξ.2
+  obtain ⟨J0, hJ0⟩ := ((hg _ hρ).eventually (gt_mem_nhds one_pos)).exists_forall_of_atTop
+  refine ⟨J0, fun J1 hJ1 => ?_⟩
+  have hshift : Tendsto (fun J : ℕ => J1 + J) atTop atTop :=
+    tendsto_atTop_mono (f := id) (fun J => Nat.le_add_left J J1) tendsto_id
+  have hg' : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g (J1 + j))) atTop (𝓝 0) := fun ρ hρ =>
+    (hg ρ hρ).comp hshift
+  obtain ⟨R, hR⟩ := exists_infprod K (g := fun j => g (J1 + j)) hg'
+  refine ⟨R, fun x => ?_, ?_⟩
+  · have h1 : Tendsto (fun J : ℕ => ∏ j ∈ Finset.range (J1 + J), (1 + (g j).1 x)) atTop (𝓝 (P.1 x)) :=
+      (hP x).comp hshift
+    have h2 : Tendsto (fun J : ℕ => (∏ j ∈ Finset.range J1, (1 + (g j).1 x)) *
+        ∏ j ∈ Finset.range J, (1 + (g (J1 + j)).1 x)) atTop
+        (𝓝 ((∏ j ∈ Finset.range J1, (1 + (g j).1 x)) * R.1 x)) :=
+      (hR x).const_mul _
+    refine tendsto_nhds_unique h1 (h2.congr (fun J => ?_))
+    rw [Finset.prod_range_add]
+  · intro hR0
+    have hnorm : ∀ J : ℕ, ‖∏ j ∈ Finset.range J, (1 + (g (J1 + j)).1 ξ)‖ = 1 := by
+      intro J
+      rw [norm_prod]
+      refine Finset.prod_eq_one (fun j _ => ?_)
+      have h1 : ‖(g (J1 + j)).1 ξ‖ < 1 :=
+        lt_of_le_of_lt (norm_eval_le_gnorm K _ ξ) (hJ0 _ (by omega))
+      rw [add_comm, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm]
+      · simp [h1.le]
+      · simp; exact h1.ne
+    have := tendsto_nhds_unique ((hR ξ).norm) (tendsto_const_nhds (x := (1 : ℝ))
+      |>.congr (fun J => (hnorm J).symm))
+    rw [hR0] at this
+    simp at this
+
 end AnalyticTheory
