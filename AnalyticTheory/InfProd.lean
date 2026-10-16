@@ -70,10 +70,13 @@ theorem partial_prod_bound {g : ℕ → holSubring K} {ρ : ℝ} (hρ : 0 < ρ)
   exact ⟨∏ j ∈ Finset.range J0, m j, lt_of_lt_of_le one_pos (one_le_prod_range m hm1 J0),
     fun J => le_trans (hbound J) (hconst J)⟩
 
-theorem exists_infprod {g : ℕ → holSubring K}
+theorem exists_infprod_sum {g : ℕ → holSubring K}
     (hg : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0)) :
-    ∃ P : holSubring K, ∀ x : OmegaX K,
-      Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop (𝓝 (P.1 x)) := by
+    ∃ g' : holSubring K,
+      NullFamily K (fun J => holCoeff K ((∏ j ∈ Finset.range J, (1 + g j)) * g J)) ∧
+      (∀ x : OmegaX K, HasSum (fun J => ((∏ j ∈ Finset.range J, (1 + g j)) * g J).1 x) (g'.1 x)) ∧
+      ∀ x : OmegaX K,
+        Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop (𝓝 (1 + g'.1 x)) := by
   classical
   set Pf : ℕ → holSubring K := fun J => ∏ j ∈ Finset.range J, (1 + g j) with hPf
   set D : ℕ → holSubring K := fun J => Pf J * g J with hD
@@ -99,7 +102,7 @@ theorem exists_infprod {g : ℕ → holSubring K}
     simp only [wt] at h1
     linarith
   obtain ⟨g', -, hg'⟩ := hol_hasSum_family hnull
-  refine ⟨1 + g', fun x => ?_⟩
+  refine ⟨g', hnull, hg', fun x => ?_⟩
   have hs := (hg' x).tendsto_sum_nat
   have hpart : ∀ J : ℕ, ∏ j ∈ Finset.range J, (1 + (g j).1 x) = 1 + ∑ j ∈ Finset.range J, (D j).1 x := by
     intro J
@@ -114,8 +117,15 @@ theorem exists_infprod {g : ℕ → holSubring K}
         rfl
       rw [this, h2, ih]; ring
   simp only [hpart]
-  exact (tendsto_const_nhds.add hs).congr' (by filter_upwards with J; rfl) |> fun h => by
-    simpa [add_apply_hol, one_apply_hol] using h
+  exact (tendsto_const_nhds.add hs).congr' (by filter_upwards with J; rfl)
+
+theorem exists_infprod {g : ℕ → holSubring K}
+    (hg : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0)) :
+    ∃ P : holSubring K, ∀ x : OmegaX K,
+      Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop (𝓝 (P.1 x)) := by
+  obtain ⟨g', -, -, h⟩ := exists_infprod_sum (K := K) hg
+  refine ⟨1 + g', fun x => ?_⟩
+  simpa [add_apply_hol, one_apply_hol] using h x
 
 
 theorem norm_eval_le_gnorm (f : holSubring K) (x : OmegaX K) :

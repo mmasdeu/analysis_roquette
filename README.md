@@ -114,7 +114,16 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   `℘′² + ℘℘′ = ℘³ + B℘ + C` with `B = −5s₃`, `C = −(5s₃+7s₅)/12` (in every characteristic: the
   coefficients are compared at `X = 1+h` in `K`, `QSeries.lean`, `CubicCoeffs.lean`), (iv) reflection;
   Lemma 1 (inversion).
-* Not started (statements only): Remarks 1, 2 of §2; Theorems VII–VIIIa; §§4–6; Appendices A1, A2.
+* §2 is complete (Remark 3 is a definitional remark, recorded only in the blueprint): items I–V,
+  Corollaries Va, Vb, and Remarks 1, 2 (`ConstRemarks.lean`).
+* §3: the derivation `D` on `H_K`/`M_K` (`DOperator.lean`), formula (18) `2℘′ = D℘ − ℘`, the Weierstraß
+  normal form of the remark for `char ≠ 2, 3` (`Sec3D.lean`), and **Theorem VII** (`Sec3VII.lean`;
+  `B`, `C`, `Δ` as integer power series, evaluation `PowerSeries ℤ → K` as a ring homomorphism).
+* Still open in §3: formula (16) `℘ = −Dζ − 2s₁`, the product formula (45) `Δ = q∏(1−qⁿ)²⁴`, and
+  Theorems VIII, VIIIa, which depend on the Appendix A1 theory (independence of the invariants of the
+  Weierstraß equation; existence of Weierstraß equations for arbitrary elliptic function fields needs
+  Riemann–Roch for general function fields, which is not in Mathlib).
+* Not started (statements only): §§4–6; Appendices A1, A2.
 
 ## Zero theory of holomorphic functions (third step)
 

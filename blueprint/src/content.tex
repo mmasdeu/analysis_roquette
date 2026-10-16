@@ -916,10 +916,10 @@ See the Lean proof of \texttt{solSpace, mem\_solSpace\_iff, solSpace\_eq\_bot\_o
 
 \begin{definition}[Derivation $D$]
 \label{def:D-operator}
-\lean{AnalyticTheory.Dop, AnalyticTheory.laurentCoeff, AnalyticTheory.DholFun, AnalyticTheory.Dop_derivation}
+\lean{AnalyticTheory.Dop, AnalyticTheory.laurentCoeff, AnalyticTheory.DholFun, AnalyticTheory.Dop_derivation, AnalyticTheory.holD, AnalyticTheory.holD_leibniz, AnalyticTheory.holCoeff_holD, AnalyticTheory.DholFun_eq, AnalyticTheory.Dquot, AnalyticTheory.Dop_eq, AnalyticTheory.Dop_alg, AnalyticTheory.holD_hasSum_family}
 \uses{def:M-K}
 \leanok
-$D=X\,\frac{d}{dX}$ on $M_K$: on a holomorphic function it acts on the Laurent coefficients, $\sum a_nX^n\mapsto\sum na_nX^n$, and $D(g/h)=(Dg\cdot h-g\cdot Dh)/h^2$.
+$D=X\,\frac{d}{dX}$ on $M_K$: on $H_K$ it acts on the Laurent coefficients, $\sum a_nX^n\mapsto\sum na_nX^n$ (convergence is preserved because $|n|\le1$ in an ultrametric field), satisfies the Leibniz rule (coefficientwise convolution), and $D(g/h)=(Dg\cdot h-g\cdot Dh)/h^2$ is independent of the representation. $D$ is a derivation of $M_K$ and commutes with sums of null families.
 \end{definition}
 
 \begin{definition}[$\zeta=D\log\Theta$]
@@ -940,10 +940,10 @@ $\wp(X)=\sum_{n\in\mathbb Z}\frac{q^nX}{(1-q^nX)^2}-2s_1$ (new definition of \S3
 
 \begin{definition}[The function $\wp'$]
 \label{def:wp-prime}
-\lean{AnalyticTheory.wpPrimeM, AnalyticTheory.wpPrime_spec}
+\lean{AnalyticTheory.wpPrimeM, AnalyticTheory.wpPrime_spec, AnalyticTheory.termwise, AnalyticTheory.sum_identity}
 \uses{def:wp, def:D-operator}
 \leanok
-$\wp'(X)=\sum_{n\in\mathbb Z}\frac{q^{2n}X^2}{(1-q^nX)^3}+s_1$, i.e.\ $\tfrac12(D\wp-\wp)$ made sense of in every characteristic (formula (18)).
+$\wp'(X)=\sum_{n\in\mathbb Z}\frac{q^{2n}X^2}{(1-q^nX)^3}+s_1$, i.e.\ $\tfrac12(D\wp-\wp)$ made sense of in every characteristic (formula (18)). Proof of (18): with $R_n=\Theta/(X-q^{-n})$ and $c=q^{-n}$ one has the identity $2(-cX^2R^3)=\Theta\,D(cXR^2)-2cXR^2\,D\Theta-\Theta\,cXR^2$ in $H_K$ (using $D\Theta=XR+(X-c)DR$); summing over $n$ gives $2G'=\Theta DG-2G\,D\Theta-\Theta G$.
 \end{definition}
 
 \begin{definition}[The series $s_k$]
@@ -1099,13 +1099,14 @@ $\varepsilon:f(X)\mapsto f(X^{-1})$, the ring automorphism of $M_K$ induced by $
 
 \begin{remark}[Weierstraß form (char $\ne 2,3$)]
 \label{rem:normal-form-3}
-\lean{AnalyticTheory.thmVI_weierstrass_form}
+\lean{AnalyticTheory.thmVI_weierstrass_form, AnalyticTheory.twelve_coeffC, AnalyticTheory.twelve_serC, AnalyticTheory.natCast_ne_zero_of_char}
 \uses{thm:VI}
 \leanok
-In characteristic $\neq 2,3$, $(D\wp)^2=4(\wp+\tfrac1{12})^3-g_2(\wp+\tfrac1{12})-g_3$.
+In characteristic $\neq 2,3$, $(D\wp)^2=4(\wp+\tfrac1{12})^3-g_2(\wp+\tfrac1{12})-g_3$ with $g_2=\tfrac1{12}+20s_3$, $g_3=-\tfrac1{216}+\tfrac73s_5$. Proof: $D\wp=2\wp'+\wp$ by (18), hence $(D\wp)^2=4(\wp'^2+\wp\wp')+\wp^2=4\wp^3+\wp^2+4B\wp+4C$, and $12C=-5s_3-7s_5$.
 \end{remark}
 \begin{proof}
-See the Lean proof of \texttt{thmVI\_weierstrass\_form}.
+\leanok
+See the Lean proof of \texttt{thmVI\_weierstrass\_form, twelve\_coeffC, twelve\_serC, natCast\_ne\_zero\_of\_char}.
 \end{proof}
 
 \begin{definition}[The polynomial $\Delta(B,C)$]
@@ -1136,13 +1137,14 @@ See the Lean proof of \texttt{lemma1\_inversion}.
 
 \begin{theorem}[Theorem VII]
 \label{thm:VII}
-\lean{AnalyticTheory.thmVII_absinv, AnalyticTheory.thmVII_bijective}
+\lean{AnalyticTheory.thmVII_absinv, AnalyticTheory.thmVII_bijective, AnalyticTheory.exists_R, AnalyticTheory.evalZ, AnalyticTheory.evalZ_mul, AnalyticTheory.evalZ_add, AnalyticTheory.jInvQ_eq, AnalyticTheory.serB, AnalyticTheory.serC, AnalyticTheory.serD, AnalyticTheory.serN, AnalyticTheory.exists_serU}
 \uses{def:jq, lem:1}
 \leanok
-$j(q)=1/q+R(q)$ with $R$ universal, $|j(q)|=1/|q|>1$; every $j$ with $|j|>1$ equals $j(q)$ for a unique $q$.
+The absolute invariant $j(q)=(1-48B)^3/\Delta$ satisfies $j(q)=\frac1q+R(q)$ with $R$ a universal power series with integer coefficients; $|j(q)|=1/|q|>1$; and for every $j\in K$ with $|j|>1$ there is exactly one $q$, $0<|q|<1$, with $j(q)=j$. Proof: $B=-5s_3$ and $C$ are integer power series with $B\equiv-5q$, $C\equiv-q\bmod q^2$, so $\Delta=qu$ with $u\in\mathbb Z[[q]]$ a unit, $u(0)=1$, and $(1-48B)^3\equiv u\bmod q$; evaluation of integer power series at $q$ is a ring homomorphism; Lemma 1 gives the norm and the bijectivity.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmVII\_absinv, thmVII\_bijective}.
+\leanok
+See the Lean proof of \texttt{thmVII\_absinv, thmVII\_bijective, exists\_R, evalZ, evalZ\_mul, evalZ\_add, jInvQ\_eq, serB, serC, serD, serN, exists\_serU}.
 \end{proof}
 
 \begin{remark}[Remark 2 (product formula)]
