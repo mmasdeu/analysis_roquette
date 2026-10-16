@@ -140,7 +140,8 @@ theorem fq_residue_degree (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (α : 
     ∃ P : PrimeDivisor K (FqSub K q),
       (∀ x : FqSub K q, x ∈ P.ring ↔ 0 ≤ anVal K α (x : MeroRing K)) ∧
       P.degree = Module.finrank K (IntermediateField.adjoin K ({α} : Set (Omega K))) := by
-  sorry
+  refine ⟨primeAt hq0 hq1 hα, fun x => Iff.rfl, ?_⟩
+  rw [primeAt_degree hq0 hq1 hα, IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral α)]
 
 /-- Book, §2, item IV: `F_K(q)` is an elliptic function field over `K` (with the
 constant field extensions `F_K(q) L = F_L(q)`). Blueprint: `thm:fq-elliptic`. -/

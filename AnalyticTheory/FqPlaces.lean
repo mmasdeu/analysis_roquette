@@ -1339,4 +1339,184 @@ noncomputable def primeAt {α : Omega K} (hα : α ≠ 0) : PrimeDivisor K (FqSu
 
 end primeAt
 
+section degreeAt
+
+variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+include hq0 hq1 in
+theorem exists_K_point_not_conj (α : Omega K) :
+    ∃ c : K, c ≠ 0 ∧ ¬ ConjModQ K q (algebraMap K (Omega K) c) α := by
+  have hq0' := norm_pos_iff.mp hq0
+  by_cases h : ConjModQ K q (algebraMap K (Omega K) 1) α
+  · have hn := norm_one_add_small hq1
+    refine ⟨1 + q, fun h0 => by rw [h0, norm_zero] at hn; exact zero_ne_one hn, fun h' => ?_⟩
+    have h2 : ConjModQ K q (algebraMap K (Omega K) (1 + q)) (algebraMap K (Omega K) 1) :=
+      conjModQ_trans hq0' h' (conjModQ_symm hq0' h)
+    obtain ⟨k, hk⟩ := eq_of_conjModQ_K hq0' h2
+    have hk' : 1 + q = q ^ k := by
+      have := (algebraMap K (Omega K)).injective hk; rw [this, mul_one]
+    have hnk := congrArg norm hk'
+    rw [hn, norm_zpow] at hnk
+    have : k = 0 := zpow_right_injective₀ hq0 hq1.ne
+      (show ‖q‖ ^ k = ‖q‖ ^ (0 : ℤ) by rw [zpow_zero]; exact hnk.symm)
+    rw [this, zpow_zero] at hk'
+    exact hq0' (by linear_combination hk')
+  · exact ⟨1, one_ne_zero, h⟩
+
+include hq0 hq1 in
+/-- Approximation at `β` by elements of `A_D`. -/
+theorem exists_approx {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K q) (hD0 : ∀ α, 0 ≤ D α)
+    (hdeg : 0 < degQ K q D) {β : Omega K} (hβ : β ≠ 0) (hDβ : D β = 0) {x : FqSub K q}
+    (hx : 0 ≤ anVal K β (x : MeroRing K)) :
+    ∃ k : ℕ, ∃ f ∈ LS q (k • D), 0 < anVal K β ((x - f : FqSub K q) : MeroRing K) := by
+  obtain ⟨n, h, hh, hhβ, hhx⟩ := exists_denominator hq0 hq1 hD hD0 hdeg hβ hDβ hx
+  obtain ⟨n', u, hu, hu1⟩ := exists_inverse_mod hq0 hq1 hD hD0 hdeg hβ hDβ hh hhβ
+  obtain ⟨k, hk⟩ := exists_LS_of_AD hq0 hq1 hD0 ((AD q D).mul_mem (LS_le_AD n' hu) hhx)
+  refine ⟨k, u * (h * x), hk, ?_⟩
+  have e : ((x - u * (h * x) : FqSub K q) : MeroRing K) =
+      (x : MeroRing K) * ((1 - u * h : FqSub K q) : MeroRing K) := by
+    show (x : MeroRing K) - (u : MeroRing K) * ((h : MeroRing K) * x) =
+      (x : MeroRing K) * (1 - (u : MeroRing K) * h)
+    ring
+  rw [e, (anVal_isValuation K β hβ).2.2.1]
+  generalize anVal K β (x : MeroRing K) = a at hx ⊢
+  generalize anVal K β ((1 - u * h : FqSub K q) : MeroRing K) = b at hu1 ⊢
+  induction a using WithTop.recTopCoe with
+  | top => simp
+  | coe a =>
+    induction b using WithTop.recTopCoe with
+    | top => simp
+    | coe b =>
+      have : 0 ≤ a := by exact_mod_cast hx
+      have : 0 < b := by exact_mod_cast hu1
+      rw [← WithTop.coe_add]; exact_mod_cast (by omega : (0 : ℤ) < a + b)
+
+theorem withTop_pos_iff_one_le {x : WithTop ℤ} : 0 < x ↔ 1 ≤ x := by
+  induction x using WithTop.recTopCoe with
+  | top => simp
+  | coe a =>
+    constructor
+    · intro h; have : 0 < a := by exact_mod_cast h
+      exact_mod_cast (by omega : 1 ≤ a)
+    · intro h; have : 1 ≤ a := by exact_mod_cast h
+      exact_mod_cast (by omega : 0 < a)
+
+include hq0 hq1 in
+/-- Book, §2, item III: the residue degree of `w_α` is `[K(α) : K]`. -/
+theorem primeAt_degree {α : Omega K} (hα : α ≠ 0) :
+    (primeAt hq0 hq1 hα).degree = (minpoly K α).natDegree := by
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  obtain ⟨c, hc0, hcα⟩ := exists_K_point_not_conj hq0 hq1 α
+  have hcne : algebraMap K (Omega K) c ≠ 0 := (_root_.map_ne_zero _).mpr hc0
+  set D := pointDivisor K q (algebraMap K (Omega K) c) with hDdef
+  have hD := pointDivisor_mem hq0 hq1 hcne
+  have hD0 : ∀ x, 0 ≤ D x := pointDivisor_nonneg _
+  have hdeg : 0 < degQ K q D := by rw [hDdef, degQ_pointDivisor_K hq0 hq1 hc0]; norm_num
+  have hDα : D α = 0 := by simp [hDdef, pointDivisor, hcα]
+  set d := (minpoly K α).natDegree with hd
+  have hdpos : 0 < d := natDegree_minpoly_pos α
+  set P := primeAt hq0 hq1 hα with hPdef
+  unfold PrimeDivisor.degree
+  letI : Algebra K (IsLocalRing.ResidueField P.ring) :=
+    ((IsLocalRing.residue P.ring).comp P.toRing).toAlgebra
+  have hLSO : ∀ n : ℕ, ∀ f ∈ LS q (n • D), f ∈ P.ring := fun n f hf => by
+    have := hf α hα
+    simp only [Pi.smul_apply, hDα, smul_zero, neg_zero] at this
+    exact_mod_cast this
+  let ψ : ∀ n : ℕ, LS q (n • D) →ₗ[K] IsLocalRing.ResidueField P.ring := fun n =>
+    { toFun := fun f => IsLocalRing.residue P.ring ⟨f, hLSO n f f.2⟩
+      map_add' := fun f g => by rw [← map_add]; rfl
+      map_smul' := fun c f => by
+        have e : (⟨((c • f : LS q (n • D)) : FqSub K q), hLSO n _ (c • f).2⟩ : P.ring) =
+            P.toRing c * ⟨f, hLSO n f f.2⟩ := Subtype.ext rfl
+        show IsLocalRing.residue P.ring ⟨((c • f : LS q (n • D)) : FqSub K q), _⟩ =
+          c • IsLocalRing.residue P.ring ⟨f, _⟩
+        rw [e, map_mul]
+        exact (Algebra.smul_def c _).symm }
+  have hres0 : ∀ x : P.ring, IsLocalRing.residue P.ring x = 0 ↔
+      0 < anVal K α ((x : FqSub K q) : MeroRing K) := by
+    intro x
+    rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
+    have hx := x.2
+    change 0 ≤ anVal K α ((x : FqSub K q) : MeroRing K) at hx
+    rw [show IsUnit x ↔ anVal K α ((x : FqSub K q) : MeroRing K) = 0 from isUnit_ringAt_iff hα x]
+    constructor
+    · intro h; exact lt_of_le_of_ne hx (Ne.symm h)
+    · intro h h0; rw [h0] at h; exact lt_irrefl _ h
+  have hker : ∀ n : ℕ, LinearMap.ker (ψ n) =
+      (LS q (n • D - pointDivisor K q α)).comap (LS q (n • D)).subtype := by
+    intro n
+    ext f
+    simp only [LinearMap.mem_ker, Submodule.mem_comap, Submodule.subtype_apply]
+    show IsLocalRing.residue P.ring ⟨f, hLSO n f f.2⟩ = 0 ↔ _
+    rw [hres0]
+    constructor
+    · intro h γ hγ
+      by_cases hc : ConjModQ K q α γ
+      · have hp : pointDivisor K q α γ = 1 := by simp [pointDivisor, hc]
+        have hDγ : D γ = 0 := (periodic_conj hq0' hD hc).symm.trans hDα
+        simp only [Pi.sub_apply, Pi.smul_apply, hDγ, smul_zero, hp, zero_sub, neg_neg]
+        rw [← anVal_conjModQ hq0' (f : FqSub K q).2 hα hc]
+        exact_mod_cast withTop_pos_iff_one_le.mp h
+      · have hp : pointDivisor K q α γ = 0 := by simp [pointDivisor, hc]
+        simp only [Pi.sub_apply, hp, sub_zero]
+        exact f.2 γ hγ
+    · intro h
+      have := h α hα
+      have hp : pointDivisor K q α α = 1 := by simp [pointDivisor, conjModQ_refl]
+      simp only [Pi.sub_apply, Pi.smul_apply, hDα, smul_zero, hp, zero_sub, neg_neg] at this
+      exact withTop_pos_iff_one_le.mpr (by exact_mod_cast this)
+  have hmem : ∀ n : ℕ, n • D ∈ DivisorsPeriodic K q := fun n => (DivisorsPeriodic K q).nsmul_mem hD n
+  haveI := fun n : ℕ => finiteDimensional_LS hq0 hq1 (hmem n)
+  have hrank : ∀ n : ℕ, d < n → Module.finrank K (LinearMap.range (ψ n)) = d := by
+    intro n hn
+    have hpos : 0 < degQ K q (n • D - pointDivisor K q α) := by
+      rw [degQ_sub hq0 hq1 (hmem n) (pointDivisor_mem hq0 hq1 hα), degQ_nsmul hq0 hq1 hD,
+        degQ_pointDivisor hq0 hq1 hα]
+      have : (d : ℤ) < n := by exact_mod_cast hn
+      nlinarith
+    have h1 := finrank_LS_sub_pt hq0 hq1 (hmem n) hα hpos
+    have h2 := LinearMap.finrank_range_add_finrank_ker (ψ n)
+    have h3 : Module.finrank K (LinearMap.ker (ψ n)) =
+        Module.finrank K (LS q (n • D - pointDivisor K q α)) :=
+      (LinearEquiv.ofEq _ _ (hker n)).finrank_eq.trans
+        (LinearEquiv.finrank_eq (Submodule.comapSubtypeEquivOfLe LS_sub_pt_le))
+    omega
+  have hincl : ∀ n n' : ℕ, n ≤ n' → LinearMap.range (ψ n) ≤ LinearMap.range (ψ n') := by
+    intro n n' hnn
+    rintro _ ⟨f, rfl⟩
+    have hle : LS q (n • D) ≤ LS q (n' • D) := LS_mono (fun x => by
+      simp only [Pi.smul_apply, nsmul_eq_mul]
+      exact mul_le_mul_of_nonneg_right (by exact_mod_cast hnn) (hD0 x))
+    exact ⟨⟨f, hle f.2⟩, rfl⟩
+  have htop : LinearMap.range (ψ (d + 1)) = ⊤ := by
+    rw [eq_top_iff]
+    intro r _
+    obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective r
+    have hx := x.2
+    change 0 ≤ anVal K α ((x : FqSub K q) : MeroRing K) at hx
+    obtain ⟨k, f, hf, hxf⟩ := exists_approx hq0 hq1 hD hD0 hdeg hα hDα hx
+    set n1 := max k (d + 1)
+    have hf1 : f ∈ LS q (n1 • D) := LS_mono (fun y => by
+      simp only [Pi.smul_apply, nsmul_eq_mul]
+      exact mul_le_mul_of_nonneg_right (by exact_mod_cast le_max_left k (d + 1)) (hD0 y)) hf
+    have hr : IsLocalRing.residue P.ring x ∈ LinearMap.range (ψ n1) := by
+      refine ⟨⟨f, hf1⟩, ?_⟩
+      show IsLocalRing.residue P.ring ⟨f, _⟩ = _
+      rw [← sub_eq_zero, ← map_sub, hres0]
+      have e : (((⟨f, hLSO n1 f hf1⟩ - x : P.ring) : FqSub K q) : MeroRing K) =
+          -((((x : FqSub K q) - f : FqSub K q)) : MeroRing K) := by
+        show (f : MeroRing K) - ((x : FqSub K q) : MeroRing K) =
+          -(((x : FqSub K q) : MeroRing K) - (f : MeroRing K))
+        ring
+      rw [e, anVal_neg hα]
+      exact hxf
+    have heq := Submodule.eq_of_le_of_finrank_le (hincl (d + 1) n1 (le_max_right _ _))
+      (by rw [hrank n1 (by omega), hrank (d + 1) (by omega)])
+    rw [heq]; exact hr
+  rw [← finrank_top K (IsLocalRing.ResidueField P.ring), ← htop, hrank (d + 1) (by omega)]
+
+end degreeAt
+
 end AnalyticTheory
