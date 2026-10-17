@@ -112,6 +112,91 @@ theorem Euler_identity (hq : ‖q‖ < 1) (hq0 : q ≠ 0) : Ep q * Eo q = 1 := b
   have h3 := (mul_eq_zero.mp this).resolve_left hP
   linear_combination -h3
 
+
+theorem thK_neg_one (hq : ‖q‖ < 1) : thK q (-1) = 2 * Ep q ^ 2 := by
+  unfold thK Ep
+  have hm : Multipliable fun n : ℕ => 1 + q ^ (n + 1) := by
+    have := mult_geom hq (-1) 1
+    simpa [sub_eq_add_neg] using this
+  have e1 : ∏' n : ℕ, (1 - q ^ n * (-1 : K)⁻¹) = ∏' n : ℕ, (1 + q ^ n) :=
+    tprod_congr (fun n => by simp [sub_eq_add_neg])
+  have e2 : ∏' n : ℕ, (1 - q ^ (n + 1) * (-1 : K)) = ∏' n : ℕ, (1 + q ^ (n + 1)) :=
+    tprod_congr (fun n => by simp)
+  have h1 : ∏' n : ℕ, (1 + q ^ n) = (1 + q ^ 0) * ∏' n : ℕ, (1 + q ^ (n + 1)) :=
+    tprod_eq_zero_mul' (f := fun n : ℕ => 1 + q ^ n) hm
+  rw [e1, e2, h1, pow_zero]
+  ring
+
+theorem thK_sq (hq : ‖q‖ < 1) {s : K} (hs0 : s ≠ 0) (hs2 : s ^ 2 = q) :
+    thK q s = -s⁻¹ * (∏' n : ℕ, (1 - s ^ (2 * n + 1))) ^ 2 := by
+  have hs1 : ‖s‖ < 1 := by
+    have h : ‖s‖ ^ 2 = ‖q‖ := by rw [← norm_pow, hs2]
+    nlinarith [norm_nonneg s]
+  have hss : ‖s ^ 2‖ < 1 := by rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hs1 (by norm_num)
+  have hA : (fun n : ℕ => 1 - q ^ (n + 1) * s⁻¹) = fun n : ℕ => 1 - s ^ (2 * n + 1) := by
+    funext n
+    rw [← hs2, ← pow_mul, show 2 * (n + 1) = (2 * n + 1) + 1 by ring, pow_succ]
+    field_simp
+  have hB : (fun n : ℕ => 1 - q ^ (n + 1) * s) = fun n : ℕ => 1 - s ^ (2 * (n + 1) + 1) := by
+    funext n
+    rw [← hs2, ← pow_mul, pow_succ s (2 * (n + 1))]
+  have hmo : Multipliable fun n : ℕ => 1 - s ^ (2 * (n + 1) + 1) := by
+    have := mult_geom hss s 1
+    refine this.congr (fun n => ?_)
+    rw [← pow_mul, ← pow_succ]
+  have hmo0 : Multipliable fun n : ℕ => 1 - s ^ (2 * n + 1) := by
+    have := mult_geom hss s 0
+    refine this.congr (fun n => ?_)
+    rw [← pow_mul, add_zero, ← pow_succ]
+  have hRo : ∏' n : ℕ, (1 - s ^ (2 * n + 1)) = (1 - s) * ∏' n : ℕ, (1 - s ^ (2 * (n + 1) + 1)) := by
+    have := tprod_eq_zero_mul' (f := fun n : ℕ => 1 - s ^ (2 * n + 1)) hmo
+    simpa using this
+  rw [thK_eq hq, hA, hB, hRo]
+  have e : (1 - s⁻¹) * (1 - s) = -s⁻¹ * (1 - s) ^ 2 := by field_simp; ring
+  calc (1 - s⁻¹) * (((1 - s) * ∏' n : ℕ, (1 - s ^ (2 * (n + 1) + 1))) *
+        ∏' n : ℕ, (1 - s ^ (2 * (n + 1) + 1))) =
+      ((1 - s⁻¹) * (1 - s)) * (∏' n : ℕ, (1 - s ^ (2 * (n + 1) + 1))) ^ 2 := by ring
+    _ = _ := by rw [e]; ring
+
+
+theorem Ro_mul_Ro (hq : ‖q‖ < 1) {r : K} (hr2 : r ^ 2 = q) :
+    (∏' n : ℕ, (1 - r ^ (2 * n + 1))) * ∏' n : ℕ, (1 - (-r) ^ (2 * n + 1)) = Eo q := by
+  have hr1 : ‖r‖ < 1 := by
+    have h : ‖r‖ ^ 2 = ‖q‖ := by rw [← norm_pow, hr2]
+    nlinarith [norm_nonneg r]
+  have hrr : ‖r ^ 2‖ < 1 := by rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hr1 (by norm_num)
+  have h1 : Multipliable fun n : ℕ => 1 - r ^ (2 * n + 1) := by
+    have := mult_geom hrr r 0
+    refine this.congr (fun n => ?_)
+    rw [← pow_mul, add_zero, ← pow_succ]
+  have h2 : Multipliable fun n : ℕ => 1 - (-r) ^ (2 * n + 1) := by
+    have := mult_geom hrr (-r) 0
+    refine this.congr (fun n => ?_)
+    have e : (-r) ^ (2 * n) = r ^ (2 * n) := Even.neg_pow ⟨n, by ring⟩ r
+    rw [← pow_mul, add_zero, pow_succ, e]
+  rw [← h1.tprod_mul h2]
+  unfold Eo
+  refine tprod_congr (fun n => ?_)
+  have e : (-r) ^ (2 * n + 1) = -r ^ (2 * n + 1) := Odd.neg_pow ⟨n, rfl⟩ r
+  rw [e, ← hr2]
+  have : (r ^ 2) ^ (2 * n + 1) = (r ^ (2 * n + 1)) ^ 2 := by rw [← pow_mul, ← pow_mul, mul_comm]
+  rw [this]; ring
+
+theorem thK_triple (hq : ‖q‖ < 1) (hq0 : q ≠ 0) {r : K} (hr0 : r ≠ 0) (hr2 : r ^ 2 = q) :
+    thK q (-1) * thK q r * thK q (-r) = -2 * q⁻¹ := by
+  have hneg2 : (-r) ^ 2 = q := by rw [neg_sq, hr2]
+  rw [thK_neg_one hq, thK_sq hq hr0 hr2, thK_sq hq (neg_ne_zero.mpr hr0) hneg2]
+  have hE := Euler_identity hq hq0
+  have hRo := Ro_mul_Ro hq hr2
+  rw [← hr2] at hE hRo ⊢
+  generalize ∏' n : ℕ, (1 - r ^ (2 * n + 1)) = A at *
+  generalize ∏' n : ℕ, (1 - (-r) ^ (2 * n + 1)) = B at *
+  generalize Ep (r ^ 2) = E at *
+  generalize Eo (r ^ 2) = F at *
+  rw [← hRo] at hE
+  field_simp
+  linear_combination (-2 * (E * (A * B) + 1)) * hE
+
 end prods
 
 end AnalyticTheory
