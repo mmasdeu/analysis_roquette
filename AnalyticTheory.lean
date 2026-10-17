@@ -48,3 +48,4 @@ import AnalyticTheory.DOperator
 import AnalyticTheory.Sec3D
 import AnalyticTheory.ZetaWp
 import AnalyticTheory.Delta1
+import AnalyticTheory.Delta2
