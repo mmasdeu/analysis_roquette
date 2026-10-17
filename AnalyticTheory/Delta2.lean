@@ -145,4 +145,137 @@ theorem prop_zpow {G : holSubring K} (hG : FE2 q hq0 G) {a : K} (ha : a ≠ 0)
 
 end propagate
 
+
+section fe
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+include hq0 hq1 in
+theorem Th_FE : holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ (Th hq0 hq1) =
+    -(monoHol K 1 * Th hq0 hq1) := by
+  have h := (thetaFun_spec hq0 hq1 (one_ne_zero (α := Omega K))).2.1
+  change holScale K _ (Th hq0 hq1) = _ at h
+  have hd : (Polynomial.X - 1 : Polynomial K).natDegree = 1 := by
+    simpa using Polynomial.natDegree_X_sub_C (1 : K)
+  rw [h, minpoly.one, hd]
+  simp [map_neg, neg_mul]
+  exact Or.inl rfl
+
+include hq0 hq1 in
+theorem Gw_FE : FE2 q (norm_pos_iff.mp hq0) (Gw hq0 hq1) := by
+  have hq0' := norm_pos_iff.mp hq0
+  have hper := (mem_Fq_iff hq0' _).mp (wpAlg_mem_Fq hq0 hq1)
+  rw [wpAlg_eq_Gw hq0 hq1, map_div₀, map_pow, translation_alg, translation_alg, Th_FE hq0 hq1] at hper
+  have hT := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
+  have hA : algebraMap (holSubring K) (MeroRing K) (monoHol K 1) ≠ 0 :=
+    alg_hol_ne_zero (monoHol_ne_zero 1)
+  unfold FE2
+  apply IsFractionRing.injective (holSubring K) (MeroRing K)
+  rw [map_mul, map_mul]
+  rw [map_neg, map_mul] at hper
+  field_simp at hper
+  linear_combination hper
+
+end fe
+
+
+section Mb
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+/-- `Θ(X/b) Θ(bX)`. -/
+noncomputable def Mb (b : K) (hb : b ≠ 0) : holSubring K :=
+  holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1) * holScale K (Units.mk0 b hb) (Th hq0 hq1)
+
+include hq0 hq1 in
+theorem Mb_ne_zero {b : K} (hb : b ≠ 0) : Mb hq0 hq1 b hb ≠ 0 :=
+  mul_ne_zero ((map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1))
+    ((map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1))
+
+include hq0 hq1 in
+theorem Mb_FE {b : K} (hb : b ≠ 0) : FE2 q (norm_pos_iff.mp hq0) (Mb hq0 hq1 b hb) := by
+  have hq0' := norm_pos_iff.mp hq0
+  unfold FE2 Mb
+  rw [map_mul]
+  have e1 : holScale K (Units.mk0 q hq0')⁻¹ (holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1)) =
+      -(algebraMap K (holSubring K) b⁻¹ * monoHol K 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1)) := by
+    rw [holScale_comm, Th_FE hq0 hq1, map_neg, map_mul, holScale_monoHol]
+    simp [mul_assoc]
+  have e2 : holScale K (Units.mk0 q hq0')⁻¹ (holScale K (Units.mk0 b hb) (Th hq0 hq1)) =
+      -(algebraMap K (holSubring K) b * monoHol K 1 * holScale K (Units.mk0 b hb) (Th hq0 hq1)) := by
+    rw [holScale_comm, Th_FE hq0 hq1, map_neg, map_mul, holScale_monoHol]
+    simp [mul_assoc]
+  rw [e1, e2]
+  have : algebraMap K (holSubring K) b⁻¹ * algebraMap K (holSubring K) b = 1 := by
+    rw [← map_mul, inv_mul_cancel₀ hb, map_one]
+  linear_combination (monoHol K 1 * monoHol K 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1) *
+    holScale K (Units.mk0 b hb) (Th hq0 hq1)) * this
+
+end Mb
+
+
+section anValMb
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+open scoped Classical in
+include hq0 hq1 in
+theorem anVal_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {α : Omega K} (hα : α ≠ 0) :
+    anVal K α (algebraMap (holSubring K) (MeroRing K) (Mb hq0 hq1 b hb)) =
+      if ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b then 2 else 0 := by
+  have hq0' := norm_pos_iff.mp hq0
+  have hB : algebraMap K (Omega K) b ≠ 0 := (map_ne_zero _).mpr hb
+  have hQ : algebraMap K (Omega K) q ≠ 0 := (map_ne_zero _).mpr hq0'
+  have hTh := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
+  have hS1 : holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1) ≠ 0 :=
+    (map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1)
+  have hS2 : holScale K (Units.mk0 b hb) (Th hq0 hq1) ≠ 0 :=
+    (map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1)
+  have hB2 : (algebraMap K (Omega K) b) ^ 2 = algebraMap K (Omega K) q ^ m := by
+    have := congrArg (algebraMap K (Omega K)) hbm
+    rwa [map_pow, map_zpow₀] at this
+  have hbi : algebraMap K (Omega K) b⁻¹ ≠ 0 := (map_ne_zero _).mpr (inv_ne_zero hb)
+  -- first factor
+  have f1 : anVal K α (algebraMap (holSubring K) (MeroRing K) (holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1))) =
+      if ConjModQ K q 1 ((algebraMap K (Omega K) b)⁻¹ * α) then 1 else 0 := by
+    have hξ : (algebraMap K (Omega K) b)⁻¹ * α ≠ 0 := mul_ne_zero (inv_ne_zero hB) hα
+    have := anVal_holScale_shift hb hξ (Th_ne_zero hq0 hq1)
+    rw [show algebraMap K (Omega K) b * ((algebraMap K (Omega K) b)⁻¹ * α) = α by field_simp] at this
+    rw [this]; exact anVal_Th hq0 hq1 hξ
+  have f2 : anVal K α (algebraMap (holSubring K) (MeroRing K) (holScale K (Units.mk0 b hb) (Th hq0 hq1))) =
+      if ConjModQ K q 1 (algebraMap K (Omega K) b * α) then 1 else 0 := by
+    have hξ : algebraMap K (Omega K) b * α ≠ 0 := mul_ne_zero hB hα
+    have := anVal_holScale_shift (inv_ne_zero hb) hξ (Th_ne_zero hq0 hq1)
+    rw [show Units.mk0 b⁻¹ (inv_ne_zero hb) = (Units.mk0 b hb)⁻¹ from Units.ext rfl, inv_inv,
+      map_inv₀, inv_mul_cancel_left₀ hB] at this
+    rw [this]; exact anVal_Th hq0 hq1 hξ
+  unfold Mb
+  rw [map_mul, (anVal_isValuation K α hα).2.2.1, f1, f2]
+  simp only [conjModQ_one_iff hq0']
+  have hcls1 : (∃ k : ℤ, (algebraMap K (Omega K) b)⁻¹ * α = algebraMap K (Omega K) q ^ k) ↔
+      ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b := by
+    constructor
+    · rintro ⟨k, hk⟩
+      refine ⟨k, ?_⟩
+      field_simp at hk
+      linear_combination hk
+    · rintro ⟨j, hj⟩
+      exact ⟨j, by rw [hj]; field_simp⟩
+  have hcls2 : (∃ k : ℤ, algebraMap K (Omega K) b * α = algebraMap K (Omega K) q ^ k) ↔
+      ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b := by
+    constructor
+    · rintro ⟨k, hk⟩
+      refine ⟨k - m, ?_⟩
+      rw [zpow_sub₀ hQ, ← hB2]
+      field_simp at hk ⊢
+      linear_combination hk
+    · rintro ⟨j, hj⟩
+      refine ⟨j + m, ?_⟩
+      rw [hj, zpow_add₀ hQ, ← hB2]; ring
+  by_cases hc : ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b
+  · rw [if_pos (hcls1.mpr hc), if_pos (hcls2.mpr hc), if_pos hc]; norm_cast
+  · rw [if_neg (fun h => hc (hcls1.mp h)), if_neg (fun h => hc (hcls2.mp h)), if_neg hc]; simp
+
+end anValMb
+
 end AnalyticTheory
