@@ -47,3 +47,4 @@ import AnalyticTheory.Sec3
 import AnalyticTheory.DOperator
 import AnalyticTheory.Sec3D
 import AnalyticTheory.ZetaWp
+import AnalyticTheory.Delta1
