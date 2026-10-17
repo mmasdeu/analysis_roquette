@@ -57,3 +57,8 @@ import AnalyticTheory.Delta7
 import AnalyticTheory.A1Invariance
 import AnalyticTheory.SqrtHensel
 import AnalyticTheory.Sec3VIII
+import AnalyticTheory.EllipticBasics
+import AnalyticTheory.A1Normal
+import AnalyticTheory.A1Transfer
+import AnalyticTheory.FqHomogeneous
+import AnalyticTheory.FqOrd

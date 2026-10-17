@@ -1,5 +1,7 @@
 import AnalyticTheory.Delta7
 import AnalyticTheory.A1Invariance
+import AnalyticTheory.FqHomogeneous
+import AnalyticTheory.FqOrd
 import AnalyticTheory.SqrtHensel
 import AnalyticTheory.FqStructure
 
@@ -180,8 +182,61 @@ theorem jInvQ_facts :
   rw [h] at h1; exact absurd h1 (not_lt.mpr this)
 
 include hq0 hq1 in
+theorem poleOrd_of_anVal (f : FqSub K q) (m : ℕ)
+    (hf1 : anVal K 1 (f : MeroRing K) = ((-(m : ℤ) : ℤ) : WithTop ℤ))
+    (hf2 : ∀ α : Omega K, α ≠ 0 → ¬ ConjModQ K q 1 α → 0 ≤ anVal K α (f : MeroRing K)) :
+    PoleOrd (primeAt hq0 hq1 (one_ne_zero (α := Omega K))) f (m : ℤ) := by
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  set P := primeAt hq0 hq1 (one_ne_zero (α := Omega K)) with hPdef
+  have hf0 : f ≠ 0 := by
+    rintro rfl
+    have : anVal K 1 ((0 : FqSub K q) : MeroRing K) = ⊤ := anVal_zero K 1 one_ne_zero
+    rw [this] at hf1
+    exact WithTop.top_ne_coe hf1
+  refine poleOrd_iff.mpr ⟨hf0, ?_, fun P' hP' => ?_⟩
+  · have hβ := (ptOf_spec hq0 hq1 P).1
+    have hc : ConjModQ K q 1 (ptOf P) := by
+      have := eq_primeAt hq0 hq1 P
+      rw [hPdef] at this
+      exact (primeAt_eq_iff hq0 hq1 one_ne_zero hβ).mp this
+    have h1 := anVal_conjModQ hq0' f.2 one_ne_zero hc
+    rw [anVal_ptOf_eq_ord hq0 hq1 P hf0] at h1
+    rw [hf1] at h1
+    have : (((-(m : ℤ)) : ℤ) : WithTop ℤ) = ((P.ord f : ℤ) : WithTop ℤ) := h1
+    exact (WithTop.coe_injective this).symm
+  · have hβ' := (ptOf_spec hq0 hq1 P').1
+    have hnc : ¬ ConjModQ K q 1 (ptOf P') := by
+      intro hc
+      apply hP'
+      rw [eq_primeAt hq0 hq1 P']
+      exact ((primeAt_eq_iff hq0 hq1 hβ' one_ne_zero).mpr (conjModQ_symm hq0' hc))
+    have := hf2 _ hβ' hnc
+    rw [anVal_ptOf_eq_ord hq0 hq1 P' hf0] at this
+    exact_mod_cast this
+
+include hq0 hq1 in
+theorem wp_poleOrd : PoleOrd (primeAt hq0 hq1 (one_ne_zero (α := Omega K)))
+    (⟨wpM K q, wpM_mem_Fq hq0 hq1⟩ : FqSub K q) 2 := by
+  have := poleOrd_of_anVal hq0 hq1 ⟨wpM K q, wpM_mem_Fq hq0 hq1⟩ 2
+    (by simp only [wpM_eq hq0 hq1]; push_cast; exact anVal_wpAlg_one hq0 hq1)
+    (fun α hα hc => by simpa [wpM_eq hq0 hq1] using anVal_wpAlg_nonneg hq0 hq1 hα hc)
+  simpa using this
+
+include hq0 hq1 in
+theorem wpPrime_poleOrd : PoleOrd (primeAt hq0 hq1 (one_ne_zero (α := Omega K)))
+    (⟨wpPrimeM K q, wpPrimeM_mem_Fq hq0 hq1⟩ : FqSub K q) 3 := by
+  have := poleOrd_of_anVal hq0 hq1 ⟨wpPrimeM K q, wpPrimeM_mem_Fq hq0 hq1⟩ 3
+    (by simp only [wpPrimeM_eq hq0 hq1]; push_cast; exact anVal_wpPrimeAlg_one hq0 hq1)
+    (fun α hα hc => by simpa [wpPrimeM_eq hq0 hq1] using anVal_wpPrimeAlg_nonneg hq0 hq1 hα hc)
+  simpa using this
+
+include hq0 hq1 in
 /-- The Weierstraß datum `x = ℘`, `y = ℘′` of `F_K(q)` (equation (39)). -/
 noncomputable def wpData : WeierstrassData K (FqSub K q) where
+  𝔭 := primeAt hq0 hq1 (one_ne_zero (α := Omega K))
+  deg_one := by
+    rw [primeAt_degree hq0 hq1, minpoly.one]
+    simpa using Polynomial.natDegree_X_sub_C (1 : K)
   x := ⟨wpM K q, wpM_mem_Fq hq0 hq1⟩
   y := ⟨wpPrimeM K q, wpPrimeM_mem_Fq hq0 hq1⟩
   u := 1
@@ -223,30 +278,8 @@ noncomputable def wpData : WeierstrassData K (FqSub K q) where
     exact ha
   disc := by
     rw [wDisc_wp]; exact (jInvQ_facts hq0 hq1).1
-
-/-- Transport of a Weierstraß datum along a `K`-isomorphism. -/
-noncomputable def WeierstrassData.mapEquiv {F F' : Type u} [Field F] [Field F'] [Algebra K F]
-    [Algebra K F'] (e : F ≃ₐ[K] F') (d : WeierstrassData K F) : WeierstrassData K F' where
-  x := e d.x
-  y := e d.y
-  u := d.u
-  v := d.v
-  a₁ := d.a₁
-  a₂ := d.a₂
-  a₃ := d.a₃
-  eq := by
-    have := congrArg e d.eq
-    simpa [IsNormalFormA1, map_add, map_mul, map_pow, e.commutes] using this
-  gen := by
-    rw [eq_top_iff]
-    intro z _
-    have hmap := IntermediateField.adjoin_map K ({d.x, d.y} : Set F) e.toAlgHom
-    rw [d.gen, Set.image_insert_eq, Set.image_singleton] at hmap
-    have : z ∈ ((⊤ : IntermediateField K F).map e.toAlgHom : Set F') :=
-      by rw [IntermediateField.coe_map]; exact ⟨e.symm z, trivial, by simp⟩
-    rw [hmap] at this
-    exact this
-  disc := d.disc
+  hx := ⟨(wp_poleOrd hq0 hq1).1, by simpa using (wp_poleOrd hq0 hq1).2⟩
+  hy := ⟨(wpPrime_poleOrd hq0 hq1).1, by simpa using (wpPrime_poleOrd hq0 hq1).2⟩
 
 end wpdatum
 
@@ -261,18 +294,16 @@ theorem fq_hasPrime (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) : HasPrimeOfDegreeOn
 
 /-- Invariants of a field `F` isomorphic to `F_K(q)`, computed from the datum `(℘, ℘′)`. -/
 theorem invariants_of_equiv (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {F : Type u} [Field F] [Algebra K F]
-    (hF : HasPrimeOfDegreeOne K F) (e : FqSub K q ≃ₐ[K] F) :
+    (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F) (e : FqSub K q ≃ₐ[K] F) :
     absInv K F hF = jInvQ K q ∧
       (ringChar K ≠ 2 → SquareEquiv (hasseInv K F hF) 1) ∧
       (ringChar K = 2 → PiEquiv (hasseInv K F hF) 0) := by
-  set d := (wpData hq0 hq1).mapEquiv e with hd
+  set d := (wpData hq0 hq1).transfer e with hd
   have hjd : jOfData d.u d.v d.a₁ d.a₂ d.a₃ = jInvQ K q := jOfData_wp hq1
-  have hfacts := jInvQ_facts hq0 hq1
-  have hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3 := by
-    rw [hjd]; exact ⟨hfacts.2.1, hfacts.2.2.1⟩
-  obtain ⟨h1, h2⟩ := hasseInv_eq_of_data K F hF d hj
+  have hom : DegOneHomogeneous K F := (fq_homogeneous hq0 hq1).of_equiv e
+  obtain ⟨h1, h2⟩ := hasseInv_eq_of_data K F hE hom hF d
   obtain ⟨t1, t2⟩ := hasse_wp_trivial (K := K) hq1
-  refine ⟨by rw [absInv_eq_of_data K F hF d, hjd], fun hc => (h1 hc).trans_one (t1 hc),
+  refine ⟨by rw [absInv_eq_of_data K F hE hom hF d, hjd], fun hc => (h1 hc).trans_one (t1 hc),
     fun hc => ?_⟩
   haveI : CharP K 2 := ringChar.of_eq hc
   exact (h2 hc).trans_zero (t2 hc)
@@ -285,7 +316,7 @@ theorem thmVIII_hasse (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (hp : HasPrimeOfDegreeOne K (FqSub K q)) :
     (ringChar K ≠ 2 → SquareEquiv (hasseInv K (FqSub K q) hp) 1) ∧
     (ringChar K = 2 → PiEquiv (hasseInv K (FqSub K q) hp) 0) :=
-  (invariants_of_equiv hq0 hq1 hp (AlgEquiv.refl)).2
+  (invariants_of_equiv hq0 hq1 (fq_is_elliptic K q hq0 hq1) hp (AlgEquiv.refl)).2
 
 /-- Book, §3, Theorem VIIIa: an elliptic function field `F | K` with a prime divisor of degree
 `1` is `K`-isomorphic to some `F_K(q)`, `0 < |q| < 1`, if and only if `|j| > 1` and the Hasse
@@ -301,7 +332,7 @@ theorem thmVIIIa_characterization (F : Type u) [Field F] [Algebra K F]
     obtain ⟨q, ⟨hq0, hq1, hjq⟩, -⟩ := thmVII_bijective (K := K) (absInv K F hF) hj
     refine ⟨q, hq0, hq1, ?_⟩
     have hp := fq_hasPrime hq0 hq1
-    obtain ⟨hj', hγ1, hγ2⟩ := invariants_of_equiv hq0 hq1 hp (AlgEquiv.refl)
+    obtain ⟨hj', hγ1, hγ2⟩ := invariants_of_equiv hq0 hq1 (fq_is_elliptic K q hq0 hq1) hp (AlgEquiv.refl)
     have hj12 : absInv K F hF ≠ 0 ∧ absInv K F hF ≠ 12 ^ 3 := by
       have := jInvQ_facts hq0 hq1
       rw [← hjq]; exact ⟨this.2.1, this.2.2.1⟩
@@ -310,14 +341,14 @@ theorem thmVIIIa_characterization (F : Type u) [Field F] [Algebra K F]
     haveI : CharP K 2 := ringChar.of_eq hc
     exact (hγ.2 hc).of_zeros (hγ2 hc)
   · rintro ⟨q, hq0, hq1, ⟨e⟩⟩
-    obtain ⟨h1, h2, h3⟩ := invariants_of_equiv hq0 hq1 hF e.symm
+    obtain ⟨h1, h2, h3⟩ := invariants_of_equiv hq0 hq1 hE hF e.symm
     exact ⟨by rw [h1]; exact (jInvQ_facts hq0 hq1).2.2.2, h2, h3⟩
 
 /-- Book, §3, after Theorem VIIIa: the period `q` of `F` is unique. Blueprint: `thm:VIIIa`. -/
 theorem thmVIIIa_period_unique {q q' : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hq0' : 0 < ‖q'‖)
     (hq1' : ‖q'‖ < 1) (e : FqSub K q ≃ₐ[K] FqSub K q') : q = q' := by
-  have h1 := (invariants_of_equiv hq0 hq1 (fq_hasPrime hq0' hq1') e).1
-  have h2 := (invariants_of_equiv hq0' hq1' (fq_hasPrime hq0' hq1') AlgEquiv.refl).1
+  have h1 := (invariants_of_equiv hq0 hq1 (fq_is_elliptic K q' hq0' hq1') (fq_hasPrime hq0' hq1') e).1
+  have h2 := (invariants_of_equiv hq0' hq1' (fq_is_elliptic K q' hq0' hq1') (fq_hasPrime hq0' hq1') AlgEquiv.refl).1
   obtain ⟨q₀, -, hu⟩ := thmVII_bijective (K := K) (jInvQ K q) (jInvQ_facts hq0 hq1).2.2.2
   rw [h1] at h2
   exact (hu q ⟨hq0, hq1, rfl⟩).trans (hu q' ⟨hq0', hq1', h2.symm⟩).symm

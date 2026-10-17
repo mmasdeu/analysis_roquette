@@ -1,4 +1,5 @@
 import AnalyticTheory.Basic
+import AnalyticTheory.EllipticBasics
 
 /-!
 # Appendix §A1: fields with a prime divisor of degree 1
@@ -99,8 +100,12 @@ noncomputable def hasseOfData (u v a₁ a₂ a₃ : K) : K :=
 end Invariants
 
 /-- Book, §A1: the data of generators `x, y` of `F | K` with a Weierstraß equation (A1.26) of
-non-zero discriminant. Blueprint: `def:weierstrass-data`. -/
+non-zero discriminant, where `x` and `y` have the pole divisors `2𝔭` and `3𝔭` for a prime divisor
+`𝔭` of degree `1` (`x ∈ L(2𝔭) ∖ L(𝔭)`, `y ∈ L(3𝔭) ∖ L(2𝔭)`).
+Blueprint: `def:weierstrass-data`. -/
 structure WeierstrassData (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] where
+  𝔭 : PrimeDivisor K F
+  deg_one : 𝔭.degree = 1
   x : F
   y : F
   u : K
@@ -111,6 +116,8 @@ structure WeierstrassData (K : Type u) (F : Type u) [Field K] [Field F] [Algebra
   eq : IsNormalFormA1 x y u v a₁ a₂ a₃
   gen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤
   disc : wDisc u v a₁ a₂ a₃ ≠ 0
+  hx : x ∈ Ln 𝔭 2 ∧ x ∉ Ln 𝔭 1
+  hy : y ∈ Ln 𝔭 3 ∧ y ∉ Ln 𝔭 2
 
 open Classical in
 /-- Book, §A1: the absolute invariant `j` of an elliptic function field `F | K` with a prime
