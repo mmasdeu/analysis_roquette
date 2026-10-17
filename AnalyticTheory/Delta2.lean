@@ -278,4 +278,90 @@ theorem anVal_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {α : Om
 
 end anValMb
 
+
+section mainMb
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+
+theorem q_zpow_ne_one (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {n : ℤ} (hn : n ≠ 0) : q ^ n ≠ 1 := by
+  intro h
+  have h1 := congrArg norm h
+  rw [norm_zpow, norm_one] at h1
+  have : n = 0 := zpow_right_injective₀ hq0 hq1.ne
+    (show ‖q‖ ^ n = ‖q‖ ^ (0 : ℤ) by rw [zpow_zero]; exact h1)
+  exact hn this
+
+include hq0 hq1 in
+/-- A function with `G(q⁻¹X) = X² G(X)` and a double zero at the `2`-torsion point `b` is a
+multiple of `Θ(X/b) Θ(bX)`. -/
+theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {G : holSubring K}
+    (hG : FE2 q (norm_pos_iff.mp hq0) G) (h0 : valK G b hb = 0) (h1 : valK (holD G) b hb = 0) :
+    ∃ c : K, G = algebraMap K (holSubring K) c * Mb hq0 hq1 b hb := by
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  by_cases hG0 : G = 0
+  · exact ⟨0, by rw [hG0, map_zero, zero_mul]⟩
+  have hM0 := Mb_ne_zero hq0 hq1 hb
+  have hdvd : Mb hq0 hq1 b hb ∣ G := by
+    refine hol_dvd_of_anVal_le K hM0 (fun α hα => ?_)
+    rw [anVal_Mb hq0 hq1 hb hbm hα]
+    by_cases hc : ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b
+    · rw [if_pos hc]
+      obtain ⟨j, hj⟩ := hc
+      have haj : q ^ j * b ≠ 0 := mul_ne_zero (zpow_ne_zero j hq0') hb
+      obtain ⟨v0, v1⟩ := prop_zpow hq0' hG hb h0 h1 j
+      obtain ⟨G2, hG2⟩ := lin_sq_dvd haj v0 v1
+      have hα' : α = algebraMap K (Omega K) (q ^ j * b) := by rw [hj, map_mul, map_zpow₀]
+      rw [hα']
+      have hL : anVal K (algebraMap K (Omega K) (q ^ j * b)) (algebraMap (holSubring K) (MeroRing K)
+          (monoHol K 1 - algebraMap K (holSubring K) (q ^ j * b))) = 1 := by
+        have := anVal_polyHol_minpoly (K := K) (ξ := algebraMap K (Omega K) (q ^ j * b))
+          (β := algebraMap K (Omega K) (q ^ j * b)) ((map_ne_zero _).mpr haj) ((map_ne_zero _).mpr haj)
+        rw [if_pos rfl, minpoly.eq_X_sub_C (Omega K)] at this
+        simpa [polyHol] using this
+      rw [hG2, map_mul (algebraMap (holSubring K) (MeroRing K)),
+        (anVal_isValuation K _ ((map_ne_zero _).mpr haj)).2.2.1,
+        map_pow (algebraMap (holSubring K) (MeroRing K)),
+        anVal_pow' ((map_ne_zero _).mpr haj), hL]
+      have hn := anVal_hol_nonneg ((map_ne_zero _).mpr haj : algebraMap K (Omega K) (q ^ j * b) ≠ 0) G2
+      calc ((2 : ℕ) : WithTop ℤ) = ((2 : ℕ) • (1 : WithTop ℤ)) + 0 := by simp
+        _ ≤ _ := by gcongr
+    · rw [if_neg hc]; exact_mod_cast anVal_hol_nonneg hα G
+  obtain ⟨u, hu⟩ := hdvd
+  have hfeM := Mb_FE hq0 hq1 hb
+  unfold FE2 at hG hfeM
+  have hX : monoHol K 1 * monoHol K 1 ≠ 0 := mul_ne_zero (monoHol_ne_zero 1) (monoHol_ne_zero 1)
+  have hscale : holScale K (Units.mk0 q hq0')⁻¹ u = u := by
+    have e : monoHol K 1 * monoHol K 1 * (Mb hq0 hq1 b hb * holScale K (Units.mk0 q hq0')⁻¹ u) =
+        monoHol K 1 * monoHol K 1 * (Mb hq0 hq1 b hb * u) := by
+      have := hG
+      rw [hu, map_mul, hfeM] at this
+      linear_combination this
+    exact mul_left_cancel₀ (mul_ne_zero hX hM0) (by linear_combination e)
+  have hcoef : ∀ n : ℤ, n ≠ 0 → holCoeff K u n = 0 := by
+    intro n hn
+    have := congrFun (congrArg (holCoeff K) hscale) n
+    rw [holCoeff_holScale] at this
+    simp only [Units.val_inv_eq_inv_val, Units.val_mk0] at this
+    have hne : (q⁻¹) ^ n ≠ 1 := by
+      rw [inv_zpow', ]
+      exact q_zpow_ne_one hq0 hq1 (neg_ne_zero.mpr hn)
+    have : ((q⁻¹) ^ n - 1) * holCoeff K u n = 0 := by linear_combination this
+    exact (mul_eq_zero.mp this).resolve_left (sub_ne_zero.mpr hne)
+  have hu' : u = algebraMap K (holSubring K) (holCoeff K u 0) := by
+    apply holCoeff_injective K
+    have h1 := holCoeff_algebraMap_mul K (holCoeff K u 0) 1
+    rw [mul_one, holCoeff_one] at h1
+    rw [h1]
+    funext n
+    by_cases hn : n = 0
+    · subst hn; simp [deltaSeq]
+    · simp [deltaSeq, hn, hcoef n hn]
+  refine ⟨holCoeff K u 0, ?_⟩
+  calc G = Mb hq0 hq1 b hb * u := hu
+    _ = Mb hq0 hq1 b hb * algebraMap K (holSubring K) (holCoeff K u 0) := by rw [← hu']
+    _ = _ := mul_comm _ _
+
+end mainMb
+
 end AnalyticTheory
