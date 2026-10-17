@@ -245,8 +245,8 @@ add('proposition','prop:absinv-weierstrass','Absolute invariant in Weierstraß f
  r'In Weierstraß normal form, $j=12^3g_2^3/(g_2^3-27g_3^2)$.')
 add('proposition','prop:hasse-weierstrass','Hasse invariant in Weierstraß form (A1.13)',['hasseInv_weierstrass'],['def:hasse-invariant','def:normal-forms'],False,
  r'$\gamma\equiv-\tfrac12 g_2/g_3$ modulo squares.')
-add('lemma','lem:A','Lemma A (unique nontrivial automorphism)',['lemmaA'],['def:absolute-invariant'],True,
- r'For $j\ne 0,12^3$ there is only one nontrivial automorphism fixing the prime of degree $1$. The fixing predicate is a placeholder.')
+add('lemma','lem:A','Lemma A (unique nontrivial automorphism)',['lemmaA','lemmaA_data','stab_eq','negChange_smul'],['def:absolute-invariant','lem:A1-same-prime'],False,
+ r'For a Weierstra\ss\ datum at $\mathfrak p$ with $j\ne 0,12^3$, the automorphisms of $F\,|\,K$ fixing $\mathfrak p$ are the identity and $\varepsilon:(x,y)\mapsto(x,-y-a_1x-a_3)$ (stabiliser of the curve in the group of changes of variables).')
 add('lemma','lem:A1-independence','Independence of $j$ and $\\gamma$ of the Weierstra\\ss\\ datum',['absInv_eq_of_data','hasseInv_eq_of_data'],['def:absolute-invariant','def:hasse-invariant'],False,
  r'The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Proved for fields in which the prime divisors of degree one are permuted transitively by automorphisms (e.g.\ $F_K(q)$).')
 add('lemma','lem:rr-dimension','$\\dim L(n\\mathfrak p)=n$',['finrank_Ln_nat','finrank_Ln_zero','Ln_one_const','Ln_eq_span'],['def:elliptic','def:degree-one-prime'],False,

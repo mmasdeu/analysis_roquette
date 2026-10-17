@@ -65,3 +65,4 @@ import AnalyticTheory.FqOrd
 import AnalyticTheory.A1Unique
 import AnalyticTheory.A1Classify
 import AnalyticTheory.A1Determine
+import AnalyticTheory.A1LemmaA

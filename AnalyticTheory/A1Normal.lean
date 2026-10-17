@@ -366,9 +366,13 @@ section samePrime2
 variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 
 /-- Two Weierstraß data at the same prime divisor are related by a change of variables
-(Mathlib's `VariableChange`): the content of (A1.2) and (A1.10), (A1.19), (A1.34). -/
-theorem exists_variableChange (hE : IsEllipticOver K F) (d d' : WeierstrassData K F)
-    (h𝔭 : d'.𝔭 = d.𝔭) : ∃ C : WeierstrassCurve.VariableChange K, d'.curve = C • d.curve := by
+(Mathlib's `VariableChange`): the content of (A1.2) and (A1.10), (A1.19), (A1.34); the
+coordinates are related by `x = u²x' + r`, `y = u³y' + u²sx' + t`. -/
+theorem exists_variableChange_coords (hE : IsEllipticOver K F) (d d' : WeierstrassData K F)
+    (h𝔭 : d'.𝔭 = d.𝔭) : ∃ C : WeierstrassCurve.VariableChange K, d'.curve = C • d.curve ∧
+      d.x = algebraMap K F (C.u : K) ^ 2 * d'.x + algebraMap K F C.r ∧
+      d.y = algebraMap K F (C.u : K) ^ 3 * d'.y + algebraMap K F (C.u : K) ^ 2 *
+        algebraMap K F C.s * d'.x + algebraMap K F C.t := by
   obtain ⟨a, a', b, b', b'', ha, hb, hba, hxa, hyb⟩ := affine_change hE d d' h𝔭
   have hx' : PoleOrd d.𝔭 d'.x 2 := by have := d'.poleOrd_x; rwa [h𝔭] at this
   have hy' : PoleOrd d.𝔭 d'.y 3 := by have := d'.poleOrd_y; rwa [h𝔭] at this
@@ -388,7 +392,7 @@ theorem exists_variableChange (hE : IsEllipticOver K F) (d d' : WeierstrassData 
   have hX : d.x = algebraMap K F (C.u : K) ^ 2 * d'.x + algebraMap K F C.r := by
     rw [← map_pow, hu2, hxa]
     show _ = algebraMap K F a⁻¹ * _ + algebraMap K F (-a' / a)
-    simp only [map_inv₀, map_div₀, map_neg, map_mul, map_add]
+    simp only [map_inv₀, map_div₀, map_neg]
     field_simp
     ring
   have hY : d.y = algebraMap K F (C.u : K) ^ 3 * d'.y + algebraMap K F (C.u : K) ^ 2 *
@@ -396,11 +400,16 @@ theorem exists_variableChange (hE : IsEllipticOver K F) (d d' : WeierstrassData 
     rw [← map_pow, ← map_pow, hu2, hu3, hxa, hyb]
     show _ = algebraMap K F b⁻¹ * _ + algebraMap K F a⁻¹ * algebraMap K F (-b' / b) * _ +
       algebraMap K F ((-b' / b) * (-a' / a) - b'' / b)
-    simp only [map_inv₀, map_div₀, map_neg, map_mul, map_add, map_sub]
+    simp only [map_inv₀, map_div₀, map_neg, map_mul, map_sub]
     field_simp
     ring
   have key : NormalForm (C • d.curve) d'.x d'.y := normalForm_smul C hX hY d.normalForm
-  exact ⟨C, curve_unique hx' hy' d'.normalForm key⟩
+  exact ⟨C, curve_unique hx' hy' d'.normalForm key, hX, hY⟩
+
+theorem exists_variableChange (hE : IsEllipticOver K F) (d d' : WeierstrassData K F)
+    (h𝔭 : d'.𝔭 = d.𝔭) : ∃ C : WeierstrassCurve.VariableChange K, d'.curve = C • d.curve := by
+  obtain ⟨C, hC, -, -⟩ := exists_variableChange_coords hE d d' h𝔭
+  exact ⟨C, hC⟩
 
 end samePrime2
 
