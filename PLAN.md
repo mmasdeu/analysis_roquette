@@ -6,9 +6,24 @@ Mathlib has nothing (prime divisors, Riemann–Roch spaces, `genus`, and the ana
 
 ## 0. Status (updated)
 
-Done: decisions 1–2, Phases 1–4 (`EllipticBasics`, `A1Normal`, `A1Transfer`, `FqHomogeneous`,
-`FqOrd`, `A1Classify`, `A1Unique`, `A1Determine`, `A1Invariance`); §3 is complete.
-Next: Lemma A, Remark 3, then Phase 5 (A2 for `F_L(q)`) and Lemma 2 for §4.
+Done (all `sorry`-free, `#print axioms` clean): decisions 1–2 (Weierstraß data with the prime `𝔭`, Mathlib
+`WeierstrassCurve`/`VariableChange`), Phases 1–4 (`EllipticBasics`, `A1Normal`, `A1Transfer`,
+`FqHomogeneous`, `FqOrd`, `A1Classify`, `A1Unique`, `A1Determine`, `A1Invariance`), **§3 complete**,
+and Lemma A for Weierstraß data (`A1LemmaA`: stabiliser of the curve = `{1, ε}`).
+
+Findings that change the remaining plan:
+
+* `Remark 3`, `thm:A-existence`, and general homogeneity of degree-one primes (group law) are not needed
+  for §3; `lemmaA`, `absolute_hasse_determine` are now stated for fields with a Weierstraß datum.
+* For §4 every statement about an abstract elliptic field `E | K` (Theorems IX–XI, `IsJacobianField`,
+  `charInvariant`) needs, besides the cocycle algebra of Phase 5, the *genus of a Galois descent*:
+  `genus(E) = genus(E L)` for a finite Galois constant extension, i.e. conorm of prime divisors,
+  `deg_L(conorm 𝔭) = deg_K 𝔭`, and `L_{EL}(D_L) = L ⊗ L_E(D)`.  This is the main missing piece (6a).
+* The definition of `hasseGen` and `IsJacobianField` must quantify over *all* splitting fields, and
+  `jacobian_iff_cocycle_translation` needs constant extensions by transcendental fields `E₁ ≅ E`.
+
+Next (in this order): Lemma 2 (`H¹(G,L^×/q) ≅ Ĝ(q)`, independent of A2); the `G`-action on `F_L(q)`
+and `Aut(F_L(q)|L) = T ⋊ ⟨ε⟩`; Galois descent (Artin) for the fixed fields `E_ζ`; then 6a or 6b.
 
 ## 1. What is still missing
 
