@@ -15,11 +15,6 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-/-- Book, §3, (16): `℘ = −Dζ − 2 s₁`. Blueprint: `def:wp`. -/
-theorem wp_eq_neg_D_zeta (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    wpM K q = -Dop K (zetaM K q) - 2 * algebraMap K (MeroRing K) (sK K 1 q) := by
-  sorry
-
 /-- Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic.
 Blueprint: `rem:delta-product`. -/
 theorem remark3_delta_product (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
