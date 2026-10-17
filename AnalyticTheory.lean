@@ -53,3 +53,4 @@ import AnalyticTheory.Delta3
 import AnalyticTheory.Delta4
 import AnalyticTheory.Delta5
 import AnalyticTheory.Delta6
+import AnalyticTheory.Delta7

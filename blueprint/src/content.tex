@@ -932,7 +932,7 @@ $\zeta(X)=D\log\Theta(X)$.
 
 \begin{definition}[The function $\wp$]
 \label{def:wp}
-\lean{AnalyticTheory.wpM, AnalyticTheory.EvalsTo, AnalyticTheory.wp_eq_neg_D_zeta}
+\lean{AnalyticTheory.wpM, AnalyticTheory.EvalsTo, AnalyticTheory.wp_eq_neg_D_zeta, AnalyticTheory.GP_eq, AnalyticTheory.Th_eq_theta}
 \uses{def:zeta}
 \leanok
 $\wp(X)=\sum_{n\in\mathbb Z}\frac{q^nX}{(1-q^nX)^2}-2s_1$ (new definition of \S3), the element of $M_K$ with these values; $\wp=-D\zeta-2s_1$.
@@ -1149,13 +1149,14 @@ See the Lean proof of \texttt{thmVII\_absinv, thmVII\_bijective, exists\_R, eval
 
 \begin{remark}[Remark 2 (product formula)]
 \label{rem:delta-product}
-\lean{AnalyticTheory.remark3_delta_product}
+\lean{AnalyticTheory.remark3_delta_product, AnalyticTheory.delta_product_core, AnalyticTheory.cubic_disc, AnalyticTheory.Euler_identity, AnalyticTheory.thK_triple, AnalyticTheory.eq_const_mul_Mb, AnalyticTheory.Nb_eq_const, AnalyticTheory.ev_sub, AnalyticTheory.ev_root, AnalyticTheory.serD_eq_serPsi, AnalyticTheory.int_series_zero, AnalyticTheory.evalZ_serPsi}
 \uses{def:Delta-q}
 \leanok
 $\Delta=q\prod_{n>0}(1-q^n)^{24}$ in every characteristic (formula (45)).
 \end{remark}
 \begin{proof}
-See the Lean proof of \texttt{remark3\_delta\_product}.
+\leanok
+See the Lean proof of \texttt{remark3\_delta\_product, delta\_product\_core, cubic\_disc, Euler\_identity, thK\_triple, eq\_const\_mul\_Mb, Nb\_eq\_const, ev\_sub, ev\_root, serD\_eq\_serPsi, int\_series\_zero, evalZ\_serPsi}.
 \end{proof}
 
 \begin{theorem}[Theorem VIII (Hasse invariant of $F_K(q)$)]

@@ -15,13 +15,6 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-/-- Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic.
-Blueprint: `rem:delta-product`. -/
-theorem remark3_delta_product (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    deltaPoly K (coeffB K q) (coeffC K q) =
-      q * ∏' n : ℕ, (1 - q ^ (n + 1)) ^ 24 := by
-  sorry
-
 /-- Book, §3, Theorem VIII: the Hasse invariant of `F_K(q)` is trivial: `γ ≡ 1 mod K^{×2}`
 if `char K ≠ 2`, and `γ ≡ 0 mod π(K⁺)` if `char K = 2`. Here `F_K(q)` is assumed to have a
 prime divisor of degree `1` (a placeholder predicate).

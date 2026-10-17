@@ -400,6 +400,8 @@ _addlean('def:D-operator', 'laurentCoeff', 'DholFun', 'Dop_derivation')
 _upd('def:theta-M', text=r'The function $\Theta$, which is holomorphic on $\Omega^\times$, viewed as an element of $M_K$.')
 _upd('def:wp', text=r'$\wp(X)=\sum_{n\in\mathbb Z}\frac{q^nX}{(1-q^nX)^2}-2s_1$ (new definition of \S3), the element of $M_K$ with these values; $\wp=-D\zeta-2s_1$.')
 _addlean('def:wp', 'EvalsTo', 'wp_eq_neg_D_zeta')
+_addlean('def:wp', 'GP_eq', 'Th_eq_theta')
+_addlean('rem:delta-product', 'delta_product_core', 'cubic_disc', 'Euler_identity', 'thK_triple', 'eq_const_mul_Mb', 'Nb_eq_const', 'ev_sub', 'ev_root', 'serD_eq_serPsi', 'int_series_zero', 'evalZ_serPsi')
 _upd('def:wp-prime', text=r'$\wp'+"'"+r'(X)=\sum_{n\in\mathbb Z}\frac{q^{2n}X^2}{(1-q^nX)^3}+s_1$, i.e.\ $\tfrac12(D\wp-\wp)$ made sense of in every characteristic (formula (18)).')
 
 # --- Chapter 4 : semi-periodic functions
