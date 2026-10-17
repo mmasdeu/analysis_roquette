@@ -1666,10 +1666,35 @@ See the Lean proof of \texttt{lemmaA}.
 \lean{AnalyticTheory.absInv_eq_of_data, AnalyticTheory.hasseInv_eq_of_data}
 \uses{def:absolute-invariant, def:hasse-invariant}
 \leanok
-The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Not yet formalized.
+The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Proved for fields in which the prime divisors of degree one are permuted transitively by automorphisms (e.g.\ $F_K(q)$).
 \end{lemma}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{absInv\_eq\_of\_data, hasseInv\_eq\_of\_data}.
+\end{proof}
+
+\begin{lemma}[Weierstra\ss\ data at the same prime]
+\label{lem:A1-same-prime}
+\lean{AnalyticTheory.affine_change, AnalyticTheory.exists_variableChange, AnalyticTheory.same_prime_invariants}
+\uses{lem:rr-dimension, def:weierstrass-data}
+\leanok
+Two Weierstra\ss\ data at the same prime $\mathfrak p$ differ by a change of variables $x\mapsto u^2x+r$, $y\mapsto u^3y+u^2sx+t$ (Mathlib\'s \texttt{VariableChange}); $j$ and the class of $\gamma$ are unchanged.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{affine\_change, exists\_variableChange, same\_prime\_invariants}.
+\end{proof}
+
+\begin{lemma}[Classification of Weierstra\ss\ curves by $(j,\gamma)$]
+\label{lem:A1-classify}
+\lean{AnalyticTheory.exists_variableChange_of_invariants}
+\uses{def:absolute-invariant, def:hasse-invariant}
+\leanok
+Over any field, Weierstra\ss\ curves with the same $j\neq0,12^3$ and equivalent Hasse classes differ by a change of variables (normal forms in characteristic $\ne2,3$, $3$, $2$).
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_variableChange\_of\_invariants}.
 \end{proof}
 
 \begin{remark}[Remark 1 (formula for $j$ from $y^2+xy=x^3+Bx+C$)]
@@ -1707,13 +1732,14 @@ See the Lean proof of \texttt{remark\_A3\_absinv, remark\_A3\_hasse}.
 
 \begin{theorem}[Uniqueness of $F\,|\,K$]
 \label{thm:A-uniqueness}
-\lean{AnalyticTheory.absolute_hasse_determine}
-\uses{rem:A-3, def:hasse-invariant}
+\lean{AnalyticTheory.absolute_hasse_determine, AnalyticTheory.exists_algEquiv_of_normalForm}
+\uses{lem:A1-classify, def:hasse-invariant}
 \leanok
-Fields with equal $j$ and $\gamma$ are $K$-isomorphic.
+Fields with a prime of degree $1$, equal $j\ne0,12^3$ and equivalent Hasse classes are $K$-isomorphic.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{absolute\_hasse\_determine}.
+\leanok
+See the Lean proof of \texttt{absolute\_hasse\_determine, exists\_algEquiv\_of\_normalForm}.
 \end{proof}
 
 \begin{theorem}[Existence of $F\,|\,K$ with given $j,\gamma$]

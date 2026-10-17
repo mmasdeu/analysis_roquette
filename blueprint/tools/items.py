@@ -248,15 +248,23 @@ add('proposition','prop:hasse-weierstrass','Hasse invariant in Weierstraß form 
 add('lemma','lem:A','Lemma A (unique nontrivial automorphism)',['lemmaA'],['def:absolute-invariant'],True,
  r'For $j\ne 0,12^3$ there is only one nontrivial automorphism fixing the prime of degree $1$. The fixing predicate is a placeholder.')
 add('lemma','lem:A1-independence','Independence of $j$ and $\\gamma$ of the Weierstra\\ss\\ datum',['absInv_eq_of_data','hasseInv_eq_of_data'],['def:absolute-invariant','def:hasse-invariant'],False,
- r'The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Not yet formalized.')
+ r'The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Proved for fields in which the prime divisors of degree one are permuted transitively by automorphisms (e.g.\ $F_K(q)$).')
+add('lemma','lem:rr-dimension','$\\dim L(n\\mathfrak p)=n$',['finrank_Ln_nat','finrank_Ln_zero','Ln_one_const','Ln_eq_span'],['def:elliptic','def:degree-one-prime'],False,
+ r'For an elliptic function field with a prime $\mathfrak p$ of degree $1$: $L(0)=L(\mathfrak p)=K$ and $\dim L(n\mathfrak p)=n$ for $n\ge1$, spanned by $1,x,y,x^2,xy,\dots$ when $x,y$ have pole divisors $2\mathfrak p,3\mathfrak p$.')
+add('lemma','lem:A1-same-prime','Weierstra\\ss\\ data at the same prime',['affine_change','exists_variableChange','same_prime_invariants'],['lem:rr-dimension','def:weierstrass-data'],False,
+ r'Two Weierstra\ss\ data at the same prime $\mathfrak p$ differ by a change of variables $x\mapsto u^2x+r$, $y\mapsto u^3y+u^2sx+t$ (Mathlib\'s \texttt{VariableChange}); $j$ and the class of $\gamma$ are unchanged.')
+add('lemma','lem:Fq-homogeneous','Primes of degree one of $F_K(q)$',['fq_homogeneous','DegOneHomogeneous','translationAlg'],['def:Fq','cor:translation-Va'],False,
+ r'The prime divisors of degree $1$ of $F_K(q)$ are the primes $\mathfrak p_b$, $b\in K^\times$, and the translations $\tau_a$ permute them transitively.')
+add('lemma','lem:A1-classify','Classification of Weierstra\\ss\\ curves by $(j,\\gamma)$',['exists_variableChange_of_invariants'],['def:absolute-invariant','def:hasse-invariant'],False,
+ r'Over any field, Weierstra\ss\ curves with the same $j\neq0,12^3$ and equivalent Hasse classes differ by a change of variables (normal forms in characteristic $\ne2,3$, $3$, $2$).')
 add('remark','rem:A-1','Remark 1 (formula for $j$ from $y^2+xy=x^3+Bx+C$)',['remark_A1_absinv'],['def:absolute-invariant'],False,
  r'$j=(1-48B)^3/\Delta$ in any characteristic.')
 add('remark','rem:A-2','Remark 2 (separably closed $K$)',['remark_A2_sep_closed'],['def:hasse-invariant'],False,
  r'Over a separably closed field the Hasse invariant is trivial.')
 add('remark','rem:A-3','Remark 3 (constant extensions)',['remark_A3_absinv','remark_A3_hasse'],['def:absolute-invariant','def:hasse-invariant','def:constant-extension'],False,
  r'Absolute invariant is preserved by constant extensions; Hasse invariant maps to the image class.')
-add('theorem','thm:A-uniqueness','Uniqueness of $F\\,|\\,K$',['absolute_hasse_determine'],['rem:A-3','def:hasse-invariant'],False,
- r'Fields with equal $j$ and $\gamma$ are $K$-isomorphic.')
+add('theorem','thm:A-uniqueness','Uniqueness of $F\\,|\\,K$',['absolute_hasse_determine','exists_algEquiv_of_normalForm'],['lem:A1-classify','def:hasse-invariant'],False,
+ r'Fields with a prime of degree $1$, equal $j\ne0,12^3$ and equivalent Hasse classes are $K$-isomorphic.')
 add('theorem','thm:A-existence','Existence of $F\\,|\\,K$ with given $j,\\gamma$',['absolute_hasse_exists'],['def:absolute-invariant','def:hasse-invariant'],False,
  r'For $j\ne 0,12^3$ and $\gamma\neq 0$ there is $F$ with invariants $j,\gamma$.')
 

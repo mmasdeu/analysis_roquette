@@ -122,13 +122,15 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 * §3: formula (16) `℘ = −Dζ − 2s₁` (`ZetaWp.lean`) and the product formula (45) `Δ = q∏(1−qⁿ)²⁴` in every
   characteristic (`Delta1`–`Delta7.lean`: 2-torsion points, Euler identity, case `char ≠ 2`, `√q ∈ K`,
   then universality via integer power series and `ℚ₂`).
-* §3: **Theorems VIII and VIIIa** (`Sec3VIII.lean`, `SqrtHensel.lean`): the Weierstraß datum
-  `(℘, ℘′)` of `F_K(q)`, the Hasse representative `−c₄/c₆ = (1+240s₃)/(1−504s₅)` is a square by
-  Newton iteration for `√(1+4s)`, the period `q` is unique. These rely on one unproved lemma from
-  Appendix A1 (`A1Invariance.lean`: independence of `j` and `γ` of the Weierstraß datum) and, for the
-  direction “⇒” of VIIIa, on the A1 uniqueness theorem `absolute_hasse_determine` (statement corrected to
-  use the classes mod squares / mod `π(K⁺)`). Statement of VIIIa corrected in characteristic 2.
-* §3 is therefore complete modulo the Appendix A1 results above.
+* §3: **Theorems VIII and VIIIa**, the uniqueness theorem of Appendix A1 and the invariance of `j`,
+  `γ` under change of Weierstraß datum (`Sec3VIII.lean`, `SqrtHensel.lean`, `EllipticBasics.lean`,
+  `A1Normal/Transfer/Classify/Unique/Determine/Invariance.lean`, `FqHomogeneous.lean`, `FqOrd.lean`).
+  Prime divisors as valuation rings, `dim L(n𝔭) = n`, Weierstraß data at a prime `𝔭` (`x ∈ L(2𝔭)`,
+  `y ∈ L(3𝔭)`), change of variables through Mathlib's `WeierstrassCurve.VariableChange` and normal forms,
+  `F ≅ K(X)[Y]/(P)` through `PowerBasis.equivOfMinpoly`.  **Section 3 is complete** (no `sorry` in its
+  dependency chain; `#print axioms` shows only `propext`, `Classical.choice`, `Quot.sound`).
+* Remaining in the appendices for §4: Lemma A, Remark 3, and the whole of §A2 (Jacobian field,
+  characteristic cocycle), see `PLAN.md`.
 * Not started (statements only): §§4–6; Appendices A1, A2.
 
 ## Zero theory of holomorphic functions (third step)

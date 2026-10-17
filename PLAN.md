@@ -4,6 +4,12 @@ General rule: use Mathlib whenever possible, and in particular its elliptic-curv
 (`Mathlib/AlgebraicGeometry/EllipticCurve/`). Project-specific definitions are kept only where
 Mathlib has nothing (prime divisors, Riemann–Roch spaces, `genus`, and the analytic objects).
 
+## 0. Status (updated)
+
+Done: decisions 1–2, Phases 1–4 (`EllipticBasics`, `A1Normal`, `A1Transfer`, `FqHomogeneous`,
+`FqOrd`, `A1Classify`, `A1Unique`, `A1Determine`, `A1Invariance`); §3 is complete.
+Next: Lemma A, Remark 3, then Phase 5 (A2 for `F_L(q)`) and Lemma 2 for §4.
+
 ## 1. What is still missing
 
 | Used by | Appendix result (Lean name) | Status |

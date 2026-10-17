@@ -62,3 +62,6 @@ import AnalyticTheory.A1Normal
 import AnalyticTheory.A1Transfer
 import AnalyticTheory.FqHomogeneous
 import AnalyticTheory.FqOrd
+import AnalyticTheory.A1Unique
+import AnalyticTheory.A1Classify
+import AnalyticTheory.A1Determine

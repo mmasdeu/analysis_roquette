@@ -212,18 +212,6 @@ theorem remark_A3_hasse (K : Type u) (F : Type u) (L : Type u) [Field K] [Field 
     SquareEquiv (hasseInv L FL hFL) (algebraMap K L (hasseInv K F hF)) := by
   sorry
 
-/-- Book, §A1, uniqueness: two fields with a prime divisor of degree `1` and equal absolute
-and Hasse invariants are `K`-isomorphic (for `j ≠ 0, 12³`, in the Hasse-invariant
-formulation of the book). Blueprint: `thm:A-uniqueness`. -/
-theorem absolute_hasse_determine (K : Type u) (F F' : Type u) [Field K] [Field F] [Field F']
-    [Algebra K F] [Algebra K F'] (hE : IsEllipticOver K F) (hE' : IsEllipticOver K F')
-    (hF : HasPrimeOfDegreeOne K F) (hF' : HasPrimeOfDegreeOne K F')
-    (hj0 : absInv K F hF ≠ 0 ∧ absInv K F hF ≠ 12 ^ 3) (hj : absInv K F hF = absInv K F' hF')
-    (hγ : (ringChar K ≠ 2 → SquareEquiv (hasseInv K F hF) (hasseInv K F' hF')) ∧
-      (ringChar K = 2 → PiEquiv (hasseInv K F hF) (hasseInv K F' hF'))) :
-    Nonempty (F ≃ₐ[K] F') := by
-  sorry
-
 /-- Book, §A1, existence: for `j ≠ 0, 12³` and `γ ≠ 0` there is an elliptic function field
 `F | K` with a prime divisor of degree `1`, absolute invariant `j` and Hasse invariant `γ`.
 Blueprint: `thm:A-existence`. -/

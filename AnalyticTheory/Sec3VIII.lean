@@ -1,5 +1,6 @@
 import AnalyticTheory.Delta7
 import AnalyticTheory.A1Invariance
+import AnalyticTheory.A1Determine
 import AnalyticTheory.FqHomogeneous
 import AnalyticTheory.FqOrd
 import AnalyticTheory.SqrtHensel
