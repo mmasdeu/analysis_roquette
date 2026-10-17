@@ -239,4 +239,23 @@ theorem ev_root {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK
 
 end roots
 
+
+section shift
+
+theorem valK_neg (f : holSubring K) (a : K) (ha : a ≠ 0) : valK (-f) a ha = -valK f a ha := by
+  apply (algebraMap K (Omega K)).injective
+  rw [← valK_spec, map_neg, ← valK_spec, neg_apply_hol_aux]
+
+include hq0 hq1 in
+theorem thK_shift {x : K} (hx : x ≠ 0) : thK q (q⁻¹ * x) = -x * thK q x := by
+  have hq0' := norm_pos_iff.mp hq0
+  have h := congrArg (fun H => valK H x hx) (Th_FE hq0 hq1)
+  simp only at h
+  rw [show (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ = Units.mk0 q⁻¹ (inv_ne_zero hq0') from Units.ext rfl,
+    valK_holScale, valK_neg, valK_mul, valK_monoHol, zpow_one, valK_Th_eq hq0 hq1,
+    valK_Th_eq hq0 hq1] at h
+  rw [h]; ring
+
+end shift
+
 end AnalyticTheory

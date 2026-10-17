@@ -18,7 +18,7 @@ variable {K : Type u} [NontriviallyNormedField K] [CompleteSpace K]
 
 section prods
 
-variable {q : K}
+variable {q s : K}
 
 theorem mult_geom (hq : ‖q‖ < 1) (y : K) (m : ℕ) :
     Multipliable (fun n : ℕ => 1 - q ^ (n + m) * y) := by
@@ -196,6 +196,46 @@ theorem thK_triple (hq : ‖q‖ < 1) (hq0 : q ≠ 0) {r : K} (hr0 : r ≠ 0) (h
   rw [← hRo] at hE
   field_simp
   linear_combination (-2 * (E * (A * B) + 1)) * hE
+
+
+theorem one_add_pow_ne_zero (hq : ‖q‖ < 1) (n : ℕ) : 1 + q ^ (n + 1) ≠ 0 := by
+  intro h
+  have h1 : q ^ (n + 1) = -1 := by linear_combination h
+  have h2 : ‖q‖ ^ (n + 1) = 1 := by simpa [norm_pow] using congrArg norm h1
+  have := pow_lt_one₀ (norm_nonneg q) hq (show n + 1 ≠ 0 by omega)
+  linarith
+
+theorem Ep_ne_zero (hq : ‖q‖ < 1) : Ep q ≠ 0 := by
+  have := tprod_ne_zero_geom hq (-1) 1 (fun n => by
+    simpa [sub_eq_add_neg] using one_add_pow_ne_zero hq n)
+  simpa [Ep, sub_eq_add_neg] using this
+
+theorem Ro_ne_zero (hs : ‖s‖ < 1) : (∏' n : ℕ, (1 - s ^ (2 * n + 1))) ≠ 0 := by
+  have hss : ‖s ^ 2‖ < 1 := by rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hs (by norm_num)
+  have := tprod_ne_zero_geom hss s 0 (fun n => by
+    intro h
+    have h1 : (s ^ 2) ^ (n + 0) * s = 1 := by linear_combination -h
+    have h2 : ‖s‖ ^ (2 * n + 1) = 1 := by
+      have := congrArg norm h1
+      rw [norm_mul, norm_pow, norm_pow, ← pow_mul, norm_one, add_zero, ← pow_succ] at this
+      exact this
+    have := pow_lt_one₀ (norm_nonneg s) hs (show 2 * n + 1 ≠ 0 by omega)
+    linarith)
+  have e : (fun n : ℕ => 1 - s ^ (2 * n + 1)) = fun n : ℕ => 1 - (s ^ 2) ^ (n + 0) * s := by
+    funext n
+    rw [← pow_mul, add_zero, ← pow_succ]
+  rw [e]; exact this
+
+theorem thK_neg_one_ne (hq : ‖q‖ < 1) (h2 : (2 : K) ≠ 0) : thK q (-1) ≠ 0 := by
+  rw [thK_neg_one hq]
+  exact mul_ne_zero h2 (pow_ne_zero 2 (Ep_ne_zero hq))
+
+theorem thK_sq_ne (hq : ‖q‖ < 1) {s : K} (hs0 : s ≠ 0) (hs2 : s ^ 2 = q) : thK q s ≠ 0 := by
+  have hs1 : ‖s‖ < 1 := by
+    have h : ‖s‖ ^ 2 = ‖q‖ := by rw [← norm_pow, hs2]
+    nlinarith [norm_nonneg s]
+  rw [thK_sq hq hs0 hs2]
+  exact mul_ne_zero (neg_ne_zero.mpr (inv_ne_zero hs0)) (pow_ne_zero 2 (Ro_ne_zero hs1))
 
 end prods
 
