@@ -119,10 +119,16 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 * §3: the derivation `D` on `H_K`/`M_K` (`DOperator.lean`), formula (18) `2℘′ = D℘ − ℘`, the Weierstraß
   normal form of the remark for `char ≠ 2, 3` (`Sec3D.lean`), and **Theorem VII** (`Sec3VII.lean`;
   `B`, `C`, `Δ` as integer power series, evaluation `PowerSeries ℤ → K` as a ring homomorphism).
-* Still open in §3: formula (16) `℘ = −Dζ − 2s₁`, the product formula (45) `Δ = q∏(1−qⁿ)²⁴`, and
-  Theorems VIII, VIIIa, which depend on the Appendix A1 theory (independence of the invariants of the
-  Weierstraß equation; existence of Weierstraß equations for arbitrary elliptic function fields needs
-  Riemann–Roch for general function fields, which is not in Mathlib).
+* §3: formula (16) `℘ = −Dζ − 2s₁` (`ZetaWp.lean`) and the product formula (45) `Δ = q∏(1−qⁿ)²⁴` in every
+  characteristic (`Delta1`–`Delta7.lean`: 2-torsion points, Euler identity, case `char ≠ 2`, `√q ∈ K`,
+  then universality via integer power series and `ℚ₂`).
+* §3: **Theorems VIII and VIIIa** (`Sec3VIII.lean`, `SqrtHensel.lean`): the Weierstraß datum
+  `(℘, ℘′)` of `F_K(q)`, the Hasse representative `−c₄/c₆ = (1+240s₃)/(1−504s₅)` is a square by
+  Newton iteration for `√(1+4s)`, the period `q` is unique. These rely on one unproved lemma from
+  Appendix A1 (`A1Invariance.lean`: independence of `j` and `γ` of the Weierstraß datum) and, for the
+  direction “⇒” of VIIIa, on the A1 uniqueness theorem `absolute_hasse_determine` (statement corrected to
+  use the classes mod squares / mod `π(K⁺)`). Statement of VIIIa corrected in characteristic 2.
+* §3 is therefore complete modulo the Appendix A1 results above.
 * Not started (statements only): §§4–6; Appendices A1, A2.
 
 ## Zero theory of holomorphic functions (third step)

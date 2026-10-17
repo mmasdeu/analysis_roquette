@@ -1161,24 +1161,26 @@ See the Lean proof of \texttt{remark3\_delta\_product, delta\_product\_core, cub
 
 \begin{theorem}[Theorem VIII (Hasse invariant of $F_K(q)$)]
 \label{thm:VIII}
-\lean{AnalyticTheory.thmVIII_hasse}
-\uses{thm:VII, def:hasse-invariant}
+\lean{AnalyticTheory.thmVIII_hasse, AnalyticTheory.hasse_wp_trivial, AnalyticTheory.exists_sqrt_one_add_four, AnalyticTheory.invariants_of_equiv, AnalyticTheory.wpData, AnalyticTheory.jOfData_wp}
+\uses{thm:VII, def:hasse-invariant, lem:A1-independence, thm:VI, def:weierstrass-data}
 \leanok
 The Hasse invariant of $F_K(q)$ is trivial.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmVIII\_hasse}.
+\leanok
+See the Lean proof of \texttt{thmVIII\_hasse, hasse\_wp\_trivial, exists\_sqrt\_one\_add\_four, invariants\_of\_equiv, wpData, jOfData\_wp}.
 \end{proof}
 
 \begin{theorem}[Theorem VIIIa]
 \label{thm:VIIIa}
-\lean{AnalyticTheory.thmVIIIa_characterization}
-\uses{thm:VII, thm:VIII, def:absolute-invariant, def:hasse-invariant, thm:VI}
+\lean{AnalyticTheory.thmVIIIa_characterization, AnalyticTheory.thmVIIIa_period_unique, AnalyticTheory.fq_hasPrime}
+\uses{thm:VII, thm:VIII, def:absolute-invariant, def:hasse-invariant, thm:VI, lem:A1-independence, thm:A-uniqueness, thm:fq-elliptic}
 \leanok
 An elliptic $F\,|\,K$ with a prime of degree $1$ is $K$-isomorphic to $F_K(q)$ for some $0<|q|<1$ iff $|j|>1$ and $\gamma$ is trivial.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmVIIIa\_characterization}.
+\leanok
+See the Lean proof of \texttt{thmVIIIa\_characterization, thmVIIIa\_period\_unique, fq\_hasPrime}.
 \end{proof}
 
 \section{Semi-periodic functions (\S\S 4--5)}
@@ -1657,6 +1659,17 @@ For $j\ne 0,12^3$ and a prime divisor $\mathfrak p$ of degree $1$ there is exact
 \end{lemma}
 \begin{proof}
 See the Lean proof of \texttt{lemmaA}.
+\end{proof}
+
+\begin{lemma}[Independence of $j$ and $\gamma$ of the Weierstra\ss\ datum]
+\label{lem:A1-independence}
+\lean{AnalyticTheory.absInv_eq_of_data, AnalyticTheory.hasseInv_eq_of_data}
+\uses{def:absolute-invariant, def:hasse-invariant}
+\leanok
+The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Not yet formalized.
+\end{lemma}
+\begin{proof}
+See the Lean proof of \texttt{absInv\_eq\_of\_data, hasseInv\_eq\_of\_data}.
 \end{proof}
 
 \begin{remark}[Remark 1 (formula for $j$ from $y^2+xy=x^3+Bx+C$)]

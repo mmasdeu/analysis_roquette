@@ -54,3 +54,6 @@ import AnalyticTheory.Delta4
 import AnalyticTheory.Delta5
 import AnalyticTheory.Delta6
 import AnalyticTheory.Delta7
+import AnalyticTheory.A1Invariance
+import AnalyticTheory.SqrtHensel
+import AnalyticTheory.Sec3VIII

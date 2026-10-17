@@ -211,7 +211,9 @@ formulation of the book). Blueprint: `thm:A-uniqueness`. -/
 theorem absolute_hasse_determine (K : Type u) (F F' : Type u) [Field K] [Field F] [Field F']
     [Algebra K F] [Algebra K F'] (hE : IsEllipticOver K F) (hE' : IsEllipticOver K F')
     (hF : HasPrimeOfDegreeOne K F) (hF' : HasPrimeOfDegreeOne K F')
-    (hj0 : absInv K F hF ≠ 0 ∧ absInv K F hF ≠ 12 ^ 3) (hj : absInv K F hF = absInv K F' hF') (hγ : hasseInv K F hF = hasseInv K F' hF') :
+    (hj0 : absInv K F hF ≠ 0 ∧ absInv K F hF ≠ 12 ^ 3) (hj : absInv K F hF = absInv K F' hF')
+    (hγ : (ringChar K ≠ 2 → SquareEquiv (hasseInv K F hF) (hasseInv K F' hF')) ∧
+      (ringChar K = 2 → PiEquiv (hasseInv K F hF) (hasseInv K F' hF'))) :
     Nonempty (F ≃ₐ[K] F') := by
   sorry
 

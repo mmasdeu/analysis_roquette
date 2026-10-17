@@ -247,6 +247,8 @@ add('proposition','prop:hasse-weierstrass','Hasse invariant in Weierstraß form 
  r'$\gamma\equiv-\tfrac12 g_2/g_3$ modulo squares.')
 add('lemma','lem:A','Lemma A (unique nontrivial automorphism)',['lemmaA'],['def:absolute-invariant'],True,
  r'For $j\ne 0,12^3$ there is only one nontrivial automorphism fixing the prime of degree $1$. The fixing predicate is a placeholder.')
+add('lemma','lem:A1-independence','Independence of $j$ and $\\gamma$ of the Weierstra\\ss\\ datum',['absInv_eq_of_data','hasseInv_eq_of_data'],['def:absolute-invariant','def:hasse-invariant'],False,
+ r'The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Not yet formalized.')
 add('remark','rem:A-1','Remark 1 (formula for $j$ from $y^2+xy=x^3+Bx+C$)',['remark_A1_absinv'],['def:absolute-invariant'],False,
  r'$j=(1-48B)^3/\Delta$ in any characteristic.')
 add('remark','rem:A-2','Remark 2 (separably closed $K$)',['remark_A2_sep_closed'],['def:hasse-invariant'],False,
@@ -401,6 +403,10 @@ _upd('def:theta-M', text=r'The function $\Theta$, which is holomorphic on $\Omeg
 _upd('def:wp', text=r'$\wp(X)=\sum_{n\in\mathbb Z}\frac{q^nX}{(1-q^nX)^2}-2s_1$ (new definition of \S3), the element of $M_K$ with these values; $\wp=-D\zeta-2s_1$.')
 _addlean('def:wp', 'EvalsTo', 'wp_eq_neg_D_zeta')
 _addlean('def:wp', 'GP_eq', 'Th_eq_theta')
+_addlean('thm:VIII', 'hasse_wp_trivial', 'exists_sqrt_one_add_four', 'invariants_of_equiv', 'wpData', 'jOfData_wp')
+_adduses('thm:VIII', 'lem:A1-independence', 'thm:VI', 'def:weierstrass-data')
+_addlean('thm:VIIIa', 'thmVIIIa_period_unique', 'fq_hasPrime')
+_adduses('thm:VIIIa', 'lem:A1-independence', 'thm:A-uniqueness', 'thm:fq-elliptic')
 _addlean('rem:delta-product', 'delta_product_core', 'cubic_disc', 'Euler_identity', 'thK_triple', 'eq_const_mul_Mb', 'Nb_eq_const', 'ev_sub', 'ev_root', 'serD_eq_serPsi', 'int_series_zero', 'evalZ_serPsi')
 _upd('def:wp-prime', text=r'$\wp'+"'"+r'(X)=\sum_{n\in\mathbb Z}\frac{q^{2n}X^2}{(1-q^nX)^3}+s_1$, i.e.\ $\tfrac12(D\wp-\wp)$ made sense of in every characteristic (formula (18)).')
 
