@@ -115,4 +115,128 @@ theorem R0_one_value : (Rq hq0 hq1 0).1 oneX = algebraMap K (Omega K) (Pc q) ^ 2
 
 end R0
 
+
+section assemble
+
+theorem ptK_one : ptK (1 : K) one_ne_zero = oneX :=
+  Subtype.ext (by simp [ptK, oneX])
+
+include hq0 hq1 in
+theorem valK_Th_one : valK (Th hq0 hq1) 1 one_ne_zero = 0 := by
+  apply (algebraMap K (Omega K)).injective
+  rw [← valK_spec, ptK_one, Th_one hq0 hq1, map_zero]
+
+include hq0 hq1 in
+theorem valK_GP_one : valK (GP hq0 hq1) 1 one_ne_zero = Pc q ^ 4 := by
+  apply (algebraMap K (Omega K)).injective
+  rw [← valK_spec, ptK_one, GP_one hq0 hq1, R0_one_value hq0 hq1]
+  rw [map_pow]; ring
+
+include hq0 hq1 in
+theorem valK_Gw_one : valK (Gw hq0 hq1) 1 one_ne_zero = Pc q ^ 4 := by
+  unfold Gw
+  rw [valK_sub, valK_mul, valK_pow_aux, valK_Th_one hq0 hq1, valK_GP_one hq0 hq1]
+  simp
+
+include hq0 hq1 in
+theorem valK_Nb_one {b : K} (hb : b ≠ 0) : valK (Nb hq0 hq1 b hb) 1 one_ne_zero = Pc q ^ 4 := by
+  unfold Nb
+  rw [valK_sub, valK_mul, valK_pow_aux, valK_Th_one hq0 hq1, valK_Gw_one hq0 hq1]
+  simp
+
+include hq0 hq1 in
+theorem Th_ne_zero_of_valK {b : K} (hb : b ≠ 0) (h : thK q b ≠ 0) :
+    (Th hq0 hq1).1 (ptK b hb) ≠ 0 := by
+  intro h0
+  rw [valK_spec] at h0
+  have h1 : valK (Th hq0 hq1) b hb = 0 := (map_eq_zero_iff _ (algebraMap K (Omega K)).injective).mp h0
+  rw [valK_Th_eq hq0 hq1 b hb] at h1
+  exact h h1
+
+end assemble
+
+
+section diffs
+
+include hq0 hq1 in
+theorem valK_Mb {b : K} (hb : b ≠ 0) (a : K) (ha : a ≠ 0) :
+    valK (Mb hq0 hq1 b hb) a ha =
+      thK q (b⁻¹ * a) * thK q (b * a) := by
+  unfold Mb
+  rw [valK_mul, show (Units.mk0 b hb)⁻¹ = Units.mk0 b⁻¹ (inv_ne_zero hb) from Units.ext rfl,
+    valK_holScale, valK_holScale, valK_Th_eq hq0 hq1, valK_Th_eq hq0 hq1]
+
+include hq0 hq1 in
+theorem Nb_eq_const {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK q b ≠ 0) :
+    Nb hq0 hq1 b hb = algebraMap K (holSubring K) (-(Pc q ^ 4) / (b * thK q b ^ 2)) *
+      Mb hq0 hq1 b hb := by
+  have hTh := Th_ne_zero_of_valK hq0 hq1 hb hT
+  obtain ⟨c, hc⟩ := eq_const_mul_Mb hq0 hq1 hb hbm (Nb_FE hq0 hq1 b hb)
+    (Nb_val hq0 hq1 hb hTh) (Nb_Dval hq0 hq1 hb hbm hTh)
+  have h1 := valK_Nb_one hq0 hq1 hb
+  rw [hc, valK_mul, valK_const, valK_Mb hq0 hq1 hb 1 one_ne_zero] at h1
+  rw [mul_one, mul_one, thK_inv hq1 hb] at h1
+  have hc' : c = -(Pc q ^ 4) / (b * thK q b ^ 2) := by
+    field_simp
+    linear_combination -h1
+  rw [hc, hc']
+
+include hq0 hq1 in
+theorem ev_sub {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK q b ≠ 0)
+    {a : K} (ha : a ≠ 0) (hTa : thK q a ≠ 0) :
+    evK hq0 hq1 a ha - evK hq0 hq1 b hb =
+      (-(Pc q ^ 4) / (b * thK q b ^ 2)) * thK q (b⁻¹ * a) * thK q (b * a) / thK q a ^ 2 := by
+  have h := congrArg (fun H => valK H a ha) (Nb_eq_const hq0 hq1 hb hbm hT)
+  simp only at h
+  unfold Nb at h
+  rw [valK_sub, valK_mul, valK_pow_aux, valK_const, valK_mul, valK_const,
+    valK_Mb hq0 hq1 hb a ha, valK_Th_eq hq0 hq1 a ha] at h
+  have hea : evK hq0 hq1 a ha = valK (Gw hq0 hq1) a ha / thK q a ^ 2 := by
+    unfold evK; rw [valK_Th_eq hq0 hq1 a ha]
+  rw [hea]
+  generalize thK q (b⁻¹ * a) = X1 at h ⊢
+  generalize thK q (b * a) = X2 at h ⊢
+  generalize evK hq0 hq1 b hb = eb at h ⊢
+  generalize valK (Gw hq0 hq1) a ha = Ga at h ⊢
+  generalize thK q a = Ta at h hTa ⊢
+  field_simp at h ⊢
+  linear_combination h
+
+end diffs
+
+
+section roots
+
+include hq0 hq1 in
+theorem ev_root {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK q b ≠ 0) :
+    4 * evK hq0 hq1 b hb ^ 3 + evK hq0 hq1 b hb ^ 2 + 4 * coeffB K q * evK hq0 hq1 b hb +
+      4 * coeffC K q = 0 := by
+  have hTh := Th_ne_zero_of_valK hq0 hq1 hb hT
+  have hrel := thmVI_relation (K := K) q hq0 hq1
+  rw [wpM_eq hq0 hq1, wpPrimeM_eq hq0 hq1] at hrel
+  have hrel' : wpPrimeAlg hq0 hq1 ^ 2 + wpAlg hq0 hq1 * wpPrimeAlg hq0 hq1 =
+      wpAlg hq0 hq1 ^ 3 + algebraMap K (MeroRing K) 0 * wpAlg hq0 hq1 ^ 2 +
+        algebraMap K (MeroRing K) (coeffB K q) * wpAlg hq0 hq1 +
+          algebraMap K (MeroRing K) (coeffC K q) := by
+    rw [map_zero, zero_mul, add_zero]; exact hrel
+  have hp := rel_pointwise hq0 hq1 hrel' (ptK b hb) hTh
+  have htor := torsion_Gw' hq0 hq1 hb hbm hTh
+  simp only at hp
+  have hGw := valK_spec (Gw hq0 hq1) b hb
+  have hT' := valK_spec (Th hq0 hq1) b hb
+  have hv := valK_Th_ne_zero hq0 hq1 hb hTh
+  apply (algebraMap K (Omega K)).injective
+  simp only [map_add, map_mul, map_pow, map_ofNat, map_zero]
+  unfold evK
+  rw [map_div₀, map_pow, ← hGw, ← hT']
+  rw [map_zero, zero_mul, add_zero] at hp
+  have hTa : (Th hq0 hq1).1 (ptK b hb) ≠ 0 := hTh
+  generalize (Gw hq0 hq1).1 (ptK b hb) = G at *
+  generalize (Gw' hq0 hq1).1 (ptK b hb) = G' at *
+  generalize (Th hq0 hq1).1 (ptK b hb) = T at *
+  field_simp at hp ⊢
+  linear_combination (-4 : Omega K) * hp + (2 * G' + G * T) * htor
+
+end roots
+
 end AnalyticTheory
