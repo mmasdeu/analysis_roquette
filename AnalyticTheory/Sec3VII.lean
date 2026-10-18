@@ -1,4 +1,5 @@
 import AnalyticTheory.Sec3
+import ForMathlib.RingTheory.PowerSeries.TsumEval
 
 /-!
 # Theorem VII: `j(q) = 1/q + R(q)`
@@ -35,41 +36,26 @@ theorem summable_norm_eval (f : PowerSeries ℤ) :
 noncomputable def evalZ (q : K) (f : PowerSeries ℤ) : K :=
   ∑' k : ℕ, ((coeff k f : ℤ) : K) * q ^ k
 
-include hq in
-theorem evalZ_mul (f g : PowerSeries ℤ) : evalZ q (f * g) = evalZ q f * evalZ q g := by
-  unfold evalZ
-  rw [tsum_mul_tsum_eq_tsum_sum_antidiagonal_of_summable_norm (summable_norm_eval hq f)
-    (summable_norm_eval hq g)]
-  refine tsum_congr (fun n => ?_)
-  rw [coeff_mul]
-  push_cast
-  rw [Finset.sum_mul]
-  refine Finset.sum_congr rfl (fun p hp => ?_)
-  rw [Finset.mem_antidiagonal] at hp
-  rw [← hp, pow_add]; ring
+/-- `evalZ` is the evaluation `PowerSeries.tsumEval` along `ℤ → K` (`ForMathlib`). -/
+theorem evalZ_eq_tsumEval (f : PowerSeries ℤ) :
+    evalZ q f = PowerSeries.tsumEval (Int.castRingHom K) q f := rfl
+
+theorem norm_intCastRingHom_le (n : ℤ) : ‖Int.castRingHom K n‖ ≤ 1 :=
+  IsUltrametricDist.norm_intCast_le_one K n
 
 include hq in
-theorem evalZ_add (f g : PowerSeries ℤ) : evalZ q (f + g) = evalZ q f + evalZ q g := by
-  unfold evalZ
-  have h1 := (summable_norm_eval hq f).of_norm
-  have h2 := (summable_norm_eval hq g).of_norm
-  rw [← Summable.tsum_add h1 h2]
-  refine tsum_congr (fun n => ?_)
-  rw [map_add, Int.cast_add, add_mul]
+theorem evalZ_mul (f g : PowerSeries ℤ) : evalZ q (f * g) = evalZ q f * evalZ q g :=
+  PowerSeries.tsumEval_mul (Int.castRingHom K) norm_intCastRingHom_le hq f g
+
+include hq in
+theorem evalZ_add (f g : PowerSeries ℤ) : evalZ q (f + g) = evalZ q f + evalZ q g :=
+  PowerSeries.tsumEval_add (Int.castRingHom K) norm_intCastRingHom_le hq f g
 
 theorem evalZ_zero : evalZ q (0 : PowerSeries ℤ) = 0 := by simp [evalZ]
 
-theorem evalZ_one : evalZ q (1 : PowerSeries ℤ) = 1 := by
-  unfold evalZ
-  rw [tsum_eq_single 0]
-  · simp
-  · intro n hn; simp [coeff_one, hn]
+theorem evalZ_one : evalZ q (1 : PowerSeries ℤ) = 1 := PowerSeries.tsumEval_one (Int.castRingHom K)
 
-theorem evalZ_X : evalZ q (X : PowerSeries ℤ) = q := by
-  unfold evalZ
-  rw [tsum_eq_single 1]
-  · simp
-  · intro n hn; simp [coeff_X, hn]
+theorem evalZ_X : evalZ q (X : PowerSeries ℤ) = q := PowerSeries.tsumEval_X (Int.castRingHom K)
 
 include hq in
 /-- Evaluation as a ring homomorphism. -/

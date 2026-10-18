@@ -2,7 +2,7 @@ import AnalyticTheory.Lemma2
 import AnalyticTheory.FqHomogeneous
 import AnalyticTheory.A1LemmaA
 import AnalyticTheory.Sec3VIII
-import AnalyticTheory.FieldExt
+import ForMathlib.FieldTheory.ExtendRingEquiv
 
 /-!
 # Galois descent for `F_L(q)`: the fields `E_ζ`
@@ -325,18 +325,6 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖)
 
-theorem algEquiv_eq_one_of_fix {K L : Type*} [Field K] [Field L] [Algebra K L] {α : L}
-    (hα : IntermediateField.adjoin K ({α} : Set L) = ⊤) (σ : L ≃ₐ[K] L) (h : σ α = α) :
-    σ = 1 := by
-  ext z
-  have hz : z ∈ IntermediateField.adjoin K ({α} : Set L) := by rw [hα]; trivial
-  induction hz using IntermediateField.adjoin_induction with
-  | mem w hw => rw [Set.mem_singleton_iff.mp hw]; exact h
-  | algebraMap c => exact σ.commutes c
-  | add a b _ _ ha hb => rw [map_add, ha, hb]; rfl
-  | inv a _ ha => rw [map_inv₀, ha]; rfl
-  | mul a b _ _ ha hb => rw [map_mul, ha, hb]; rfl
-
 theorem adjoin_top_of_subfield_eq {F : Type*} [Field F] {S T : Subfield F} (h : S = T) {a : F}
     (hS : IntermediateField.adjoin S ({a} : Set F) = ⊤) :
     IntermediateField.adjoin T ({a} : Set F) = ⊤ := h ▸ hS
@@ -379,7 +367,8 @@ theorem Ezeta_adjoin (ζ : CocycleModQ K L q) {α : L}
           (IntermediateField.subset_adjoin E _ (Set.mem_singleton a))
       rw [hρ, ha, rhoZ_const] at h1
       have h3 : σ α = α := FqHom_injective q h1
-      have : σ = 1 := algEquiv_eq_one_of_fix hα σ h3
+      have : σ = 1 := IntermediateField.algEquiv_eq_one_of_adjoin_eq_top hα
+        (fun x hx => by rw [Set.mem_singleton_iff.mp hx]; exact h3)
       have hρ1 : ρ 1 = 1 := AlgEquiv.ext fun f => rhoZ_one q hq0 ζ f
       rw [this, hρ1]; exact Subgroup.one_mem _
     · intro hγ
@@ -633,9 +622,9 @@ theorem minpoly_Ezeta (ζ : CocycleModQ K L q) {α : L}
   have hmonic : (m.map (algebraMap K E)).Monic := (minpoly.monic hα').map _
   have h3 : (minpoly E a).natDegree = Fintype.card (L ≃ₐ[K] L) := by
     rw [← Ezeta_finrank q hq0 ζ]
-    exact natDegree_minpoly_eq_finrank a (Ezeta_adjoin q hq0 ζ hα)
+    exact minpoly.natDegree_eq_finrank_of_adjoin_eq_top (Ezeta_adjoin q hq0 ζ hα)
   have h4 : m.natDegree = Fintype.card (L ≃ₐ[K] L) := by
-    rw [natDegree_minpoly_eq_finrank α hα, ← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank K L]
+    rw [minpoly.natDegree_eq_finrank_of_adjoin_eq_top hα, ← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank K L]
   refine (Polynomial.eq_of_monic_of_dvd_of_natDegree_le (minpoly.monic hint) hmonic h2 ?_).symm
   rw [Polynomial.natDegree_map, h3, h4]
 
@@ -665,7 +654,7 @@ theorem extend_Ezeta (ζ ζ' : CocycleModQ K L q)
     have := minpoly.aeval (Ezeta q ζ') a
     rw [minpoly_Ezeta q hq0 ζ' hα] at this
     rw [map_mul, this, zero_mul]
-  obtain ⟨Φ, hΦe, hΦa⟩ := extend_iso (Ezeta q ζ) (Ezeta q ζ') φ.toRingEquiv a
+  obtain ⟨Φ, hΦe, hΦa⟩ := Subfield.exists_ringEquiv_extend (Ezeta q ζ) (Ezeta q ζ') φ.toRingEquiv a
     (Ezeta_adjoin q hq0 ζ hα) (Ezeta_adjoin q hq0 ζ' hα) hmin
   refine ⟨AlgEquiv.ofRingEquiv (f := Φ) (fun l => ?_), hΦe⟩
   have hl : l ∈ IntermediateField.adjoin K ({α} : Set L) := by rw [hα]; trivial
@@ -874,7 +863,8 @@ theorem extend_conj (ζ ζ' : CocycleModQ K L q) (φ : Ezeta q ζ ≃ₐ[K] Ezet
   intro σ
   have key : (Φ.toRingEquiv.toRingHom.comp ((rhoZ q ζ σ).toRingHom.comp
       Φ.symm.toRingEquiv.toRingHom)) = (rhoZ q ζ' σ).toRingHom := by
-    refine ringHom_ext_adjoin (Ezeta q ζ') a (Ezeta_adjoin q hq0 ζ' hα) _ _ (fun e => ?_) ?_
+    refine IntermediateField.ringHom_ext_of_adjoin_eq_top (Ezeta q ζ') (Ezeta_adjoin q hq0 ζ' hα)
+      (fun e => ?_) (fun x hx => ?_)
     · -- on `E_ζ'`
       obtain ⟨e0, he0⟩ : ∃ e0 : Ezeta q ζ, φ e0 = e := ⟨φ.symm e, φ.apply_symm_apply e⟩
       have h1 : Φ.symm (e : F) = (e0 : F) := by
@@ -883,7 +873,8 @@ theorem extend_conj (ζ ζ' : CocycleModQ K L q) (φ : Ezeta q ζ ≃ₐ[K] Ezet
       have h3 : rhoZ q ζ' σ (e : F) = e := (mem_semiFixed_iff q ζ' _).mp e.2 σ
       show Φ (rhoZ q ζ σ (Φ.symm (e : F))) = rhoZ q ζ' σ (e : F)
       rw [h1, h2, hΦ, he0, h3]
-    · show Φ (rhoZ q ζ σ (Φ.symm a)) = rhoZ q ζ' σ a
+    · rw [Set.mem_singleton_iff.mp hx]
+      show Φ (rhoZ q ζ σ (Φ.symm a)) = rhoZ q ζ' σ a
       have h1 : Φ.symm a = a := by rw [AlgEquiv.symm_apply_eq, ha, hΦc]
       rw [h1, ha, rhoZ_const, rhoZ_const, hΦc]
   intro f

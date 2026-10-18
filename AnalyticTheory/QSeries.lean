@@ -1,10 +1,13 @@
 import AnalyticTheory.RelationCoeffs
 import Mathlib.NumberTheory.TsumDivisorsAntidiagonal
+import ForMathlib.NumberTheory.LambertSeries
+import ForMathlib.Topology.Algebra.InfiniteSum.NonarchimedeanProd
 
 /-!
 # `q`-series in a complete ultrametric field
 
-Double series, geometric series and Lambert series: `Σₘ f(m) qᵐ/(1 − qᵐ) = Σₙ (Σ_{d ∣ n} f(d)) qⁿ`.
+Expansions of the terms of `℘`, `℘′` as `q`-series. The general facts used here (double series in
+non-archimedean groups, Lambert series) are in `ForMathlib`.
 -/
 
 open Filter Topology
@@ -14,101 +17,6 @@ namespace AnalyticTheory
 universe u
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-
-theorem summable_of_norm_le_tendsto {ι : Type*} {f : ι → K} {g : ι → ℝ}
-    (hfg : ∀ i, ‖f i‖ ≤ g i) (hg : Tendsto g cofinite (𝓝 0)) : Summable f := by
-  refine NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero ?_
-  rw [tendsto_zero_iff_norm_tendsto_zero]
-  exact squeeze_zero (fun i => norm_nonneg _) hfg hg
-
-theorem tendsto_pow_add_cofinite {s : ℝ} (hs0 : 0 ≤ s) (hs1 : s < 1) :
-    Tendsto (fun p : ℕ × ℕ => s ^ (p.1 + p.2)) cofinite (𝓝 0) := by
-  rw [Metric.tendsto_nhds]
-  intro ε hε
-  obtain ⟨N, hN⟩ := ((tendsto_pow_atTop_nhds_zero_of_lt_one hs0 hs1).eventually
-    (gt_mem_nhds hε)).exists_forall_of_atTop
-  rw [Filter.eventually_cofinite]
-  refine ((Set.finite_lt_nat N).prod (Set.finite_lt_nat N)).subset (fun p hp => ?_)
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, not_lt] at hp
-  rw [abs_of_nonneg (pow_nonneg hs0 _)] at hp
-  simp only [Set.mem_prod, Set.mem_setOf_eq]
-  by_contra h
-  have : N ≤ p.1 + p.2 := by
-    rcases not_and_or.mp h with h1 | h1 <;> push_neg at h1 <;> omega
-  exact absurd hp (not_le.mpr (hN _ this))
-
-/-- Interchange of a double series with terms tending to zero. -/
-theorem hasSum_double {f : ℕ × ℕ → K} (hf : Tendsto f cofinite (𝓝 0)) :
-    ∃ S : K, HasSum f S ∧ HasSum (fun n => ∑' m, f (n, m)) S ∧ HasSum (fun m => ∑' n, f (n, m)) S := by
-  have hs : Summable f := NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero hf
-  obtain ⟨S, hS⟩ := hs
-  have h1 : ∀ n, Summable (fun m => f (n, m)) := fun n =>
-    NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero
-      (hf.comp (Function.Injective.tendsto_cofinite (fun a b h => by simpa using h)))
-  have h2 : ∀ m, Summable (fun n => f (n, m)) := fun m =>
-    NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero
-      (hf.comp (Function.Injective.tendsto_cofinite (fun a b h => by simpa using h)))
-  refine ⟨S, hS, hS.prod_fiberwise (fun n => (h1 n).hasSum), ?_⟩
-  have hS' := (Equiv.prodComm ℕ ℕ).hasSum_iff.mpr hS
-  exact hS'.prod_fiberwise (fun m => (h2 m).hasSum)
-
-
-theorem hasSum_geometric_pnat {r : K} (hr : ‖r‖ < 1) :
-    HasSum (fun c : ℕ+ => r ^ (c : ℕ)) (r / (1 - r)) := by
-  have h := (hasSum_geometric_of_norm_lt_one hr).mul_left r
-  rw [← Equiv.pnatEquivNat.symm.hasSum_iff]
-  convert h using 1
-  · funext n; simp [Equiv.pnatEquivNat, pow_succ']
-  · rw [div_eq_mul_inv]
-
-/-- Lambert series: `Σₘ F(m) qᵐ/(1 − qᵐ) = Σₙ (Σ_{d ∣ n} F(d)) qⁿ`. -/
-theorem lambert {q : K} (hq1 : ‖q‖ < 1) (F : ℕ → K) (hF : ∀ d, ‖F d‖ ≤ 1) :
-    HasSum (fun m : ℕ+ => F m * (q ^ (m : ℕ) / (1 - q ^ (m : ℕ))))
-      (∑' n : ℕ+, (∑ d ∈ (n : ℕ).divisors, F d) * q ^ (n : ℕ)) := by
-  classical
-  set φ : ℕ+ × ℕ+ → K := fun p => F p.1 * q ^ ((p.1 : ℕ) * (p.2 : ℕ)) with hφ
-  have hq0 : 0 ≤ ‖q‖ := norm_nonneg q
-  have hsum : Summable φ := by
-    refine summable_of_norm_le_tendsto (g := fun p : ℕ+ × ℕ+ =>
-      ‖q‖ ^ (((p.1 : ℕ) - 1) + ((p.2 : ℕ) - 1))) (fun p => ?_) ?_
-    · rw [hφ]; simp only
-      rw [norm_mul, norm_pow]
-      have h1 : ((p.1 : ℕ) - 1) + ((p.2 : ℕ) - 1) ≤ (p.1 : ℕ) * (p.2 : ℕ) := by
-        obtain ⟨a, ha⟩ : ∃ a, (p.1 : ℕ) = a + 1 := ⟨(p.1 : ℕ) - 1, by have := p.1.pos; omega⟩
-        obtain ⟨b, hb⟩ : ∃ b, (p.2 : ℕ) = b + 1 := ⟨(p.2 : ℕ) - 1, by have := p.2.pos; omega⟩
-        rw [ha, hb]; simp only [Nat.add_sub_cancel]; nlinarith
-      calc ‖F p.1‖ * ‖q‖ ^ ((p.1 : ℕ) * (p.2 : ℕ)) ≤ 1 * ‖q‖ ^ ((p.1 : ℕ) * (p.2 : ℕ)) :=
-            mul_le_mul_of_nonneg_right (hF _) (pow_nonneg hq0 _)
-        _ ≤ _ := by rw [one_mul]; exact pow_le_pow_of_le_one hq0 hq1.le h1
-    · have hinj : Function.Injective (fun p : ℕ+ × ℕ+ => ((p.1 : ℕ) - 1, (p.2 : ℕ) - 1)) := by
-        intro a b h
-        simp only [Prod.mk.injEq] at h
-        obtain ⟨h1, h2⟩ := h
-        exact Prod.ext (PNat.eq (by have := a.1.pos; have := b.1.pos; omega))
-          (PNat.eq (by have := a.2.pos; have := b.2.pos; omega))
-      exact (tendsto_pow_add_cofinite hq0 hq1).comp hinj.tendsto_cofinite
-  obtain ⟨S, hS⟩ := hsum
-  have h1 : HasSum (fun m : ℕ+ => F m * (q ^ (m : ℕ) / (1 - q ^ (m : ℕ)))) S := by
-    refine hS.prod_fiberwise (fun d => ?_)
-    have hr : ‖q ^ (d : ℕ)‖ < 1 := by
-      rw [norm_pow]; exact pow_lt_one₀ hq0 hq1 (PNat.ne_zero d)
-    have := (hasSum_geometric_pnat hr).mul_left (F d)
-    convert this using 1
-    funext c; simp [hφ, pow_mul]
-  have h2 : HasSum (fun n : ℕ+ => (∑ d ∈ (n : ℕ).divisors, F d) * q ^ (n : ℕ)) S := by
-    have hS' := sigmaAntidiagonalEquivProd.hasSum_iff.mpr hS
-    refine hS'.sigma (fun n => ?_)
-    have := hasSum_fintype (fun x : {x // x ∈ (n : ℕ).divisorsAntidiagonal} =>
-      φ (sigmaAntidiagonalEquivProd ⟨n, x⟩))
-    convert this using 1
-    rw [Finset.sum_mul, ← Nat.sum_divisorsAntidiagonal (fun i _ => F i * q ^ (n : ℕ))]
-    rw [← Finset.sum_attach ((n : ℕ).divisorsAntidiagonal) (fun i => F i.1 * q ^ (n : ℕ))]
-    refine Finset.sum_congr rfl (fun x _ => ?_)
-    have hx := (Nat.mem_divisorsAntidiagonal.mp x.2).1
-    simp [hφ, sigmaAntidiagonalEquivProd, divisorsAntidiagonalFactors, hx]
-  rw [h2.tsum_eq]
-  exact h1
-
 
 section expansions
 
@@ -155,7 +63,7 @@ theorem hasSum_tW_pos {y : K} (hy : ‖y‖ = 1) :
   have hq0 : 0 ≤ ‖q‖ := norm_nonneg q
   have ht : Tendsto f cofinite (𝓝 0) := by
     rw [tendsto_zero_iff_norm_tendsto_zero]
-    refine squeeze_zero (fun p => norm_nonneg _) (fun p => ?_) (tendsto_pow_add_cofinite hq0 hq1)
+    refine squeeze_zero (fun p => norm_nonneg _) (fun p => ?_) (tendsto_pow_add_cofinite_zero hq0 hq1)
     rcases Nat.eq_zero_or_pos p.2 with h0 | h0
     · simp [hf, h0]
     · simp only [hf, norm_mul, norm_pow, hy, mul_one]
@@ -164,7 +72,7 @@ theorem hasSum_tW_pos {y : K} (hy : ‖y‖ = 1) :
         _ ≤ ‖q‖ ^ (p.1 + p.2) := by
             rw [one_mul, ← pow_mul]
             exact pow_le_pow_of_le_one hq0 hq1.le (by nlinarith)
-  obtain ⟨S, -, h1, h2⟩ := hasSum_double ht
+  obtain ⟨S, -, h1, h2⟩ := NonarchimedeanAddGroup.hasSum_prod_of_tendsto_cofinite_zero ht
   have e1 : ∀ n : ℕ, ∑' m, f (n, m) = tW q ((n : ℤ) + 1) y := by
     intro n
     have hr : ‖q ^ (n + 1) * y‖ < 1 := by
@@ -211,7 +119,7 @@ theorem hasSum_gen_pos (c : ℕ → K) (hc : ∀ j, ‖c j‖ ≤ 1) (hc0 : c 0 
   have hq0 : 0 ≤ ‖q‖ := norm_nonneg q
   have ht : Tendsto f cofinite (𝓝 0) := by
     rw [tendsto_zero_iff_norm_tendsto_zero]
-    refine squeeze_zero (fun p => norm_nonneg _) (fun p => ?_) (tendsto_pow_add_cofinite hq0 hq1)
+    refine squeeze_zero (fun p => norm_nonneg _) (fun p => ?_) (tendsto_pow_add_cofinite_zero hq0 hq1)
     rcases Nat.eq_zero_or_pos p.2 with h0 | h0
     · simp [hf, h0, hc0]
     · simp only [hf, norm_mul, norm_pow, hy, mul_one]
@@ -220,7 +128,7 @@ theorem hasSum_gen_pos (c : ℕ → K) (hc : ∀ j, ‖c j‖ ≤ 1) (hc0 : c 0 
         _ ≤ ‖q‖ ^ (p.1 + p.2) := by
             rw [one_mul, ← pow_mul]
             exact pow_le_pow_of_le_one hq0 hq1.le (by nlinarith)
-  obtain ⟨S, -, h1, h2⟩ := hasSum_double ht
+  obtain ⟨S, -, h1, h2⟩ := NonarchimedeanAddGroup.hasSum_prod_of_tendsto_cofinite_zero ht
   have e1 : ∀ n : ℕ, ∑' m, f (n, m) = g (q ^ (n + 1) * y) := by
     intro n
     have hr : ‖q ^ (n + 1) * y‖ < 1 := by
@@ -242,7 +150,7 @@ theorem hasSum_gen_pos (c : ℕ → K) (hc : ∀ j, ‖c j‖ ≤ 1) (hc0 : c 0 
 include hq1 in
 theorem summable_coeff_Qn (c : ℕ → K) (hc : ∀ j, ‖c j‖ ≤ 1) {y : K} (hy : ‖y‖ = 1) :
     Summable (fun j : ℕ => c j * Qn q j * y ^ j) := by
-  refine summable_of_norm_le_tendsto (g := fun j => ‖q‖ ^ j) (fun j => ?_)
+  refine IsUltrametricDist.summable_of_norm_le_of_tendsto (g := fun j => ‖q‖ ^ j) (fun j => ?_)
     (by simpa [Nat.cofinite_eq_atTop] using tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg q) hq1)
   rw [norm_mul, norm_mul, norm_pow, hy, one_pow, mul_one]
   calc ‖c j‖ * ‖Qn q j‖ ≤ 1 * ‖q‖ ^ j :=
@@ -382,7 +290,7 @@ theorem hasSum_binom_double (a : ℕ → K) (ha : ∀ m, ‖a m‖ ≤ ‖q‖ ^
   have hs1 : s < 1 := max_lt hq1 hh
   have ht : Tendsto f cofinite (𝓝 0) := by
     rw [tendsto_zero_iff_norm_tendsto_zero]
-    refine squeeze_zero (fun p => norm_nonneg _) (fun p => ?_) (tendsto_pow_add_cofinite hs0 hs1)
+    refine squeeze_zero (fun p => norm_nonneg _) (fun p => ?_) (tendsto_pow_add_cofinite_zero hs0 hs1)
     simp only [hf, norm_mul, norm_pow]
     have h1 : ‖(binomZ (e p.1) p.2 : K)‖ ≤ 1 := IsUltrametricDist.norm_intCast_le_one K _
     calc ‖a p.1‖ * ‖(binomZ (e p.1) p.2 : K)‖ * ‖h‖ ^ p.2 ≤ s ^ p.1 * 1 * s ^ p.2 := by
@@ -390,7 +298,7 @@ theorem hasSum_binom_double (a : ℕ → K) (ha : ∀ m, ‖a m‖ ≤ ‖q‖ ^
           · exact le_trans (ha _) (pow_le_pow_left₀ (norm_nonneg _) (le_max_left _ _) _)
           · exact le_max_right _ _
       _ = s ^ (p.1 + p.2) := by rw [mul_one, pow_add]
-  obtain ⟨S, -, h1, h2⟩ := hasSum_double ht
+  obtain ⟨S, -, h1, h2⟩ := NonarchimedeanAddGroup.hasSum_prod_of_tendsto_cofinite_zero ht
   have e1 : ∀ m : ℕ, ∑' k, f (m, k) = a m * (1 + h) ^ (e m) := by
     intro m
     have hb := hasSum_binom_expansion (x := (1 : K)) (y := h) (by simpa using hh) (e m)
@@ -409,7 +317,7 @@ theorem hasSum_binom_double (a : ℕ → K) (ha : ∀ m, ‖a m‖ ≤ ‖q‖ ^
 include hq1 in
 theorem summable_bounded_coeff (a : ℕ → K) (ha : ∀ m, ‖a m‖ ≤ ‖q‖ ^ m) (b : ℕ → K)
     (hb : ∀ m, ‖b m‖ ≤ 1) : Summable (fun m => a m * b m) := by
-  refine summable_of_norm_le_tendsto (g := fun j => ‖q‖ ^ j) (fun m => ?_)
+  refine IsUltrametricDist.summable_of_norm_le_of_tendsto (g := fun j => ‖q‖ ^ j) (fun m => ?_)
     (by simpa [Nat.cofinite_eq_atTop] using tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg q) hq1)
   rw [norm_mul]
   calc ‖a m‖ * ‖b m‖ ≤ ‖q‖ ^ m * 1 := mul_le_mul (ha m) (hb m) (norm_nonneg _) (by positivity)
@@ -546,7 +454,7 @@ include hq1 in
 theorem lambertZ (g : ℕ → ℤ) :
     HasSum (fun m : ℕ => (g m : K) * Qn q m)
       (∑' n : ℕ, ((∑ d ∈ n.divisors, g d : ℤ) : K) * q ^ n) := by
-  have hL := lambert hq1 (fun d => (g d : K)) (fun d => IsUltrametricDist.norm_intCast_le_one K _)
+  have hL := hasSum_lambert_pnat hq1 (fun d => (g d : K)) (fun d => IsUltrametricDist.norm_intCast_le_one K _)
   have hinj : Function.Injective (fun n : ℕ+ => (n : ℕ)) := PNat.coe_injective
   have hrange : ∀ x : ℕ, x ∉ Set.range (fun n : ℕ+ => (n : ℕ)) → x = 0 := by
     intro x hx

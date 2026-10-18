@@ -55,7 +55,6 @@ import AnalyticTheory.Delta5
 import AnalyticTheory.Delta6
 import AnalyticTheory.Delta7
 import AnalyticTheory.A1Invariance
-import AnalyticTheory.SqrtHensel
 import AnalyticTheory.Sec3VIII
 import AnalyticTheory.EllipticBasics
 import AnalyticTheory.A1Normal
@@ -69,6 +68,5 @@ import AnalyticTheory.A1LemmaA
 import AnalyticTheory.Lemma2
 import AnalyticTheory.Lemma2b
 import AnalyticTheory.FqDescent
-import AnalyticTheory.FieldExt
 import AnalyticTheory.Sec4
 import AnalyticTheory.buzzard

@@ -995,14 +995,14 @@ See the Lean proof of \texttt{anVal\_wpAlg\_one, anVal\_wpPrimeAlg\_one, anVal\_
 
 \begin{lemma}[$q$-expansions of $\wp$ and $\wp'$ near $X=1$]
 \label{lem:wp-q-expansions}
-\lean{AnalyticTheory.lambert, AnalyticTheory.lambertZ, AnalyticTheory.hasSum_sK, AnalyticTheory.Qn, AnalyticTheory.tW, AnalyticTheory.tPp, AnalyticTheory.hasSum_tW_int, AnalyticTheory.hasSum_tPp_int, AnalyticTheory.hasSum_binom_two, AnalyticTheory.rhoC, AnalyticTheory.piC, AnalyticTheory.hasSum_rhoC, AnalyticTheory.hasSum_piC, AnalyticTheory.norm_rhoC_le, AnalyticTheory.norm_piC_le, AnalyticTheory.rhoC_zero, AnalyticTheory.rhoC_one, AnalyticTheory.piC_zero}
+\lean{AnalyticTheory.lambertZ, AnalyticTheory.hasSum_sK, AnalyticTheory.Qn, AnalyticTheory.tW, AnalyticTheory.tPp, AnalyticTheory.hasSum_tW_int, AnalyticTheory.hasSum_tPp_int, AnalyticTheory.hasSum_binom_two, AnalyticTheory.rhoC, AnalyticTheory.piC, AnalyticTheory.hasSum_rhoC, AnalyticTheory.hasSum_piC, AnalyticTheory.norm_rhoC_le, AnalyticTheory.norm_piC_le, AnalyticTheory.rhoC_zero, AnalyticTheory.rhoC_one, AnalyticTheory.piC_zero}
 \uses{def:s-k, lem:binomial-expansion, prop:wp-construction}
 \leanok
 Lambert: $\sum_mF(m)\frac{q^m}{1-q^m}=\sum_n\big(\sum_{d\mid n}F(d)\big)q^n$, so $s_k=\sum_m m^kQ_m$ with $Q_m=q^m/(1-q^m)$. For $|y|=1$, $\wp(y)+2s_1=\frac{y}{(1-y)^2}+\sum_m mQ_m(y^m+y^{-m})$ and $\wp'(y)-s_1=\frac{y^2}{(1-y)^3}+\sum_mQ_m\big(\binom m2y^m-\binom{m+1}2y^{-m}\big)$; with $y=1+h$ the sums are power series $\sum_k\rho_kh^k$, $\sum_k\pi_kh^k$ with $|\rho_k|,|\pi_k|\le1$, $\rho_0=2s_1$, $\rho_1=0$, $\pi_0=-s_1$.
 \end{lemma}
 \begin{proof}
 \leanok
-See the Lean proof of \texttt{lambert, lambertZ, hasSum\_sK, Qn, tW, tPp, hasSum\_tW\_int, hasSum\_tPp\_int, hasSum\_binom\_two, rhoC, piC, hasSum\_rhoC, hasSum\_piC, norm\_rhoC\_le, norm\_piC\_le, rhoC\_zero, rhoC\_one, piC\_zero}.
+See the Lean proof of \texttt{lambertZ, hasSum\_sK, Qn, tW, tPp, hasSum\_tW\_int, hasSum\_tPp\_int, hasSum\_binom\_two, rhoC, piC, hasSum\_rhoC, hasSum\_piC, norm\_rhoC\_le, norm\_piC\_le, rhoC\_zero, rhoC\_one, piC\_zero}.
 \end{proof}
 
 \begin{proposition}[Generation of $L(n\mathfrak p_1)$ by $\wp^i\wp'^j$]
@@ -1161,14 +1161,14 @@ See the Lean proof of \texttt{remark3\_delta\_product, delta\_product\_core, cub
 
 \begin{theorem}[Theorem VIII (Hasse invariant of $F_K(q)$)]
 \label{thm:VIII}
-\lean{AnalyticTheory.thmVIII_hasse, AnalyticTheory.hasse_wp_trivial, AnalyticTheory.exists_sqrt_one_add_four, AnalyticTheory.invariants_of_equiv, AnalyticTheory.wpData, AnalyticTheory.jOfData_wp}
+\lean{AnalyticTheory.thmVIII_hasse, AnalyticTheory.hasse_wp_trivial, AnalyticTheory.squareEquiv_one_add_four, AnalyticTheory.invariants_of_equiv, AnalyticTheory.wpData, AnalyticTheory.jOfData_wp}
 \uses{thm:VII, def:hasse-invariant, lem:A1-independence, thm:VI, def:weierstrass-data}
 \leanok
 The Hasse invariant of $F_K(q)$ is trivial.
 \end{theorem}
 \begin{proof}
 \leanok
-See the Lean proof of \texttt{thmVIII\_hasse, hasse\_wp\_trivial, exists\_sqrt\_one\_add\_four, invariants\_of\_equiv, wpData, jOfData\_wp}.
+See the Lean proof of \texttt{thmVIII\_hasse, hasse\_wp\_trivial, squareEquiv\_one\_add\_four, invariants\_of\_equiv, wpData, jOfData\_wp}.
 \end{proof}
 
 \begin{theorem}[Theorem VIIIa]

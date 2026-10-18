@@ -3,7 +3,7 @@ import AnalyticTheory.A1Invariance
 import AnalyticTheory.A1Determine
 import AnalyticTheory.FqHomogeneous
 import AnalyticTheory.FqOrd
-import AnalyticTheory.SqrtHensel
+import ForMathlib.Analysis.Normed.Field.SqrtOneAddFour
 import AnalyticTheory.FqStructure
 
 /-!
@@ -94,7 +94,7 @@ theorem norm_four_mul_lt {s : K} (hs : ‖s‖ < 1) : ‖(4 : K) * s‖ < 1 := b
 /-- `1 + 4s` is a non-zero square for `‖s‖ < 1` (`char K ≠ 2`). -/
 theorem squareEquiv_one_add_four (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) :
     SquareEquiv (1 + 4 * s) 1 := by
-  obtain ⟨r, hr⟩ := exists_sqrt_one_add_four h2 hs
+  obtain ⟨r, hr⟩ := IsUltrametricDist.exists_sq_eq_one_add_four_mul h2 hs
   have hne : 1 + 4 * s ≠ 0 := by
     intro h
     have h1 : 4 * s = -1 := by linear_combination h

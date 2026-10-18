@@ -20,6 +20,7 @@ progress is traced by the Lean blueprint in `blueprint/`.
 | `AnalyticTheory/Isogeny.lean` | §6: commensurable periods, Theorems XVII–XIX, isogenies, CM |
 | `AnalyticTheory/FunctionField.lean` | prime divisors, divisors, Riemann–Roch spaces, genus |
 | `AnalyticTheory/Remarks.lean` | §2, additional remarks 1–2 |
+| `ForMathlib/` | general results not in Mathlib, independent of `AnalyticTheory` (see `ForMathlib/README.md`) |
 | `blueprint/src/content.tex` | the blueprint (generated, see below) |
 | `blueprint/tools/` | generator and consistency checker for the blueprint |
 
@@ -123,7 +124,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   characteristic (`Delta1`–`Delta7.lean`: 2-torsion points, Euler identity, case `char ≠ 2`, `√q ∈ K`,
   then universality via integer power series and `ℚ₂`).
 * §3: **Theorems VIII and VIIIa**, the uniqueness theorem of Appendix A1 and the invariance of `j`,
-  `γ` under change of Weierstraß datum (`Sec3VIII.lean`, `SqrtHensel.lean`, `EllipticBasics.lean`,
+  `γ` under change of Weierstraß datum (`Sec3VIII.lean`, `ForMathlib/Analysis/Normed/Field/SqrtOneAddFour.lean`, `EllipticBasics.lean`,
   `A1Normal/Transfer/Classify/Unique/Determine/Invariance.lean`, `FqHomogeneous.lean`, `FqOrd.lean`).
   Prime divisors as valuation rings, `dim L(n𝔭) = n`, Weierstraß data at a prime `𝔭` (`x ∈ L(2𝔭)`,
   `y ∈ L(3𝔭)`), change of variables through Mathlib's `WeierstrassCurve.VariableChange` and normal forms,
@@ -131,7 +132,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   dependency chain; `#print axioms` shows only `propext`, `Classical.choice`, `Quot.sound`).
 * Appendix A1: Lemma A (`A1LemmaA.lean`), independence and uniqueness of Weierstraß data, homogeneity
   of `F_K(q)` under translations (`FqHomogeneous.lean`); existence of `A` and general homogeneity remain.
-* §4, pragmatic form (`Lemma2.lean`, `Lemma2b.lean`, `FieldExt.lean`, `FqDescent.lean`, `Sec4.lean`):
+* §4, pragmatic form (`Lemma2.lean`, `Lemma2b.lean`, `ForMathlib/FieldTheory/ExtendRingEquiv.lean`, `FqDescent.lean`, `Sec4.lean`):
   Lemma 2 (`H¹(G, L^×/q) ≅ Ĝ(q)`), Galois descent of `F_L(q)` along the twisted action
   `ρ_σ = τ_{ζ(σ)}σ`, the model fields `E_ζ`, their classification up to `K`-isomorphism by
   `e_q(ζ)^{±1}` (model Theorem IX), `E_ζ` is split by `L`, and the model Theorem XI

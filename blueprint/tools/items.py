@@ -411,7 +411,7 @@ _upd('def:theta-M', text=r'The function $\Theta$, which is holomorphic on $\Omeg
 _upd('def:wp', text=r'$\wp(X)=\sum_{n\in\mathbb Z}\frac{q^nX}{(1-q^nX)^2}-2s_1$ (new definition of \S3), the element of $M_K$ with these values; $\wp=-D\zeta-2s_1$.')
 _addlean('def:wp', 'EvalsTo', 'wp_eq_neg_D_zeta')
 _addlean('def:wp', 'GP_eq', 'Th_eq_theta')
-_addlean('thm:VIII', 'hasse_wp_trivial', 'exists_sqrt_one_add_four', 'invariants_of_equiv', 'wpData', 'jOfData_wp')
+_addlean('thm:VIII', 'hasse_wp_trivial', 'squareEquiv_one_add_four', 'invariants_of_equiv', 'wpData', 'jOfData_wp')
 _adduses('thm:VIII', 'lem:A1-independence', 'thm:VI', 'def:weierstrass-data')
 _addlean('thm:VIIIa', 'thmVIIIa_period_unique', 'fq_hasPrime')
 _adduses('thm:VIIIa', 'lem:A1-independence', 'thm:A-uniqueness', 'thm:fq-elliptic')
@@ -624,7 +624,7 @@ add('proposition', 'prop:wp-structural-relation', 'Structure of the cubic relati
     ['prop:wp-generation', 'def:reflection'], False,
     r'$\wp\circ\varepsilon=\wp$ and $\wp'+"'"+r'\circ\varepsilon=-\wp'+"'"+r'-\wp$. Since $\wp'+"'"+r'^2+\wp\wp'+"'"+r'-\wp^3\in L(5\mathfrak p_1)$ is $\varepsilon$-invariant, there are $A,B,C\in K$ with $\wp'+"'"+r'^2+\wp\wp'+"'"+r'=\wp^3+A\wp^2+B\wp+C$; the relation also holds pointwise at every $x$ with $\Theta(x)\neq0$.')
 add('lemma', 'lem:wp-q-expansions', '$q$-expansions of $\\wp$ and $\\wp\'$ near $X=1$',
-    ['lambert', 'lambertZ', 'hasSum_sK', 'Qn', 'tW', 'tPp', 'hasSum_tW_int', 'hasSum_tPp_int', 'hasSum_binom_two',
+    ['lambertZ', 'hasSum_sK', 'Qn', 'tW', 'tPp', 'hasSum_tW_int', 'hasSum_tPp_int', 'hasSum_binom_two',
      'rhoC', 'piC', 'hasSum_rhoC', 'hasSum_piC', 'norm_rhoC_le', 'norm_piC_le', 'rhoC_zero', 'rhoC_one', 'piC_zero'],
     ['def:s-k', 'lem:binomial-expansion', 'prop:wp-construction'], False,
     r'Lambert: $\sum_mF(m)\frac{q^m}{1-q^m}=\sum_n\big(\sum_{d\mid n}F(d)\big)q^n$, so $s_k=\sum_m m^kQ_m$ with $Q_m=q^m/(1-q^m)$. For $|y|=1$, $\wp(y)+2s_1=\frac{y}{(1-y)^2}+\sum_m mQ_m(y^m+y^{-m})$ and $\wp'+"'"+r'(y)-s_1=\frac{y^2}{(1-y)^3}+\sum_mQ_m\big(\binom m2y^m-\binom{m+1}2y^{-m}\big)$; with $y=1+h$ the sums are power series $\sum_k\rho_kh^k$, $\sum_k\pi_kh^k$ with $|\rho_k|,|\pi_k|\le1$, $\rho_0=2s_1$, $\rho_1=0$, $\pi_0=-s_1$.')

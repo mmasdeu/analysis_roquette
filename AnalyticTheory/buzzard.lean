@@ -1,5 +1,8 @@
 import AnalyticTheory.TheoremVI
 import AnalyticTheory.Sec3VII
+import ForMathlib.Algebra.Polynomial.LaurentRoots
+import ForMathlib.NumberTheory.LambertSeries
+import ForMathlib.RingTheory.PowerSeries.TsumEval
 
 /-!
 # Buzzard's identity for the Tate curve
@@ -103,142 +106,23 @@ theorem ι_injective : Function.Injective ι := fun _ _ h => Subtype.ext h
 theorem norm_ι_le (z : ℤ_[3]) : ‖ι z‖ ≤ 1 := by
   rw [show ι z = (z : ℚ_[3]) from rfl, PadicInt.padic_norm_e_of_padicInt]; exact PadicInt.norm_le_one z
 
-/-- Evaluation of a power series over `ℤ₃` at `q ∈ ℚ₃`. -/
-def evalP (q : ℚ_[3]) (f : PowerSeries ℤ_[3]) : ℚ_[3] :=
-  ∑' k : ℕ, ι (PowerSeries.coeff k f) * q ^ k
+/-- Evaluation of a power series over `ℤ₃` at `q ∈ ℚ₃` (`PowerSeries.tsumEval`, `ForMathlib`). -/
+abbrev evalP (q : ℚ_[3]) (f : PowerSeries ℤ_[3]) : ℚ_[3] := PowerSeries.tsumEval ι q f
 
-section evalP
-
-variable {q : ℚ_[3]} (hq : ‖q‖ < 1)
-
-theorem norm_termP (c : ℕ → ℤ_[3]) (k : ℕ) : ‖ι (c k) * q ^ k‖ ≤ ‖q‖ ^ k := by
-  rw [norm_mul, norm_pow]
-  exact mul_le_of_le_one_left (by positivity) (norm_ι_le _)
-
-include hq in
-theorem summable_normP (c : ℕ → ℤ_[3]) : Summable (fun k : ℕ => ‖ι (c k) * q ^ k‖) :=
-  Summable.of_nonneg_of_le (fun _ => norm_nonneg _) (norm_termP c)
-    (summable_geometric_of_lt_one (norm_nonneg _) hq)
-
-include hq in
-theorem evalP_mul (f g : PowerSeries ℤ_[3]) : evalP q (f * g) = evalP q f * evalP q g := by
-  unfold evalP
-  rw [tsum_mul_tsum_eq_tsum_sum_antidiagonal_of_summable_norm
-    (summable_normP hq (fun k => PowerSeries.coeff k f))
-    (summable_normP hq (fun k => PowerSeries.coeff k g))]
-  refine tsum_congr (fun n => ?_)
-  rw [PowerSeries.coeff_mul, map_sum, Finset.sum_mul]
-  refine Finset.sum_congr rfl (fun p hp => ?_)
-  rw [Finset.mem_antidiagonal] at hp
-  rw [← hp, pow_add, map_mul]; ring
-
-include hq in
-theorem evalP_add (f g : PowerSeries ℤ_[3]) : evalP q (f + g) = evalP q f + evalP q g := by
-  unfold evalP
-  rw [← Summable.tsum_add (summable_normP hq (fun k => PowerSeries.coeff k f)).of_norm
-    (summable_normP hq (fun k => PowerSeries.coeff k g)).of_norm]
-  refine tsum_congr (fun n => ?_)
-  rw [map_add, map_add, add_mul]
-
-theorem evalP_C (r : ℤ_[3]) : evalP q (PowerSeries.C r) = ι r := by
-  unfold evalP
-  rw [tsum_eq_single 0]
-  · simp
-  · intro n hn; simp [PowerSeries.coeff_C, hn]
-
-include hq in
-/-- Evaluation as a ring homomorphism. -/
-def evalPHom : PowerSeries ℤ_[3] →+* ℚ_[3] where
-  toFun := evalP q
-  map_one' := by simpa using evalP_C (q := q) 1
-  map_mul' := evalP_mul hq
-  map_zero' := by simp [evalP]
-  map_add' := evalP_add hq
-
-include hq in
-theorem norm_evalP_tail {F : PowerSeries ℤ_[3]} {N : ℕ} (hF : ∀ k ≤ N, PowerSeries.coeff k F = 0) :
-    ‖evalP q F‖ ≤ ‖q‖ ^ (N + 1) := by
-  have hs := (summable_normP hq (fun k => PowerSeries.coeff k F)).of_norm
-  refine AnalyticTheory.hasSum_norm_le hs.hasSum (pow_nonneg (norm_nonneg _) _) (fun k => ?_)
-  by_cases hk : k ≤ N
-  · rw [hF k hk]; simp
-  · exact (norm_termP (fun k => PowerSeries.coeff k F) k).trans (pow_le_pow_of_le_one (norm_nonneg _) hq.le (show N + 1 ≤ k by omega))
-
-end evalP
+theorem evalP_C (q : ℚ_[3]) (r : ℤ_[3]) : evalP q (PowerSeries.C r) = ι r :=
+  PowerSeries.tsumEval_C ι r
 
 theorem norm_three : ‖(3 : ℚ_[3])‖ = 3⁻¹ := by simpa using Padic.norm_p (p := 3)
 
-/-- A power series over `ℤ₃` vanishing at all `q = 3ᵏ`, `k ≥ 1`, is zero. -/
+/-- A power series over `ℤ₃` vanishing at all `q = 3ᵏ`, `k ≥ 1`, is zero (identity principle
+`PowerSeries.eq_zero_of_tsumEval_eq_zero`). -/
 theorem eq_zero_of_evalP {F : PowerSeries ℤ_[3]}
     (hF : ∀ k : ℕ, 1 ≤ k → evalP ((3 : ℚ_[3]) ^ k) F = 0) : F = 0 := by
-  by_contra hne
-  have hex : ∃ n, PowerSeries.coeff n F ≠ 0 := by
-    by_contra h; push_neg at h; exact hne (PowerSeries.ext fun n => by simpa using h n)
-  classical
-  let m := Nat.find hex
-  have hm : PowerSeries.coeff m F ≠ 0 := Nat.find_spec hex
-  have hlt : ∀ k < m, PowerSeries.coeff k F = 0 := fun k hk => by
-    have := Nat.find_min hex hk; push_neg at this; exact this
-  have hg : 0 < ‖ι (PowerSeries.coeff m F)‖ := by
-    exact norm_pos_iff.mpr (fun h => hm (ι_injective (by rw [h, map_zero])))
-  obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one hg (show (3 : ℝ)⁻¹ < 1 by norm_num)
-  set q : ℚ_[3] := 3 ^ (k + 1) with hqdef
-  have hqn : ‖q‖ = (3 : ℝ)⁻¹ ^ (k + 1) := by rw [hqdef, norm_pow, norm_three]
-  have hq1 : ‖q‖ < 1 := by
-    rw [hqn]; exact pow_lt_one₀ (by positivity) (by norm_num) (by omega)
-  have hqk : ‖q‖ < ‖ι (PowerSeries.coeff m F)‖ := by
-    rw [hqn]
-    exact lt_of_le_of_lt (pow_le_pow_of_le_one (by positivity) (by norm_num) (by omega)) hk
-  have hsplit : F = PowerSeries.C (PowerSeries.coeff m F) * PowerSeries.X ^ m +
-      (F - PowerSeries.C (PowerSeries.coeff m F) * PowerSeries.X ^ m) := by ring
-  have hX : evalP q PowerSeries.X = q := by
-    unfold evalP
-    rw [tsum_eq_single 1]
-    · simp
-    · intro n hn; simp [PowerSeries.coeff_X, hn]
-  have hmain : evalP q (PowerSeries.C (PowerSeries.coeff m F) * PowerSeries.X ^ m) =
-      ι (PowerSeries.coeff m F) * q ^ m := by
-    have := map_pow (evalPHom hq1) PowerSeries.X m
-    rw [evalP_mul hq1, evalP_C]
-    exact congrArg _ (by simpa [evalPHom, hX] using this)
-  have htail : ‖evalP q (F - PowerSeries.C (PowerSeries.coeff m F) * PowerSeries.X ^ m)‖ ≤
-      ‖q‖ ^ (m + 1) := by
-    refine norm_evalP_tail hq1 (fun j hj => ?_)
-    rw [map_sub, PowerSeries.coeff_C_mul, PowerSeries.coeff_X_pow]
-    rcases lt_or_eq_of_le hj with h | h
-    · rw [hlt j h, if_neg (by omega)]; simp
-    · subst h; simp
-  have h0 := hF (k + 1) (by omega)
-  rw [← hqdef, hsplit, evalP_add hq1, hmain] at h0
-  have h1 : ‖ι (PowerSeries.coeff m F) * q ^ m‖ =
-      ‖evalP q (F - PowerSeries.C (PowerSeries.coeff m F) * PowerSeries.X ^ m)‖ := by
-    rw [eq_neg_of_add_eq_zero_left h0, norm_neg]
-  rw [norm_mul, norm_pow] at h1
-  have h2 : ‖q‖ ^ (m + 1) < ‖ι (PowerSeries.coeff m F)‖ * ‖q‖ ^ m := by
-    rw [pow_succ, mul_comm (‖q‖ ^ m)]
-    exact mul_lt_mul_of_pos_right hqk (pow_pos (by rw [hqn]; positivity) m)
-  linarith
-
-/-- Lambert series with coefficients in `K`, summed over `ℕ`. -/
-theorem lambertK {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    {q : K} (hq1 : ‖q‖ < 1) (F : ℕ → K) (hF : ∀ d, ‖F d‖ ≤ 1) :
-    HasSum (fun m : ℕ => F m * AnalyticTheory.Qn q m)
-      (∑' n : ℕ, (∑ d ∈ n.divisors, F d) * q ^ n) := by
-  have hL := AnalyticTheory.lambert hq1 F hF
-  have hinj : Function.Injective (fun n : ℕ+ => (n : ℕ)) := PNat.coe_injective
-  have hrange : ∀ x : ℕ, x ∉ Set.range (fun n : ℕ+ => (n : ℕ)) → x = 0 := by
-    intro x hx
-    by_contra h0
-    exact hx ⟨⟨x, Nat.pos_of_ne_zero h0⟩, rfl⟩
-  have e1 : ∑' n : ℕ+, (∑ d ∈ (n : ℕ).divisors, F d) * q ^ (n : ℕ) =
-      ∑' n : ℕ, (∑ d ∈ n.divisors, F d) * q ^ n := by
-    rw [← hinj.tsum_eq (f := fun n : ℕ => (∑ d ∈ n.divisors, F d) * q ^ n)]
-    intro x hx
-    by_contra h
-    exact hx (by rw [hrange x h]; simp)
-  rw [← e1]
-  refine (hinj.hasSum_iff (f := fun m : ℕ => F m * AnalyticTheory.Qn q m) (fun x hx => ?_)).mp hL
-  rw [hrange x hx]; simp only [AnalyticTheory.Qn_zero, mul_zero]
+  refine PowerSeries.eq_zero_of_tsumEval_eq_zero ι norm_ι_le ι_injective
+    (u := fun n => (3 : ℚ_[3]) ^ (n + 1)) (fun n => pow_ne_zero _ three_ne_zero) ?_
+    (fun n => hF (n + 1) (by omega))
+  exact (tendsto_pow_atTop_nhds_zero_of_norm_lt_one (by rw [norm_three]; norm_num)).comp
+    (tendsto_add_atTop_nat 1)
 
 /-! ### Step 2 (cont.): evaluating the integral identity at a unit `y ∈ ℤ₃^×` -/
 
@@ -270,7 +154,8 @@ theorem coe_inv_unit : (((y⁻¹ : ℤ_[3]ˣ) : ℤ_[3]) : ℚ_[3]) = (yK y)⁻�
   rw [yK, ← PadicInt.coe_mul, Units.inv_mul, PadicInt.coe_one]
 
 theorem summable_coeffP {q : ℚ_[3]} (hq : ‖q‖ < 1) (c : ℕ → ℤ_[3]) :
-    Summable (fun n : ℕ => ι (c n) * q ^ n) := (summable_normP hq c).of_norm
+    Summable (fun n : ℕ => ι (c n) * q ^ n) :=
+  (PowerSeries.summable_norm_coeff_mul_pow ι norm_ι_le hq c).of_norm
 
 variable {y}
 
@@ -298,7 +183,7 @@ theorem evalP_XI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     simp only [hterm]
     exact (hasSum_ite_eq 0 (yK y)).add (hS.hasSum.mul_left _)
   have hFb : ∀ d, ‖F d‖ ≤ 1 := fun d => norm_ι_le _
-  have hL := lambertK hq1 F hFb
+  have hL : HasSum (fun m : ℕ => F m * Qn q m) _ := hasSum_lambert hq1 F hFb
   have hs1 := hasSum_sK (K := ℚ_[3]) hq1 1
   have hsw : SW q (yK y) - 2 * sK ℚ_[3] 1 q =
       yK y / (1 - yK y) ^ 2 + ∑' n : ℕ, (∑ d ∈ n.divisors, F d) * q ^ n := by
@@ -309,7 +194,7 @@ theorem evalP_XI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     rw [e] at h2
     rw [SW, h2.tsum_eq]; ring
   have hne : (1 - yK y) ≠ 0 := sub_ne_zero.mpr (Ne.symm hy1)
-  rw [evalP, h1.tsum_eq, hsw]
+  rw [evalP, PowerSeries.tsumEval, h1.tsum_eq, hsw]
   field_simp
 
 open AnalyticTheory in
@@ -339,7 +224,7 @@ theorem evalP_YI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     simp only [hterm]
     exact (hasSum_ite_eq 0 (yK y ^ 2)).add (hS.hasSum.mul_left _)
   have hFb : ∀ d, ‖F d‖ ≤ 1 := fun d => norm_ι_le _
-  have hL := lambertK hq1 F hFb
+  have hL : HasSum (fun m : ℕ => F m * Qn q m) _ := hasSum_lambert hq1 F hFb
   have hs1 := hasSum_sK (K := ℚ_[3]) hq1 1
   have hsp : SP q (yK y) + sK ℚ_[3] 1 q =
       yK y ^ 2 / (1 - yK y) ^ 3 + ∑' n : ℕ, (∑ d ∈ n.divisors, F d) * q ^ n := by
@@ -351,13 +236,13 @@ theorem evalP_YI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     rw [e] at h2
     rw [SP, h2.tsum_eq, ← hs1.tsum_eq]; ring
   have hne : (1 - yK y) ≠ 0 := sub_ne_zero.mpr (Ne.symm hy1)
-  rw [evalP, h1.tsum_eq, hsp]
+  rw [evalP, PowerSeries.tsumEval, h1.tsum_eq, hsp]
   field_simp
 
 theorem evalP_map_int (f : PowerSeries ℤ) (q : ℚ_[3]) :
     evalP q (PowerSeries.map (E y) (PowerSeries.map (Int.castRingHom R) f)) =
       AnalyticTheory.evalZ q f := by
-  unfold evalP AnalyticTheory.evalZ
+  unfold evalP PowerSeries.tsumEval AnalyticTheory.evalZ
   refine tsum_congr (fun n => ?_)
   rw [PowerSeries.coeff_map, PowerSeries.coeff_map]
   simp
@@ -369,7 +254,8 @@ theorem map_E_GI (hy1 : yK y ≠ 1) : PowerSeries.map (E y) GI = 0 := by
   have hqn : ‖q‖ = (3 : ℝ)⁻¹ ^ k := by rw [hqdef, norm_pow, norm_three]
   have hq0 : 0 < ‖q‖ := by rw [hqn]; positivity
   have hq1 : ‖q‖ < 1 := by rw [hqn]; exact pow_lt_one₀ (by positivity) (by norm_num) (by omega)
-  have key : ∀ f : PowerSeries ℤ_[3], evalPHom hq1 f = evalP q f := fun _ => rfl
+  have key : ∀ f : PowerSeries ℤ_[3], PowerSeries.tsumEvalHom ι norm_ι_le hq1 f = evalP q f :=
+    fun _ => rfl
   have hG : PowerSeries.map (E y) GI = PowerSeries.map (E y) YI ^ 2 +
       PowerSeries.C (1 - (y : ℤ_[3])) * PowerSeries.map (E y) XI * PowerSeries.map (E y) YI -
       PowerSeries.map (E y) XI ^ 3 -
@@ -402,32 +288,26 @@ theorem isUnit_three_mul_add_two (k : ℕ) : IsUnit (((3 * k + 2 : ℤ) : ℤ) :
 theorem GI_eq_zero : GI = 0 := by
   refine PowerSeries.ext (fun N => ?_)
   rw [map_zero]
-  set g := PowerSeries.coeff N GI
-  obtain ⟨n, f', hf'⟩ := exists_T_pow g
-  have hroot : ∀ k : ℕ, f'.eval (3 * k + 2 : ℤ) = 0 := by
-    intro k
-    set y : ℤ_[3]ˣ := (isUnit_three_mul_add_two k).unit with hydef
-    have hy : (y : ℤ_[3]) = ((3 * k + 2 : ℤ) : ℤ_[3]) := IsUnit.unit_spec _
-    have hy1 : yK y ≠ 1 := by
-      intro h
-      have h' : ((3 * k + 2 : ℤ) : ℤ_[3]) = ((1 : ℤ) : ℤ_[3]) := by
-        rw [← hy]; exact Subtype.ext (by simpa using h)
-      have := Int.cast_injective h'
-      omega
-    have h0 : E y g = 0 := by
-      have := congrArg (PowerSeries.coeff N) (map_E_GI hy1)
-      rwa [PowerSeries.coeff_map, map_zero] at this
-    have h1 := congrArg (E y) hf'
-    rw [map_mul, h0, zero_mul, E, eval₂_toLaurent, hy, ← eq_intCast (Int.castRingHom ℤ_[3]),
-      Polynomial.eval₂_hom] at h1
-    simpa using h1
-  have hf0 : f' = 0 := by
-    refine Polynomial.eq_zero_of_infinite_isRoot f' ?_
-    refine Set.infinite_of_injective_forall_mem (f := fun k : ℕ => (3 * k + 2 : ℤ)) ?_ ?_
-    · intro a b h; simp only at h; omega
-    · intro k; exact hroot k
-  rw [hf0, map_zero] at hf'
-  exact ((isUnit_T (n : ℤ)).mul_left_eq_zero).mp hf'.symm
+  let y : ℕ → ℤ_[3]ˣ := fun k => (isUnit_three_mul_add_two k).unit
+  have hy : ∀ k, (y k : ℤ_[3]) = ((3 * k + 2 : ℤ) : ℤ_[3]) := fun k => IsUnit.unit_spec _
+  have hinj : Function.Injective y := by
+    intro a b h
+    have h' := congrArg (fun z : ℤ_[3]ˣ => (z : ℤ_[3])) h
+    simp only [hy] at h'
+    have := Int.cast_injective h'
+    omega
+  refine LaurentPolynomial.eq_zero_of_infinite_eval₂_eq_zero (Int.castRingHom ℤ_[3])
+    Int.cast_injective _ (Set.infinite_range_of_injective hinj) ?_
+  rintro _ ⟨k, rfl⟩
+  have hy1 : yK (y k) ≠ 1 := by
+    intro h
+    have h' : ((3 * k + 2 : ℤ) : ℤ_[3]) = ((1 : ℤ) : ℤ_[3]) := by
+      rw [← hy]; exact Subtype.ext (by simpa using h)
+    have := Int.cast_injective h'
+    omega
+  have := congrArg (PowerSeries.coeff N) (map_E_GI hy1)
+  rw [PowerSeries.coeff_map, map_zero] at this
+  exact this
 
 /-! ### From `ℤ[T,T⁻¹]` to `ℚ(u)` -/
 

@@ -1,28 +1,37 @@
-import Mathlib
+import Mathlib.Analysis.Normed.Ring.Ultra
+import Mathlib.Analysis.SpecificLimits.Normed
 
 /-!
 # Square roots of `1 + 4s` in complete ultrametric fields
 
-For `char K ≠ 2` and `‖s‖ < 1` the element `1 + 4s` is a square: Newton iteration
-`u₀ = 1`, `u_{i+1} = u_i + ½(v/u_i − u_i)` (book, proof of Theorem VIII).
+Let `K` be a complete field with an ultrametric absolute value and `2 ≠ 0` in `K`. For `‖s‖ < 1`
+the element `1 + 4s` is a square in `K`. The square root is the limit of the Newton iteration
+`u₀ = 1`, `u_{i+1} = (u_i + v/u_i)/2`, which converges quadratically:
+`‖u_i² − v‖ ≤ ‖4‖ ‖s‖^{2^i}`.
+
+This is the analogue, for an arbitrary complete non-archimedean field (possibly of residue
+characteristic `2`), of the statement that units congruent to `1` modulo `4` are squares in `ℤ₂`.
+
+## Main results
+
+* `IsUltrametricDist.exists_sq_eq_one_add_four_mul`: `∃ u, u² = 1 + 4s`.
 -/
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace IsUltrametricDist
 
-universe u
-
-variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
 /-- Newton step for `u² = v`. -/
-noncomputable def newtonSeq (v : K) : ℕ → K
+noncomputable def sqrtNewtonSeq (v : K) : ℕ → K
   | 0 => 1
-  | i + 1 => (newtonSeq v i + v / newtonSeq v i) / 2
+  | i + 1 => (sqrtNewtonSeq v i + v / sqrtNewtonSeq v i) / 2
 
-theorem newtonSeq_inv (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) (i : ℕ) :
-    ‖newtonSeq (1 + 4 * s) i‖ = 1 ∧
-      ‖newtonSeq (1 + 4 * s) i ^ 2 - (1 + 4 * s)‖ ≤ ‖(4 : K)‖ * ‖s‖ ^ 2 ^ i := by
+omit [CompleteSpace K] in
+theorem sqrtNewtonSeq_inv (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) (i : ℕ) :
+    ‖sqrtNewtonSeq (1 + 4 * s) i‖ = 1 ∧
+      ‖sqrtNewtonSeq (1 + 4 * s) i ^ 2 - (1 + 4 * s)‖ ≤ ‖(4 : K)‖ * ‖s‖ ^ 2 ^ i := by
   have h4 : (4 : K) ≠ 0 := by
     have : (4 : K) = 2 * 2 := by norm_num
     rw [this]; exact mul_ne_zero h2 h2
@@ -33,16 +42,16 @@ theorem newtonSeq_inv (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) (i : ℕ) 
     simpa using IsUltrametricDist.norm_natCast_le_one K 2
   induction i with
   | zero =>
-    refine ⟨by simp [newtonSeq], ?_⟩
-    simp only [newtonSeq, one_pow, pow_zero, pow_one]
+    refine ⟨by simp [sqrtNewtonSeq], ?_⟩
+    simp only [sqrtNewtonSeq, one_pow, pow_zero, pow_one]
     have : (1 : K) - (1 + 4 * s) = -(4 * s) := by ring
     rw [this, norm_neg, norm_mul]
   | succ i ih =>
     obtain ⟨hu, hd⟩ := ih
-    set u := newtonSeq (1 + 4 * s) i with hudef
+    set u := sqrtNewtonSeq (1 + 4 * s) i with hudef
     set v : K := 1 + 4 * s with hv
     have hu0 : u ≠ 0 := norm_pos_iff.mp (by rw [hu]; exact one_pos)
-    have hnext : newtonSeq (1 + 4 * s) (i + 1) = (u + v / u) / 2 := rfl
+    have hnext : sqrtNewtonSeq (1 + 4 * s) (i + 1) = (u + v / u) / 2 := rfl
     have hdiff : (u + v / u) / 2 - u = -((u ^ 2 - v) / (2 * u)) := by
       field_simp; ring
     have hdn : ‖(u ^ 2 - v) / (2 * u)‖ ≤ ‖(2 : K)‖ * ‖s‖ ^ 2 ^ i := by
@@ -78,19 +87,21 @@ theorem newtonSeq_inv (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) (i : ℕ) 
         have e : ‖s‖ ^ 2 ^ (i + 1) = (‖s‖ ^ 2 ^ i) ^ 2 := by rw [pow_succ, pow_mul]
         rw [e]; ring
 
-theorem exists_sqrt_one_add_four (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) :
+theorem exists_sq_eq_one_add_four_mul (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) :
     ∃ r : K, r ^ 2 = 1 + 4 * s := by
   have h2n : 0 < ‖(2 : K)‖ := norm_pos_iff.mpr h2
   have h2le : ‖(2 : K)‖ ≤ 1 := by simpa using IsUltrametricDist.norm_natCast_le_one K 2
-  have hstep : ∀ i, dist (newtonSeq (1 + 4 * s) i) (newtonSeq (1 + 4 * s) (i + 1)) ≤ ‖s‖ ^ i := by
+  have hstep : ∀ i, dist (sqrtNewtonSeq (1 + 4 * s) i) (sqrtNewtonSeq (1 + 4 * s) (i + 1)) ≤
+      ‖s‖ ^ i := by
     intro i
-    obtain ⟨hu, hd⟩ := newtonSeq_inv h2 hs i
-    set u := newtonSeq (1 + 4 * s) i
+    obtain ⟨hu, hd⟩ := sqrtNewtonSeq_inv h2 hs i
+    set u := sqrtNewtonSeq (1 + 4 * s) i
     have hu0 : u ≠ 0 := norm_pos_iff.mp (by rw [hu]; exact one_pos)
     have hdiff : u - (u + (1 + 4 * s) / u) / 2 = (u ^ 2 - (1 + 4 * s)) / (2 * u) := by
       field_simp; ring
     rw [dist_eq_norm]
-    rw [show newtonSeq (1 + 4 * s) (i + 1) = (u + (1 + 4 * s) / u) / 2 from rfl, hdiff, norm_div,
+    rw [show sqrtNewtonSeq (1 + 4 * s) (i + 1) = (u + (1 + 4 * s) / u) / 2 from rfl, hdiff,
+      norm_div,
       norm_mul, hu, mul_one, div_le_iff₀ h2n]
     have h4' : ‖(4 : K)‖ = ‖(2 : K)‖ ^ 2 := by rw [← norm_pow]; norm_num
     calc ‖u ^ 2 - (1 + 4 * s)‖ ≤ ‖(4 : K)‖ * ‖s‖ ^ 2 ^ i := hd
@@ -100,18 +111,18 @@ theorem exists_sqrt_one_add_four (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1)
         exact mul_le_mul h2le (pow_le_pow_of_le_one (norm_nonneg _) hs.le
           (Nat.lt_two_pow_self (n := i)).le) (by positivity) zero_le_one
       _ = ‖s‖ ^ i * ‖(2 : K)‖ := by ring
-  have hc : CauchySeq (newtonSeq (1 + 4 * s)) :=
+  have hc : CauchySeq (sqrtNewtonSeq (1 + 4 * s)) :=
     cauchySeq_of_le_geometric ‖s‖ 1 hs (fun n => by simpa using hstep n)
   obtain ⟨r, hr⟩ := cauchySeq_tendsto_of_complete hc
   refine ⟨r, ?_⟩
-  have h1 : Tendsto (fun i => newtonSeq (1 + 4 * s) i ^ 2) atTop (𝓝 (r ^ 2)) := hr.pow 2
-  have h2' : Tendsto (fun i => newtonSeq (1 + 4 * s) i ^ 2) atTop (𝓝 (1 + 4 * s)) := by
+  have h1 : Tendsto (fun i => sqrtNewtonSeq (1 + 4 * s) i ^ 2) atTop (𝓝 (r ^ 2)) := hr.pow 2
+  have h2' : Tendsto (fun i => sqrtNewtonSeq (1 + 4 * s) i ^ 2) atTop (𝓝 (1 + 4 * s)) := by
     rw [tendsto_iff_norm_sub_tendsto_zero]
-    refine squeeze_zero (fun i => norm_nonneg _) (fun i => (newtonSeq_inv h2 hs i).2) ?_
+    refine squeeze_zero (fun i => norm_nonneg _) (fun i => (sqrtNewtonSeq_inv h2 hs i).2) ?_
     have : Tendsto (fun i : ℕ => ‖s‖ ^ 2 ^ i) atTop (𝓝 0) :=
       (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hs).comp
         (tendsto_pow_atTop_atTop_of_one_lt one_lt_two)
     simpa using this.const_mul ‖(4 : K)‖
   exact tendsto_nhds_unique h1 h2'
 
-end AnalyticTheory
+end IsUltrametricDist

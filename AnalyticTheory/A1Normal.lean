@@ -1,4 +1,5 @@
 import AnalyticTheory.AppendixA1
+import ForMathlib.AlgebraicGeometry.EllipticCurve.IsomOfJTwist
 
 /-!
 # Appendix A1: Weierstraß data at a fixed prime divisor
@@ -434,53 +435,35 @@ theorem jOfData_smul (W : WeierstrassCurve K) (C : WeierstrassCurve.VariableChan
   · simp [hΔ]
   · field_simp
 
+/-- The book's Hasse representative is Mathlib-style `WeierstrassCurve.twistInvariant`
+(`ForMathlib`). -/
+theorem hasseOfData_curve (W : WeierstrassCurve K) :
+    hasseOfData W.a₁ W.a₃ W.a₂ W.a₄ W.a₆ = W.twistInvariant := by
+  unfold hasseOfData WeierstrassCurve.twistInvariant
+  rw [wB2_eq W.a₁ W.a₃ W.a₂ W.a₄ W.a₆, wC4_eq W.a₁ W.a₃ W.a₂ W.a₄ W.a₆,
+    wC6_eq W.a₁ W.a₃ W.a₂ W.a₄ W.a₆, dataCurve_eq]
+
+theorem squareEquiv_iff_twistEquiv (h2 : ringChar K ≠ 2) {a b : K} :
+    SquareEquiv a b ↔ WeierstrassCurve.TwistEquiv a b :=
+  (WeierstrassCurve.twistEquiv_iff_of_ringChar_ne_two h2).symm
+
+theorem piEquiv_iff_twistEquiv (h2 : ringChar K = 2) {a b : K} :
+    PiEquiv a b ↔ WeierstrassCurve.TwistEquiv a b :=
+  (WeierstrassCurve.twistEquiv_iff_of_ringChar_eq_two h2).symm
+
 theorem hasse_smul_ne_two (W : WeierstrassCurve K) (C : WeierstrassCurve.VariableChange K)
     (h2 : ringChar K ≠ 2) :
     SquareEquiv (hasseOfData (C • W).a₁ (C • W).a₃ (C • W).a₂ (C • W).a₄ (C • W).a₆)
       (hasseOfData W.a₁ W.a₃ W.a₂ W.a₄ W.a₆) := by
-  have hu : (C.u : K) ≠ 0 := C.u.ne_zero
-  have hinv : ((C.u⁻¹ : Kˣ) : K) = (C.u : K)⁻¹ := by simp
-  by_cases h3 : ringChar K = 3
-  · haveI : CharP K 3 := ringChar.of_eq h3
-    have h12 : (12 : K) = 0 := by
-      have : (12 : K) = 4 * 3 := by norm_num
-      rw [this, show (3 : K) = 0 from CharP.cast_eq_zero K 3, mul_zero]
-    refine ⟨((C.u⁻¹ : Kˣ) : K), (C.u⁻¹).ne_zero, ?_⟩
-    rw [hasseOfData, hasseOfData, if_neg h2, if_neg h2, if_pos h3, if_pos h3,
-      wB2_eq W.a₁ W.a₃ W.a₂ W.a₄ W.a₆ |>.trans (by rw [dataCurve_eq]),
-      wB2_eq (C • W).a₁ (C • W).a₃ (C • W).a₂ (C • W).a₄ (C • W).a₆ |>.trans (by rw [dataCurve_eq]),
-      WeierstrassCurve.variableChange_b₂, h12, zero_mul, add_zero]
-  · refine ⟨(C.u : K), hu, ?_⟩
-    rw [hasseOfData, hasseOfData, if_neg h2, if_neg h2, if_neg h3, if_neg h3,
-      wC4_eq W.a₁ W.a₃ W.a₂ W.a₄ W.a₆ |>.trans (by rw [dataCurve_eq]),
-      wC6_eq W.a₁ W.a₃ W.a₂ W.a₄ W.a₆ |>.trans (by rw [dataCurve_eq]),
-      wC4_eq (C • W).a₁ (C • W).a₃ (C • W).a₂ (C • W).a₄ (C • W).a₆ |>.trans (by rw [dataCurve_eq]),
-      wC6_eq (C • W).a₁ (C • W).a₃ (C • W).a₂ (C • W).a₄ (C • W).a₆ |>.trans (by rw [dataCurve_eq]),
-      WeierstrassCurve.variableChange_c₄, WeierstrassCurve.variableChange_c₆, hinv]
-    by_cases hc6 : W.c₆ = 0
-    · simp [hc6]
-    · field_simp
+  rw [hasseOfData_curve, hasseOfData_curve, squareEquiv_iff_twistEquiv h2]
+  exact WeierstrassCurve.twistEquiv_twistInvariant_variableChange W C
 
 theorem hasse_smul_two (W : WeierstrassCurve K) (C : WeierstrassCurve.VariableChange K)
     (h2 : ringChar K = 2) :
     PiEquiv (hasseOfData (C • W).a₁ (C • W).a₃ (C • W).a₂ (C • W).a₄ (C • W).a₆)
       (hasseOfData W.a₁ W.a₃ W.a₂ W.a₄ W.a₆) := by
-  haveI : CharP K 2 := ringChar.of_eq h2
-  have h20 : (2 : K) = 0 := CharP.cast_eq_zero K 2
-  have hū : ((C.u⁻¹ : Kˣ) : K) ≠ 0 := (C.u⁻¹).ne_zero
-  rw [hasseOfData, hasseOfData, if_pos h2, if_pos h2]
-  simp only [WeierstrassCurve.variableChange_a₁, WeierstrassCurve.variableChange_a₂,
-    WeierstrassCurve.variableChange_a₃]
-  set ū : K := ((C.u⁻¹ : Kˣ) : K)
-  by_cases ha : W.a₁ = 0
-  · refine ⟨0, ?_⟩
-    simp [ha, h20]
-  · refine ⟨C.s / W.a₁, ?_⟩
-    have h3 : (3 : K) = 1 := by linear_combination h20
-    rw [h20, h3]
-    simp only [mul_zero, add_zero, zero_mul]
-    field_simp
-    linear_combination (W.a₁ * (-(C.s * W.a₁) + C.r - C.s ^ 2)) * h20
+  rw [hasseOfData_curve, hasseOfData_curve, piEquiv_iff_twistEquiv h2]
+  exact WeierstrassCurve.twistEquiv_twistInvariant_variableChange W C
 
 end invariance
 

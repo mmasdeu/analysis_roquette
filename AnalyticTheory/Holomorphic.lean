@@ -131,24 +131,17 @@ section Ultra
 
 variable {E : Type*} [NormedAddCommGroup E] [IsUltrametricDist E]
 
-/-- A finite sum of terms of norm at most `δ` has norm at most `δ` (ultrametric inequality). -/
+/-- A finite sum of terms of norm at most `δ` has norm at most `δ` (ultrametric inequality;
+Mathlib's `IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg`). -/
 theorem sum_norm_le_of_forall {ι : Type*} (s : Finset ι) (g : ι → E) {δ : ℝ} (h0 : 0 ≤ δ)
-    (hg : ∀ i ∈ s, ‖g i‖ ≤ δ) : ‖∑ i ∈ s, g i‖ ≤ δ := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simpa using h0
-  | insert a s ha ih =>
-    rw [Finset.sum_insert ha]
-    exact (IsUltrametricDist.isNonarchimedean_norm (g a) (∑ i ∈ s, g i)).trans
-      (max_le (hg a (Finset.mem_insert_self a s))
-        (ih fun i hi => hg i (Finset.mem_insert_of_mem hi)))
+    (hg : ∀ i ∈ s, ‖g i‖ ≤ δ) : ‖∑ i ∈ s, g i‖ ≤ δ :=
+  IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg h0 hg
 
-/-- A convergent sum of terms of norm at most `δ` has norm at most `δ`. -/
+/-- A convergent sum of terms of norm at most `δ` has norm at most `δ`
+(Mathlib's `IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg`). -/
 theorem hasSum_norm_le {ι : Type*} {x : ι → E} {s : E} (hx : HasSum x s) {δ : ℝ} (h0 : 0 ≤ δ)
-    (h : ∀ i, ‖x i‖ ≤ δ) : ‖s‖ ≤ δ := by
-  have hx' : Tendsto (fun t : Finset ι => ∑ i ∈ t, x i) atTop (𝓝 s) := hx
-  exact le_of_tendsto hx'.norm (Filter.Eventually.of_forall fun t =>
-    sum_norm_le_of_forall t x h0 (fun i _ => h i))
+    (h : ∀ i, ‖x i‖ ≤ δ) : ‖s‖ ≤ δ :=
+  hx.tsum_eq ▸ IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg h0 h
 
 end Ultra
 

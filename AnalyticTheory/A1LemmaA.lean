@@ -1,5 +1,6 @@
 import AnalyticTheory.A1Determine
 import AnalyticTheory.A1Transfer
+import ForMathlib.FieldTheory.ExtendRingEquiv
 
 /-!
 # Appendix A1, Lemma A: the automorphisms of `F | K` fixing the prime `𝔭`
@@ -148,7 +149,7 @@ theorem stab_eq (W : WeierstrassCurve K) (hΔ : W.Δ ≠ 0) (hc4 : W.c₄ ≠ 0)
       · exact h1
     haveI : CharP K 2 := ringChar.of_eq hrc
     have ha : W.a₁ ≠ 0 := by
-      intro h0; apply hc4; rw [c₄_char2, h0]; ring
+      intro h0; apply hc4; rw [WeierstrassCurve.c₄_eq_a₁_pow_four_of_charP_two, h0]; ring
     have hu : (C.u : K) = 1 := by
       have : ((C.u : K) - 1) ^ 2 = 0 := by linear_combination hu2 + (1 - (C.u : K)) * h2
       have := pow_eq_zero_iff (two_ne_zero) |>.mp this
@@ -184,18 +185,11 @@ section lemmaA
 variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 
 theorem algEquiv_ext_of_gen {x y : F} (hgen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤)
-    (φ ψ : F ≃ₐ[K] F) (hx : φ x = ψ x) (hy : φ y = ψ y) : φ = ψ := by
-  ext z
-  have hz : z ∈ IntermediateField.adjoin K ({x, y} : Set F) := by rw [hgen]; trivial
-  induction hz using IntermediateField.adjoin_induction with
-  | mem w hw =>
-    rcases hw with h | h
-    · rw [h]; exact hx
-    · rw [Set.mem_singleton_iff.mp h]; exact hy
-  | algebraMap c => rw [AlgEquiv.commutes, AlgEquiv.commutes]
-  | add a b _ _ ha hb => rw [map_add, map_add, ha, hb]
-  | inv a _ ha => rw [map_inv₀, map_inv₀, ha]
-  | mul a b _ _ ha hb => rw [map_mul, map_mul, ha, hb]
+    (φ ψ : F ≃ₐ[K] F) (hx : φ x = ψ x) (hy : φ y = ψ y) : φ = ψ :=
+  IntermediateField.algEquiv_ext_of_adjoin_eq_top hgen (fun z hz => by
+    rcases hz with rfl | hz
+    · exact hx
+    · rw [Set.mem_singleton_iff.mp hz]; exact hy)
 
 end lemmaA
 
@@ -268,7 +262,7 @@ theorem lemmaA_data (hE : IsEllipticOver K F) (d : WeierstrassData K F) (hc4 : d
         · exact h1
       haveI : CharP K 2 := ringChar.of_eq hrc
       have ha : W.a₁ ≠ 0 := by
-        intro h0; apply hc4; rw [c₄_char2, h0]; ring
+        intro h0; apply hc4; rw [WeierstrassCurve.c₄_eq_a₁_pow_four_of_charP_two, h0]; ring
       have hpo := d.poleOrd_x.affine2 ha W.a₃
       have : algebraMap K F W.a₁ * d.x + algebraMap K F W.a₃ = 0 := by
         have h2F : (2 : F) = 0 := by

@@ -118,47 +118,17 @@ theorem evalZ_pow {q : K} (hq : ‖q‖ < 1) (f : PowerSeries ℤ) (n : ℕ) :
   have key : ∀ f : PowerSeries ℤ, evalZHom hq f = evalZ q f := fun _ => rfl
   rw [← key, map_pow, key]
 
-/-- A non-zero integer power series does not vanish at `π^{2k}` for large `k`. -/
+/-- A non-zero integer power series does not vanish at `π^{2k}` for large `k` (an instance of the
+identity principle `PowerSeries.eq_zero_of_tsumEval_eq_zero`). -/
 theorem int_series_zero [CharZero K] {π : K} (hπ0 : 0 < ‖π‖) (hπ1 : ‖π‖ < 1) {F : PowerSeries ℤ}
     (hF : ∀ k : ℕ, 1 ≤ k → evalZ ((π ^ k) ^ 2) F = 0) : F = 0 := by
-  by_contra hne
-  have hex : ∃ n, coeff n F ≠ 0 := by
-    by_contra h; push_neg at h; exact hne (PowerSeries.ext fun n => by simpa using h n)
-  classical
-  let m := Nat.find hex
-  have hm : coeff m F ≠ 0 := Nat.find_spec hex
-  have hlt : ∀ k < m, coeff k F = 0 := fun k hk => by
-    have := Nat.find_min hex hk; push_neg at this; exact this
-  have hg : 0 < ‖((coeff m F : ℤ) : K)‖ := by
-    rw [norm_pos_iff]; exact_mod_cast hm
-  obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one hg (show ‖π‖ ^ 2 < 1 by nlinarith)
-  set q : K := (π ^ (k + 1)) ^ 2 with hqdef
-  have hqn : ‖q‖ = (‖π‖ ^ 2) ^ (k + 1) := by
-    rw [hqdef, norm_pow, norm_pow]; ring
-  have hq0 : 0 < ‖q‖ := by rw [hqn]; positivity
-  have hq1 : ‖q‖ < 1 := by
-    rw [hqn]; exact pow_lt_one₀ (by positivity) (by nlinarith) (by omega)
-  have hqk : ‖q‖ < ‖((coeff m F : ℤ) : K)‖ := by
-    rw [hqn]
-    exact lt_of_le_of_lt (pow_le_pow_of_le_one (by positivity) (by nlinarith) (by omega)) hk
-  have hsplit : F = (C (coeff m F) * X ^ m) + (F - C (coeff m F) * X ^ m) := by ring
-  have hmain : evalZ q (C (coeff m F) * X ^ m) = ((coeff m F : ℤ) : K) * q ^ m := by
-    rw [evalZ_mul hq1, evalZ_C hq1, evalZ_pow hq1, evalZ_X]
-  have htail : ‖evalZ q (F - C (coeff m F) * X ^ m)‖ ≤ ‖q‖ ^ (m + 1) := by
-    refine norm_evalZ_tail hq1 (fun j hj => ?_)
-    rw [map_sub, coeff_C_mul, coeff_X_pow]
-    rcases lt_or_eq_of_le hj with h | h
-    · rw [hlt j h, if_neg (by omega)]; simp
-    · subst h; simp
-  have h0 := hF (k + 1) (by omega)
-  rw [← hqdef, hsplit, evalZ_add hq1, hmain] at h0
-  have h1 : ‖((coeff m F : ℤ) : K) * q ^ m‖ = ‖evalZ q (F - C (coeff m F) * X ^ m)‖ := by
-    rw [eq_neg_of_add_eq_zero_left h0, norm_neg]
-  rw [norm_mul, norm_pow] at h1
-  have h2 : ‖q‖ ^ (m + 1) < ‖((coeff m F : ℤ) : K)‖ * ‖q‖ ^ m := by
-    rw [pow_succ, mul_comm (‖q‖ ^ m)]
-    exact mul_lt_mul_of_pos_right hqk (by positivity)
-  linarith
+  have hπ : π ≠ 0 := norm_pos_iff.mp hπ0
+  refine PowerSeries.eq_zero_of_tsumEval_eq_zero (Int.castRingHom K) norm_intCastRingHom_le
+    (Int.cast_injective) (u := fun n => (π ^ (n + 1)) ^ 2) (fun n => by simp [hπ]) ?_
+    (fun n => hF (n + 1) (by omega))
+  have h1 : Tendsto (fun n : ℕ => π ^ (n + 1)) atTop (𝓝 0) :=
+    (tendsto_pow_atTop_nhds_zero_of_norm_lt_one hπ1).comp (tendsto_add_atTop_nat 1)
+  simpa using h1.pow 2
 
 theorem evalZ_serD {q : K} (hq : ‖q‖ < 1) :
     evalZ q serD = deltaPoly K (coeffB K q) (coeffC K q) := by
