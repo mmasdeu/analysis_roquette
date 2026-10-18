@@ -325,22 +325,26 @@ variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 /-- Book, §A1, Lemma A: if `j ≠ 0, 12³` there is only one non-trivial `K`-automorphism `ε` of `F`
 which fixes the prime divisor `𝔭` of degree `1` attached to a Weierstraß datum.
 Blueprint: `lem:A`. -/
-theorem lemmaA (hE : IsEllipticOver K F) (d : WeierstrassData K F)
+theorem curve_c_ne_zero (d : WeierstrassData K F)
     (hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3) :
-    ∃ ε : F ≃ₐ[K] F, ε ≠ AlgEquiv.refl ∧ d.𝔭.transfer ε = d.𝔭 ∧
-      ∀ σ : F ≃ₐ[K] F, d.𝔭.transfer σ = d.𝔭 → σ = AlgEquiv.refl ∨ σ = ε := by
+    d.curve.c₄ ≠ 0 ∧ d.curve.c₆ ≠ 0 := by
   have hΔ : d.curve.Δ ≠ 0 := by
     have := d.disc
     rwa [wDisc_eq] at this
   have hjc : jc d.curve = jOfData d.u d.v d.a₁ d.a₂ d.a₃ := rfl
-  have hc4 : d.curve.c₄ ≠ 0 := by
-    intro h0; apply hj.1; rw [← hjc, jc_eq, h0]; simp
-  have hc6 : d.curve.c₆ ≠ 0 := by
-    intro h0; apply hj.2
+  refine ⟨?_, ?_⟩
+  · intro h0; apply hj.1; rw [← hjc, jc_eq, h0]; simp
+  · intro h0; apply hj.2
     have hrel := WeierstrassCurve.c_relation d.curve
     rw [← hjc, jc_eq, div_eq_iff hΔ]
     rw [h0] at hrel
     linear_combination -hrel
+
+theorem lemmaA (hE : IsEllipticOver K F) (d : WeierstrassData K F)
+    (hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3) :
+    ∃ ε : F ≃ₐ[K] F, ε ≠ AlgEquiv.refl ∧ d.𝔭.transfer ε = d.𝔭 ∧
+      ∀ σ : F ≃ₐ[K] F, d.𝔭.transfer σ = d.𝔭 → σ = AlgEquiv.refl ∨ σ = ε := by
+  obtain ⟨hc4, hc6⟩ := curve_c_ne_zero d hj
   obtain ⟨ε, h1, h2, -, -, h3⟩ := lemmaA_data hE d hc4 hc6
   exact ⟨ε, h1, h2, h3⟩
 

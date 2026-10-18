@@ -205,12 +205,8 @@ theorem vq_alg : vq q (Units.mk0 (algebraMap K L q) ((map_ne_zero_iff _
   exact div_self (Real.log_neg hq0 hq1).ne
 
 include hq0 hq1 in
-theorem eQ_injective : Function.Injective (eQ K L q) := by
-  intro c c' h
-  induction c using Quot.ind with | _ ζ => ?_
-  induction c' using Quot.ind with | _ ζ' => ?_
-  rw [eQ_mk q hq0 hq1, eQ_mk q hq0 hq1] at h
-  apply Quot.sound
+theorem cocycleEquiv_of_char_eq (ζ ζ' : CocycleModQ K L q)
+    (h : charOfCocycle q hq0 hq1 ζ = charOfCocycle q hq0 hq1 ζ') : CocycleEquiv K L q ζ ζ' := by
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
   have hqL : algebraMap K L q ≠ 0 := (map_ne_zero_iff _ (algebraMap K L).injective).mpr hq0'
   set Q : Lˣ := Units.mk0 (algebraMap K L q) hqL with hQdef
@@ -260,6 +256,14 @@ theorem eQ_injective : Function.Injective (eQ K L q) := by
     at this ⊢
   field_simp at this ⊢
   exact this
+
+include hq0 hq1 in
+theorem eQ_injective : Function.Injective (eQ K L q) := by
+  intro c c' h
+  induction c using Quot.ind with | _ ζ => ?_
+  induction c' using Quot.ind with | _ ζ' => ?_
+  rw [eQ_mk q hq0 hq1, eQ_mk q hq0 hq1] at h
+  exact Quot.sound (cocycleEquiv_of_char_eq q hq0 hq1 ζ ζ' h)
 
 end inj
 

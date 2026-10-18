@@ -66,15 +66,21 @@ theorem transfer_translation_primeAt (a : Kˣ) {b : K} (hb : b ≠ 0) :
   rw [e, map_mul, h1]
 
 include hq0 hq1 in
-theorem fq_homogeneous : DegOneHomogeneous K (FqSub K q) := by
-  intro P P' hP hP'
+theorem fq_translation_transitive (P P' : PrimeDivisor K (FqSub K q)) (hP : P.degree = 1)
+    (hP' : P'.degree = 1) : ∃ a : Kˣ, P.transfer (translationAlg q a) = P' := by
   obtain ⟨b, hb, rfl⟩ := exists_pt_of_degree_one hq0 hq1 P hP
   obtain ⟨b', hb', rfl⟩ := exists_pt_of_degree_one hq0 hq1 P' hP'
-  refine ⟨translationAlg q (Units.mk0 (b' / b) (div_ne_zero hb' hb)), ?_⟩
+  refine ⟨Units.mk0 (b' / b) (div_ne_zero hb' hb), ?_⟩
   rw [transfer_translation_primeAt hq0 hq1 _ hb]
   congr 1
   simp only [Units.val_mk0]
   field_simp
+
+include hq0 hq1 in
+theorem fq_homogeneous : DegOneHomogeneous K (FqSub K q) := by
+  intro P P' hP hP'
+  obtain ⟨a, ha⟩ := fq_translation_transitive hq0 hq1 P P' hP hP'
+  exact ⟨translationAlg q a, ha⟩
 
 end fq
 
