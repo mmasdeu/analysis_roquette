@@ -59,7 +59,7 @@ theorem holScale_algebraMap (c : Kˣ) (a : K) :
 
 /-- The holomorphic solutions of `G(q⁻¹X) = κ X^d G(X)`. -/
 noncomputable def solSpace (q : K) (hq0 : q ≠ 0) (κ : K) (d : ℤ) : Submodule K (holSubring K) where
-  carrier := {G | holScale K (Units.mk0 q hq0)⁻¹ G = algebraMap K (holSubring K) κ * monoHol K d * G}
+  carrier := {G | holScale K (Units.mk0 q hq0)⁻¹ G = algebraMap K (holSubring K) κ * monoHol K (Omega K) d * G}
   add_mem' := fun {G H} hG hH => by
     simp only [Set.mem_setOf_eq] at hG hH ⊢
     rw [map_add, hG, hH]; ring
@@ -75,7 +75,7 @@ theorem mem_solSpace_iff {q : K} (hq0 : q ≠ 0) {κ : K} {d : ℤ} (G : holSubr
       fun n => q ^ (-n) * holCoeff K G n := by
     rw [holCoeff_holScale]; funext n
     rw [Units.val_inv_eq_inv_val, Units.val_mk0, inv_zpow']
-  have e2 : holCoeff K (algebraMap K (holSubring K) κ * monoHol K d * G) =
+  have e2 : holCoeff K (algebraMap K (holSubring K) κ * monoHol K (Omega K) d * G) =
       fun n => κ * holCoeff K G (n - d) := by
     rw [mul_assoc, holCoeff_algebraMap_mul, holCoeff_monoHol_mul]
   constructor
@@ -356,7 +356,7 @@ theorem solEval_surjective {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {κ :
   intro v
   set c : ℕ → K := fun i => if h : i < d.toNat then v ⟨i, h⟩ else 0 with hc
   have hconv := seqOf_convergent hq0 hq1 hκ hd c
-  have hmem : holOfSeq K _ hconv ∈ solSpace q hq0' κ d := by
+  have hmem : holOfSeq K (Omega K) _ hconv ∈ solSpace q hq0' κ d := by
     rw [mem_solSpace_iff, holCoeff_holOfSeq]
     exact seqOf_rec hq0' hκ hd c
   refine ⟨⟨_, hmem⟩, ?_⟩
@@ -391,14 +391,14 @@ theorem solSpace_zero_eq_bot {q : K} (hq0 : q ≠ 0) {κ : K} (hκ : ∀ k : ℤ
 theorem solSpace_zero_finrank {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {κ : K} {k : ℤ}
     (hk : κ = q ^ k) : Module.finrank K (solSpace q (norm_pos_iff.mp hq0) κ 0) = 1 := by
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
-  have hv : monoHol K (-k) ∈ solSpace q hq0' κ 0 := by
+  have hv : monoHol K (Omega K) (-k) ∈ solSpace q hq0' κ 0 := by
     rw [mem_solSpace_iff]
     intro n
     rw [sub_zero, holCoeff_monoHol]
     by_cases hn : n = -k
     · subst hn; simp [hk]
     · simp [hn]
-  have hvne : (⟨monoHol K (-k), hv⟩ : solSpace q hq0' κ 0) ≠ 0 := by
+  have hvne : (⟨monoHol K (Omega K) (-k), hv⟩ : solSpace q hq0' κ 0) ≠ 0 := by
     intro h
     have := congrArg Subtype.val h
     exact monoHol_ne_zero (-k) this
@@ -406,7 +406,7 @@ theorem solSpace_zero_finrank {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {�
   intro G
   refine ⟨holCoeff K (G : holSubring K) (-k), ?_⟩
   apply Subtype.ext
-  show algebraMap K (holSubring K) (holCoeff K (G : holSubring K) (-k)) * monoHol K (-k) = G
+  show algebraMap K (holSubring K) (holCoeff K (G : holSubring K) (-k)) * monoHol K (Omega K) (-k) = G
   apply holCoeff_injective K
   rw [holCoeff_algebraMap_mul]
   funext n

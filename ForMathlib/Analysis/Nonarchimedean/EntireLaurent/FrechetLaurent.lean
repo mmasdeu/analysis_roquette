@@ -1,4 +1,4 @@
-import AnalyticTheory.HolSeq
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolSeq
 
 /-!
 # Summable families of convergent Laurent series
@@ -13,11 +13,13 @@ sum `∑ᵢ fᵢ(α)`.
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
 /-- A family of Laurent sequences whose Gauss norms tend to `0` along the cofinite filter. -/
 def NullFamily {ι : Type*} (c : ι → ℤ → K) : Prop :=
@@ -25,6 +27,15 @@ def NullFamily {ι : Type*} (c : ι → ℤ → K) : Prop :=
 
 variable {K} {ι : Type*}
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
+/-- A family dominated termwise by a null family is null. -/
+theorem NullFamily.mono {c c' : ι → ℤ → K} (hn : NullFamily K c) (h : ∀ i n, ‖c' i n‖ ≤ ‖c i n‖) :
+    NullFamily K c' := by
+  intro r hr ε hε
+  refine (hn r hr ε hε).subset (fun i ⟨n, hn'⟩ => ⟨n, lt_of_lt_of_le hn' ?_⟩)
+  exact mul_le_mul_of_nonneg_right (h i n) (by positivity)
+
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- Outside a finite set of indices `n`, all terms are small. -/
 theorem NullFamily.exists_finite {c : ι → ℤ → K} (hn : NullFamily K c)
     (hc : ∀ i, IsConvergentLaurent K (c i)) {r : ℝ} (hr : 0 < r) {ε : ℝ} (hε : 0 < ε) :
@@ -42,6 +53,7 @@ theorem NullFamily.exists_finite {c : ι → ℤ → K} (hn : NullFamily K c)
     refine ⟨i, ?_, hlt⟩
     simpa using ⟨n, hlt⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem NullFamily.tendsto_prod {c : ι → ℤ → K} (hn : NullFamily K c)
     (hc : ∀ i, IsConvergentLaurent K (c i)) {r : ℝ} (hr : 0 < r) :
     Tendsto (fun p : ι × ℤ => ‖c p.1 p.2‖ * r ^ p.2) cofinite (𝓝 0) := by
@@ -76,6 +88,7 @@ theorem NullFamily.hasSum_coeff {c : ι → ℤ → K} (hn : NullFamily K c) (n 
   exact (NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero this)
 
 
+omit [CompleteSpace K] in
 theorem tail_norm_le {b : K} {f : ι → K} (h : HasSum f b) (s : Finset ι) {δ : ℝ} (h0 : 0 ≤ δ)
     (hb : ∀ i, i ∉ s → ‖f i‖ ≤ δ) : ‖b - ∑ i ∈ s, f i‖ ≤ δ := by
   classical
@@ -134,17 +147,17 @@ theorem NullFamily.sum_convergent {c : ι → ℤ → K} (hn : NullFamily K c)
   linarith
 
 /-- Sums of null families of holomorphic functions are holomorphic, and are computed pointwise. -/
-theorem hol_hasSum_family {f : ι → holSubring K} (hn : NullFamily K (fun i => holCoeff K (f i))) :
-    ∃ g : holSubring K, holCoeff K g = hn.sum ∧
-      ∀ α : OmegaX K, HasSum (fun i => (f i).1 α) (g.1 α) := by
+theorem hol_hasSum_family {f : ι → holSubring K L} (hn : NullFamily K (fun i => holCoeff K (f i))) :
+    ∃ g : holSubring K L, holCoeff K g = hn.sum ∧
+      ∀ α : Punct L, HasSum (fun i => (f i).1 α) (g.1 α) := by
   have hc : ∀ i, IsConvergentLaurent K (holCoeff K (f i)) := fun i => holCoeff_convergent K (f i)
   have hb := hn.sum_convergent hc
-  refine ⟨holOfSeq K hn.sum hb, holCoeff_holOfSeq K _ hb, fun α => ?_⟩
-  set S := IntermediateField.adjoin K ({α.1} : Set (Omega K)) with hS
+  refine ⟨holOfSeq K L hn.sum hb, holCoeff_holOfSeq K _ hb, fun α => ?_⟩
+  set S := IntermediateField.adjoin K ({α.1} : Set L) with hS
   haveI : FiniteDimensional K S :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α.1)
   have hαS : α.1 ∈ S := IntermediateField.mem_adjoin_simple_self K α.1
-  set u : ι × ℤ → Omega K := fun p => algebraMap K (Omega K) (holCoeff K (f p.1) p.2) * α.1 ^ p.2
+  set u : ι × ℤ → L := fun p => algebraMap K L (holCoeff K (f p.1) p.2) * α.1 ^ p.2
     with hu
   have hmem : ∀ p, u p ∈ S := fun p =>
     S.mul_mem (S.algebraMap_mem _) (S.toSubfield.zpow_mem hαS _)
@@ -155,14 +168,14 @@ theorem hol_hasSum_family {f : ι → holSubring K} (hn : NullFamily K (fun i =>
     simp [hu, norm_algebraMap_omega]
   obtain ⟨s, -, hs⟩ := omega_hasSum_mem K S hmem ht
   have h1 : HasSum (fun i => (f i).1 α) s := hs.prod_fiberwise (fun i => holCoeff_hasSum K (f i) α)
-  have h2 : HasSum (fun n : ℤ => algebraMap K (Omega K) (hn.sum n) * α.1 ^ n) s := by
+  have h2 : HasSum (fun n : ℤ => algebraMap K L (hn.sum n) * α.1 ^ n) s := by
     have hs' := (Equiv.prodComm ℤ ι).hasSum_iff.mpr hs
     refine hs'.prod_fiberwise (fun n => ?_)
-    have := ((hn.hasSum_sum n).map (algebraMap K (Omega K) : K →+* Omega K)
+    have := ((hn.hasSum_sum n).map (algebraMap K L : K →+* L)
       (continuous_algebraMap_omega K)).mul_right (α.1 ^ n)
     simpa [hu] using this
   have h3 := holOfSeq_hasSum K hn.sum hb α
   rw [h3.unique h2]
   exact h1
 
-end AnalyticTheory
+end EntireLaurent

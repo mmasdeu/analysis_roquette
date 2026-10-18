@@ -295,7 +295,7 @@ theorem holRel_holExt (g : holSubring K) : HolRel (ψ : Omega K ≃+* Omega L) g
   simp only [Function.comp, AddMonoidHom.coe_coe, map_mul, map_zpow₀, AlgEquiv.commutes]
   rw [IsScalarTower.algebraMap_apply K L (Omega L)]
 
-theorem holExt_monoHol (n : ℤ) : holExt (L := L) (monoHol K n) = monoHol L n := by
+theorem holExt_monoHol (n : ℤ) : holExt (L := L) (monoHol K (Omega K) n) = monoHol L (Omega L) n := by
   apply holCoeff_injective L
   rw [holCoeff_holExt]
   funext k
@@ -314,7 +314,7 @@ theorem anPt_meroExt {α : Omega K} (hα : α ≠ 0) (f : MeroRing K) :
 
 theorem eIdx_dvd {α : Omega K} (hα : α ≠ 0) : eIdx L (ψ α) ∣ eIdx K α := by
   have hψ : ψ α ≠ 0 := (map_ne_zero ψ).mpr hα
-  set f := algebraMap (holSubring K) (MeroRing K) (polyHol K (minpoly K α))
+  set f := algebraMap (holSubring K) (MeroRing K) (polyHol K (Omega K) (minpoly K α))
   have hf1 : anVal K α f = 1 := by
     rw [anVal_polyHol_minpoly hα hα, if_pos rfl]
   have hf0 : f ≠ 0 := by
@@ -733,10 +733,10 @@ theorem convCoeff_gal (σ : L ≃ₐ[K] L) {a b : ℤ → L} (ha : IsConvergentL
 
 /-- The coefficientwise action on holomorphic functions. -/
 noncomputable def holGalFun (σ : L ≃ₐ[K] L) (g : holSubring L) : holSubring L :=
-  holOfSeq L (fun n => σ (holCoeff L g n)) (isConvergentLaurent_gal σ (holCoeff_convergent L g))
+  holOfSeq L (Omega L) (fun n => σ (holCoeff L g n)) (isConvergentLaurent_gal σ (holCoeff_convergent L g))
 
 theorem holCoeff_holGalFun (σ : L ≃ₐ[K] L) (g : holSubring L) :
-    holCoeff L (holGalFun σ g) = fun n => σ (holCoeff L g n) := holCoeff_holOfSeq L _ _
+    holCoeff L (holGalFun σ g) = fun n => σ (holCoeff L g n) := holCoeff_holOfSeq L (L := Omega L) _ _
 
 /-- The action of `σ ∈ Gal(L|K)` on `H_L` through the coefficients. -/
 noncomputable def holGal (σ : L ≃ₐ[K] L) : holSubring L →+* holSubring L where
@@ -790,9 +790,9 @@ theorem holGal_const (σ : L ≃ₐ[K] L) (c : L) :
     holGal σ (algebraMap L (holSubring L) c) = algebraMap L (holSubring L) (σ c) := by
   apply holCoeff_injective L
   rw [holCoeff_holGal]
-  have h1 := holCoeff_algebraMap_mul L c 1
+  have h1 := holCoeff_algebraMap_mul L (L := Omega L) c 1
   rw [mul_one, holCoeff_one] at h1
-  have h2 := holCoeff_algebraMap_mul L (σ c) 1
+  have h2 := holCoeff_algebraMap_mul L (L := Omega L) (σ c) 1
   rw [mul_one, holCoeff_one] at h2
   rw [h1, h2]
   funext n; simp only [deltaSeq]; split_ifs <;> simp
@@ -852,8 +852,8 @@ theorem minpoly_ext {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : I
 theorem eIdx_ext {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ')
     {α : Omega L} (hα : α ≠ 0) : eIdx L (σ' α) = eIdx L α := by
   have hσα : σ' α ≠ 0 := (map_ne_zero σ').mpr hα
-  set P := polyHol L (minpoly L α)
-  set P' := polyHol L (minpoly L (σ' α))
+  set P := polyHol L (Omega L) (minpoly L α)
+  set P' := polyHol L (Omega L) (minpoly L (σ' α))
   have hrel : HolRel σ' P P' := by
     have hρ := isGalAct_meroGal σ
     refine galAct_holRel hρ hσ' ?_
@@ -913,7 +913,7 @@ theorem hol_descend {g : holSubring L} (hg : ∀ σ : L ≃ₐ[K] L, holGal σ g
     intro r hr
     have := holCoeff_convergent L g r hr
     simpa [← hb, norm_algebraMap'] using this
-  refine ⟨holOfSeq K b hbconv, holCoeff_injective L ?_⟩
+  refine ⟨holOfSeq K (Omega K) b hbconv, holCoeff_injective L ?_⟩
   rw [holCoeff_holExt, holCoeff_holOfSeq]
   funext n; exact hb n
 

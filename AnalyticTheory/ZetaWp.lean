@@ -217,10 +217,10 @@ theorem holD_sub (f g : holSubring K) : holD (f - g) = holD f - holD g := by
 
 /-- A binomial factor `1 − c Xᵏ`. -/
 noncomputable def binom1 (c : K) (k : ℤ) : holSubring K :=
-  1 - algebraMap K (holSubring K) c * monoHol K k
+  1 - algebraMap K (holSubring K) c * monoHol K (Omega K) k
 
 theorem holD_binom1 (c : K) (k : ℤ) :
-    holD (binom1 c k) = -(algebraMap K (holSubring K) (c * (k : K)) * monoHol K k) := by
+    holD (binom1 c k) = -(algebraMap K (holSubring K) (c * (k : K)) * monoHol K (Omega K) k) := by
   unfold binom1
   rw [holD_sub, holD_one, holD_leibniz, holD_const, holD_monoHol]
   simp only [map_mul]
@@ -228,7 +228,7 @@ theorem holD_binom1 (c : K) (k : ℤ) :
 
 theorem holD_holD_binom1 (c : K) (k : ℤ) :
     holD (holD (binom1 c k)) =
-      -(algebraMap K (holSubring K) (c * (k : K) * (k : K)) * monoHol K k) := by
+      -(algebraMap K (holSubring K) (c * (k : K) * (k : K)) * monoHol K (Omega K) k) := by
   rw [holD_binom1, holD_neg, holD_leibniz, holD_const, holD_monoHol]
   simp only [map_mul]
   ring

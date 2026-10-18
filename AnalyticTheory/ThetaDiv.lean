@@ -84,7 +84,7 @@ theorem thetaFun_spec {α : Omega K} (hα : α ≠ 0) :
     thetaFun hq0 hq1 α ≠ 0 ∧
       holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ (thetaFun hq0 hq1 α) =
         algebraMap K (holSubring K) ((minpoly K α).coeff 0)⁻¹ *
-          monoHol K ((minpoly K α).natDegree : ℤ) * thetaFun hq0 hq1 α ∧
+          monoHol K (Omega K) ((minpoly K α).natDegree : ℤ) * thetaFun hq0 hq1 α ∧
       (∀ ξ : Omega K, ξ ≠ 0 →
         anVal K ξ (algebraMap (holSubring K) (MeroRing K) (thetaFun hq0 hq1 α)) =
           if ConjModQ K q α ξ then 1 else 0) ∧
@@ -190,7 +190,7 @@ theorem translation_alg (a : Kˣ) (f : holSubring K) :
   rw [IsFractionRing.ringEquivOfRingEquiv_algebraMap]
 
 /-- `X^n` in `M_K`. -/
-noncomputable def Xm (n : ℤ) : MeroRing K := algebraMap (holSubring K) (MeroRing K) (monoHol K n)
+noncomputable def Xm (n : ℤ) : MeroRing K := algebraMap (holSubring K) (MeroRing K) (monoHol K (Omega K) n)
 
 theorem Xm_add (n m : ℤ) : Xm (K := K) (n + m) = Xm n * Xm m := by
   unfold Xm; rw [monoHol_add, map_mul]
@@ -257,7 +257,7 @@ theorem translation_thetaDiv :
     obtain ⟨-, hfe, -⟩ := thetaFun_spec hq0 hq1 hα0
     rw [map_zpow₀, translation_alg, hfe, map_mul, map_mul, algebraMap_hol_mero, mul_zpow, mul_zpow,
       map_zpow₀]
-    rw [show algebraMap (holSubring K) (MeroRing K) (monoHol K ((minpoly K α).natDegree : ℤ)) =
+    rw [show algebraMap (holSubring K) (MeroRing K) (monoHol K (Omega K) ((minpoly K α).natDegree : ℤ)) =
       Xm ((minpoly K α).natDegree : ℤ) from rfl, Xm_zpow]
   rw [Finset.prod_congr rfl hfac, Finset.prod_mul_distrib, Finset.prod_mul_distrib, Xm_sum,
     ← map_prod, aTheta, dTheta]

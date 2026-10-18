@@ -1,5 +1,4 @@
 import AnalyticTheory.Holomorphic
-import AnalyticTheory.Dominance
 
 /-!
 # Fields of periodic functions (book, §2)
@@ -35,94 +34,12 @@ theorem omegaNorm_unique_extension (f : Omega K → ℝ) (hf : IsAbsoluteValue f
   simpa [omegaNorm] using this
 
 /-- The punctured plane `Ω^×`. -/
-abbrev OmegaX : Type u := {α : Omega K // α ≠ 0}
+abbrev OmegaX : Type u := EntireLaurent.Punct (Omega K)
 
 /-- Book, §2: the holomorphic functions over `K`, `H_K`: functions on `Ω^×` that are given
-by convergent Laurent series with coefficients in `K` (the value at `0` is irrelevant, so
-we work with functions on `Ω^×`; closure under products is the Cauchy product of convergent
-Laurent series, proved in `Holomorphic.lean`). Blueprint: `def:H-K`. -/
-def holSubring : Subring (OmegaX K → Omega K) where
-  carrier := {f | ∃ g : Omega K → Omega K, IsHolomorphicOver K g ∧ (fun α : OmegaX K => g α.1) = f}
-  mul_mem' := fun {f f'} ⟨g, hg, hgf⟩ ⟨g', hg', hgf'⟩ =>
-    ⟨g * g', isHolomorphicOver_mul K hg hg', by rw [← hgf, ← hgf']; rfl⟩
-  one_mem' := ⟨fun _ => 1, by simpa using isHolomorphicOver_const K 1, rfl⟩
-  add_mem' := fun {f f'} ⟨g, hg, hgf⟩ ⟨g', hg', hgf'⟩ =>
-    ⟨g + g', isHolomorphicOver_add K hg hg', by rw [← hgf, ← hgf']; rfl⟩
-  zero_mem' := ⟨fun _ => 0, by simpa using isHolomorphicOver_const K 0, rfl⟩
-  neg_mem' := fun {f} ⟨g, hg, hgf⟩ => ⟨-g, isHolomorphicOver_neg K hg, by rw [← hgf]; rfl⟩
-
-/-- Holomorphic functions are stable under the reflection `X ↦ X⁻¹`. -/
-theorem isHolomorphicOver_inv {f : Omega K → Omega K} (hf : IsHolomorphicOver K f) :
-    IsHolomorphicOver K (fun α => f α⁻¹) := by
-  obtain ⟨a, hconv, hsum⟩ := hf
-  refine ⟨fun n => a (-n), ?_, ?_⟩
-  · intro r hr
-    have h := hconv r⁻¹ (inv_pos.mpr hr)
-    have h' : Tendsto (fun n : ℤ => ‖a (-n)‖ * (r⁻¹) ^ (-n)) cofinite (𝓝 0) :=
-      h.comp (neg_injective.tendsto_cofinite)
-    refine h'.congr (fun n => ?_)
-    simp [zpow_neg]
-  · intro α hα
-    have h := hsum α⁻¹ (inv_ne_zero hα)
-    have h2 := (Equiv.neg ℤ).hasSum_iff.mpr h
-    convert h2 using 1
-    funext n
-    simp [zpow_neg, inv_inv]
-
-/-- Book, §2: the reflection `f(X) ↦ f(X⁻¹)` as a ring automorphism of `H_K`. -/
-noncomputable def holReflectHom : holSubring K ≃+* holSubring K where
-  toFun f := ⟨fun α => f.1 ⟨α.1⁻¹, inv_ne_zero α.2⟩, by
-    obtain ⟨g, hg, hgf⟩ := f.2
-    refine ⟨fun α => g α⁻¹, isHolomorphicOver_inv K hg, ?_⟩
-    funext α
-    exact congrFun hgf ⟨α.1⁻¹, inv_ne_zero α.2⟩⟩
-  invFun f := ⟨fun α => f.1 ⟨α.1⁻¹, inv_ne_zero α.2⟩, by
-    obtain ⟨g, hg, hgf⟩ := f.2
-    refine ⟨fun α => g α⁻¹, isHolomorphicOver_inv K hg, ?_⟩
-    funext α
-    exact congrFun hgf ⟨α.1⁻¹, inv_ne_zero α.2⟩⟩
-  left_inv f := Subtype.ext (funext fun α => by simp)
-  right_inv f := Subtype.ext (funext fun α => by simp)
-  map_mul' f g := rfl
-  map_add' f g := rfl
-
-/-- Book, §2: `H_K` is an integral domain. Blueprint: `lem:H-K-domain`. -/
-theorem holSubring_isDomain : IsDomain (holSubring K) := by
-  haveI : Nontrivial (holSubring K) := ⟨⟨1, 0, fun h => by
-    have := congrFun (congrArg Subtype.val h) ⟨1, one_ne_zero⟩
-    exact one_ne_zero this⟩⟩
-  haveI : NoZeroDivisors (holSubring K) := ⟨fun {f g} h => by
-    by_contra hcon
-    push_neg at hcon
-    obtain ⟨hf, hg⟩ := hcon
-    -- representations and non-vanishing coefficients
-    have key : ∀ f : holSubring K, f ≠ 0 → ∃ (a : ℤ → K), IsConvergentLaurent K a ∧
-        (∃ n, a n ≠ 0) ∧ ∀ α : OmegaX K, HasSum
-          (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (f.1 α) := by
-      intro f hf
-      obtain ⟨F, ⟨a, ha, hFa⟩, hFf⟩ := f.2
-      have hsum : ∀ α : OmegaX K, HasSum
-          (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (f.1 α) := fun α => by
-        rw [← hFf]; exact hFa α.1 α.2
-      refine ⟨a, ha, ?_, hsum⟩
-      by_contra hno
-      push_neg at hno
-      apply hf
-      apply Subtype.ext
-      funext α
-      have hz : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (0 : Omega K) := by
-        simpa [hno] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : Omega K)) 0)
-      simpa using (hsum α).unique hz
-    obtain ⟨a, ha, ha0, hfa⟩ := key f hf
-    obtain ⟨b, hb, hb0, hgb⟩ := key g hg
-    obtain ⟨α, hα, hga, hgb'⟩ := exists_good_point K ha hb ha0 hb0
-    have h1 := congrFun (congrArg Subtype.val h) ⟨α, hα⟩
-    have h2 : f.1 ⟨α, hα⟩ * g.1 ⟨α, hα⟩ = 0 := h1
-    exact mul_ne_zero (sum_ne_zero_of_good K ha hα (hfa ⟨α, hα⟩) hga)
-      (sum_ne_zero_of_good K hb hα (hgb ⟨α, hα⟩) hgb') h2⟩
-  exact NoZeroDivisors.to_isDomain _
-
-instance : IsDomain (holSubring K) := holSubring_isDomain K
+by convergent Laurent series with coefficients in `K` (`EntireLaurent.holSubring`). It is an
+integral domain (`EntireLaurent.holSubring_isDomain`). Blueprint: `def:H-K`. -/
+noncomputable abbrev holSubring : Subring (OmegaX K → Omega K) := EntireLaurent.holSubring K (Omega K)
 
 /-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`.
 Blueprint: `def:M-K`. -/
@@ -137,20 +54,7 @@ instance : IsFractionRing (holSubring K) (MeroRing K) :=
 /-- Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`.
 Blueprint: `def:reflection`. -/
 noncomputable def reflectionM : MeroRing K ≃+* MeroRing K :=
-  IsFractionRing.ringEquivOfRingEquiv (holReflectHom K)
-
-/-- Book, §2: the constant functions `K ↪ H_K`. Blueprint: `def:const-algebra`. -/
-noncomputable def constHom : K →+* holSubring K where
-  toFun c := ⟨fun _ => algebraMap K (Omega K) c, fun _ => algebraMap K (Omega K) c,
-    isHolomorphicOver_const K c, rfl⟩
-  map_one' := Subtype.ext (funext fun _ => map_one _)
-  map_mul' c d := Subtype.ext (funext fun _ => map_mul _ _ _)
-  map_zero' := Subtype.ext (funext fun _ => map_zero _)
-  map_add' c d := Subtype.ext (funext fun _ => map_add _ _ _)
-
-/-- The `K`-algebra structure on `H_K` given by the constant functions.
-Blueprint: `def:const-algebra`. -/
-noncomputable instance holAlgebra : Algebra K (holSubring K) := RingHom.toAlgebra (constHom K)
+  IsFractionRing.ringEquivOfRingEquiv (holReflectHom K (Omega K))
 
 /-- The constants `K ⊂ M_K`. -/
 noncomputable instance meroAlgebra : Algebra K (MeroRing K) :=
@@ -262,9 +166,9 @@ def Fq (q : K) : Set (MeroRing K) := (FqSub K q : Set (MeroRing K))
 theorem translation_algebraMap (a : Kˣ) (c : K) :
     translation K a (algebraMap K (MeroRing K) c) = algebraMap K (MeroRing K) c := by
   have h1 : algebraMap K (MeroRing K) c =
-      algebraMap (holSubring K) (MeroRing K) (constHom K c) :=
+      algebraMap (holSubring K) (MeroRing K) (constHom K (Omega K) c) :=
     IsScalarTower.algebraMap_apply K (holSubring K) (MeroRing K) c
-  have h2 : holScale K a⁻¹ (constHom K c) = constHom K c := Subtype.ext rfl
+  have h2 : holScale K a⁻¹ (constHom K (Omega K) c) = constHom K (Omega K) c := Subtype.ext rfl
   unfold translation meroScale
   rw [h1, IsFractionRing.ringEquivOfRingEquiv_algebraMap, h2]
 

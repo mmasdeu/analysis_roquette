@@ -1,4 +1,4 @@
-import AnalyticTheory.Normalize
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.PolyHol
 
 /-!
 # Gauss norms on `H_K`
@@ -9,36 +9,38 @@ import AnalyticTheory.Normalize
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
 /-- The Gauss norm of `f ∈ H_K` at radius `r`. -/
-noncomputable def gnorm (r : ℝ) (f : holSubring K) : ℝ := ⨆ n : ℤ, wt K r (holCoeff K f) n
+noncomputable def gnorm (r : ℝ) (f : holSubring K L) : ℝ := ⨆ n : ℤ, wt K r (holCoeff K f) n
 
 variable {K}
 
-theorem holCoeff_zero : holCoeff K (0 : holSubring K) = fun _ => 0 :=
+theorem holCoeff_zero : holCoeff K (0 : holSubring K L) = fun _ => 0 :=
   holCoeff_eq K (fun r hr => by simp) (fun x => by simpa using hasSum_zero)
 
-theorem wt_bddAbove {r : ℝ} (hr : 0 < r) (f : holSubring K) :
+theorem wt_bddAbove {r : ℝ} (hr : 0 < r) (f : holSubring K L) :
     BddAbove (Set.range (fun n : ℤ => wt K r (holCoeff K f) n)) :=
   (wt_tendsto K (holCoeff_convergent K f) hr).bddAbove_range_of_cofinite
 
-theorem wt_le_gnorm {r : ℝ} (hr : 0 < r) (f : holSubring K) (n : ℤ) :
+theorem wt_le_gnorm {r : ℝ} (hr : 0 < r) (f : holSubring K L) (n : ℤ) :
     wt K r (holCoeff K f) n ≤ gnorm K r f :=
   le_ciSup (wt_bddAbove hr f) n
 
-theorem gnorm_nonneg {r : ℝ} (hr : 0 < r) (f : holSubring K) : 0 ≤ gnorm K r f :=
+theorem gnorm_nonneg {r : ℝ} (hr : 0 < r) (f : holSubring K L) : 0 ≤ gnorm K r f :=
   le_trans (wt_nonneg K hr _ 0) (wt_le_gnorm hr f 0)
 
-theorem gnorm_le_iff {r : ℝ} (hr : 0 < r) (f : holSubring K) {M : ℝ} :
+theorem gnorm_le_iff {r : ℝ} (hr : 0 < r) (f : holSubring K L) {M : ℝ} :
     gnorm K r f ≤ M ↔ ∀ n, wt K r (holCoeff K f) n ≤ M :=
   ⟨fun h n => le_trans (wt_le_gnorm hr f n) h, fun h => ciSup_le h⟩
 
-theorem exists_gnorm_attained {r : ℝ} (hr : 0 < r) {f : holSubring K} (hf : f ≠ 0) :
+theorem exists_gnorm_attained {r : ℝ} (hr : 0 < r) {f : holSubring K L} (hf : f ≠ 0) :
     ∃ N, wt K r (holCoeff K f) N = gnorm K r f ∧ 0 < gnorm K r f ∧
       IsLeftMax K r (holCoeff K f) N := by
   have h0 : ∃ n, holCoeff K f n ≠ 0 := by
@@ -51,21 +53,21 @@ theorem exists_gnorm_attained {r : ℝ} (hr : 0 < r) {f : holSubring K} (hf : f 
     le_antisymm ((gnorm_le_iff hr f).mpr hN.1) (wt_le_gnorm hr f N)
   exact ⟨N, this.symm, this ▸ hp, hN⟩
 
-theorem gnorm_pos {r : ℝ} (hr : 0 < r) {f : holSubring K} (hf : f ≠ 0) : 0 < gnorm K r f :=
+theorem gnorm_pos {r : ℝ} (hr : 0 < r) {f : holSubring K L} (hf : f ≠ 0) : 0 < gnorm K r f :=
   (exists_gnorm_attained hr hf).choose_spec.2.1
 
-theorem gnorm_zero {r : ℝ} (hr : 0 < r) : gnorm K r (0 : holSubring K) = 0 := by
+theorem gnorm_zero {r : ℝ} (hr : 0 < r) : gnorm K r (0 : holSubring K L) = 0 := by
   refine le_antisymm ((gnorm_le_iff hr 0).mpr (fun n => ?_)) (gnorm_nonneg hr _)
   simp [wt, holCoeff_zero]
 
-theorem gnorm_eq_zero_iff {r : ℝ} (hr : 0 < r) {f : holSubring K} : gnorm K r f = 0 ↔ f = 0 := by
+theorem gnorm_eq_zero_iff {r : ℝ} (hr : 0 < r) {f : holSubring K L} : gnorm K r f = 0 ↔ f = 0 := by
   constructor
   · intro h
     by_contra hf
     exact (gnorm_pos hr hf).ne' h
   · rintro rfl; exact gnorm_zero hr
 
-theorem gnorm_mul {r : ℝ} (hr : 0 < r) (f g : holSubring K) :
+theorem gnorm_mul {r : ℝ} (hr : 0 < r) (f g : holSubring K L) :
     gnorm K r (f * g) = gnorm K r f * gnorm K r g := by
   by_cases hf : f = 0
   · subst hf; simp [gnorm_zero hr]
@@ -81,7 +83,7 @@ theorem gnorm_mul {r : ℝ} (hr : 0 < r) (f g : holSubring K) :
   refine le_antisymm ?_ (h1 ▸ wt_le_gnorm hr (f * g) _)
   exact (gnorm_le_iff hr _).mpr (fun n => le_trans (this.1.1 n) (le_of_eq h1))
 
-theorem gnorm_add_le {r : ℝ} (hr : 0 < r) (f g : holSubring K) :
+theorem gnorm_add_le {r : ℝ} (hr : 0 < r) (f g : holSubring K L) :
     gnorm K r (f + g) ≤ max (gnorm K r f) (gnorm K r g) := by
   refine (gnorm_le_iff hr _).mpr (fun n => ?_)
   rw [holCoeff_add]
@@ -94,29 +96,29 @@ theorem gnorm_add_le {r : ℝ} (hr : 0 < r) (f g : holSubring K) :
         rw [max_mul_of_nonneg _ _ hp]
     _ ≤ _ := max_le_max (wt_le_gnorm hr f n) (wt_le_gnorm hr g n)
 
-theorem gnorm_neg {r : ℝ} (hr : 0 < r) (f : holSubring K) : gnorm K r (-f) = gnorm K r f := by
-  have h : ∀ f : holSubring K, gnorm K r (-f) ≤ gnorm K r f := fun f =>
+theorem gnorm_neg {r : ℝ} (hr : 0 < r) (f : holSubring K L) : gnorm K r (-f) = gnorm K r f := by
+  have h : ∀ f : holSubring K L, gnorm K r (-f) ≤ gnorm K r f := fun f =>
     (gnorm_le_iff hr _).mpr (fun n => by
       rw [holCoeff_neg]; simpa [wt] using wt_le_gnorm hr f n)
   exact le_antisymm (h f) (by simpa using h (-f))
 
-theorem gnorm_sub_le {r : ℝ} (hr : 0 < r) (f g : holSubring K) :
+theorem gnorm_sub_le {r : ℝ} (hr : 0 < r) (f g : holSubring K L) :
     gnorm K r (f - g) ≤ max (gnorm K r f) (gnorm K r g) := by
   rw [sub_eq_add_neg]
   simpa [gnorm_neg hr] using gnorm_add_le hr f (-g)
 
-theorem gnorm_monoHol {r : ℝ} (hr : 0 < r) (n : ℤ) : gnorm K r (monoHol K n) = r ^ n := by
+theorem gnorm_monoHol {r : ℝ} (hr : 0 < r) (n : ℤ) : gnorm K r (monoHol K L n) = r ^ n := by
   refine le_antisymm ((gnorm_le_iff hr _).mpr (fun m => ?_)) ?_
   · simp only [wt, holCoeff_monoHol]
     by_cases h : m = n
     · subst h; simp
     · simp [h]; exact zpow_nonneg hr.le n
-  · have := wt_le_gnorm hr (monoHol K n) n
+  · have := wt_le_gnorm hr (monoHol K L n) n
     simpa [wt, holCoeff_monoHol] using this
 
-theorem gnorm_algebraMap_mul {r : ℝ} (hr : 0 < r) (c : K) (f : holSubring K) :
-    gnorm K r (algebraMap K (holSubring K) c * f) = ‖c‖ * gnorm K r f := by
-  have h : ∀ (c : K) (f : holSubring K), gnorm K r (algebraMap K (holSubring K) c * f) ≤
+theorem gnorm_algebraMap_mul {r : ℝ} (hr : 0 < r) (c : K) (f : holSubring K L) :
+    gnorm K r (algebraMap K (holSubring K L) c * f) = ‖c‖ * gnorm K r f := by
+  have h : ∀ (c : K) (f : holSubring K L), gnorm K r (algebraMap K (holSubring K L) c * f) ≤
       ‖c‖ * gnorm K r f := fun c f => by
     refine (gnorm_le_iff hr _).mpr (fun n => ?_)
     rw [holCoeff_algebraMap_mul]
@@ -126,23 +128,23 @@ theorem gnorm_algebraMap_mul {r : ℝ} (hr : 0 < r) (c : K) (f : holSubring K) :
   by_cases hc : c = 0
   · subst hc; simp [gnorm_zero hr]
   refine le_antisymm (h c f) ?_
-  have h2 := h c⁻¹ (algebraMap K (holSubring K) c * f)
+  have h2 := h c⁻¹ (algebraMap K (holSubring K L) c * f)
   rw [← mul_assoc, ← map_mul, inv_mul_cancel₀ hc, map_one, one_mul, norm_inv] at h2
   have hcpos : 0 < ‖c‖ := norm_pos_iff.mpr hc
-  calc ‖c‖ * gnorm K r f ≤ ‖c‖ * (‖c‖⁻¹ * gnorm K r (algebraMap K (holSubring K) c * f)) :=
+  calc ‖c‖ * gnorm K r f ≤ ‖c‖ * (‖c‖⁻¹ * gnorm K r (algebraMap K (holSubring K L) c * f)) :=
         mul_le_mul_of_nonneg_left h2 hcpos.le
     _ = _ := by field_simp
 
-theorem gnorm_one {r : ℝ} (hr : 0 < r) : gnorm K r (1 : holSubring K) = 1 := by
-  simpa [monoHol_zero K] using gnorm_monoHol (K := K) hr 0
+theorem gnorm_one {r : ℝ} (hr : 0 < r) : gnorm K r (1 : holSubring K L) = 1 := by
+  simpa [monoHol_zero K (L := L)] using gnorm_monoHol (K := K) (L := L) hr 0
 
-theorem gnorm_pow {r : ℝ} (hr : 0 < r) (f : holSubring K) (m : ℕ) :
+theorem gnorm_pow {r : ℝ} (hr : 0 < r) (f : holSubring K L) (m : ℕ) :
     gnorm K r (f ^ m) = gnorm K r f ^ m := by
   induction m with
   | zero => simpa using gnorm_one hr
   | succ m ih => rw [pow_succ, gnorm_mul hr, ih, pow_succ]
 
-theorem gnorm_between {r r' ρ : ℝ} (hr : 0 < r) (hrρ : r ≤ ρ) (hρr' : ρ ≤ r') (f : holSubring K) :
+theorem gnorm_between {r r' ρ : ℝ} (hr : 0 < r) (hrρ : r ≤ ρ) (hρr' : ρ ≤ r') (f : holSubring K L) :
     gnorm K ρ f ≤ max (gnorm K r f) (gnorm K r' f) := by
   have hρ : 0 < ρ := lt_of_lt_of_le hr hrρ
   have hr' : 0 < r' := lt_of_lt_of_le hρ hρr'
@@ -160,4 +162,4 @@ theorem gnorm_between {r r' ρ : ℝ} (hr : 0 < r) (hrρ : r ≤ ρ) (hρr' : ρ
         rw [mul_max_of_nonneg _ _ (norm_nonneg _)]
     _ ≤ _ := max_le_max (wt_le_gnorm hr f n) (wt_le_gnorm hr' f n)
 
-end AnalyticTheory
+end EntireLaurent

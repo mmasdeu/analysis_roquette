@@ -1,6 +1,4 @@
 import AnalyticTheory.Analytic
-import AnalyticTheory.Identity
-import AnalyticTheory.Zeros
 
 /-!
 # The analytic valuations `w_α` (book, §2)

@@ -77,10 +77,10 @@ theorem R0_one_value : (Rq hq0 hq1 0).1 oneX = algebraMap K (Omega K) (Pc q) ^ 2
     exact h3.trans (by ring)
   have hThEq : Th hq0 hq1 = thF q φ 0 * (PF * PG) :=
     Subtype.ext (funext fun x => by rw [mul_apply_hol, mul_apply_hol]; exact hTh x)
-  have hlin : linF (q := q) (0 : ℤ) = monoHol K 1 - 1 := by
+  have hlin : linF (q := q) (0 : ℤ) = monoHol K (Omega K) 1 - 1 := by
     unfold linF polyHol
     simp
-  have hth0 : thF q φ 0 = monoHol K (-1) * linF (q := q) (0 : ℤ) := by
+  have hth0 : thF q φ 0 = monoHol K (Omega K) (-1) * linF (q := q) (0 : ℤ) := by
     refine Subtype.ext (funext fun x => ?_)
     rw [mul_apply_hol, linF_apply, monoHol_apply, hφdef, thF_one hq0 hq1]
     have hx := x.2
@@ -90,7 +90,7 @@ theorem R0_one_value : (Rq hq0 hq1 0).1 oneX = algebraMap K (Omega K) (Pc q) ^ 2
     unfold linF
     exact polyHol_ne_zero_of_monic (by
       exact Polynomial.monic_X_sub_C _)
-  have hR0 : Rq hq0 hq1 0 = monoHol K (-1) * (PF * PG) := by
+  have hR0 : Rq hq0 hq1 0 = monoHol K (Omega K) (-1) * (PF * PG) := by
     have h1 := Rq_spec hq0 hq1 0
     rw [hThEq, hth0] at h1
     apply mul_left_cancel₀ hlin0

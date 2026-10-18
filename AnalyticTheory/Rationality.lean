@@ -87,29 +87,4 @@ theorem anPt_aut (σ : Omega K ≃ₐ[K] Omega K) {α : Omega K} (hα : α ≠ 0
   rw [anPt_eq_of_rep K hα f x y hy0 hxy.symm, anPt_eq_of_rep K hσ f x y hy0 hxy.symm,
     anOrdHol_aut K σ hα, anOrdHol_aut K σ hα]
 
-/-- A non-zero holomorphic function has a Laurent expansion with a non-zero coefficient. -/
-theorem hol_rep {p : holSubring K} (hp : p ≠ 0) :
-    ∃ (g : Omega K → Omega K) (a : ℤ → K), IsConvergentLaurent K a ∧ (∃ n, a n ≠ 0) ∧
-      (∀ x : Omega K, x ≠ 0 →
-        HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (g x)) ∧
-      ∀ (x : Omega K) (hx : x ≠ 0), p.1 ⟨x, hx⟩ = g x := by
-  obtain ⟨g, ⟨a, ha, hsum⟩, hgf⟩ := p.2
-  refine ⟨g, a, ha, ?_, hsum, fun x hx => (congrFun hgf ⟨x, hx⟩).symm⟩
-  by_contra hcon
-  push_neg at hcon
-  apply hp
-  apply Subtype.ext
-  funext x
-  have h1 := hsum x.1 x.2
-  have h2 : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x.1 ^ n) (0 : Omega K) := by
-    simpa [hcon] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : Omega K)) 0)
-  have : g x.1 = 0 := h1.unique h2
-  rw [← congrFun hgf x]; simpa using this
-
-theorem holZeros_finite {p : holSubring K} (hp : p ≠ 0) {r r' : ℝ} (hr : 0 < r) (hrr' : r ≤ r') :
-    {x : Omega K | ∃ hx : x ≠ 0, r ≤ ‖x‖ ∧ ‖x‖ ≤ r' ∧ p.1 ⟨x, hx⟩ = 0}.Finite := by
-  obtain ⟨g, a, ha, h0, hsum, hpg⟩ := hol_rep K hp
-  refine (zeros_annulus_finite K ha h0 hsum hr hrr').subset (fun x ⟨hx, h1, h2, h3⟩ => ?_)
-  exact ⟨hx, h1, h2, by rw [← hpg x hx]; exact h3⟩
-
 end AnalyticTheory

@@ -32,10 +32,10 @@ theorem valK_holScale (c a : K) (hc : c ≠ 0) (ha : a ≠ 0) (f : holSubring K)
 
 /-- `(X − a)²` divides `G` if `G` and `DG` vanish at `a`. -/
 theorem lin_sq_dvd {a : K} (ha : a ≠ 0) {G : holSubring K} (h0 : valK G a ha = 0)
-    (h1 : valK (holD G) a ha = 0) : (monoHol K 1 - algebraMap K (holSubring K) a) ^ 2 ∣ G := by
-  set X := monoHol K 1 with hX
+    (h1 : valK (holD G) a ha = 0) : (monoHol K (Omega K) 1 - algebraMap K (holSubring K) a) ^ 2 ∣ G := by
+  set X := monoHol K (Omega K) 1 with hX
   set L := X - algebraMap K (holSubring K) a with hL
-  have hLdef : L = polyHol K (minpoly K (algebraMap K (Omega K) a)) := by
+  have hLdef : L = polyHol K (Omega K) (minpoly K (algebraMap K (Omega K) a)) := by
     rw [minpoly.eq_X_sub_C (Omega K) a]; simp [polyHol, hL, hX]
   have hdvd : ∀ H : holSubring K, valK H a ha = 0 → L ∣ H := by
     intro H hH
@@ -68,7 +68,7 @@ theorem valK_congr (f : holSubring K) {a a' : K} (h : a = a') (ha : a ≠ 0) (ha
 
 /-- The functional equation `G(q⁻¹X) = X² G(X)`. -/
 def FE2 (q : K) (hq0 : q ≠ 0) (G : holSubring K) : Prop :=
-  holScale K (Units.mk0 q hq0)⁻¹ G = monoHol K 1 * monoHol K 1 * G
+  holScale K (Units.mk0 q hq0)⁻¹ G = monoHol K (Omega K) 1 * monoHol K (Omega K) 1 * G
 
 include hq0 in
 theorem FE2_val {G : holSubring K} (hG : FE2 q hq0 G) (x : K) (hx : x ≠ 0) :
@@ -152,7 +152,7 @@ variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 include hq0 hq1 in
 theorem Th_FE : holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ (Th hq0 hq1) =
-    -(monoHol K 1 * Th hq0 hq1) := by
+    -(monoHol K (Omega K) 1 * Th hq0 hq1) := by
   have h := (thetaFun_spec hq0 hq1 (one_ne_zero (α := Omega K))).2.1
   change holScale K _ (Th hq0 hq1) = _ at h
   have hd : (Polynomial.X - 1 : Polynomial K).natDegree = 1 := by
@@ -167,7 +167,7 @@ theorem Gw_FE : FE2 q (norm_pos_iff.mp hq0) (Gw hq0 hq1) := by
   have hper := (mem_Fq_iff hq0' _).mp (wpAlg_mem_Fq hq0 hq1)
   rw [wpAlg_eq_Gw hq0 hq1, map_div₀, map_pow, translation_alg, translation_alg, Th_FE hq0 hq1] at hper
   have hT := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
-  have hA : algebraMap (holSubring K) (MeroRing K) (monoHol K 1) ≠ 0 :=
+  have hA : algebraMap (holSubring K) (MeroRing K) (monoHol K (Omega K) 1) ≠ 0 :=
     alg_hol_ne_zero (monoHol_ne_zero 1)
   unfold FE2
   apply IsFractionRing.injective (holSubring K) (MeroRing K)
@@ -198,17 +198,17 @@ theorem Mb_FE {b : K} (hb : b ≠ 0) : FE2 q (norm_pos_iff.mp hq0) (Mb hq0 hq1 b
   unfold FE2 Mb
   rw [map_mul]
   have e1 : holScale K (Units.mk0 q hq0')⁻¹ (holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1)) =
-      -(algebraMap K (holSubring K) b⁻¹ * monoHol K 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1)) := by
+      -(algebraMap K (holSubring K) b⁻¹ * monoHol K (Omega K) 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1)) := by
     rw [holScale_comm, Th_FE hq0 hq1, map_neg, map_mul, holScale_monoHol]
     simp [mul_assoc]
   have e2 : holScale K (Units.mk0 q hq0')⁻¹ (holScale K (Units.mk0 b hb) (Th hq0 hq1)) =
-      -(algebraMap K (holSubring K) b * monoHol K 1 * holScale K (Units.mk0 b hb) (Th hq0 hq1)) := by
+      -(algebraMap K (holSubring K) b * monoHol K (Omega K) 1 * holScale K (Units.mk0 b hb) (Th hq0 hq1)) := by
     rw [holScale_comm, Th_FE hq0 hq1, map_neg, map_mul, holScale_monoHol]
     simp [mul_assoc]
   rw [e1, e2]
   have : algebraMap K (holSubring K) b⁻¹ * algebraMap K (holSubring K) b = 1 := by
     rw [← map_mul, inv_mul_cancel₀ hb, map_one]
-  linear_combination (monoHol K 1 * monoHol K 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1) *
+  linear_combination (monoHol K (Omega K) 1 * monoHol K (Omega K) 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1) *
     holScale K (Units.mk0 b hb) (Th hq0 hq1)) * this
 
 end Mb
@@ -314,7 +314,7 @@ theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {
       have hα' : α = algebraMap K (Omega K) (q ^ j * b) := by rw [hj, map_mul, map_zpow₀]
       rw [hα']
       have hL : anVal K (algebraMap K (Omega K) (q ^ j * b)) (algebraMap (holSubring K) (MeroRing K)
-          (monoHol K 1 - algebraMap K (holSubring K) (q ^ j * b))) = 1 := by
+          (monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ j * b))) = 1 := by
         have := anVal_polyHol_minpoly (K := K) (ξ := algebraMap K (Omega K) (q ^ j * b))
           (β := algebraMap K (Omega K) (q ^ j * b)) ((map_ne_zero _).mpr haj) ((map_ne_zero _).mpr haj)
         rw [if_pos rfl, minpoly.eq_X_sub_C (Omega K)] at this
@@ -330,10 +330,10 @@ theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {
   obtain ⟨u, hu⟩ := hdvd
   have hfeM := Mb_FE hq0 hq1 hb
   unfold FE2 at hG hfeM
-  have hX : monoHol K 1 * monoHol K 1 ≠ 0 := mul_ne_zero (monoHol_ne_zero 1) (monoHol_ne_zero 1)
+  have hX : monoHol K (Omega K) 1 * monoHol K (Omega K) 1 ≠ 0 := mul_ne_zero (monoHol_ne_zero 1) (monoHol_ne_zero 1)
   have hscale : holScale K (Units.mk0 q hq0')⁻¹ u = u := by
-    have e : monoHol K 1 * monoHol K 1 * (Mb hq0 hq1 b hb * holScale K (Units.mk0 q hq0')⁻¹ u) =
-        monoHol K 1 * monoHol K 1 * (Mb hq0 hq1 b hb * u) := by
+    have e : monoHol K (Omega K) 1 * monoHol K (Omega K) 1 * (Mb hq0 hq1 b hb * holScale K (Units.mk0 q hq0')⁻¹ u) =
+        monoHol K (Omega K) 1 * monoHol K (Omega K) 1 * (Mb hq0 hq1 b hb * u) := by
       have := hG
       rw [hu, map_mul, hfeM] at this
       linear_combination this
@@ -350,7 +350,7 @@ theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {
     exact (mul_eq_zero.mp this).resolve_left (sub_ne_zero.mpr hne)
   have hu' : u = algebraMap K (holSubring K) (holCoeff K u 0) := by
     apply holCoeff_injective K
-    have h1 := holCoeff_algebraMap_mul K (holCoeff K u 0) 1
+    have h1 := holCoeff_algebraMap_mul K (L := Omega K) (holCoeff K u 0) 1
     rw [mul_one, holCoeff_one] at h1
     rw [h1]
     funext n

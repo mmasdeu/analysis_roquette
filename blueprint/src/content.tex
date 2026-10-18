@@ -131,7 +131,7 @@ $\Omega$ is an algebraic closure of $K$.
 
 \begin{definition}[Extension of the absolute value]
 \label{def:omega-norm}
-\lean{AnalyticTheory.omegaNorm, AnalyticTheory.omegaNormedField}
+\lean{AnalyticTheory.omegaNorm, EntireLaurent.omegaNormedField}
 \uses{def:omega}
 \leanok
 The absolute value of $K$ extends uniquely to $\Omega$ (spectral norm); $\Omega$ is normed through it.
@@ -151,14 +151,14 @@ See the Lean proof of \texttt{omegaNorm\_unique\_extension}.
 
 \begin{definition}[Convergent Laurent series]
 \label{def:convergent-laurent}
-\lean{AnalyticTheory.IsConvergentLaurent}
+\lean{EntireLaurent.IsConvergentLaurent}
 \leanok
 A Laurent series $\sum a_n X^n$ is convergent if $|a_n|r^n\to 0$ for every $r>0$.
 \end{definition}
 
 \begin{definition}[Holomorphic function over $K$]
 \label{def:holomorphic}
-\lean{AnalyticTheory.IsHolomorphicOver}
+\lean{EntireLaurent.IsHolomorphicOver}
 \uses{def:convergent-laurent}
 \leanok
 $f:\Omega^\times\to\Omega$ is holomorphic over $K$ if it is given by a convergent Laurent series with coefficients in $K$.
@@ -174,7 +174,7 @@ The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of t
 
 \begin{lemma}[$H_K$ is a domain]
 \label{lem:H-K-domain}
-\lean{AnalyticTheory.holSubring_isDomain, AnalyticTheory.exists_good_point, AnalyticTheory.sum_ne_zero_of_good, AnalyticTheory.bad_radii_finite}
+\lean{EntireLaurent.holSubring_isDomain, EntireLaurent.exists_good_point, EntireLaurent.sum_ne_zero_of_good, EntireLaurent.bad_radii_finite}
 \uses{def:H-K}
 \leanok
 $H_K$ is an integral domain.
@@ -194,7 +194,7 @@ $M_K$ is the quotient field of $H_K$ (meromorphic functions).
 
 \begin{definition}[$K$-structure on $H_K$]
 \label{def:const-algebra}
-\lean{AnalyticTheory.holAlgebra}
+\lean{EntireLaurent.holAlgebra}
 \uses{def:H-K}
 \leanok
 Constant functions give a ring homomorphism $K\to H_K$, hence a $K$-algebra structure on $H_K$.
@@ -297,7 +297,7 @@ $\Theta_\alpha(X)=\Theta(\alpha^{-1}X)$.
 
 \begin{proposition}[Functional equation of $\Theta$]
 \label{prop:theta-functional-eq}
-\lean{AnalyticTheory.theta_functional_equation, AnalyticTheory.multipliable_one_sub_omega, AnalyticTheory.multipliable_geom_omega, AnalyticTheory.omegaNormedAlgebra}
+\lean{AnalyticTheory.theta_functional_equation, AnalyticTheory.multipliable_one_sub_omega, AnalyticTheory.multipliable_geom_omega, EntireLaurent.omegaNormedAlgebra}
 \uses{def:theta}
 \leanok
 $\Theta(q^{-1}X)=-X\,\Theta(X)$ for $0<|q|<1$ and $X\neq 0$ (the products are multipliable in $\Omega$ since they live in the complete field $K(X)$; at $X=0$ the identity fails, as $\Theta(0)=1$).
@@ -612,7 +612,7 @@ Constants lie in $F_K(q)$ because translations fix $K$, giving $K\to F_K(q)$.
 
 \begin{definition}[Convolution coefficients]
 \label{def:convolution}
-\lean{AnalyticTheory.convCoeff}
+\lean{EntireLaurent.convCoeff}
 \uses{def:convergent-laurent}
 \leanok
 For Laurent coefficients $a,b$ the convolution $c_n=\sum_k a_k b_{n-k}$ (summed in $K$).
@@ -620,7 +620,7 @@ For Laurent coefficients $a,b$ the convolution $c_n=\sum_k a_k b_{n-k}$ (summed 
 
 \begin{lemma}[$H_K$ is closed under products]
 \label{lem:H-K-mul}
-\lean{AnalyticTheory.isHolomorphicOver_mul}
+\lean{EntireLaurent.isHolomorphicOver_mul}
 \uses{def:H-K, def:convolution}
 \leanok
 If $f,g$ are holomorphic over $K$ then so is $fg$: its coefficients are the convolutions of those of $f$ and $g$.
@@ -652,7 +652,7 @@ An $L$-automorphism $\tau$ of $FL$ is a translation if $\tau(\mathfrak p)\sim\ma
 
 \begin{lemma}[Binomial theorem for integer exponents]
 \label{lem:binomial-expansion}
-\lean{AnalyticTheory.binomZ, AnalyticTheory.hasSum_binom_expansion}
+\lean{EntireLaurent.binomZ, EntireLaurent.hasSum_binom_expansion}
 \leanok
 In a complete normed field, $(x+y)^n=\sum_k\binom nk x^{n-k}y^k$ for all $n\in\mathbb Z$ and $|y|<|x|$, with generalized binomial coefficients.
 \end{lemma}
@@ -663,7 +663,7 @@ See the Lean proof of \texttt{binomZ, hasSum\_binom\_expansion}.
 
 \begin{proposition}[Taylor expansion of holomorphic functions]
 \label{prop:taylor-expansion}
-\lean{AnalyticTheory.taylor_expansion, AnalyticTheory.omega_hasSum_mem, AnalyticTheory.tendsto_mul_cofinite_prod}
+\lean{EntireLaurent.taylor_expansion, EntireLaurent.omega_hasSum_mem, EntireLaurent.tendsto_mul_cofinite_prod}
 \uses{def:holomorphic, lem:binomial-expansion}
 \leanok
 If $f=\sum a_nX^n$ is a convergent Laurent series over $K$ and $\alpha\in\Omega^\times$, then $f(\alpha+h)=\sum_k b_kh^k$ for $|h|<|\alpha|$, with $b_k\in K(\alpha)$ and $|b_k||\alpha|^k$ bounded.
@@ -675,7 +675,7 @@ See the Lean proof of \texttt{taylor\_expansion, omega\_hasSum\_mem, tendsto\_mu
 
 \begin{lemma}[Identity theorem for Laurent series]
 \label{lem:identity-theorem}
-\lean{AnalyticTheory.laurent_eq_zero_of_vanishing, AnalyticTheory.exists_large_value, AnalyticTheory.exists_poly_of_max, AnalyticTheory.sumM_le, AnalyticTheory.poly_bad_radii_finite, AnalyticTheory.exists_norm_in_open}
+\lean{EntireLaurent.laurent_eq_zero_of_vanishing, EntireLaurent.exists_large_value, EntireLaurent.exists_poly_of_max, EntireLaurent.sumM_le, EntireLaurent.poly_bad_radii_finite, EntireLaurent.exists_norm_in_open}
 \uses{prop:taylor-expansion}
 \leanok
 A convergent Laurent series over $K$ that vanishes on the ball $\{x : |x-\alpha|<|\alpha|\}$ (with $\alpha\in\Omega^\times$) is zero. The proof collects the terms of maximal norm into a polynomial in $t=(x-\alpha)/\alpha$ and evaluates it at a point of generic radius.
@@ -687,7 +687,7 @@ See the Lean proof of \texttt{laurent\_eq\_zero\_of\_vanishing, exists\_large\_v
 
 \begin{proposition}[Finite order of vanishing]
 \label{prop:finite-order}
-\lean{AnalyticTheory.exists_order}
+\lean{EntireLaurent.exists_order}
 \uses{prop:taylor-expansion, lem:identity-theorem}
 \leanok
 A holomorphic function that is not identically zero has, at every $\alpha\in\Omega^\times$, a finite order $k$: $f(x)/(x-\alpha)^k$ has a nonzero limit as $x\to\alpha$.
@@ -699,7 +699,7 @@ See the Lean proof of \texttt{exists\_order}.
 
 \begin{lemma}[Weierstra\ss\ preparation on the unit circle]
 \label{lem:weierstrass-prep}
-\lean{AnalyticTheory.weierstrass_prep, AnalyticTheory.wit_prop, AnalyticTheory.divD, AnalyticTheory.divR, AnalyticTheory.div_identity, AnalyticTheory.hasSum_cauchy_product, AnalyticTheory.PolyData, AnalyticTheory.WitProp}
+\lean{EntireLaurent.weierstrass_prep, EntireLaurent.wit_prop, EntireLaurent.divD, EntireLaurent.divR, EntireLaurent.div_identity, EntireLaurent.hasSum_cauchy_product, EntireLaurent.PolyData, EntireLaurent.WitProp}
 \leanok
 Let $H=\sum h_my^m$ be a null sequence over a complete ultrametric field with $|h_m|\le 1$, $|h_0|=|h_s|=1$ and $|h_m|\le\varepsilon<1$ for $m<0$ and $m>s$. Then $y^s=Q\cdot H+R$ with $Q$ a null sequence, $|Q-h_s^{-1}|\le\varepsilon$, and $R$ a polynomial of degree $<s$ with coefficients of norm $\le1$. (Euclidean division by the polynomial part, then a contraction argument in $C_0(\mathbb Z,F)$.)
 \end{lemma}
@@ -710,7 +710,7 @@ See the Lean proof of \texttt{weierstrass\_prep, wit\_prop, divD, divR, div\_ide
 
 \begin{proposition}[Zeros on a sphere with tied dominant terms]
 \label{prop:tie-structure}
-\lean{AnalyticTheory.tie_structure, AnalyticTheory.exists_zero_of_tie, AnalyticTheory.prep_eval, AnalyticTheory.cauchy_omega}
+\lean{EntireLaurent.tie_structure, EntireLaurent.exists_zero_of_tie, EntireLaurent.prep_eval, EntireLaurent.cauchy_omega}
 \uses{lem:weierstrass-prep, prop:taylor-expansion}
 \leanok
 If the maximal terms of a convergent Laurent series $f$ at radius $\rho$ are attained at two indices, there are $x_0\in\Omega$ with $|x_0|=\rho$ and a monic polynomial $P$ (all of whose roots have norm $1$) with: for $|y|=1$, $f(x_0y)=0$ iff $P(y)=0$. In particular $f$ has a zero of norm $\rho$.
@@ -722,7 +722,7 @@ See the Lean proof of \texttt{tie\_structure, exists\_zero\_of\_tie, prep\_eval,
 
 \begin{proposition}[Finiteness of zeros]
 \label{prop:zeros-finite}
-\lean{AnalyticTheory.zeros_sphere_finite, AnalyticTheory.zeros_annulus_finite, AnalyticTheory.bad_radii_finite_Icc, AnalyticTheory.exists_tie_of_not_good, AnalyticTheory.holZeros_finite, AnalyticTheory.hol_rep}
+\lean{EntireLaurent.zeros_sphere_finite, EntireLaurent.zeros_annulus_finite, EntireLaurent.bad_radii_finite_Icc, EntireLaurent.exists_tie_of_not_good, EntireLaurent.holZeros_finite, EntireLaurent.hol_rep}
 \uses{prop:tie-structure, lem:H-K-domain}
 \leanok
 A nonzero holomorphic function over $K$ has only finitely many zeros in every closed annulus $r\le|x|\le r'$.
@@ -758,7 +758,7 @@ See the Lean proof of \texttt{divisorOf\_finite, divisorOf\_mem\_Divisors, princ
 
 \begin{lemma}[Gauss lemma with extremal indices]
 \label{lem:gauss-extremal}
-\lean{AnalyticTheory.wt, AnalyticTheory.IsLeftMax, AnalyticTheory.IsRightMax, AnalyticTheory.exists_leftMax, AnalyticTheory.exists_rightMax, AnalyticTheory.leftMax_conv, AnalyticTheory.rightMax_conv, AnalyticTheory.leftMax_mono, AnalyticTheory.reflSeq, AnalyticTheory.exists_max_of_tendsto}
+\lean{EntireLaurent.wt, EntireLaurent.IsLeftMax, EntireLaurent.IsRightMax, EntireLaurent.exists_leftMax, EntireLaurent.exists_rightMax, EntireLaurent.leftMax_conv, EntireLaurent.rightMax_conv, EntireLaurent.leftMax_mono, EntireLaurent.reflSeq, EntireLaurent.exists_max_of_tendsto}
 \uses{def:convergent-laurent}
 \leanok
 For convergent Laurent sequences $a,b$ and $r>0$ let $N_a$ ($N_a^+$) be the leftmost (rightmost) index maximizing $|a_n|r^n$. Then $N_{a*b}=N_a+N_b$, $N^+_{a*b}=N^+_a+N^+_b$ and $\max|(a*b)_n|r^n=\max|a_n|r^n\cdot\max|b_n|r^n$. Moreover $r\mapsto N_a(r)$ is nondecreasing.
@@ -770,7 +770,7 @@ See the Lean proof of \texttt{wt, IsLeftMax, IsRightMax, exists\_leftMax, exists
 
 \begin{lemma}[Units of the convolution algebra]
 \label{lem:unit-convolution}
-\lean{AnalyticTheory.unit_aux, AnalyticTheory.unit_monomial, AnalyticTheory.deltaSeq, AnalyticTheory.isLeftMax_unique, AnalyticTheory.isRightMax_unique}
+\lean{EntireLaurent.unit_aux, EntireLaurent.unit_monomial, EntireLaurent.deltaSeq, EntireLaurent.isLeftMax_unique, EntireLaurent.isRightMax_unique}
 \uses{lem:gauss-extremal}
 \leanok
 If $a*b=\delta_0$ for convergent Laurent sequences, then $a$ has a single nonzero coefficient.
@@ -782,7 +782,7 @@ See the Lean proof of \texttt{unit\_aux, unit\_monomial, deltaSeq, isLeftMax\_un
 
 \begin{proposition}[Laurent coefficients of holomorphic functions]
 \label{prop:laurent-coefficients}
-\lean{AnalyticTheory.laurent_summable, AnalyticTheory.laurentFun, AnalyticTheory.holOfSeq, AnalyticTheory.laurent_unique, AnalyticTheory.holCoeff, AnalyticTheory.holCoeff_mul, AnalyticTheory.holCoeff_injective, AnalyticTheory.monoHol, AnalyticTheory.monoHol_apply}
+\lean{EntireLaurent.laurent_summable, EntireLaurent.laurentFun, EntireLaurent.holOfSeq, EntireLaurent.laurent_unique, EntireLaurent.holCoeff, EntireLaurent.holCoeff_mul, EntireLaurent.holCoeff_injective, EntireLaurent.monoHol, EntireLaurent.monoHol_apply}
 \uses{lem:identity-theorem, def:H-K}
 \leanok
 Every convergent Laurent sequence defines an element of $H_K$; the coefficient sequence of an element of $H_K$ is unique, and that of a product is the convolution.
@@ -794,7 +794,7 @@ See the Lean proof of \texttt{laurent\_summable, laurentFun, holOfSeq, laurent\_
 
 \begin{corollary}[Units of $H_K$]
 \label{cor:hol-units}
-\lean{AnalyticTheory.hol_unit}
+\lean{EntireLaurent.hol_unit}
 \uses{lem:unit-convolution, prop:laurent-coefficients}
 \leanok
 The units of $H_K$ are the functions $cX^n$ with $c\in K^\times$, $n\in\mathbb Z$.
@@ -806,7 +806,7 @@ See the Lean proof of \texttt{hol\_unit}.
 
 \begin{proposition}[Sums of null families of holomorphic functions]
 \label{prop:null-family-sum}
-\lean{AnalyticTheory.NullFamily, AnalyticTheory.tail_norm_le, AnalyticTheory.hol_hasSum_family, AnalyticTheory.NullFamily.exists_finite, AnalyticTheory.NullFamily.tendsto_prod, AnalyticTheory.NullFamily.hasSum_coeff, AnalyticTheory.NullFamily.sum, AnalyticTheory.NullFamily.hasSum_sum, AnalyticTheory.NullFamily.approx, AnalyticTheory.NullFamily.sum_convergent}
+\lean{EntireLaurent.NullFamily, EntireLaurent.tail_norm_le, EntireLaurent.hol_hasSum_family, EntireLaurent.NullFamily.exists_finite, EntireLaurent.NullFamily.tendsto_prod, EntireLaurent.NullFamily.hasSum_coeff, EntireLaurent.NullFamily.sum, EntireLaurent.NullFamily.hasSum_sum, EntireLaurent.NullFamily.approx, EntireLaurent.NullFamily.sum_convergent}
 \uses{prop:laurent-coefficients}
 \leanok
 Let $(f_i)$ be elements of $H_K$ whose Gauss norms $\|f_i\|_r$ tend to $0$ along the cofinite filter for every $r>0$. Then the coefficientwise sums define a holomorphic $g$ with $g(\alpha)=\sum_if_i(\alpha)$ for every $\alpha\neq0$; $H_K$ is complete for the Gauss norms.
@@ -818,7 +818,7 @@ See the Lean proof of \texttt{NullFamily, tail\_norm\_le, hol\_hasSum\_family, e
 
 \begin{proposition}[Division by the minimal polynomial]
 \label{prop:phi-division}
-\lean{AnalyticTheory.polyHol, AnalyticTheory.hol_phi_division, AnalyticTheory.phi_dvd_iff, AnalyticTheory.polyHol_minpoly_prime, AnalyticTheory.exists_coord_bound, AnalyticTheory.exists_quot, AnalyticTheory.phi_quot_bound, AnalyticTheory.coord_bound, AnalyticTheory.wt_le_of_conv, AnalyticTheory.holCoeff_polyHol, AnalyticTheory.polyHol_apply}
+\lean{EntireLaurent.polyHol, EntireLaurent.hol_phi_division, EntireLaurent.phi_dvd_iff, EntireLaurent.polyHol_minpoly_prime, EntireLaurent.exists_coord_bound, EntireLaurent.exists_quot, EntireLaurent.phi_quot_bound, EntireLaurent.coord_bound, EntireLaurent.wt_le_of_conv, EntireLaurent.holCoeff_polyHol, EntireLaurent.polyHol_apply}
 \uses{prop:laurent-coefficients, prop:null-family-sum}
 \leanok
 Let $\alpha\in\Omega^\times$ with minimal polynomial $\varphi$ over $K$. Every $f\in H_K$ can be written $f=\varphi g+r$ with $g\in H_K$ and $r\in K[X]$ of degree $<\deg\varphi$; and $\varphi\mid f$ in $H_K$ iff $f(\alpha)=0$. In particular $\varphi$ is a prime element of $H_K$. (The coordinates of $X^k$ modulo $\varphi$ are bounded by $C|\alpha|^k$, since $K(\alpha)$ is a finite-dimensional normed space; the Gauss lemma bounds the quotients.)
@@ -830,7 +830,7 @@ See the Lean proof of \texttt{polyHol, hol\_phi\_division, phi\_dvd\_iff, polyHo
 
 \begin{lemma}[Dominant coefficient on a zero-free annulus]
 \label{lem:dominant-annulus}
-\lean{AnalyticTheory.unique_max_of_no_zero, AnalyticTheory.dominant_const, AnalyticTheory.gnorm, AnalyticTheory.gnorm_mul, AnalyticTheory.gnorm_add_le, AnalyticTheory.gnorm_between, AnalyticTheory.gnorm_pos, AnalyticTheory.local_inverse, AnalyticTheory.holCoeff_monoHol_mul}
+\lean{EntireLaurent.unique_max_of_no_zero, EntireLaurent.dominant_const, EntireLaurent.gnorm, EntireLaurent.gnorm_mul, EntireLaurent.gnorm_add_le, EntireLaurent.gnorm_between, EntireLaurent.gnorm_pos, EntireLaurent.local_inverse, EntireLaurent.holCoeff_monoHol_mul}
 \uses{prop:tie-structure, lem:gauss-extremal, prop:laurent-coefficients}
 \leanok
 If $U\in H_K$ has no zero $x$ with $r\le|x|\le r'$, then the maximum of $|u_n|\rho^n$ is attained at one index $N$, the same for all $\rho\in[r,r']$ (a change of the dominant index forces a tie, hence a zero). Consequently $E=1-u_N^{-1}X^{-N}U$ has Gauss norm $<1$ on $[r,r']$; the Gauss norm $\|f\|_\rho=\max|a_n|\rho^n$ on $H_K$ is multiplicative (Gauss lemma) and ultrametric.
@@ -842,7 +842,7 @@ See the Lean proof of \texttt{unique\_max\_of\_no\_zero, dominant\_const, gnorm,
 
 \begin{theorem}[Division theorem in $H_K$]
 \label{thm:division-hol}
-\lean{AnalyticTheory.hol_dvd_of_anVal_le, AnalyticTheory.hol_dvd_of_pow_dvd, AnalyticTheory.local_approx, AnalyticTheory.exists_limit_coeff, AnalyticTheory.exists_factor_annulus, AnalyticTheory.exists_exact_pow, AnalyticTheory.dvd_pow_of_anVal_le, AnalyticTheory.isCoprime_minpoly_pow}
+\lean{AnalyticTheory.hol_dvd_of_anVal_le, EntireLaurent.hol_dvd_of_pow_dvd, EntireLaurent.local_approx, EntireLaurent.exists_limit_coeff, EntireLaurent.exists_factor_annulus, AnalyticTheory.exists_exact_pow, AnalyticTheory.dvd_pow_of_anVal_le, EntireLaurent.isCoprime_minpoly_pow}
 \uses{lem:dominant-annulus, prop:phi-division, def:analytic-valuation}
 \leanok
 If $A,B\in H_K$, $B\ne0$, and $w_\alpha(A)\ge w_\alpha(B)$ for all $\alpha\in\Omega^\times$, then $B$ divides $A$ in $H_K$. (On every annulus the factors $\varphi_\alpha^{w_\alpha(B)}$ with zeros there are removed; the rest is inverted by a geometric series, giving approximate quotients in $H_K$ whose coefficientwise limit is independent of the annulus.)
@@ -854,7 +854,7 @@ See the Lean proof of \texttt{hol\_dvd\_of\_anVal\_le, hol\_dvd\_of\_pow\_dvd, l
 
 \begin{proposition}[Infinite products in $H_K$]
 \label{prop:infinite-products}
-\lean{AnalyticTheory.exists_infprod, AnalyticTheory.exists_infprod_tail, AnalyticTheory.partial_prod_bound, AnalyticTheory.norm_eval_le_gnorm, AnalyticTheory.prod_apply_hol}
+\lean{EntireLaurent.exists_infprod, EntireLaurent.exists_infprod_tail, EntireLaurent.partial_prod_bound, EntireLaurent.norm_eval_le_gnorm, EntireLaurent.prod_apply_hol}
 \uses{prop:null-family-sum, lem:dominant-annulus}
 \leanok
 If $g_j\in H_K$ and $\|g_j\|_\rho\to0$ for every $\rho>0$, the partial products $\prod_{j<J}(1+g_j)$ converge pointwise on $\Omega^\times$ to an element of $H_K$; removing finitely many factors leaves a factor not vanishing at a given point.

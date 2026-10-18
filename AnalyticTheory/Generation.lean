@@ -291,7 +291,7 @@ theorem hol_val_one (G : holSubring K) : ∃ s : K, G.1 oneX = algebraMap K (Ome
 
 omit hq0 hq1 in
 theorem exact_factor_one {x : holSubring K} (hx : x ≠ 0) :
-    ∃ (a : ℕ) (x' : holSubring K), x = polyHol K (minpoly K (1 : Omega K)) ^ a * x' ∧
+    ∃ (a : ℕ) (x' : holSubring K), x = polyHol K (Omega K) (minpoly K (1 : Omega K)) ^ a * x' ∧
       x'.1 oneX ≠ 0 ∧ anVal K 1 (algebraMap (holSubring K) (MeroRing K) x) = (a : ℤ) := by
   obtain ⟨a, ⟨x', hx'⟩, hnd, hval⟩ := exists_exact_pow K (one_ne_zero (α := Omega K)) hx
   refine ⟨a, x', hx', fun h0 => hnd ?_, hval⟩
@@ -336,7 +336,7 @@ theorem exists_const_approx {r : MeroRing K} (hr : 0 ≤ anVal K 1 r) :
     exact_mod_cast (by omega : (1 : ℤ) ≤ (a : ℤ) - b)
   · have hab' : a = b := by exact_mod_cast heq.symm
     subst hab'
-    have hφ : polyHol K (minpoly K (1 : Omega K)) ^ a ≠ 0 :=
+    have hφ : polyHol K (Omega K) (minpoly K (1 : Omega K)) ^ a ≠ 0 :=
       pow_ne_zero _ (polyHol_minpoly_prime K one_ne_zero).ne_zero
     have hx'0 : x' ≠ 0 := by rintro rfl; apply hx0; rw [hx', mul_zero]
     have hy'0 : y' ≠ 0 := by rintro rfl; apply hy0; rw [hy', mul_zero]

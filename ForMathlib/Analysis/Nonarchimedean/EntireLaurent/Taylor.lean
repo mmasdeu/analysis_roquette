@@ -1,4 +1,9 @@
-import AnalyticTheory.Dominance
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
+import Mathlib.Analysis.Normed.Ring.Ultra
+import Mathlib.Analysis.SpecificLimits.Normed
+import Mathlib.Data.Real.StarOrdered
+import Mathlib.Topology.Algebra.Module.FiniteDimension
+import Mathlib.Topology.UniformSpace.Uniformizable
 
 /-!
 # Taylor expansion of holomorphic functions at a point of `Ω^×`
@@ -9,7 +14,7 @@ around `α ≠ 0`, and the consequences needed for the analytic valuations `w_α
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
@@ -67,19 +72,22 @@ theorem hasSum_binom_expansion {F : Type*} [NormedField F] [CompleteSpace F] {x 
 
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
+omit [IsUltrametricDist K] [Algebra.IsIntegral K L] [IsAlgClosed L] in
 /-- A family in a finite extension `S` of `K` inside `Ω` tending to `0` is summable, with sum in `S`. -/
-theorem omega_hasSum_mem {ι : Type*} (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
-    {g : ι → Omega K} (hg : ∀ i, g i ∈ S) (ht : Tendsto g cofinite (𝓝 0)) :
-    ∃ s : Omega K, s ∈ S ∧ HasSum g s := by
+theorem omega_hasSum_mem {ι : Type*} (S : IntermediateField K L) [FiniteDimensional K S]
+    {g : ι → L} (hg : ∀ i, g i ∈ S) (ht : Tendsto g cofinite (𝓝 0)) :
+    ∃ s : L, s ∈ S ∧ HasSum g s := by
   haveI : CompleteSpace S := FiniteDimensional.complete K S
   set g' : ι → S := fun i => ⟨g i, hg i⟩
   have ht' : Tendsto g' cofinite (𝓝 0) := by
     rw [tendsto_subtype_rng]; simpa using ht
   have hs : Summable g' := NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero ht'
   obtain ⟨s', hs'⟩ := hs
-  have := hs'.map (S.val : S →+ Omega K) continuous_subtype_val
-  exact ⟨(s' : Omega K), s'.2, by simpa using this⟩
+  have := hs'.map (S.val : S →+ L) continuous_subtype_val
+  exact ⟨(s' : L), s'.2, by simpa using this⟩
 
 theorem tendsto_mul_cofinite_prod {u : ℤ → ℝ} {v : ℕ → ℝ} (hu0 : ∀ n, 0 ≤ u n)
     (hv0 : ∀ k, 0 ≤ v k) (hv1 : ∀ k, v k ≤ 1) (hu : Tendsto u cofinite (𝓝 0))
@@ -113,35 +121,37 @@ theorem tendsto_mul_cofinite_prod {u : ℤ → ℝ} {v : ℕ → ℝ} (hu0 : ∀
       _ ≤ v p.2 * (U + 1) := by nlinarith [hv0 p.2]
 
 
-theorem norm_binom_le_one (n : ℤ) (k : ℕ) : ‖((binomZ n k : ℤ) : Omega K)‖ ≤ 1 :=
+omit [IsAlgClosed L] in
+theorem norm_binom_le_one (n : ℤ) (k : ℕ) : ‖((binomZ n k : ℤ) : L)‖ ≤ 1 :=
   IsUltrametricDist.norm_intCast_le_one _ _
 
+omit [IsUltrametricDist K] [IsAlgClosed L] in
 /-- Taylor expansion at `α ≠ 0` of a function given by a convergent Laurent series with
 coefficients in `K`: `F(α + h) = ∑ bₖ hᵏ` for `|h| < |α|`, with `bₖ ∈ K(α)` and `|bₖ| |α|ᵏ` bounded. -/
-theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K → Omega K}
-    (hF : ∀ x : Omega K, x ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
-    {α : Omega K} (hα : α ≠ 0) :
-    ∃ b : ℕ → Omega K, (∀ k, b k ∈ IntermediateField.adjoin K ({α} : Set (Omega K))) ∧
+theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → L}
+    (hF : ∀ x : L, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K L (a n) * x ^ n) (F x))
+    {α : L} (hα : α ≠ 0) :
+    ∃ b : ℕ → L, (∀ k, b k ∈ IntermediateField.adjoin K ({α} : Set L)) ∧
       (∃ C : ℝ, ∀ k, ‖b k‖ * ‖α‖ ^ k ≤ C) ∧
-      ∀ h : Omega K, ‖h‖ < ‖α‖ → HasSum (fun k : ℕ => b k * h ^ k) (F (α + h)) := by
+      ∀ h : L, ‖h‖ < ‖α‖ → HasSum (fun k : ℕ => b k * h ^ k) (F (α + h)) := by
   have hr : 0 < ‖α‖ := norm_pos_iff.mpr hα
   set r := ‖α‖ with hrdef
-  haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set (Omega K))) :=
+  haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set L)) :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α)
-  set τ : ℤ → ℕ → Omega K := fun n k =>
-    algebraMap K (Omega K) (a n) * (binomZ n k : Omega K) * α ^ (n - k) with hτ
-  have hα_mem : α ∈ IntermediateField.adjoin K ({α} : Set (Omega K)) :=
+  set τ : ℤ → ℕ → L := fun n k =>
+    algebraMap K L (a n) * (binomZ n k : L) * α ^ (n - k) with hτ
+  have hα_mem : α ∈ IntermediateField.adjoin K ({α} : Set L) :=
     IntermediateField.mem_adjoin_simple_self K α
-  have hτmem : ∀ n k, τ n k ∈ IntermediateField.adjoin K ({α} : Set (Omega K)) := fun n k =>
+  have hτmem : ∀ n k, τ n k ∈ IntermediateField.adjoin K ({α} : Set L) := fun n k =>
     mul_mem (mul_mem (IntermediateField.algebraMap_mem _ _) (by
       exact intCast_mem _ _)) (zpow_mem hα_mem _)
   have hτnorm : ∀ n k, ‖τ n k‖ ≤ ‖a n‖ * r ^ n * (r ^ k)⁻¹ := by
     intro n k
-    calc ‖τ n k‖ = ‖a n‖ * ‖((binomZ n k : ℤ) : Omega K)‖ * r ^ (n - k) := by
+    calc ‖τ n k‖ = ‖a n‖ * ‖((binomZ n k : ℤ) : L)‖ * r ^ (n - k) := by
           simp only [hτ, norm_mul, norm_zpow, norm_algebraMap_omega]; rfl
       _ ≤ ‖a n‖ * 1 * r ^ (n - k) := by
-          gcongr; exact norm_binom_le_one K n k
+          gcongr; exact norm_binom_le_one n k
       _ = ‖a n‖ * r ^ n * (r ^ k)⁻¹ := by
           rw [mul_one, zpow_sub₀ hr.ne', zpow_natCast]; ring
   obtain ⟨C0, hC0⟩ := (ha r hr).bddAbove_range_of_cofinite
@@ -150,7 +160,7 @@ theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Ome
     intro k
     refine squeeze_zero_norm (fun n => hτnorm n k) ?_
     simpa using (ha r hr).mul_const (r ^ k)⁻¹
-  have hb : ∀ k, ∃ s : Omega K, s ∈ IntermediateField.adjoin K ({α} : Set (Omega K)) ∧
+  have hb : ∀ k, ∃ s : L, s ∈ IntermediateField.adjoin K ({α} : Set L) ∧
       HasSum (fun n => τ n k) s := fun k => omega_hasSum_mem K _ (fun n => hτmem n k) (hτt k)
   choose b hbmem hbsum using hb
   refine ⟨b, hbmem, ⟨C0, fun k => ?_⟩, fun h hh => ?_⟩
@@ -167,13 +177,13 @@ theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Ome
       rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hne.symm, max_eq_left hh.le]
     have hα2 : α + h ≠ 0 := fun h0 => by
       rw [h0, norm_zero] at hnorm; linarith
-    set S2 := IntermediateField.adjoin K ({α, h} : Set (Omega K)) with hS2
+    set S2 := IntermediateField.adjoin K ({α, h} : Set L) with hS2
     haveI : FiniteDimensional K S2 :=
       IntermediateField.finiteDimensional_adjoin (fun x _ => Algebra.IsIntegral.isIntegral x)
     haveI : CompleteSpace S2 := FiniteDimensional.complete K S2
     have hαS : α ∈ S2 := IntermediateField.subset_adjoin K _ (by simp)
     have hhS : h ∈ S2 := IntermediateField.subset_adjoin K _ (by simp)
-    set T : ℤ × ℕ → Omega K := fun p => τ p.1 p.2 * h ^ p.2 with hT
+    set T : ℤ × ℕ → L := fun p => τ p.1 p.2 * h ^ p.2 with hT
     have hTmem : ∀ p, T p ∈ S2 := fun p =>
       mul_mem (mul_mem (mul_mem (IntermediateField.algebraMap_mem _ _) (intCast_mem _ _))
         (zpow_mem hαS _)) (pow_mem hhS _)
@@ -192,18 +202,18 @@ theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Ome
         (tendsto_pow_atTop_nhds_zero_of_lt_one (by positivity) hθ)
     obtain ⟨σ, -, hσ⟩ := omega_hasSum_mem K S2 hTmem hTt
     have hfib : ∀ n : ℤ, HasSum (fun k : ℕ => T (n, k))
-        (algebraMap K (Omega K) (a n) * (α + h) ^ n) := by
+        (algebraMap K L (a n) * (α + h) ^ n) := by
       intro n
       have hxy : ‖(⟨h, hhS⟩ : S2)‖ < ‖(⟨α, hαS⟩ : S2)‖ := hh
-      have h1 := (hasSum_binom_expansion hxy n).map (S2.val.toRingHom : S2 →+* Omega K)
+      have h1 := (hasSum_binom_expansion hxy n).map (S2.val.toRingHom : S2 →+* L)
         continuous_subtype_val
-      have h2 := h1.mul_left (algebraMap K (Omega K) (a n))
+      have h2 := h1.mul_left (algebraMap K L (a n))
       convert h2 using 1
       funext k
-      have hz : (((⟨α, hαS⟩ : S2) ^ (n - (k : ℤ)) : S2) : Omega K) = α ^ (n - (k : ℤ)) :=
+      have hz : (((⟨α, hαS⟩ : S2) ^ (n - (k : ℤ)) : S2) : L) = α ^ (n - (k : ℤ)) :=
         map_zpow₀ S2.val (⟨α, hαS⟩ : S2) (n - (k : ℤ))
       simp [hT, hτ, mul_assoc, hz]
-    have hσ1 : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * (α + h) ^ n) σ :=
+    have hσ1 : HasSum (fun n : ℤ => algebraMap K L (a n) * (α + h) ^ n) σ :=
       hσ.prod_fiberwise hfib
     have hσF : σ = F (α + h) := hσ1.unique (hF _ hα2)
     have hσ' : HasSum (T ∘ (Equiv.prodComm ℕ ℤ)) σ := (Equiv.prodComm ℕ ℤ).hasSum_iff.mpr hσ
@@ -212,4 +222,4 @@ theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Ome
     rw [← hσF]
     exact hσ'.prod_fiberwise hfib2
 
-end AnalyticTheory
+end EntireLaurent

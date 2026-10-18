@@ -57,7 +57,7 @@ theorem valK_const (c : K) (a : K) (ha : a ≠ 0) : valK (algebraMap K (holSubri
   apply (algebraMap K (Omega K)).injective
   rw [← valK_spec, algebraMap_apply_hol]
 
-theorem valK_monoHol (n : ℤ) (a : K) (ha : a ≠ 0) : valK (monoHol K n) a ha = a ^ n := by
+theorem valK_monoHol (n : ℤ) (a : K) (ha : a ≠ 0) : valK (monoHol K (Omega K) n) a ha = a ^ n := by
   apply (algebraMap K (Omega K)).injective
   rw [← valK_spec, ptK, monoHol_apply, map_zpow₀]
 

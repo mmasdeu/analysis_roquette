@@ -1,4 +1,4 @@
-import AnalyticTheory.HolDiv
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
 
 /-!
 # Infinite products in `H_K`
@@ -9,20 +9,24 @@ If `gⱼ ∈ H_K` and the Gauss norms `‖gⱼ‖_ρ` tend to `0` for every `ρ 
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
-theorem prod_apply_hol {ι : Type*} (s : Finset ι) (f : ι → holSubring K) (x : OmegaX K) :
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
+theorem prod_apply_hol {ι : Type*} (s : Finset ι) (f : ι → holSubring K L) (x : Punct L) :
     (∏ i ∈ s, f i).1 x = ∏ i ∈ s, (f i).1 x := by
   classical
   induction s using Finset.induction_on with
   | empty => rfl
   | insert a s ha ih => rw [Finset.prod_insert ha, Finset.prod_insert ha, mul_apply_hol, ih]
 
-theorem one_apply_hol (x : OmegaX K) : (1 : holSubring K).1 x = 1 := rfl
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
+theorem one_apply_hol (x : Punct L) : (1 : holSubring K L).1 x = 1 := rfl
 
 theorem one_le_prod_range (m : ℕ → ℝ) (hm : ∀ j, 1 ≤ m j) (J : ℕ) :
     1 ≤ ∏ j ∈ Finset.range J, m j := by
@@ -42,7 +46,7 @@ theorem prod_range_mono (m : ℕ → ℝ) (hm : ∀ j, 1 ≤ m j) {J J' : ℕ} (
     nlinarith [hm J']
 
 /-- A uniform bound for the Gauss norms of the partial products. -/
-theorem partial_prod_bound {g : ℕ → holSubring K} {ρ : ℝ} (hρ : 0 < ρ)
+theorem partial_prod_bound {g : ℕ → holSubring K L} {ρ : ℝ} (hρ : 0 < ρ)
     (hg : Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0)) :
     ∃ B : ℝ, 0 < B ∧ ∀ J : ℕ, gnorm K ρ (∏ j ∈ Finset.range J, (1 + g j)) ≤ B := by
   obtain ⟨J0, hJ0⟩ := (hg.eventually (gt_mem_nhds one_pos)).exists_forall_of_atTop
@@ -70,16 +74,16 @@ theorem partial_prod_bound {g : ℕ → holSubring K} {ρ : ℝ} (hρ : 0 < ρ)
   exact ⟨∏ j ∈ Finset.range J0, m j, lt_of_lt_of_le one_pos (one_le_prod_range m hm1 J0),
     fun J => le_trans (hbound J) (hconst J)⟩
 
-theorem exists_infprod_sum {g : ℕ → holSubring K}
+theorem exists_infprod_sum {g : ℕ → holSubring K L}
     (hg : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0)) :
-    ∃ g' : holSubring K,
+    ∃ g' : holSubring K L,
       NullFamily K (fun J => holCoeff K ((∏ j ∈ Finset.range J, (1 + g j)) * g J)) ∧
-      (∀ x : OmegaX K, HasSum (fun J => ((∏ j ∈ Finset.range J, (1 + g j)) * g J).1 x) (g'.1 x)) ∧
-      ∀ x : OmegaX K,
+      (∀ x : Punct L, HasSum (fun J => ((∏ j ∈ Finset.range J, (1 + g j)) * g J).1 x) (g'.1 x)) ∧
+      ∀ x : Punct L,
         Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop (𝓝 (1 + g'.1 x)) := by
   classical
-  set Pf : ℕ → holSubring K := fun J => ∏ j ∈ Finset.range J, (1 + g j) with hPf
-  set D : ℕ → holSubring K := fun J => Pf J * g J with hD
+  set Pf : ℕ → holSubring K L := fun J => ∏ j ∈ Finset.range J, (1 + g j) with hPf
+  set D : ℕ → holSubring K L := fun J => Pf J * g J with hD
   have hnull : NullFamily K (fun J => holCoeff K (D J)) := by
     intro r hr ε hε
     obtain ⟨B, hB, hBb⟩ := partial_prod_bound K hr (hg r hr)
@@ -119,29 +123,29 @@ theorem exists_infprod_sum {g : ℕ → holSubring K}
   simp only [hpart]
   exact (tendsto_const_nhds.add hs).congr' (by filter_upwards with J; rfl)
 
-theorem exists_infprod {g : ℕ → holSubring K}
+theorem exists_infprod {g : ℕ → holSubring K L}
     (hg : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0)) :
-    ∃ P : holSubring K, ∀ x : OmegaX K,
+    ∃ P : holSubring K L, ∀ x : Punct L,
       Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop (𝓝 (P.1 x)) := by
   obtain ⟨g', -, -, h⟩ := exists_infprod_sum (K := K) hg
   refine ⟨1 + g', fun x => ?_⟩
   simpa [add_apply_hol, one_apply_hol] using h x
 
 
-theorem norm_eval_le_gnorm (f : holSubring K) (x : OmegaX K) :
+theorem norm_eval_le_gnorm (f : holSubring K L) (x : Punct L) :
     ‖f.1 x‖ ≤ gnorm K ‖x.1‖ f := by
   have hρ : 0 < ‖x.1‖ := norm_pos_iff.mpr x.2
   refine hasSum_norm_le (holCoeff_hasSum K f x) (gnorm_nonneg hρ f) (fun n => ?_)
   rw [norm_mul, norm_algebraMap_omega, norm_zpow]
   exact wt_le_gnorm hρ f n
 
-theorem exists_infprod_tail {g : ℕ → holSubring K}
+theorem exists_infprod_tail {g : ℕ → holSubring K L}
     (hg : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0))
-    {P : holSubring K}
-    (hP : ∀ x : OmegaX K, Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop
-      (𝓝 (P.1 x))) (ξ : OmegaX K) :
-    ∃ J0 : ℕ, ∀ J1, J0 ≤ J1 → ∃ R : holSubring K,
-      (∀ x : OmegaX K, P.1 x = (∏ j ∈ Finset.range J1, (1 + (g j).1 x)) * R.1 x) ∧ R.1 ξ ≠ 0 := by
+    {P : holSubring K L}
+    (hP : ∀ x : Punct L, Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (g j).1 x)) atTop
+      (𝓝 (P.1 x))) (ξ : Punct L) :
+    ∃ J0 : ℕ, ∀ J1, J0 ≤ J1 → ∃ R : holSubring K L,
+      (∀ x : Punct L, P.1 x = (∏ j ∈ Finset.range J1, (1 + (g j).1 x)) * R.1 x) ∧ R.1 ξ ≠ 0 := by
   have hρ : 0 < ‖ξ.1‖ := norm_pos_iff.mpr ξ.2
   obtain ⟨J0, hJ0⟩ := ((hg _ hρ).eventually (gt_mem_nhds one_pos)).exists_forall_of_atTop
   refine ⟨J0, fun J1 hJ1 => ?_⟩
@@ -174,4 +178,4 @@ theorem exists_infprod_tail {g : ℕ → holSubring K}
     rw [hR0] at this
     simp at this
 
-end AnalyticTheory
+end EntireLaurent

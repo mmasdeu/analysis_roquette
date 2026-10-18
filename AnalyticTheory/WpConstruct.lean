@@ -118,7 +118,7 @@ theorem Th_zero (n : ℤ) :
     exact ⟨-n, by rw [ptQ, map_zpow₀]⟩
 
 /-- The linear factor `X − q⁻ⁿ`. -/
-noncomputable def linF (n : ℤ) : holSubring K := polyHol K (X - C (q ^ (-n)))
+noncomputable def linF (n : ℤ) : holSubring K := polyHol K (Omega K) (X - C (q ^ (-n)))
 
 theorem exists_Rq (n : ℤ) : ∃ R : holSubring K, Th hq0 hq1 = linF (q := q) n * R := by
   have hq0' := norm_pos_iff.mp hq0
@@ -236,11 +236,11 @@ theorem term_bound {ρ : ℝ} (hρ : 0 < ρ) (k p : ℕ) (hp : 2 ≤ p) (G : ℝ
 
 /-- The terms `q⁻ⁿ X Rₙ²` of `Θ² (℘ + 2s₁)`. -/
 noncomputable def tP (n : ℤ) : holSubring K :=
-  algebraMap K (holSubring K) (q ^ (-n)) * monoHol K 1 * Rq hq0 hq1 n ^ 2
+  algebraMap K (holSubring K) (q ^ (-n)) * monoHol K (Omega K) 1 * Rq hq0 hq1 n ^ 2
 
 /-- The terms `-q⁻ⁿ X² Rₙ³` of `Θ³ (℘′ - s₁)`. -/
 noncomputable def tP' (n : ℤ) : holSubring K :=
-  algebraMap K (holSubring K) (-(q ^ (-n))) * monoHol K 2 * Rq hq0 hq1 n ^ 3
+  algebraMap K (holSubring K) (-(q ^ (-n))) * monoHol K (Omega K) 2 * Rq hq0 hq1 n ^ 3
 
 theorem tP_null : NullFamily K (fun n => holCoeff K (tP hq0 hq1 n)) := by
   refine nullFamily_of_bound hq1 (fun ρ hρ => ?_)
@@ -483,7 +483,7 @@ theorem anVal_R0_one :
   simp only at h
   rw [map_mul, (anVal_isValuation K 1 one_ne_zero).2.2.1, anVal_Th_one hq0 hq1] at h
   have hl : anVal K 1 (algebraMap (holSubring K) (MeroRing K) (linF (q := q) 0)) = 1 := by
-    have e : linF (q := q) 0 = polyHol K (minpoly K (1 : Omega K)) := by
+    have e : linF (q := q) 0 = polyHol K (Omega K) (minpoly K (1 : Omega K)) := by
       rw [linF, show (1 : Omega K) = algebraMap K (Omega K) 1 from (map_one _).symm, minpoly_alg]
       simp
     rw [e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, if_pos rfl]
@@ -601,7 +601,7 @@ theorem evalsTo_unique' {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {f f' : 
 theorem evalsTo_reflection {f : MeroRing K} {F : OmegaX K → Omega K} (hf : EvalsTo K f F) :
     EvalsTo K (reflectionM K f) (fun α => F ⟨α.1⁻¹, inv_ne_zero α.2⟩) := by
   obtain ⟨g, h, hh, rfl, hgh⟩ := hf
-  refine ⟨holReflectHom K g, holReflectHom K h, (map_ne_zero_iff _ (holReflectHom K).injective).mpr hh, ?_, fun α hα => ?_⟩
+  refine ⟨holReflectHom K (Omega K) g, holReflectHom K (Omega K) h, (map_ne_zero_iff _ (holReflectHom K (Omega K)).injective).mpr hh, ?_, fun α hα => ?_⟩
   · unfold reflectionM
     rw [map_div₀, IsFractionRing.ringEquivOfRingEquiv_algebraMap,
       IsFractionRing.ringEquivOfRingEquiv_algebraMap]
@@ -635,9 +635,9 @@ section transport
 variable {q : K} (hq0 : q ≠ 0)
 
 theorem polyHol_minpoly_shift (ξ : Omega K) :
-    polyHol K (minpoly K (algebraMap K (Omega K) q * ξ)) =
+    polyHol K (Omega K) (minpoly K (algebraMap K (Omega K) q * ξ)) =
       algebraMap K (holSubring K) (q ^ (minpoly K ξ).natDegree) *
-        holScale K (Units.mk0 q hq0)⁻¹ (polyHol K (minpoly K ξ)) := by
+        holScale K (Units.mk0 q hq0)⁻¹ (polyHol K (Omega K) (minpoly K ξ)) := by
   have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0
   have e : minpoly K (algebraMap K (Omega K) q * ξ) = psi q (minpoly K ξ) 1 := by
     rw [psi_eq_minpoly hq0, zpow_one]
@@ -660,8 +660,8 @@ theorem anVal_holScale_shift {ξ : Omega K} (hξ : ξ ≠ 0) {g : holSubring K} 
   rw [hm3, hm3']
   have hunit : IsUnit (algebraMap K (holSubring K) (q ^ (minpoly K ξ).natDegree)) :=
     (IsUnit.mk0 _ (pow_ne_zero _ hq0)).map _
-  have hiff : ∀ k : ℕ, polyHol K (minpoly K (algebraMap K (Omega K) q * ξ)) ^ k ∣ S g ↔
-      polyHol K (minpoly K ξ) ^ k ∣ g := by
+  have hiff : ∀ k : ℕ, polyHol K (Omega K) (minpoly K (algebraMap K (Omega K) q * ξ)) ^ k ∣ S g ↔
+      polyHol K (Omega K) (minpoly K ξ) ^ k ∣ g := by
     intro k
     rw [polyHol_minpoly_shift hq0, mul_pow, (hunit.pow k).mul_left_dvd, ← map_pow, map_dvd_iff]
   have h1 : m ≤ m' := (pow_dvd_iff_le K hξ' hSg ⟨hm1', hm2'⟩ m).mp ((hiff m).mpr hm1)

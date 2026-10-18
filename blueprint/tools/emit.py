@@ -3,12 +3,25 @@ import os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from items import ITEMS
 
 import re, glob
-_LEAN=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','AnalyticTheory')+'/'
+_ROOT=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..')
+_LEAN=os.path.join(_ROOT,'AnalyticTheory')+'/'
+_FM=os.path.join(_ROOT,'ForMathlib','Analysis','Nonarchimedean','EntireLaurent')+'/'
+def _decl_names(d):
+    names=set()
+    for f in glob.glob(d+'*.lean'):
+        names|=set(re.findall(r"^(?:(?:noncomputable|private|protected)\s+)*(?:theorem|lemma|def|abbrev|instance|structure)\s+([A-Za-z_][A-Za-z0-9_'.]*)",open(f,encoding='utf8').read(),re.M))
+    return names
+_PROJ=_decl_names(_LEAN)
+_EL=_decl_names(_FM)
+def _full(n):
+    # names moved to the general library `EntireLaurent` keep their short name in the items
+    if n not in _PROJ and n in _EL: return 'EntireLaurent.'+n
+    return 'AnalyticTheory.'+n
 def _sorry_status():
     """name (last component) -> True if its declaration contains `sorry`."""
     status={}
     pat=re.compile(r"^(?:(?:noncomputable|private|protected|partial|unsafe)\s+)*(theorem|lemma|def|abbrev|instance|structure|class|inductive)\s+([A-Za-z_][A-Za-z0-9_'.]*)",re.M)
-    for f in glob.glob(_LEAN+'*.lean'):
+    for f in glob.glob(_LEAN+'*.lean')+glob.glob(_FM+'*.lean'):
         src=open(f,encoding='utf8').read()
         src=re.sub(r'/-.*?-/','',src,flags=re.S)
         src=re.sub(r'--[^\n]*','',src)
@@ -45,7 +58,7 @@ for title,pred in CHAPTERS:
         out.append('\\begin{%s}[%s]' % (env, it['title']))
         out.append('\\label{%s}' % it['label'])
         if it['lean']:
-            out.append('\\lean{%s}' % ', '.join('AnalyticTheory.'+n for n in it['lean']))
+            out.append('\\lean{%s}' % ', '.join(_full(n) for n in it['lean']))
         if it['uses']:
             out.append('\\uses{%s}' % ', '.join(it['uses']))
         if it['notready']:

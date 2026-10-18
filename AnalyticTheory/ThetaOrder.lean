@@ -30,18 +30,18 @@ theorem alg_hol_ne_zero {f : holSubring K} (hf : f ≠ 0) :
 
 open scoped Classical in
 theorem anVal_polyHol_minpoly {ξ β : Omega K} (hξ : ξ ≠ 0) (hβ : β ≠ 0) :
-    anVal K ξ (algebraMap (holSubring K) (MeroRing K) (polyHol K (minpoly K β))) =
+    anVal K ξ (algebraMap (holSubring K) (MeroRing K) (polyHol K (Omega K) (minpoly K β))) =
       if minpoly K ξ = minpoly K β then 1 else 0 := by
   have hintβ : IsIntegral K β := Algebra.IsIntegral.isIntegral β
   have hintξ : IsIntegral K ξ := Algebra.IsIntegral.isIntegral ξ
   by_cases h : minpoly K ξ = minpoly K β
   · rw [if_pos h, ← h]
-    have h1 : anPt K ξ (algebraMap (holSubring K) (MeroRing K) (polyHol K (minpoly K ξ))) =
+    have h1 : anPt K ξ (algebraMap (holSubring K) (MeroRing K) (polyHol K (Omega K) (minpoly K ξ))) =
         (((eIdx K ξ : ℤ) * 1 : ℤ) : WithTop ℤ) := by
       rw [anPt_alg_hol K hξ, anOrdHol_minpoly K hξ]; simp
     rw [anVal_of_anPt K hξ h1]; rfl
   · rw [if_neg h]
-    have hne : (polyHol K (minpoly K β)).1 ⟨ξ, hξ⟩ ≠ 0 := by
+    have hne : (polyHol K (Omega K) (minpoly K β)).1 ⟨ξ, hξ⟩ ≠ 0 := by
       rw [polyHol_apply_eq_aeval K _ hξ]
       intro h0
       have hd := minpoly.dvd K ξ h0
@@ -84,9 +84,9 @@ theorem chi_unique {q : K} (hq0 : 0 < ‖q‖) (hq : ‖q‖ < 1) {α ξ : Omega
   exact zpow_right_injective₀ hq0 hq.ne h2
 
 
-theorem monoHol_ne_zero (n : ℤ) : monoHol K n ≠ 0 := by
+theorem monoHol_ne_zero (n : ℤ) : monoHol K (Omega K) n ≠ 0 := by
   intro h
-  have := monoHol_neg_mul K n
+  have := monoHol_neg_mul K (L := Omega K) n
   rw [h, mul_zero] at this
   exact zero_ne_one this
 
@@ -97,7 +97,7 @@ theorem algebraMap_hol_ne_zero {c : K} (hc : c ≠ 0) : algebraMap K (holSubring
   exact (_root_.map_ne_zero (algebraMap K (Omega K))).mpr hc this
 
 theorem anVal_monoHol {ξ : Omega K} (hξ : ξ ≠ 0) (n : ℤ) :
-    anVal K ξ (algebraMap (holSubring K) (MeroRing K) (monoHol K n)) = 0 := by
+    anVal K ξ (algebraMap (holSubring K) (MeroRing K) (monoHol K (Omega K) n)) = 0 := by
   refine anVal_hol_nonvanishing hξ (monoHol_ne_zero n) ?_
   rw [monoHol_apply]
   exact zpow_ne_zero n hξ
@@ -179,12 +179,12 @@ theorem conjModQ_iff_chi {q : K} {α ξ : Omega K} :
 
 theorem thF_ne_zero {q : K} (hq0 : q ≠ 0) {φ : Polynomial K} (hφ : φ.Monic) (n : ℕ) :
     thF q φ n ≠ 0 := by
-  have h1 : polyHol K (psi q φ n) ≠ 0 := polyHol_ne_zero_of_monic (psi_monic q hφ n)
+  have h1 : polyHol K (Omega K) (psi q φ n) ≠ 0 := polyHol_ne_zero_of_monic (psi_monic q hφ n)
   exact mul_ne_zero (monoHol_ne_zero _) h1
 
 theorem thG_ne_zero {q : K} (hq0 : q ≠ 0) {φ : Polynomial K} (hφ : φ.Monic)
     (hc0 : φ.coeff 0 ≠ 0) (n : ℕ) : thG q φ n ≠ 0 := by
-  have h1 : polyHol K (psi q φ (-(n : ℤ))) ≠ 0 := polyHol_ne_zero_of_monic (psi_monic q hφ _)
+  have h1 : polyHol K (Omega K) (psi q φ (-(n : ℤ))) ≠ 0 := polyHol_ne_zero_of_monic (psi_monic q hφ _)
   have h2 : gcoef q φ n ≠ 0 := div_ne_zero (zpow_ne_zero _ hq0) hc0
   exact mul_ne_zero (algebraMap_hol_ne_zero h2) h1
 
@@ -257,7 +257,7 @@ theorem theta_spec {q : K} (hq0 : 0 < ‖q‖) (hq : ‖q‖ < 1) {α : Omega K}
     ∃ T : holSubring K, T ≠ 0 ∧
       holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ T =
         algebraMap K (holSubring K) ((minpoly K α).coeff 0)⁻¹ *
-          monoHol K ((minpoly K α).natDegree : ℤ) * T ∧
+          monoHol K (Omega K) ((minpoly K α).natDegree : ℤ) * T ∧
       (∀ ξ : Omega K, ξ ≠ 0 → anVal K ξ (algebraMap (holSubring K) (MeroRing K) T) =
         if ConjModQ K q α ξ then 1 else 0) ∧
       ∀ x : OmegaX K, Tendsto (fun J : ℕ => (∏ n ∈ Finset.range J, (thF q (minpoly K α) n).1 x) *

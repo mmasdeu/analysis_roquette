@@ -20,7 +20,7 @@ progress is traced by the Lean blueprint in `blueprint/`.
 | `AnalyticTheory/Isogeny.lean` | §6: commensurable periods, Theorems XVII–XIX, isogenies, CM |
 | `AnalyticTheory/FunctionField.lean` | prime divisors, divisors, Riemann–Roch spaces, genus |
 | `AnalyticTheory/Remarks.lean` | §2, additional remarks 1–2 |
-| `ForMathlib/` | general results not in Mathlib, independent of `AnalyticTheory` (see `ForMathlib/README.md`) |
+| `ForMathlib/` | general results not in Mathlib, independent of `AnalyticTheory` (see `ForMathlib/README.md`), including the non-archimedean function theory of entire Laurent series (`ForMathlib/Analysis/Nonarchimedean/EntireLaurent/`), on which §2 is built |
 | `blueprint/src/content.tex` | the blueprint (generated, see below) |
 | `blueprint/tools/` | generator and consistency checker for the blueprint |
 

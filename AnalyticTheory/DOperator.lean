@@ -27,10 +27,10 @@ theorem isConvergentLaurent_Dseq {a : ℤ → K} (ha : IsConvergentLaurent K a) 
 
 /-- `D = X d/dX` on `H_K`. -/
 noncomputable def holD (f : holSubring K) : holSubring K :=
-  holOfSeq K (fun n : ℤ => (n : K) * holCoeff K f n) (isConvergentLaurent_Dseq (holCoeff_convergent K f))
+  holOfSeq K (Omega K) (fun n : ℤ => (n : K) * holCoeff K f n) (isConvergentLaurent_Dseq (holCoeff_convergent K f))
 
 theorem holCoeff_holD (f : holSubring K) :
-    holCoeff K (holD f) = fun n : ℤ => (n : K) * holCoeff K f n := holCoeff_holOfSeq K _ _
+    holCoeff K (holD f) = fun n : ℤ => (n : K) * holCoeff K f n := holCoeff_holOfSeq K (L := Omega K) _ _
 
 theorem holD_add (f g : holSubring K) : holD (f + g) = holD f + holD g := by
   apply holCoeff_injective K
@@ -55,7 +55,7 @@ theorem holD_leibniz (f g : holSubring K) : holD (f * g) = f * holD g + g * holD
 theorem holD_const (c : K) : holD (algebraMap K (holSubring K) c) = 0 := by
   apply holCoeff_injective K
   rw [holCoeff_holD, holCoeff_zero]
-  have h1 := holCoeff_algebraMap_mul K c 1
+  have h1 := holCoeff_algebraMap_mul K (L := Omega K) c 1
   rw [mul_one, holCoeff_one] at h1
   funext n
   rw [h1]
@@ -66,7 +66,7 @@ theorem holD_zero : holD (0 : holSubring K) = 0 := by
   have := holD_const (K := K) 0
   rwa [map_zero] at this
 
-theorem holD_monoHol (n : ℤ) : holD (monoHol K n) = algebraMap K (holSubring K) (n : K) * monoHol K n := by
+theorem holD_monoHol (n : ℤ) : holD (monoHol K (Omega K) n) = algebraMap K (holSubring K) (n : K) * monoHol K (Omega K) n := by
   apply holCoeff_injective K
   rw [holCoeff_holD, holCoeff_algebraMap_mul]
   funext m
@@ -197,12 +197,6 @@ end mero
 section family
 
 variable {ι : Type*}
-
-theorem NullFamily.mono {c c' : ι → ℤ → K} (hn : NullFamily K c) (h : ∀ i n, ‖c' i n‖ ≤ ‖c i n‖) :
-    NullFamily K c' := by
-  intro r hr ε hε
-  refine (hn r hr ε hε).subset (fun i ⟨n, hn'⟩ => ⟨n, lt_of_lt_of_le hn' ?_⟩)
-  exact mul_le_mul_of_nonneg_right (h i n) (by positivity)
 
 theorem nullFamily_holD {f : ι → holSubring K} (hn : NullFamily K (fun i => holCoeff K (f i))) :
     NullFamily K (fun i => holCoeff K (holD (f i))) := by

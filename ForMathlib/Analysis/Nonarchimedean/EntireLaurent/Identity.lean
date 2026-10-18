@@ -1,4 +1,5 @@
-import AnalyticTheory.Taylor
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Dominance
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Taylor
 
 /-!
 # Identity theorem: a convergent Laurent series vanishing on a ball is zero
@@ -10,15 +11,19 @@ evaluates `Q` at a point `t` with `|t| < 1` of generic radius, where one monomia
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [Algebra.IsIntegral K L] in
+include K in
 /-- There are points of `Ω^×` with norm in any non-empty open subset of `(0, ∞)`. -/
 theorem exists_norm_in_open (U : Set ℝ) (hU : IsOpen U) (hU0 : U ⊆ Set.Ioi 0) (hne : U.Nonempty) :
-    ∃ z : Omega K, z ≠ 0 ∧ ‖z‖ ∈ U := by
+    ∃ z : L, z ≠ 0 ∧ ‖z‖ ∈ U := by
   obtain ⟨u0, hu0⟩ := hne
   have hu0pos : 0 < u0 := hU0 hu0
   obtain ⟨c, hc0, hc1⟩ := NormedField.exists_norm_lt_one K
@@ -30,8 +35,8 @@ theorem exists_norm_in_open (U : Set ℝ) (hU : IsOpen U) (hU0 : U ⊆ Set.Ioi 0
     rw [Real.rpow_logb hc0 hc1.ne hu0pos]; exact hu0
   obtain ⟨q, hq⟩ := Rat.denseRange_cast.exists_mem_open hV ⟨_, ht0⟩
   have hqU : ρ ^ (q : ℝ) ∈ U := hq
-  have hcΩ : algebraMap K (Omega K) c ≠ 0 := (map_ne_zero _).mpr (norm_pos_iff.mp hc0)
-  obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap K (Omega K) c ^ q.num) q.den_pos
+  have hcΩ : algebraMap K L c ≠ 0 := (map_ne_zero _).mpr (norm_pos_iff.mp hc0)
+  obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap K L c ^ q.num) q.den_pos
   have hz0 : z ≠ 0 := by
     rintro rfl
     rw [zero_pow q.den_ne_zero] at hz
@@ -122,13 +127,15 @@ theorem norm_finsum_dominant {ι E : Type*} [NormedAddCommGroup E] [IsUltrametri
   · rw [Finset.not_nonempty_iff_eq_empty.mp he]; simp
 
 
-theorem norm_one_add {t : Omega K} (ht : ‖t‖ < 1) : ‖1 + t‖ = 1 := by
-  have : ‖(1 : Omega K)‖ ≠ ‖t‖ := by rw [norm_one]; exact ht.ne'
+omit [IsAlgClosed L] in
+theorem norm_one_add {t : L} (ht : ‖t‖ < 1) : ‖1 + t‖ = 1 := by
+  have : ‖(1 : L)‖ ≠ ‖t‖ := by rw [norm_one]; exact ht.ne'
   rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm this, norm_one, max_eq_left ht.le]
 
+omit [IsAlgClosed L] in
 /-- Lemma A: the terms of maximal norm carry the sum. -/
-theorem sumM_le (c : ℤ → Omega K) (Ms : Finset ℤ) (δ : ℝ) (hδ : 0 ≤ δ)
-    (hout : ∀ n, n ∉ Ms → ‖c n‖ ≤ δ) {t : Omega K} (ht : ‖t‖ < 1)
+theorem sumM_le (c : ℤ → L) (Ms : Finset ℤ) (δ : ℝ) (hδ : 0 ≤ δ)
+    (hout : ∀ n, n ∉ Ms → ‖c n‖ ≤ δ) {t : L} (ht : ‖t‖ < 1)
     (hs : HasSum (fun n : ℤ => c n * (1 + t) ^ n) 0) :
     ‖∑ n ∈ Ms, c n * (1 + t) ^ n‖ ≤ δ := by
   classical
@@ -140,20 +147,21 @@ theorem sumM_le (c : ℤ → Omega K) (Ms : Finset ℤ) (δ : ℝ) (hδ : 0 ≤ 
     rw [heq]
     exact hasSum_sum_of_ne_finset_zero (fun n hn => by simp [hn])
   have h2 := hs.sub hM
-  have h3 : ‖(0 : Omega K) - ∑ n ∈ Ms, c n * (1 + t) ^ n‖ ≤ δ := by
+  have h3 : ‖(0 : L) - ∑ n ∈ Ms, c n * (1 + t) ^ n‖ ≤ δ := by
     refine hasSum_norm_le h2 hδ (fun n => ?_)
     by_cases hn : n ∈ Ms
     · simpa [hn] using hδ
-    · simp only [hn, if_false, sub_zero, norm_mul, norm_zpow, norm_one_add K ht, one_zpow, mul_one]
+    · simp only [hn, if_false, sub_zero, norm_mul, norm_zpow, norm_one_add ht, one_zpow, mul_one]
       exact hout n hn
   simpa using h3
 
+omit [IsAlgClosed L] in
 /-- Lemma B: the polynomial collecting the maximal terms. -/
-theorem exists_poly_of_max (c : ℤ → Omega K) (Ms : Finset ℤ) (hMs : Ms.Nonempty) (w : ℝ)
+theorem exists_poly_of_max (c : ℤ → L) (Ms : Finset ℤ) (hMs : Ms.Nonempty) (w : ℝ)
     (hw : ∀ n ∈ Ms, ‖c n‖ = w) :
-    ∃ (Q : Polynomial (Omega K)) (d : ℕ) (n1 : ℤ),
+    ∃ (Q : Polynomial L) (d : ℕ) (n1 : ℤ),
       (∀ j, ‖Q.coeff j‖ ≤ w) ∧ ‖Q.coeff d‖ = w ∧
-      ∀ t : Omega K, 1 + t ≠ 0 →
+      ∀ t : L, 1 + t ≠ 0 →
         (1 + t) ^ n1 * Q.eval t = ∑ n ∈ Ms, c n * (1 + t) ^ n := by
   classical
   set n1 := Ms.min' hMs with hn1
@@ -169,7 +177,7 @@ theorem exists_poly_of_max (c : ℤ → Omega K) (Ms : Finset ℤ) (hMs : Ms.Non
     have hw0 : 0 ≤ w := by rw [← hw n1 hn1m]; exact norm_nonneg _
     refine sum_norm_le_of_forall _ _ hw0 (fun n hn => ?_)
     rw [Polynomial.coeff_C_mul, Polynomial.coeff_one_add_X_pow, norm_mul, hw n hn]
-    calc w * ‖(((n - n1).toNat.choose j : ℕ) : Omega K)‖ ≤ w * 1 :=
+    calc w * ‖(((n - n1).toNat.choose j : ℕ) : L)‖ ≤ w * 1 :=
           mul_le_mul_of_nonneg_left (IsUltrametricDist.norm_natCast_le_one _ _) hw0
       _ = w := mul_one w
   · rw [Polynomial.finset_sum_coeff]
@@ -196,11 +204,13 @@ theorem exists_poly_of_max (c : ℤ → Omega K) (Ms : Finset ℤ) (hMs : Ms.Non
     rw [h3]; ring
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] [Algebra.IsIntegral K L] in
+include K in
 /-- Lemma C: a polynomial with a coefficient of maximal norm `w` takes values of norm `> δ`
 on the open unit ball, when `δ < w`. -/
-theorem exists_large_value (Q : Polynomial (Omega K)) (d : ℕ) (w δ : ℝ) (hw : 0 < w) (hδ : 0 ≤ δ)
+theorem exists_large_value (Q : Polynomial L) (d : ℕ) (w δ : ℝ) (hw : 0 < w) (hδ : 0 ≤ δ)
     (hδw : δ < w) (hle : ∀ j, ‖Q.coeff j‖ ≤ w) (hd : ‖Q.coeff d‖ = w) :
-    ∃ t : Omega K, ‖t‖ < 1 ∧ δ < ‖Q.eval t‖ := by
+    ∃ t : L, ‖t‖ < 1 ∧ δ < ‖Q.eval t‖ := by
   classical
   set e : ℕ → ℝ := fun j => ‖Q.coeff j‖ with he
   have hfin : {j | e j ≠ 0}.Finite := by
@@ -223,7 +233,7 @@ theorem exists_large_value (Q : Polynomial (Omega K)) (d : ℕ) (w δ : ℝ) (hw
   have hU0 : U ⊆ Set.Ioi 0 := fun ρ hρ => by
     have := hρ.1.1; simp only [Set.mem_Ioi]; exact lt_trans (by positivity) this
   have hUne : U.Nonempty := (Set.Ioo_infinite hρ0lt).diff hZ |>.nonempty
-  obtain ⟨t, ht0, htU⟩ := exists_norm_in_open K U hUopen hU0 hUne
+  obtain ⟨t, ht0, htU⟩ := exists_norm_in_open K (L := L) U hUopen hU0 hUne
   set ρ := ‖t‖ with hρ
   have hρ1 : ρ < 1 := htU.1.2
   have hρpos : 0 < ρ := norm_pos_iff.mpr ht0
@@ -266,20 +276,21 @@ theorem exists_large_value (Q : Polynomial (Omega K)) (d : ℕ) (w δ : ℝ) (hw
         · exact (hJ d hdJ).le
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] [Algebra.IsIntegral K L] in
 /-- Identity theorem: a convergent Laurent series over `K` vanishing on a ball `B(α, |α|)`,
 `α ≠ 0`, is zero. -/
 theorem laurent_eq_zero_of_vanishing {a : ℤ → K} (ha : IsConvergentLaurent K a)
-    {F : Omega K → Omega K}
-    (hF : ∀ x : Omega K, x ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
-    {α : Omega K} (hα : α ≠ 0) (hzero : ∀ h : Omega K, ‖h‖ < ‖α‖ → F (α + h) = 0) :
+    {F : L → L}
+    (hF : ∀ x : L, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K L (a n) * x ^ n) (F x))
+    {α : L} (hα : α ≠ 0) (hzero : ∀ h : L, ‖h‖ < ‖α‖ → F (α + h) = 0) :
     ∀ n, a n = 0 := by
   classical
   by_contra hcon
   push_neg at hcon
   obtain ⟨n0, hn0⟩ := hcon
   have hr : 0 < ‖α‖ := norm_pos_iff.mpr hα
-  set c : ℤ → Omega K := fun n => algebraMap K (Omega K) (a n) * α ^ n with hc
+  set c : ℤ → L := fun n => algebraMap K L (a n) * α ^ n with hc
   set wn : ℤ → ℝ := fun n => ‖c n‖ with hwn
   have hwn_eq : ∀ n, wn n = ‖a n‖ * ‖α‖ ^ n := fun n => by
     simp only [hwn, hc, norm_mul, norm_zpow, norm_algebraMap_omega]
@@ -310,9 +321,9 @@ theorem laurent_eq_zero_of_vanishing {a : ℤ → K} (ha : IsConvergentLaurent K
   set Ms := hMfin.toFinset with hMs
   have hMsne : Ms.Nonempty := ⟨N, by simp [hMs, hw]⟩
   have hMsw : ∀ n ∈ Ms, ‖c n‖ = w := fun n hn => by simpa [hMs] using hn
-  obtain ⟨Q, d, n1, hQle, hQd, hQeval⟩ := exists_poly_of_max K c Ms hMsne w hMsw
-  obtain ⟨t, ht1, htlt⟩ := exists_large_value K Q d w δ hwpos hδ0 hδw hQle hQd
-  have h1t : ‖1 + t‖ = 1 := norm_one_add K ht1
+  obtain ⟨Q, d, n1, hQle, hQd, hQeval⟩ := exists_poly_of_max c Ms hMsne w hMsw
+  obtain ⟨t, ht1, htlt⟩ := exists_large_value K (L := L) Q d w δ hwpos hδ0 hδw hQle hQd
+  have h1t : ‖1 + t‖ = 1 := norm_one_add ht1
   have h1t0 : 1 + t ≠ 0 := fun h => by rw [h, norm_zero] at h1t; exact zero_ne_one h1t
   have hx0 : α * (1 + t) ≠ 0 := mul_ne_zero hα h1t0
   have hFx : F (α * (1 + t)) = 0 := by
@@ -321,7 +332,7 @@ theorem laurent_eq_zero_of_vanishing {a : ℤ → K} (ha : IsConvergentLaurent K
   have hsum : HasSum (fun n : ℤ => c n * (1 + t) ^ n) 0 := by
     have := hF _ hx0
     rw [hFx] at this
-    have hfun : (fun n : ℤ => algebraMap K (Omega K) (a n) * (α * (1 + t)) ^ n) =
+    have hfun : (fun n : ℤ => algebraMap K L (a n) * (α * (1 + t)) ^ n) =
         fun n : ℤ => c n * (1 + t) ^ n := by
       funext n; simp only [hc, mul_zpow]; ring
     rwa [hfun] at this
@@ -329,21 +340,22 @@ theorem laurent_eq_zero_of_vanishing {a : ℤ → K} (ha : IsConvergentLaurent K
     intro n hn
     have hne : wn n ≠ w := fun h => hn (by simp [hMs, h])
     exact hδ n (lt_of_le_of_ne (hNmax' n) hne)
-  have hS := sumM_le K c Ms δ hδ0 hout ht1 hsum
+  have hS := sumM_le c Ms δ hδ0 hout ht1 hsum
   have hnorm : ‖Q.eval t‖ = ‖∑ n ∈ Ms, c n * (1 + t) ^ n‖ := by
     rw [← hQeval t h1t0, norm_mul, norm_zpow, h1t, one_zpow, one_mul]
   rw [hnorm] at htlt
   exact absurd hS (not_le.mpr htlt)
 
 
+omit [IsUltrametricDist K] in
 /-- Order of vanishing: a non-zero holomorphic function has a finite order `k` at `α ≠ 0`:
 `F(x)/(x − α)ᵏ` has a non-zero limit as `x → α`. -/
-theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K → Omega K}
-    (hF : ∀ x : Omega K, x ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
-    {α : Omega K} (hα : α ≠ 0) (h0 : ∃ n, a n ≠ 0) :
-    ∃ (k : ℕ) (c : Omega K), c ≠ 0 ∧ (k = 0 ↔ F α ≠ 0) ∧
-      Tendsto (fun x : Omega K => F x / (x - α) ^ k) (𝓝[≠] α) (𝓝 c) := by
+theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → L}
+    (hF : ∀ x : L, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K L (a n) * x ^ n) (F x))
+    {α : L} (hα : α ≠ 0) (h0 : ∃ n, a n ≠ 0) :
+    ∃ (k : ℕ) (c : L), c ≠ 0 ∧ (k = 0 ↔ F α ≠ 0) ∧
+      Tendsto (fun x : L => F x / (x - α) ^ k) (𝓝[≠] α) (𝓝 c) := by
   classical
   have hr : 0 < ‖α‖ := norm_pos_iff.mpr hα
   set r := ‖α‖ with hrdef
@@ -364,8 +376,8 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K
   have hFα : F α = b 0 := by
     have h1 := hb 0 (by rw [norm_zero]; exact hr)
     rw [add_zero] at h1
-    have h2 : HasSum (fun k : ℕ => b k * (0 : Omega K) ^ k) (b 0) := by
-      have := hasSum_single (f := fun k : ℕ => b k * (0 : Omega K) ^ k) 0
+    have h2 : HasSum (fun k : ℕ => b k * (0 : L) ^ k) (b 0) := by
+      have := hasSum_single (f := fun k : ℕ => b k * (0 : L) ^ k) 0
         (fun k hk => by simp [zero_pow hk])
       simpa using this
     exact h1.unique h2
@@ -376,7 +388,7 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K
     · intro h; exact Nat.eq_zero_of_le_zero (Nat.find_min' hex h)
   refine ⟨k0, b k0, hbk0, hk0iff, ?_⟩
   -- estimate
-  have key : ∀ h : Omega K, ‖h‖ < r → h ≠ 0 →
+  have key : ∀ h : L, ‖h‖ < r → h ≠ 0 →
       ‖F (α + h) / h ^ k0 - b k0‖ ≤ C * (r ^ (k0 + 1))⁻¹ * ‖h‖ := by
     intro h hh hh0
     have hS := hb h hh
@@ -405,17 +417,17 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K
       _ = C * (r ^ (k0 + 1))⁻¹ * ‖h‖ * ‖h‖ ^ k0 := by
           rw [div_pow, pow_succ]; field_simp
   -- limit
-  have hB : Tendsto (fun x : Omega K => C * (r ^ (k0 + 1))⁻¹ * ‖x - α‖) (𝓝[≠] α) (𝓝 0) := by
-    have : Tendsto (fun x : Omega K => C * (r ^ (k0 + 1))⁻¹ * ‖x - α‖) (𝓝 α) (𝓝 0) := by
-      have hc : Continuous (fun x : Omega K => C * (r ^ (k0 + 1))⁻¹ * ‖x - α‖) := by fun_prop
+  have hB : Tendsto (fun x : L => C * (r ^ (k0 + 1))⁻¹ * ‖x - α‖) (𝓝[≠] α) (𝓝 0) := by
+    have : Tendsto (fun x : L => C * (r ^ (k0 + 1))⁻¹ * ‖x - α‖) (𝓝 α) (𝓝 0) := by
+      have hc : Continuous (fun x : L => C * (r ^ (k0 + 1))⁻¹ * ‖x - α‖) := by fun_prop
       simpa using hc.tendsto α
     exact this.mono_left nhdsWithin_le_nhds
   rw [tendsto_iff_dist_tendsto_zero]
   refine squeeze_zero' (Filter.Eventually.of_forall (fun _ => dist_nonneg)) ?_ hB
   have hball : ∀ᶠ x in 𝓝[≠] α, ‖x - α‖ < r := by
     refine eventually_nhdsWithin_of_eventually_nhds ?_
-    have : Tendsto (fun x : Omega K => ‖x - α‖) (𝓝 α) (𝓝 0) := by
-      have hc : Continuous (fun x : Omega K => ‖x - α‖) := by fun_prop
+    have : Tendsto (fun x : L => ‖x - α‖) (𝓝 α) (𝓝 0) := by
+      have hc : Continuous (fun x : L => ‖x - α‖) := by fun_prop
       simpa using hc.tendsto α
     exact this.eventually (gt_mem_nhds hr)
   filter_upwards [hball, self_mem_nhdsWithin] with x hx hxne
@@ -423,4 +435,4 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K
   have := key (x - α) hx hxne'
   simpa [dist_eq_norm] using this
 
-end AnalyticTheory
+end EntireLaurent

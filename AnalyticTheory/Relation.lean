@@ -22,7 +22,7 @@ variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 noncomputable def ellM : MeroRing K := algebraMap (holSubring K) (MeroRing K) (linF (q := q) 0)
 
 theorem anVal_ellM : anVal K 1 (ellM (q := q)) = ((1 : ℤ) : WithTop ℤ) := by
-  have e : linF (q := q) 0 = polyHol K (minpoly K (1 : Omega K)) := by
+  have e : linF (q := q) 0 = polyHol K (Omega K) (minpoly K (1 : Omega K)) := by
     rw [linF, show (1 : Omega K) = algebraMap K (Omega K) 1 from (map_one _).symm, minpoly_alg]
     simp
   rw [ellM, e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, if_pos rfl]; rfl

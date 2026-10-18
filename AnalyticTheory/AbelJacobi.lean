@@ -37,7 +37,7 @@ theorem mero_unit_of_anVal_zero {f : MeroRing K} (hf0 : f ≠ 0)
       rw [mul_one, mul_comm u v, ← mul_assoc, ← hv, ← hu]
     exact mul_left_cancel₀ hx0 this
   obtain ⟨c, n, hc, hcn⟩ := hol_unit K huv
-  have hu' : u = algebraMap K (holSubring K) c * monoHol K n := by
+  have hu' : u = algebraMap K (holSubring K) c * monoHol K (Omega K) n := by
     refine Subtype.ext (funext fun α => ?_)
     rw [mul_apply_hol, algebraMap_apply_hol, monoHol_apply]
     exact hcn α
@@ -53,7 +53,7 @@ theorem holScale_apply (c : Kˣ) (f : holSubring K) (x : OmegaX K) :
     (holScale K c f).1 x = f.1 (scalePt K c x) := rfl
 
 theorem holScale_monoHol (c : Kˣ) (n : ℤ) :
-    holScale K c (monoHol K n) = algebraMap K (holSubring K) ((c : K) ^ n) * monoHol K n := by
+    holScale K c (monoHol K (Omega K) n) = algebraMap K (holSubring K) ((c : K) ^ n) * monoHol K (Omega K) n := by
   refine Subtype.ext (funext fun x => ?_)
   rw [holScale_apply, mul_apply_hol, algebraMap_apply_hol, monoHol_apply, monoHol_apply]
   show (algebraMap K (Omega K) (c : K) * x.1) ^ n = _
@@ -88,7 +88,7 @@ theorem anVal_of_divisorOf {f : MeroRing K} (hf0 : f ≠ 0) {m : Omega K → ℤ
 theorem exists_const_of_mul_Xm {e : K} (he : e ≠ 0) {d : ℤ}
     (h : algebraMap K (MeroRing K) e * Xm d = 1) : d = 0 := by
   by_contra hd
-  have h1 : algebraMap K (holSubring K) e * monoHol K d = 1 := by
+  have h1 : algebraMap K (holSubring K) e * monoHol K (Omega K) d = 1 := by
     apply IsFractionRing.injective (holSubring K) (MeroRing K)
     rw [map_mul, algebraMap_hol_mero, map_one]; exact h
   have h2 := congrArg (fun y : holSubring K => holCoeff K y d) h1
@@ -250,7 +250,7 @@ theorem translation_thM_zpow {y : Omega K} (hy : y ≠ 0) (z : ℤ) :
   unfold thM
   rw [map_zpow₀, translation_alg, hfe, map_mul, map_mul, algebraMap_hol_mero, mul_zpow, mul_zpow,
     map_zpow₀]
-  rw [show algebraMap (holSubring K) (MeroRing K) (monoHol K ((minpoly K y).natDegree : ℤ)) =
+  rw [show algebraMap (holSubring K) (MeroRing K) (monoHol K (Omega K) ((minpoly K y).natDegree : ℤ)) =
     Xm ((minpoly K y).natDegree : ℤ) from rfl, Xm_zpow]
 
 open scoped Classical in
@@ -639,7 +639,7 @@ theorem mem_LSet_iff_range (f : MeroRing K) :
       exact_mod_cast (by omega : (0 : ℤ) ≤ v + m ξ)
     obtain ⟨G, hG⟩ := mem_hol_of_anVal_nonneg hnn
     have hGmem : G ∈ solSpace q hq0' a⁻¹ d := by
-      show holScale K u⁻¹ G = algebraMap K (holSubring K) a⁻¹ * monoHol K d * G
+      show holScale K u⁻¹ G = algebraMap K (holSubring K) a⁻¹ * monoHol K (Omega K) d * G
       apply IsFractionRing.injective (holSubring K) (MeroRing K)
       rw [← translation_hol_mero hq0, ← hG, map_mul, hfq, htr, map_mul, map_mul, algebraMap_hol_mero, ← hG]
       unfold Xm; ring
@@ -649,11 +649,11 @@ theorem mem_LSet_iff_range (f : MeroRing K) :
   · rintro ⟨G, rfl⟩
     simp only [solToL, LinearMap.coe_mk, AddHom.coe_mk]
     have hGs : holScale K u⁻¹ (G : holSubring K) =
-        algebraMap K (holSubring K) a⁻¹ * monoHol K d * G := G.2
+        algebraMap K (holSubring K) a⁻¹ * monoHol K (Omega K) d * G := G.2
     refine ⟨(mem_Fq_iff hq0' _).mpr ?_, fun ξ hξ => ?_⟩
     · rw [map_mul, map_inv₀, translation_hol_mero hq0, htr, hGs, map_mul, map_mul,
         algebraMap_hol_mero]
-      have : algebraMap (holSubring K) (MeroRing K) (monoHol K d) = Xm d := rfl
+      have : algebraMap (holSubring K) (MeroRing K) (monoHol K (Omega K) d) = Xm d := rfl
       rw [this]
       calc algebraMap K (MeroRing K) a⁻¹ * Xm d * algebraMap (holSubring K) (MeroRing K) G *
             (algebraMap K (MeroRing K) a⁻¹ * Xm d * Θ)⁻¹

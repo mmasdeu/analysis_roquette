@@ -29,12 +29,12 @@ theorem isConvergentLaurent_map {a : ℤ → K} (ha : IsConvergentLaurent K a) :
 
 /-- The coefficient inclusion on holomorphic functions. -/
 noncomputable def holExtFun (g : holSubring K) : holSubring L :=
-  holOfSeq L (fun n => algebraMap K L (holCoeff K g n))
+  holOfSeq L (Omega L) (fun n => algebraMap K L (holCoeff K g n))
     (isConvergentLaurent_map (holCoeff_convergent K g))
 
 theorem holCoeff_holExtFun (g : holSubring K) :
     holCoeff L (holExtFun (L := L) g) = fun n => algebraMap K L (holCoeff K g n) :=
-  holCoeff_holOfSeq L _ _
+  holCoeff_holOfSeq L (L := Omega L) _ _
 
 theorem convCoeff_map {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsConvergentLaurent K b) :
     (fun n => algebraMap K L (convCoeff K a b n)) =
@@ -97,9 +97,9 @@ theorem meroExt_algebraMap (c : K) :
   congr 1
   apply holCoeff_injective L
   rw [holCoeff_holExt]
-  have h1 := holCoeff_algebraMap_mul K c 1
+  have h1 := holCoeff_algebraMap_mul K (L := Omega K) c 1
   rw [mul_one, holCoeff_one] at h1
-  have h2 := holCoeff_algebraMap_mul L (algebraMap K L c) 1
+  have h2 := holCoeff_algebraMap_mul L (L := Omega L) (algebraMap K L c) 1
   rw [mul_one, holCoeff_one] at h2
   rw [h1, h2]
   funext n
@@ -138,7 +138,7 @@ theorem holCoeff_sum {α : Type*} (s : Finset α) (g : α → holSubring L) :
 
 /-- The `i`-th coordinate of a holomorphic function over `L` with respect to the basis `b`. -/
 noncomputable def holComp (g : holSubring L) (i : ι) : holSubring K :=
-  holOfSeq K (fun n => b.repr (holCoeff L g n) i) (by
+  holOfSeq K (Omega K) (fun n => b.repr (holCoeff L g n) i) (by
     obtain ⟨C, hC0, hC⟩ := exists_coord_bound' b i
     intro r hr
     refine squeeze_zero (fun n => by positivity) (fun n => ?_)
@@ -149,7 +149,7 @@ noncomputable def holComp (g : holSubring L) (i : ι) : holSubring K :=
 
 theorem holCoeff_holComp (g : holSubring L) (i : ι) :
     holCoeff K (holComp b g i) = fun n => b.repr (holCoeff L g n) i :=
-  holCoeff_holOfSeq K _ _
+  holCoeff_holOfSeq K (L := Omega K) _ _
 
 theorem holCoeff_combo (g : ι → holSubring K) (n : ℤ) :
     holCoeff L (∑ i, algebraMap L (holSubring L) (b i) * holExt (g i)) n =

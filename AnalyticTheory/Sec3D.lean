@@ -22,18 +22,18 @@ theorem two_apply_hol (x : OmegaX K) : (2 : holSubring K).1 x = 2 := by
   have : (2 : holSubring K) = 1 + 1 := by norm_num
   rw [this, add_apply_hol, one_apply_hol]; norm_num
 
-theorem holD_monoHol_one : holD (monoHol K 1) = monoHol K 1 := by
+theorem holD_monoHol_one : holD (monoHol K (Omega K) 1) = monoHol K (Omega K) 1 := by
   rw [holD_monoHol]; simp
 
-theorem monoHol_two : monoHol K 2 = monoHol K 1 * monoHol K 1 := by
+theorem monoHol_two : monoHol K (Omega K) 2 = monoHol K (Omega K) 1 * monoHol K (Omega K) 1 := by
   rw [← monoHol_add]; rfl
 
-theorem holD_linF (n : ℤ) : holD (linF (q := q) n) = monoHol K 1 := by
-  have : linF (q := q) n = monoHol K 1 - algebraMap K (holSubring K) (q ^ (-n)) := by
+theorem holD_linF (n : ℤ) : holD (linF (q := q) n) = monoHol K (Omega K) 1 := by
+  have : linF (q := q) n = monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ (-n)) := by
     unfold linF polyHol
     simp
   rw [this]
-  have h := holD_add (monoHol K 1 - algebraMap K (holSubring K) (q ^ (-n))) (algebraMap K (holSubring K) (q ^ (-n)))
+  have h := holD_add (monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ (-n))) (algebraMap K (holSubring K) (q ^ (-n)))
   rw [sub_add_cancel, holD_const] at h
   rw [holD_monoHol_one] at h
   linear_combination -h
@@ -45,7 +45,7 @@ theorem termwise (n : ℤ) :
   have hT := Rq_spec hq0 hq1 n
   set T := Th hq0 hq1
   set R := Rq hq0 hq1 n
-  set X := monoHol K 1
+  set X := monoHol K (Omega K) 1
   set c := algebraMap K (holSubring K) (q ^ (-n))
   have hlin : linF (q := q) n = X - c := by unfold linF polyHol; simp [X, c]
   have hDlin := holD_linF (q := q) n
@@ -60,7 +60,7 @@ theorem termwise (n : ℤ) :
     change holD (c * X * R ^ 2) = _
     rw [holD_leibniz, holD_leibniz, hDR2, holD_monoHol_one]
     have hc : holD c = 0 := holD_const _
-    rw [hc, show monoHol K 1 = X from rfl]
+    rw [hc, show monoHol K (Omega K) 1 = X from rfl]
     ring
   have htP : tP hq0 hq1 n = c * X * R ^ 2 := rfl
   have htP' : tP' hq0 hq1 n = -c * (X * X) * R ^ 3 := by

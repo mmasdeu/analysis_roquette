@@ -1,4 +1,8 @@
-import AnalyticTheory.Holomorphic
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
+import Mathlib.Data.Real.StarOrdered
+import Mathlib.Topology.ContinuousMap.ZeroAtInfty
+import Mathlib.Topology.MetricSpace.Contracting
+import Mathlib.Topology.UniformSpace.Uniformizable
 
 /-!
 # Weierstrass preparation on the unit circle
@@ -12,7 +16,10 @@ form*: `‖hₘ‖ ≤ 1`, `‖h₀‖ = ‖hₛ‖ = 1`, and `‖hₘ‖ ≤ ε
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
+
+universe u
+
 
 theorem ultra_sub {E : Type*} [NormedAddCommGroup E] [IsUltrametricDist E] (x y : E) :
     ‖x - y‖ ≤ max ‖x‖ ‖y‖ := by
@@ -39,15 +46,19 @@ def shSeq (k : ℤ) (Q : ℤ → F) : ℤ → F := fun n => Q (n - k)
 def Hop (h : ℕ → F) (s : ℕ) (Q : ℤ → F) : ℤ → F :=
   fun n => ∑ j ∈ Finset.range (s + 1), h j * Q (n - j)
 
+omit [IsUltrametricDist F] in
 theorem Hop_add (h : ℕ → F) (s : ℕ) (Q Q' : ℤ → F) : Hop h s (Q + Q') = Hop h s Q + Hop h s Q' := by
   funext n; simp [Hop, mul_add, Finset.sum_add_distrib]
 
+omit [IsUltrametricDist F] in
 theorem Hop_smul (h : ℕ → F) (s : ℕ) (a : F) (Q : ℤ → F) : Hop h s (a • Q) = a • Hop h s Q := by
   funext n; simp [Hop, Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => by ring)
 
+omit [IsUltrametricDist F] in
 theorem Hop_neg (h : ℕ → F) (s : ℕ) (Q : ℤ → F) : Hop h s (-Q) = -Hop h s Q := by
   funext n; simp [Hop, Finset.sum_neg_distrib]
 
+omit [IsUltrametricDist F] in
 theorem Hop_sum {ι : Type*} (h : ℕ → F) (s : ℕ) (S : Finset ι) (Q : ι → ℤ → F) :
     Hop h s (∑ i ∈ S, Q i) = ∑ i ∈ S, Hop h s (Q i) := by
   classical
@@ -55,10 +66,12 @@ theorem Hop_sum {ι : Type*} (h : ℕ → F) (s : ℕ) (S : Finset ι) (Q : ι �
   | empty => funext n; simp [Hop]
   | insert a S ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, Hop_add, ih]
 
+omit [IsUltrametricDist F] in
 theorem Hop_shift (h : ℕ → F) (s : ℕ) (k : ℤ) (Q : ℤ → F) :
     Hop h s (shSeq k Q) = shSeq k (Hop h s Q) := by
   funext n; simp only [Hop, shSeq]; refine Finset.sum_congr rfl (fun j _ => ?_); congr 2; ring
 
+omit [IsUltrametricDist F] in
 theorem Hop_e0 (h : ℕ → F) (s : ℕ) (n : ℤ) :
     Hop h s (eSeq 0) n = if 0 ≤ n ∧ n ≤ s then h n.toNat else 0 := by
   classical
@@ -80,10 +93,12 @@ theorem Hop_e0 (h : ℕ → F) (s : ℕ) (n : ℤ) :
     simp [this]
 
 
+omit [IsUltrametricDist F] in
 theorem Hop_shift_e0 (h : ℕ → F) (s : ℕ) (k n : ℤ) :
     Hop h s (shSeq k (eSeq 0)) n = if 0 ≤ n - k ∧ n - k ≤ s then h (n - k).toNat else 0 := by
   rw [Hop_shift]; exact Hop_e0 h s (n - k)
 
+omit [IsUltrametricDist F] in
 theorem sum_e_shift (a : ℕ → F) (k : ℤ) (t : ℕ) (n : ℤ) :
     (∑ j ∈ Finset.range t, a j • eSeq (k + j) : ℤ → F) n =
       if 0 ≤ n - k ∧ n - k < t then a (n - k).toNat else 0 := by
@@ -110,6 +125,7 @@ def Pair (h : ℕ → F) (s : ℕ) (u : ℤ → F) : Prop :=
   ∃ q r : ℤ → F, FinSup q ∧ FinSup r ∧ Bd q 1 ∧ Bd r 1 ∧ (∀ n, (n < 0 ∨ (s : ℤ) ≤ n) → r n = 0) ∧
     ∀ n, Hop h s q n + r n = u n
 
+omit [IsUltrametricDist F] in
 theorem Pair.smul {h : ℕ → F} {s : ℕ} {u : ℤ → F} (hu : Pair h s u) {a : F} (ha : ‖a‖ ≤ 1) :
     Pair h s (a • u) := by
   obtain ⟨q, r, hq, hr, hqb, hrb, hrs, hu⟩ := hu
@@ -145,6 +161,7 @@ theorem Pair.add {h : ℕ → F} {s : ℕ} {u v : ℤ → F} (hu : Pair h s u) (
   · intro n; rw [Hop_add]; simp only [Pi.add_apply]
     rw [← hu n, ← hv n]; ring
 
+omit [IsUltrametricDist F] in
 theorem Pair.neg {h : ℕ → F} {s : ℕ} {u : ℤ → F} (hu : Pair h s u) : Pair h s (-u) := by
   have := hu.smul (a := -1) (by simp)
   simpa using this
@@ -160,6 +177,7 @@ theorem Pair.sum {h : ℕ → F} {s : ℕ} {ι : Type*} (S : Finset ι) (u : ι 
     rw [Finset.sum_insert ha]
     exact (hu a (Finset.mem_insert_self _ _)).add (ih (fun i hi => hu i (Finset.mem_insert_of_mem hi)))
 
+omit [IsUltrametricDist F] in
 theorem Pair.of_Hop {h : ℕ → F} {s : ℕ} {q : ℤ → F} (hq : FinSup q) (hqb : Bd q 1) :
     Pair h s (Hop h s q) :=
   ⟨q, 0, hq, ⟨∅, fun n _ => rfl⟩, hqb, fun n => by simp, fun n _ => rfl, fun n => by simp⟩
@@ -307,6 +325,8 @@ section Division
 variable [CompleteSpace F] {h : ℕ → F} {s : ℕ} (hP : PolyData h s)
 include hP
 
+omit [CompleteSpace F] in
+omit [IsUltrametricDist F] in
 /-- The explicit division pair for `yˢ`. -/
 theorem witProp_s : WitProp h s (s : ℤ) ((h s)⁻¹ • eSeq 0)
     (-(∑ j ∈ Finset.range s, ((h s)⁻¹ * h j) • eSeq ((0 : ℤ) + j))) := by
@@ -360,6 +380,7 @@ noncomputable def wit (m : ℤ) : (ℤ → F) × (ℤ → F) :=
   if m = (s : ℤ) then ((h s)⁻¹ • eSeq 0, -(∑ j ∈ Finset.range s, ((h s)⁻¹ * h j) • eSeq ((0 : ℤ) + j)))
   else ((Pair_e hP.le_one hP.h0 hP.hs m).choose, (Pair_e hP.le_one hP.h0 hP.hs m).choose_spec.choose)
 
+omit [CompleteSpace F] in
 theorem wit_prop (m : ℤ) : WitProp h s m (wit hP m).1 (wit hP m).2 := by
   classical
   unfold wit
@@ -405,6 +426,7 @@ theorem divR_bd {u : ℤ → F} {c : ℝ} (hc : 0 ≤ c) (hu : Dec u) (hub : Bd 
           mul_le_mul (hub m) ((wit_prop hP m).2.2.2.1 n) (norm_nonneg _) hc
       _ = c := mul_one c)
 
+omit [CompleteSpace F] in
 theorem divR_supp {u : ℤ → F} (n : ℤ) (hn : n < 0 ∨ (s : ℤ) ≤ n) : divR hP u n = 0 := by
   simp [divR, (wit_prop hP _).2.2.2.2.1 n hn]
 
@@ -469,6 +491,7 @@ theorem div_identity {u : ℤ → F} (hu : Dec u) (n : ℤ) :
   have := h3.unique h4
   simpa [Hop, divR] using this
 
+omit [CompleteSpace F] in
 theorem divD_eSeq_s : divD hP (eSeq (s : ℤ)) = (h s)⁻¹ • eSeq 0 := by
   classical
   funext n
@@ -496,8 +519,10 @@ noncomputable def ofDec (u : ℤ → F) (hu : Dec u) : ZeroAtInftyContinuousMap 
     rw [cocompact_eq_cofinite]
     exact tendsto_zero_iff_norm_tendsto_zero.mpr hu
 
+omit [IsUltrametricDist F] in
 theorem ofDec_apply (u : ℤ → F) (hu : Dec u) (n : ℤ) : ofDec u hu n = u n := rfl
 
+omit [IsUltrametricDist F] in
 theorem dec_of_c0 (f : ZeroAtInftyContinuousMap ℤ F) : Dec (fun n => f n) := by
   have := f.zero_at_infty'
   rw [cocompact_eq_cofinite] at this
@@ -583,6 +608,7 @@ theorem cvT_dec {T Q : ℤ → F} {c : ℝ} (hT : Dec T) (hQd : Dec Q) (hQ : Bd 
     nlinarith
   linarith
 
+omit [IsUltrametricDist F] [CompleteSpace F] in
 theorem dec_eSeq (m : ℤ) : Dec (eSeq m : ℤ → F) := by
   classical
   rw [Dec]
@@ -591,6 +617,7 @@ theorem dec_eSeq (m : ℤ) : Dec (eSeq m : ℤ → F) := by
   have : n ≠ m := by simpa using hn
   simp [eSeq, this]
 
+omit [CompleteSpace F] in
 theorem dec_sub {u v : ℤ → F} (hu : Dec u) (hv : Dec v) : Dec (u - v) := by
   have := tendsto_zero_iff_norm_tendsto_zero.mpr hu
   have h2 := tendsto_zero_iff_norm_tendsto_zero.mpr hv
@@ -840,4 +867,4 @@ end Cauchy
 
 end Seq
 
-end AnalyticTheory
+end EntireLaurent

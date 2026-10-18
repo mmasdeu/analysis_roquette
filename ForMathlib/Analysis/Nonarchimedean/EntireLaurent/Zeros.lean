@@ -1,5 +1,6 @@
-import AnalyticTheory.WeierstrassPrep
-import AnalyticTheory.Identity
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.WeierstrassPrep
+import Mathlib.RingTheory.SimpleRing.Principal
 
 /-!
 # Existence of zeros of holomorphic functions on tie spheres
@@ -11,16 +12,19 @@ preparation theorem on the unit circle after scaling by an element of norm `ρ`.
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
+omit [IsUltrametricDist K] [Algebra.IsIntegral K L] [IsAlgClosed L] in
 /-- The Cauchy product of two null sequences in a finite extension of `K` inside `Ω`. -/
-theorem cauchy_omega (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
-    {u v : ℤ → Omega K} (hu : ∀ i, u i ∈ S) (hv : ∀ i, v i ∈ S) (hud : Dec u) (hvd : Dec v) :
-    ∃ (A B : Omega K) (c : ℤ → Omega K), HasSum u A ∧ HasSum v B ∧
+theorem cauchy_omega (S : IntermediateField K L) [FiniteDimensional K S]
+    {u v : ℤ → L} (hu : ∀ i, u i ∈ S) (hv : ∀ i, v i ∈ S) (hud : Dec u) (hvd : Dec v) :
+    ∃ (A B : L) (c : ℤ → L), HasSum u A ∧ HasSum v B ∧
       (∀ m, HasSum (fun i => u i * v (m - i)) (c m)) ∧ HasSum c (A * B) := by
   haveI : CompleteSpace S := FiniteDimensional.complete K S
   set u' : ℤ → S := fun i => ⟨u i, hu i⟩ with hu'
@@ -29,9 +33,9 @@ theorem cauchy_omega (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
   have hv'd : Dec v' := hvd
   obtain ⟨A, B, hA, hB, hfib, hAB⟩ := hasSum_cauchy_product hu'd hv'd
   have mapS : ∀ {ι : Type _} {f : ι → S} {a : S}, HasSum f a →
-      HasSum (fun i => ((f i : S) : Omega K)) (a : Omega K) := fun {ι f a} h => by
-    simpa using h.map (S.val : S →+ Omega K) continuous_subtype_val
-  refine ⟨A, B, fun m => ((∑' i, u' i * v' (m - i) : S) : Omega K), mapS hA, mapS hB,
+      HasSum (fun i => ((f i : S) : L)) (a : L) := fun {ι f a} h => by
+    simpa using h.map (S.val : S →+ L) continuous_subtype_val
+  refine ⟨A, B, fun m => ((∑' i, u' i * v' (m - i) : S) : L), mapS hA, mapS hB,
     fun m => ?_, ?_⟩
   · have := mapS (hfib m)
     simpa [hu', hv'] using this
@@ -39,28 +43,29 @@ theorem cauchy_omega (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
     simpa using this
 
 
+omit [IsUltrametricDist K] [IsAlgClosed L] in
 /-- Evaluation of the preparation identity `P = Q·H` at a point of the unit circle. -/
-theorem prep_eval (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
+theorem prep_eval (S : IntermediateField K L) [FiniteDimensional K S]
     (H Q R : ℤ → S) (s : ℕ) (ε : ℝ) (hε0 : 0 ≤ ε) (hε1 : ε < 1)
     (hHd : Dec H) (hQd : Dec Q) (hQ0 : ‖Q 0‖ = 1) (hQi : ∀ i : ℤ, i ≠ 0 → ‖Q i‖ ≤ ε)
     (hRs : ∀ n : ℤ, (n < 0 ∨ (s : ℤ) ≤ n) → R n = 0)
     (hQH : ∀ n, HasSum (fun i => Q i * H (n - i)) ((eSeq (s : ℤ) : ℤ → S) n - R n))
-    (y : Omega K) (hy1 : ‖y‖ = 1) :
-    ∃ A B : Omega K, ‖A‖ = 1 ∧ HasSum (fun j => ((H j : S) : Omega K) * y ^ j) B ∧
-      A * B = y ^ s - ∑ i ∈ Finset.range s, ((R (i : ℤ) : S) : Omega K) * y ^ i := by
+    (y : L) (hy1 : ‖y‖ = 1) :
+    ∃ A B : L, ‖A‖ = 1 ∧ HasSum (fun j => ((H j : S) : L) * y ^ j) B ∧
+      A * B = y ^ s - ∑ i ∈ Finset.range s, ((R (i : ℤ) : S) : L) * y ^ i := by
   classical
   have hy0 : y ≠ 0 := by intro h; rw [h, norm_zero] at hy1; exact zero_ne_one hy1
-  set S' := IntermediateField.adjoin K ({y} : Set (Omega K)) ⊔ S with hS'
-  haveI : FiniteDimensional K (IntermediateField.adjoin K ({y} : Set (Omega K))) :=
+  set S' := IntermediateField.adjoin K ({y} : Set L) ⊔ S with hS'
+  haveI : FiniteDimensional K (IntermediateField.adjoin K ({y} : Set L)) :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral y)
   haveI : FiniteDimensional K S' := by
     rw [hS']; infer_instance
   have hSS' : S ≤ S' := le_sup_right
   have hyS' : y ∈ S' :=
-    (le_sup_left : IntermediateField.adjoin K ({y} : Set (Omega K)) ≤ S')
+    (le_sup_left : IntermediateField.adjoin K ({y} : Set L) ≤ S')
       (IntermediateField.mem_adjoin_simple_self K y)
-  set u : ℤ → Omega K := fun i => ((Q i : S) : Omega K) * y ^ i with hu
-  set v : ℤ → Omega K := fun j => ((H j : S) : Omega K) * y ^ j with hv
+  set u : ℤ → L := fun i => ((Q i : S) : L) * y ^ i with hu
+  set v : ℤ → L := fun j => ((H j : S) : L) * y ^ j with hv
   have huS : ∀ i, u i ∈ S' := fun i => mul_mem (hSS' (Q i).2) (zpow_mem hyS' _)
   have hvS : ∀ j, v j ∈ S' := fun j => mul_mem (hSS' (H j).2) (zpow_mem hyS' _)
   have hun : ∀ i, ‖u i‖ = ‖Q i‖ := fun i => by
@@ -70,29 +75,29 @@ theorem prep_eval (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
   have hud : Dec u := hQd.congr (fun i => (hun i).symm)
   have hvd : Dec v := hHd.congr (fun i => (hvn i).symm)
   obtain ⟨A, B, c, hA, hB, hc, hcAB⟩ := cauchy_omega K S' huS hvS hud hvd
-  have hcm : ∀ m, c m = (((eSeq (s : ℤ) : ℤ → S) m - R m : S) : Omega K) * y ^ m := by
+  have hcm : ∀ m, c m = (((eSeq (s : ℤ) : ℤ → S) m - R m : S) : L) * y ^ m := by
     intro m
-    have h1 := (hQH m).map (S.val : S →+ Omega K) continuous_subtype_val
+    have h1 := (hQH m).map (S.val : S →+ L) continuous_subtype_val
     have h2 := h1.mul_right (y ^ m)
     have h3 : HasSum (fun i => u i * v (m - i))
-        ((((eSeq (s : ℤ) : ℤ → S) m - R m : S) : Omega K) * y ^ m) := by
+        ((((eSeq (s : ℤ) : ℤ → S) m - R m : S) : L) * y ^ m) := by
       convert h2 using 1
       funext i
-      have e : ((Q i * H (m - i) : S) : Omega K) = (Q i : Omega K) * (H (m - i) : Omega K) := rfl
+      have e : ((Q i * H (m - i) : S) : L) = (Q i : L) * (H (m - i) : L) := rfl
       have : y ^ i * y ^ (m - i) = y ^ m := by rw [← zpow_add₀ hy0]; congr 1; ring
-      show ((Q i : S) : Omega K) * y ^ i * (((H (m - i) : S) : Omega K) * y ^ (m - i)) =
-        ((Q i * H (m - i) : S) : Omega K) * y ^ m
+      show ((Q i : S) : L) * y ^ i * (((H (m - i) : S) : L) * y ^ (m - i)) =
+        ((Q i * H (m - i) : S) : L) * y ^ m
       rw [e, ← this]; ring
     exact (hc m).unique h3
-  set r : ℕ → Omega K := fun i => ((R (i : ℤ) : S) : Omega K) with hr
-  have hes_sum : HasSum (fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m) (y ^ s) := by
-    have := hasSum_single (f := fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m)
+  set r : ℕ → L := fun i => ((R (i : ℤ) : S) : L) with hr
+  have hes_sum : HasSum (fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : L) * y ^ m) (y ^ s) := by
+    have := hasSum_single (f := fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : L) * y ^ m)
       (s : ℤ) (fun m hm => by simp [eSeq, hm])
     simpa [eSeq] using this
-  have hR_sum : HasSum (fun m : ℤ => ((R m : S) : Omega K) * y ^ m)
+  have hR_sum : HasSum (fun m : ℤ => ((R m : S) : L) * y ^ m)
       (∑ i ∈ Finset.range s, r i * y ^ i) := by
     set T0 : Finset ℤ := (Finset.range s).image (fun i : ℕ => (i : ℤ)) with hT0
-    have hz : ∀ m ∉ T0, ((R m : S) : Omega K) * y ^ m = 0 := by
+    have hz : ∀ m ∉ T0, ((R m : S) : L) * y ^ m = 0 := by
       intro m hm
       have : R m = 0 := hRs m (by
         by_contra hcon
@@ -100,7 +105,7 @@ theorem prep_eval (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
         exact hm (Finset.mem_image.mpr ⟨m.toNat, Finset.mem_range.mpr (by omega), by omega⟩))
       simp [this]
     have hsumeq : ∑ i ∈ Finset.range s, r i * y ^ i =
-        ∑ m ∈ T0, ((R m : S) : Omega K) * y ^ m := by
+        ∑ m ∈ T0, ((R m : S) : L) * y ^ m := by
       rw [hT0, Finset.sum_image (fun a _ b _ hab => by simpa using hab)]
       refine Finset.sum_congr rfl (fun i _ => ?_)
       simp [hr]
@@ -108,8 +113,8 @@ theorem prep_eval (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
     exact hasSum_sum_of_ne_finset_zero hz
   have hcsum : HasSum (fun m => c m) (y ^ s - ∑ i ∈ Finset.range s, r i * y ^ i) := by
     have h1 := hes_sum.sub hR_sum
-    have h2 : (fun m => c m) = fun m => (((eSeq (s : ℤ) : ℤ → S) m : S) : Omega K) * y ^ m -
-        ((R m : S) : Omega K) * y ^ m := by
+    have h2 : (fun m => c m) = fun m => (((eSeq (s : ℤ) : ℤ → S) m : S) : L) * y ^ m -
+        ((R m : S) : L) * y ^ m := by
       funext m; rw [hcm m]; push_cast; ring
     rw [h2]; exact h1
   have hAB0 : A * B = y ^ s - ∑ i ∈ Finset.range s, r i * y ^ i := hcAB.unique hcsum
@@ -120,15 +125,16 @@ theorem prep_eval (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
     rw [this, hun, hQ0]
   exact ⟨A, B, hA1, hB, hAB0⟩
 
+omit [IsUltrametricDist K] in
 /-- Zero existence on a tie sphere. -/
-theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K → Omega K}
-    (hF : ∀ x : Omega K, x ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
+theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → L}
+    (hF : ∀ x : L, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K L (a n) * x ^ n) (F x))
     {ρ : ℝ} (hρ : 0 < ρ) {n1 n2 : ℤ} (h12 : n1 < n2)
     (hmax : ∀ n, ‖a n‖ * ρ ^ n ≤ ‖a n1‖ * ρ ^ n1)
     (htie : ‖a n2‖ * ρ ^ n2 = ‖a n1‖ * ρ ^ n1) (hpos : 0 < ‖a n1‖ * ρ ^ n1) :
-    ∃ (x0 : Omega K) (P : Polynomial (Omega K)), ‖x0‖ = ρ ∧ x0 ≠ 0 ∧ P.Monic ∧ 1 ≤ P.natDegree ∧
-      (∀ y, P.IsRoot y → ‖y‖ = 1) ∧ (∀ y : Omega K, ‖y‖ = 1 → (F (x0 * y) = 0 ↔ P.IsRoot y)) := by
+    ∃ (x0 : L) (P : Polynomial L), ‖x0‖ = ρ ∧ x0 ≠ 0 ∧ P.Monic ∧ 1 ≤ P.natDegree ∧
+      (∀ y, P.IsRoot y → ‖y‖ = 1) ∧ (∀ y : L, ‖y‖ = 1 → (F (x0 * y) = 0 ↔ P.IsRoot y)) := by
   classical
   set w := ‖a n1‖ * ρ ^ n1 with hw
   have ha1 : a n1 ≠ 0 := by
@@ -149,19 +155,19 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega 
     field_simp
     rw [h2] at h1
     nlinarith
-  obtain ⟨x0, hx0⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap K (Omega K) c0) hk0pos
+  obtain ⟨x0, hx0⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap K L c0) hk0pos
   have hx0norm : ‖x0‖ = ρ := by
     have : ‖x0‖ ^ k0 = ρ ^ k0 := by
       rw [← norm_pow, hx0, norm_algebraMap_omega, hρk]
     exact (pow_left_inj₀ (norm_nonneg _) hρ.le hk0pos.ne').mp this
   have hx00 : x0 ≠ 0 := by
     intro h; rw [h, norm_zero] at hx0norm; linarith
-  set S := IntermediateField.adjoin K ({x0} : Set (Omega K)) with hS
+  set S := IntermediateField.adjoin K ({x0} : Set L) with hS
   haveI : FiniteDimensional K S :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral x0)
   haveI : CompleteSpace S := FiniteDimensional.complete K S
   have hx0S : x0 ∈ S := IntermediateField.mem_adjoin_simple_self K x0
-  set g : ℤ → Omega K := fun n => algebraMap K (Omega K) (a n) * x0 ^ n with hg
+  set g : ℤ → L := fun n => algebraMap K L (a n) * x0 ^ n with hg
   have hgS : ∀ n, g n ∈ S := fun n =>
     mul_mem (IntermediateField.algebraMap_mem _ _) (zpow_mem hx0S _)
   have hgn : ∀ n, ‖g n‖ = ‖a n‖ * ρ ^ n := fun n => by
@@ -259,9 +265,9 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega 
     rw [norm_neg] at this
     rw [this]; simp only [norm_mul, hQ0, zero_sub, neg_zero, h0, mul_one]
   -- the polynomial
-  set r : ℕ → Omega K := fun i => ((R (i : ℤ) : S) : Omega K) with hr
-  set p0 : Polynomial (Omega K) := ∑ i ∈ Finset.range s, Polynomial.C (r i) * Polynomial.X ^ i with hp0
-  set P : Polynomial (Omega K) := Polynomial.X ^ s - p0 with hP
+  set r : ℕ → L := fun i => ((R (i : ℤ) : S) : L) with hr
+  set p0 : Polynomial L := ∑ i ∈ Finset.range s, Polynomial.C (r i) * Polynomial.X ^ i with hp0
+  set P : Polynomial L := Polynomial.X ^ s - p0 with hP
   have hp0deg : p0.degree < s := by
     rw [Polynomial.degree_lt_iff_coeff_zero]
     intro m hm
@@ -313,7 +319,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega 
         rw [hm, Finset.sum_range_succ'] at hy2
         simp only [pow_zero, mul_one] at hy2
         have hsplit : r 0 = y ^ (m + 1) - ∑ i ∈ Finset.range m, r (i + 1) * y ^ (i + 1) := by
-          linear_combination (-1 : Omega K) * hy2
+          linear_combination (-1 : L) * hy2
         rw [hsplit]
         have hyn0 : 0 ≤ ‖y‖ := norm_nonneg _
         have ha1 : ‖y ^ (m + 1)‖ < 1 := by
@@ -329,29 +335,29 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega 
       have : ‖r 0‖ = 1 := hR0
       linarith
     exact le_antisymm hyle hyge
-  have hgN2y : ∀ y : Omega K, y ≠ 0 → g N2 * y ^ N1 ≠ 0 := fun y hy =>
+  have hgN2y : ∀ y : L, y ≠ 0 → g N2 * y ^ N1 ≠ 0 := fun y hy =>
     mul_ne_zero hgN2 (zpow_ne_zero _ hy)
-  have key : ∀ y : Omega K, ‖y‖ = 1 → (F (x0 * y) = 0 ↔ P.IsRoot y) := by
+  have key : ∀ y : L, ‖y‖ = 1 → (F (x0 * y) = 0 ↔ P.IsRoot y) := by
     intro y hy1
     have hy0 : y ≠ 0 := by intro h; rw [h, norm_zero] at hy1; exact zero_ne_one hy1
     obtain ⟨A, B, hA1, hB, hAB⟩ := prep_eval K S H Q R s ε hε0 hε1 hHd hQd hQ0 hQi hRs hQH y hy1
     have hAne : A ≠ 0 := by intro h; rw [h, norm_zero] at hA1; exact zero_ne_one hA1
     have hFy : F (x0 * y) = g N2 * y ^ N1 * B := by
       have hx := hF (x0 * y) (mul_ne_zero hx00 hy0)
-      have h1 : HasSum (fun j : ℤ => g N2 * y ^ N1 * (((H j : S) : Omega K) * y ^ j))
+      have h1 : HasSum (fun j : ℤ => g N2 * y ^ N1 * (((H j : S) : L) * y ^ j))
           (g N2 * y ^ N1 * B) := hB.mul_left _
-      have h2 : (fun j : ℤ => g N2 * y ^ N1 * (((H j : S) : Omega K) * y ^ j)) =
+      have h2 : (fun j : ℤ => g N2 * y ^ N1 * (((H j : S) : L) * y ^ j)) =
           fun j : ℤ => g (N1 + j) * y ^ (N1 + j) := by
         funext j
         simp only [hH, hgS']
-        have hdiv : ((gS (N1 + j) / gS N2 : S) : Omega K) = g (N1 + j) / g N2 := by
+        have hdiv : ((gS (N1 + j) / gS N2 : S) : L) = g (N1 + j) / g N2 := by
           push_cast; rfl
         rw [hdiv, zpow_add₀ hy0]
         field_simp
       rw [h2] at h1
       have h3 : HasSum (fun n : ℤ => g n * y ^ n) (g N2 * y ^ N1 * B) :=
         (Equiv.addLeft N1).hasSum_iff.mp (by simpa [Function.comp_def] using h1)
-      have h4 : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * (x0 * y) ^ n)
+      have h4 : HasSum (fun n : ℤ => algebraMap K L (a n) * (x0 * y) ^ n)
           (g N2 * y ^ N1 * B) := by
         convert h3 using 1
         funext n; simp only [hg, mul_zpow]; ring
@@ -368,14 +374,15 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega 
       · rw [h, mul_zero]
   exact ⟨x0, P, hx0norm, hx00, hPmonic, by omega, hroot, key⟩
 
+omit [IsUltrametricDist K] in
 /-- Zero existence on a tie sphere. -/
-theorem exists_zero_of_tie {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : Omega K → Omega K}
-    (hF : ∀ x : Omega K, x ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
+theorem exists_zero_of_tie {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → L}
+    (hF : ∀ x : L, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K L (a n) * x ^ n) (F x))
     {ρ : ℝ} (hρ : 0 < ρ) {n1 n2 : ℤ} (h12 : n1 < n2)
     (hmax : ∀ n, ‖a n‖ * ρ ^ n ≤ ‖a n1‖ * ρ ^ n1)
     (htie : ‖a n2‖ * ρ ^ n2 = ‖a n1‖ * ρ ^ n1) (hpos : 0 < ‖a n1‖ * ρ ^ n1) :
-    ∃ x : Omega K, ‖x‖ = ρ ∧ x ≠ 0 ∧ F x = 0 := by
+    ∃ x : L, ‖x‖ = ρ ∧ x ≠ 0 ∧ F x = 0 := by
   obtain ⟨x0, P, hx0, hx00, hmon, hnat, hroot, key⟩ :=
     tie_structure K ha hF hρ h12 hmax htie hpos
   have hdeg : P.degree ≠ 0 := by
@@ -405,6 +412,7 @@ theorem zpow_bounds_Icc {r r' ρ : ℝ} (hr : 0 < r) (h1 : r ≤ ρ) (h2 : ρ �
     have b2 : (r' ^ m)⁻¹ ≤ (ρ ^ m)⁻¹ := inv_anti₀ (by positivity) a2
     exact ⟨le_trans (min_le_right _ _) b2, by linarith⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- The radii in `[r, r']` without a strictly dominant term form a finite set. -/
 theorem bad_radii_finite_Icc {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
     {r r' : ℝ} (hr : 0 < r) (hrr' : r ≤ r') :
@@ -465,6 +473,7 @@ theorem bad_radii_finite_Icc {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 
     exact ⟨(n, N), Finset.mem_coe.mpr (Finset.mem_product.mpr ⟨hnF, hNF⟩), hρ0, hnN, htie, hpos⟩
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- A non-good radius yields two tied maximal indices. -/
 theorem exists_tie_of_not_good {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
     {ρ : ℝ} (hρ : 0 < ρ) (hbad : ¬ GoodRadius K a ρ) :
@@ -495,12 +504,13 @@ theorem exists_tie_of_not_good {a : ℤ → K} (ha : IsConvergentLaurent K a) (h
   · exact ⟨n, N, h, fun m => le_trans (hNmax' m) htie.symm.le, htie.symm, lt_of_lt_of_le hNpos htie.symm.le⟩
   · exact ⟨N, n, h, hNmax', htie, hNpos⟩
 
+omit [IsUltrametricDist K] in
 /-- The zeros on a sphere form a finite set. -/
 theorem zeros_sphere_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
-    {F : Omega K → Omega K}
-    (hF : ∀ x : Omega K, x ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
-    {ρ : ℝ} (hρ : 0 < ρ) : {x : Omega K | x ≠ 0 ∧ ‖x‖ = ρ ∧ F x = 0}.Finite := by
+    {F : L → L}
+    (hF : ∀ x : L, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K L (a n) * x ^ n) (F x))
+    {ρ : ℝ} (hρ : 0 < ρ) : {x : L | x ≠ 0 ∧ ‖x‖ = ρ ∧ F x = 0}.Finite := by
   classical
   by_cases hgood : GoodRadius K a ρ
   · refine Set.Finite.subset (Set.finite_empty) (fun x ⟨hx0, hxρ, hFx⟩ => ?_)
@@ -508,8 +518,8 @@ theorem zeros_sphere_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 :
   · obtain ⟨n1, n2, h12, hmax, htie, hpos⟩ := exists_tie_of_not_good K ha h0 hρ hgood
     obtain ⟨x0, P, hx0, hx00, hmon, hnat, hroot, key⟩ :=
       tie_structure K ha hF hρ h12 hmax htie hpos
-    have hfin : {y : Omega K | P.IsRoot y}.Finite := by
-      have : {y : Omega K | P.IsRoot y} = ↑P.roots.toFinset := by
+    have hfin : {y : L | P.IsRoot y}.Finite := by
+      have : {y : L | P.IsRoot y} = ↑P.roots.toFinset := by
         ext y; simp [Polynomial.mem_roots hmon.ne_zero]
       rw [this]; exact Finset.finite_toSet _
     refine (hfin.image (fun y => x0 * y)).subset (fun x ⟨hx, hxρ, hFx⟩ => ?_)
@@ -517,13 +527,14 @@ theorem zeros_sphere_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 :
     have hy1 : ‖x / x0‖ = 1 := by rw [norm_div, hxρ, hx0, div_self hρ.ne']
     exact (key _ hy1).mp (by rwa [show x0 * (x / x0) = x by field_simp])
 
+omit [IsUltrametricDist K] in
 /-- A non-zero holomorphic function has only finitely many zeros in each closed annulus. -/
 theorem zeros_annulus_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0)
-    {F : Omega K → Omega K}
-    (hF : ∀ x : Omega K, x ≠ 0 →
-      HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x ^ n) (F x))
+    {F : L → L}
+    (hF : ∀ x : L, x ≠ 0 →
+      HasSum (fun n : ℤ => algebraMap K L (a n) * x ^ n) (F x))
     {r r' : ℝ} (hr : 0 < r) (hrr' : r ≤ r') :
-    {x : Omega K | x ≠ 0 ∧ r ≤ ‖x‖ ∧ ‖x‖ ≤ r' ∧ F x = 0}.Finite := by
+    {x : L | x ≠ 0 ∧ r ≤ ‖x‖ ∧ ‖x‖ ≤ r' ∧ F x = 0}.Finite := by
   have hbad := bad_radii_finite_Icc K ha h0 hr hrr'
   refine (hbad.biUnion (fun ρ hρ => zeros_sphere_finite K ha h0 hF
     (lt_of_lt_of_le hr hρ.1.1))).subset (fun x ⟨hx0, h1, h2, hFx⟩ => ?_)
@@ -531,4 +542,4 @@ theorem zeros_annulus_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 
   refine ⟨‖x‖, ⟨⟨h1, h2⟩, fun hgood => ?_⟩, hx0, rfl, hFx⟩
   exact sum_ne_zero_of_good K ha hx0 (hF x hx0) hgood hFx
 
-end AnalyticTheory
+end EntireLaurent

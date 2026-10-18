@@ -1,5 +1,5 @@
 import AnalyticTheory.Rationality
-import AnalyticTheory.PolyHol
+import AnalyticTheory.Analytic
 
 /-!
 # Normalized analytic valuations
@@ -25,7 +25,7 @@ theorem eIdx_pos {α : Omega K} : 0 < eIdx K α := by
   simpa [Polynomial.IsRoot, Polynomial.eval_map_algebraMap] using minpoly.aeval K α
 
 theorem hasOrd_minpoly {α : Omega K} (hα : α ≠ 0) :
-    HasOrd K α (polyHol K (minpoly K α)) (eIdx K α : ℤ) := by
+    HasOrd K α (polyHol K (Omega K) (minpoly K α)) (eIdx K α : ℤ) := by
   have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
   set P : (Omega K)[X] := (minpoly K α).map (algebraMap K (Omega K)) with hP
   have hP0 : P ≠ 0 := ((minpoly.monic hint).map _).ne_zero
@@ -42,7 +42,7 @@ theorem hasOrd_minpoly {α : Omega K} (hα : α ≠ 0) :
   filter_upwards [hne, self_mem_nhdsWithin] with x hx hxα
   have hxα' : x - α ≠ 0 := sub_ne_zero.mpr hxα
   simp only [quotFun, dif_pos hx]
-  have h1 : (polyHol K (minpoly K α)).1 ⟨x, hx⟩ = P.eval x := polyHol_apply K _ _
+  have h1 : (polyHol K (Omega K) (minpoly K α)).1 ⟨x, hx⟩ = P.eval x := polyHol_apply K _ _
   rw [h1]
   conv_rhs => rw [hq]
   simp only [Polynomial.eval_mul, Polynomial.eval_pow, Polynomial.eval_sub, Polynomial.eval_X,
@@ -52,12 +52,12 @@ theorem hasOrd_minpoly {α : Omega K} (hα : α ≠ 0) :
   field_simp
 
 theorem anOrdHol_minpoly {α : Omega K} (hα : α ≠ 0) :
-    anOrdHol K α (polyHol K (minpoly K α)) = ((eIdx K α : ℤ) : WithTop ℤ) :=
+    anOrdHol K α (polyHol K (Omega K) (minpoly K α)) = ((eIdx K α : ℤ) : WithTop ℤ) :=
   anOrdHol_of_hasOrd K (hasOrd_minpoly K hα)
 
 theorem exists_phi_factor {α : Omega K} (hα : α ≠ 0) :
     ∀ (n : ℕ) (f : holSubring K), f ≠ 0 → anOrdHol K α f = (n : ℤ) →
-      ∃ (m : ℕ) (g : holSubring K), f = polyHol K (minpoly K α) ^ m * g ∧
+      ∃ (m : ℕ) (g : holSubring K), f = polyHol K (Omega K) (minpoly K α) ^ m * g ∧
         g.1 ⟨α, hα⟩ ≠ 0 := by
   intro n
   induction n using Nat.strong_induction_on with
@@ -68,7 +68,7 @@ theorem exists_phi_factor {α : Omega K} (hα : α ≠ 0) :
       have hf'0 : f' ≠ 0 := by rintro rfl; apply hf; simpa using hf'
       obtain ⟨k, hk, hk0⟩ := hasOrd_data K hα hf'0
       have hord' := anOrdHol_of_hasOrd K hk
-      have h2 := anOrdHol_mul K α hα (polyHol K (minpoly K α)) f'
+      have h2 := anOrdHol_mul K α hα (polyHol K (Omega K) (minpoly K α)) f'
       rw [← hf', hfn, anOrdHol_minpoly K hα, hord'] at h2
       have h3 : (n : ℤ) = (eIdx K α : ℤ) + (k : ℤ) := by exact_mod_cast h2
       have hepos := eIdx_pos K (α := α)
@@ -77,7 +77,7 @@ theorem exists_phi_factor {α : Omega K} (hα : α ≠ 0) :
     · exact ⟨0, f, by simp, h0⟩
 
 theorem anOrdHol_pow_minpoly {α : Omega K} (hα : α ≠ 0) (m : ℕ) :
-    anOrdHol K α (polyHol K (minpoly K α) ^ m) = (((m * eIdx K α : ℕ) : ℤ) : WithTop ℤ) := by
+    anOrdHol K α (polyHol K (Omega K) (minpoly K α) ^ m) = (((m * eIdx K α : ℕ) : ℤ) : WithTop ℤ) := by
   induction m with
   | zero => simpa using anOrdHol_one K hα
   | succ m ih =>

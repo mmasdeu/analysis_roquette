@@ -386,7 +386,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 
 theorem holCoeff_holReflect (g : holSubring L) (n : ℤ) :
-    holCoeff L (holReflectHom L g) n = holCoeff L g (-n) := by
+    holCoeff L (holReflectHom L (Omega L) g) n = holCoeff L g (-n) := by
   have hconv : IsConvergentLaurent L (fun n => holCoeff L g (-n)) := by
     intro r hr
     have h := holCoeff_convergent L g r⁻¹ (inv_pos.mpr hr)
@@ -395,7 +395,7 @@ theorem holCoeff_holReflect (g : holSubring L) (n : ℤ) :
       refine this.congr (fun n => ?_)
       simp [zpow_neg]
     exact h2
-  have := holCoeff_eq L hconv (f := holReflectHom L g) (fun α => ?_)
+  have := holCoeff_eq L hconv (f := holReflectHom L (Omega L) g) (fun α => ?_)
   · exact congrFun this n
   · have h1 := holCoeff_hasSum L g ⟨α.1⁻¹, inv_ne_zero α.2⟩
     have h2 := (Equiv.neg ℤ).hasSum_iff.mpr h1
@@ -413,12 +413,12 @@ variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 
 theorem reflectionM_alg (g : holSubring L) :
     reflectionM L (algebraMap (holSubring L) (MeroRing L) g) =
-      algebraMap (holSubring L) (MeroRing L) (holReflectHom L g) := by
+      algebraMap (holSubring L) (MeroRing L) (holReflectHom L (Omega L) g) := by
   unfold reflectionM
   rw [IsFractionRing.ringEquivOfRingEquiv_algebraMap]
 
 theorem holReflect_holScale (a : Lˣ) (g : holSubring L) :
-    holReflectHom L (holScale L a g) = holScale L a⁻¹ (holReflectHom L g) := by
+    holReflectHom L (Omega L) (holScale L a g) = holScale L a⁻¹ (holReflectHom L (Omega L) g) := by
   refine Subtype.ext (funext fun α => ?_)
   show g.1 (scalePt L a ⟨α.1⁻¹, inv_ne_zero α.2⟩) = g.1 (⟨(scalePt L a⁻¹ α).1⁻¹, inv_ne_zero (scalePt L a⁻¹ α).2⟩)
   have : scalePt L a ⟨α.1⁻¹, inv_ne_zero α.2⟩ =
@@ -433,11 +433,11 @@ theorem reflectionM_translation (a : Lˣ) (f : MeroRing L) :
   simp only [map_div₀, translation_alg, reflectionM_alg, holReflect_holScale, inv_inv]
 
 theorem holGal_holReflect (σ : L ≃ₐ[K] L) (g : holSubring L) :
-    holGal σ (holReflectHom L g) = holReflectHom L (holGal σ g) := by
+    holGal σ (holReflectHom L (Omega L) g) = holReflectHom L (Omega L) (holGal σ g) := by
   apply holCoeff_injective L
   rw [holCoeff_holGal]
   funext n
-  show σ (holCoeff L (holReflectHom L g) n) = holCoeff L (holReflectHom L (holGal σ g)) n
+  show σ (holCoeff L (holReflectHom L (Omega L) g) n) = holCoeff L (holReflectHom L (Omega L) (holGal σ g)) n
   rw [holCoeff_holReflect, holCoeff_holReflect, holCoeff_holGal]
 
 theorem reflectionM_meroGal (σ : L ≃ₐ[K] L) (f : MeroRing L) :
@@ -465,7 +465,7 @@ theorem reflFq_mem (q' : L) (f : FqSub L q') : reflectionM L (f : MeroRing L) �
 
 theorem reflectionM_involutive (f : MeroRing L) : reflectionM L (reflectionM L f) = f := by
   obtain ⟨x, y, -, rfl⟩ := IsFractionRing.div_surjective (A := holSubring L) f
-  have h : ∀ g : holSubring L, holReflectHom L (holReflectHom L g) = g := fun g =>
+  have h : ∀ g : holSubring L, holReflectHom L (Omega L) (holReflectHom L (Omega L) g) = g := fun g =>
     Subtype.ext (funext fun α => by
       show g.1 ⟨(α.1⁻¹)⁻¹, inv_ne_zero (inv_ne_zero α.2)⟩ = g.1 α
       have : (⟨(α.1⁻¹)⁻¹, inv_ne_zero (inv_ne_zero α.2)⟩ : OmegaX L) = α :=

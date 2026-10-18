@@ -1,4 +1,4 @@
-import AnalyticTheory.Identity
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
 
 /-!
 # Gauss norms of convergent Laurent series and extremal indices
@@ -11,18 +11,22 @@ maximal index is monotone in `r`, and the units of the convolution algebra are m
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
 /-- The weighted terms `‖aₙ‖ rⁿ`. -/
 noncomputable def wt (r : ℝ) (a : ℤ → K) (n : ℤ) : ℝ := ‖a n‖ * r ^ n
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem wt_nonneg {r : ℝ} (hr : 0 < r) (a : ℤ → K) (n : ℤ) : 0 ≤ wt K r a n :=
   mul_nonneg (norm_nonneg _) (zpow_nonneg hr.le n)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem wt_tendsto {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ} (hr : 0 < r) :
     Tendsto (wt K r a) cofinite (𝓝 0) := ha r hr
 
@@ -47,6 +51,7 @@ def IsLeftMax (r : ℝ) (a : ℤ → K) (N : ℤ) : Prop :=
 def IsRightMax (r : ℝ) (a : ℤ → K) (N : ℤ) : Prop :=
   (∀ n, wt K r a n ≤ wt K r a N) ∧ (∀ n, N < n → wt K r a n < wt K r a N)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem exists_leftMax {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ} (hr : 0 < r)
     (h0 : ∃ n, a n ≠ 0) : ∃ N, IsLeftMax K r a N ∧ 0 < wt K r a N := by
   classical
@@ -80,6 +85,7 @@ theorem exists_leftMax {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ} 
     rw [e]; exact hNpos
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem wt_term {r : ℝ} (hr : 0 < r) (a b : ℤ → K) (n k : ℤ) :
     ‖a k * b (n - k)‖ * r ^ n = wt K r a k * wt K r b (n - k) := by
   simp only [wt, norm_mul]
@@ -168,6 +174,7 @@ theorem leftMax_conv {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsCo
 /-- Reflection `n ↦ -n` of a sequence. -/
 def reflSeq (a : ℤ → K) : ℤ → K := fun n => a (-n)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem reflSeq_convergent {a : ℤ → K} (ha : IsConvergentLaurent K a) :
     IsConvergentLaurent K (reflSeq K a) := by
   intro r hr
@@ -177,10 +184,12 @@ theorem reflSeq_convergent {a : ℤ → K} (ha : IsConvergentLaurent K a) :
   refine h'.congr (fun n => ?_)
   simp [reflSeq, zpow_neg]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem wt_refl {r : ℝ} (hr : 0 < r) (a : ℤ → K) (n : ℤ) :
     wt K r (reflSeq K a) n = wt K r⁻¹ a (-n) := by
   simp [wt, reflSeq, zpow_neg]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem convCoeff_refl (a b : ℤ → K) (n : ℤ) :
     convCoeff K (reflSeq K a) (reflSeq K b) n = convCoeff K a b (-n) := by
   unfold convCoeff reflSeq
@@ -189,6 +198,7 @@ theorem convCoeff_refl (a b : ℤ → K) (n : ℤ) :
   simp only [Equiv.neg_apply]
   congr 2; ring
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem isRightMax_iff_refl {r : ℝ} (hr : 0 < r) (a : ℤ → K) (N : ℤ) :
     IsRightMax K r a N ↔ IsLeftMax K r⁻¹ (reflSeq K a) (-N) := by
   have hr' : 0 < r⁻¹ := inv_pos.mpr hr
@@ -229,6 +239,7 @@ theorem rightMax_conv {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsC
   · rw [show -Na + -Nb = -(Na + Nb) by ring, e] at h2
     rw [h2, e, e]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- The leftmost maximal index is nondecreasing in `r`. -/
 theorem leftMax_mono {a : ℤ → K} {r r' : ℝ} (hr : 0 < r) (hrr : r < r') {N N' : ℤ}
     (hN : IsLeftMax K r a N) (hN' : IsLeftMax K r' a N') (hp : 0 < wt K r a N) : N ≤ N' := by
@@ -265,6 +276,7 @@ theorem leftMax_mono {a : ℤ → K} {r r' : ℝ} (hr : 0 < r) (hrr : r < r') {N
   nlinarith
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem isLeftMax_unique {a : ℤ → K} {r : ℝ} {N N' : ℤ} (h : IsLeftMax K r a N)
     (h' : IsLeftMax K r a N') : N = N' := by
   by_contra hne
@@ -272,6 +284,7 @@ theorem isLeftMax_unique {a : ℤ → K} {r : ℝ} {N N' : ℤ} (h : IsLeftMax K
   · exact absurd (h'.2 _ hl) (not_lt.mpr (h.1 N'))
   · exact absurd (h.2 _ hl) (not_lt.mpr (h'.1 N))
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem isRightMax_unique {a : ℤ → K} {r : ℝ} {N N' : ℤ} (h : IsRightMax K r a N)
     (h' : IsRightMax K r a N') : N = N' := by
   by_contra hne
@@ -279,12 +292,14 @@ theorem isRightMax_unique {a : ℤ → K} {r : ℝ} {N N' : ℤ} (h : IsRightMax
   · exact absurd (h.2 _ hl) (not_lt.mpr (h'.1 N))
   · exact absurd (h'.2 _ hl) (not_lt.mpr (h.1 N'))
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem leftMax_le_rightMax {a : ℤ → K} {r : ℝ} {L R : ℤ} (hL : IsLeftMax K r a L)
     (hR : IsRightMax K r a R) : L ≤ R := by
   by_contra h
   push_neg at h
   exact absurd (hL.2 _ h) (not_lt.mpr (hR.1 L))
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem exists_rightMax {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ} (hr : 0 < r)
     (h0 : ∃ n, a n ≠ 0) : ∃ N, IsRightMax K r a N ∧ 0 < wt K r a N := by
   have hr' : 0 < r⁻¹ := inv_pos.mpr hr
@@ -298,15 +313,18 @@ theorem exists_rightMax {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ}
 /-- The Kronecker sequence. -/
 def deltaSeq : ℤ → K := fun n => if n = 0 then 1 else 0
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem deltaSeq_wt {r : ℝ} (hr : 0 < r) (n : ℤ) :
     wt K r (deltaSeq K) n = if n = 0 then 1 else 0 := by
   by_cases h : n = 0 <;> simp [wt, deltaSeq, h]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem deltaSeq_leftMax {r : ℝ} (hr : 0 < r) : IsLeftMax K r (deltaSeq K) 0 := by
   refine ⟨fun n => ?_, fun n hn => ?_⟩
   · rw [deltaSeq_wt K hr, deltaSeq_wt K hr]; by_cases h : n = 0 <;> simp [h]
   · rw [deltaSeq_wt K hr, deltaSeq_wt K hr, if_neg hn.ne]; simp
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem deltaSeq_rightMax {r : ℝ} (hr : 0 < r) : IsRightMax K r (deltaSeq K) 0 := by
   refine ⟨fun n => ?_, fun n hn => ?_⟩
   · rw [deltaSeq_wt K hr, deltaSeq_wt K hr]; by_cases h : n = 0 <;> simp [h]
@@ -405,4 +423,4 @@ theorem unit_monomial {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsC
         _ ≤ ‖a n‖ * s ^ (n - N) := mul_le_mul_of_nonneg_left (le_trans hst hk) hpn.le
     nlinarith [mul_le_mul_of_nonneg_right this hp.le]
 
-end AnalyticTheory
+end EntireLaurent

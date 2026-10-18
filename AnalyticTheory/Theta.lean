@@ -1,4 +1,4 @@
-import AnalyticTheory.InfProd
+import AnalyticTheory.HolDiv
 
 /-!
 # The theta functions `T_φ`
@@ -22,7 +22,7 @@ variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 
 theorem gnorm_poly_le (P : Polynomial K) (N : ℕ) (hP : ∀ j, N ≤ j → P.coeff j = 0) (M : ℝ)
     (hM : ∀ j, ‖P.coeff j‖ ≤ M) {ρ : ℝ} (hρ : 0 < ρ) :
-    gnorm K ρ (polyHol K P) ≤ M * max 1 ρ ^ N := by
+    gnorm K ρ (polyHol K (Omega K) P) ≤ M * max 1 ρ ^ N := by
   have hM0 : 0 ≤ M := le_trans (norm_nonneg _) (hM 0)
   have hmax : 1 ≤ max 1 ρ := le_max_left _ _
   refine (gnorm_le_iff hρ _).mpr (fun n => ?_)
@@ -91,7 +91,7 @@ theorem psi_sub_coeff_zero {q : K} {φ : Polynomial K} (hφ : φ.Monic) (k : ℤ
 
 /-- `F_n = X^{-N} ψ_n`. -/
 noncomputable def thF (q : K) (φ : Polynomial K) (n : ℕ) : holSubring K :=
-  monoHol K (-(φ.natDegree : ℤ)) * polyHol K (psi q φ n)
+  monoHol K (Omega K) (-(φ.natDegree : ℤ)) * polyHol K (Omega K) (psi q φ n)
 
 /-- The scalar in `G_n = q^{nN} ψ_{-n} / φ(0)`. -/
 noncomputable def gcoef (q : K) (φ : Polynomial K) (n : ℕ) : K :=
@@ -99,10 +99,10 @@ noncomputable def gcoef (q : K) (φ : Polynomial K) (n : ℕ) : K :=
 
 /-- `G_n = q^{nN} ψ_{-n} / φ(0)`. -/
 noncomputable def thG (q : K) (φ : Polynomial K) (n : ℕ) : holSubring K :=
-  algebraMap K (holSubring K) (gcoef q φ n) * polyHol K (psi q φ (-(n : ℤ)))
+  algebraMap K (holSubring K) (gcoef q φ n) * polyHol K (Omega K) (psi q φ (-(n : ℤ)))
 
 theorem thF_sub_one (q : K) (φ : Polynomial K) (n : ℕ) :
-    thF q φ n - 1 = monoHol K (-(φ.natDegree : ℤ)) * polyHol K (psi q φ n - X ^ φ.natDegree) := by
+    thF q φ n - 1 = monoHol K (Omega K) (-(φ.natDegree : ℤ)) * polyHol K (Omega K) (psi q φ n - X ^ φ.natDegree) := by
   rw [thF, map_sub, mul_sub, polyHol_X_pow, monoHol_neg_mul]
 
 theorem gnorm_thF_sub_one {q : K} (hq : ‖q‖ < 1) {φ : Polynomial K} (hφ : φ.Monic) (n : ℕ)
@@ -131,7 +131,7 @@ noncomputable def thGpoly (q : K) (φ : Polynomial K) (n : ℕ) : Polynomial K :
   Polynomial.C (gcoef q φ n) * psi q φ (-(n : ℤ)) - 1
 
 theorem thG_sub_one (q : K) (φ : Polynomial K) (n : ℕ) :
-    thG q φ n - 1 = polyHol K (thGpoly q φ n) := by
+    thG q φ n - 1 = polyHol K (Omega K) (thGpoly q φ n) := by
   rw [thGpoly, map_sub, map_mul, map_one, thG]
   congr 2
   exact (Polynomial.aeval_C _ _).symm
@@ -206,7 +206,7 @@ noncomputable def phiOm (φ : Polynomial K) (z : Omega K) : Omega K :=
   (φ.map (algebraMap K (Omega K))).eval z
 
 theorem polyHol_psi_apply (q : K) (hq0 : q ≠ 0) (φ : Polynomial K) (k : ℤ) (y : OmegaX K) :
-    (polyHol K (psi q φ k)).1 y =
+    (polyHol K (Omega K) (psi q φ k)).1 y =
       algebraMap K (Omega K) (q ^ k) ^ φ.natDegree *
         phiOm φ (y.1 / algebraMap K (Omega K) (q ^ k)) := by
   rw [polyHol_apply]
@@ -274,7 +274,7 @@ theorem thG_scale {q : K} (hq0 : q ≠ 0) {φ : Polynomial K} (hc0 : φ.coeff 0 
   rw [pow_succ]; field_simp
 
 
-theorem polyHol_ne_zero_of_monic {φ : Polynomial K} (hφ : φ.Monic) : polyHol K φ ≠ 0 := by
+theorem polyHol_ne_zero_of_monic {φ : Polynomial K} (hφ : φ.Monic) : polyHol K (Omega K) φ ≠ 0 := by
   intro h
   have := congrArg (fun y : holSubring K => holCoeff K y (φ.natDegree : ℤ)) h
   simp only [holCoeff_polyHol] at this
@@ -312,7 +312,7 @@ theorem one_add_sub_apply (f : holSubring K) (x : OmegaX K) : 1 + (f - 1).1 x = 
 theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial K} (hφ : φ.Monic)
     (hc0 : φ.coeff 0 ≠ 0) : ∃ T : holSubring K,
     holScale K (Units.mk0 q hq0)⁻¹ T =
-      algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * monoHol K (φ.natDegree : ℤ) * T ∧
+      algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * monoHol K (Omega K) (φ.natDegree : ℤ) * T ∧
     (∀ ξ : OmegaX K, ∃ J0 : ℕ, ∀ J1, J0 ≤ J1 → ∃ R : holSubring K, R.1 ξ ≠ 0 ∧
       T = (∏ n ∈ Finset.range J1, thF q φ n) * (∏ n ∈ Finset.range J1, thG q φ (n + 1)) * R) ∧
     ∀ x : OmegaX K, Tendsto (fun J : ℕ => (∏ n ∈ Finset.range J, (thF q φ n).1 x) *
@@ -347,9 +347,9 @@ theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
       have := tendsto_nhds_unique (h1.congr (fun J => h2 J)) h3
       rw [this]; ring
     have hφne := polyHol_ne_zero_of_monic hφ
-    have hF0 : thF q φ 0 = monoHol K (-(φ.natDegree : ℤ)) * polyHol K φ := by
+    have hF0 : thF q φ 0 = monoHol K (Omega K) (-(φ.natDegree : ℤ)) * polyHol K (Omega K) φ := by
       simp [thF, psi, Polynomial.scaleRoots_one]
-    have hG0 : thG q φ 0 = algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * polyHol K φ := by
+    have hG0 : thG q φ 0 = algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * polyHol K (Omega K) φ := by
       simp [thG, gcoef, psi, Polynomial.scaleRoots_one]
     have key : thF q φ 0 * holScale K c (PF * PG) = thG q φ 0 * (PF * PG) := by
       refine Subtype.ext (funext fun x => ?_)
@@ -357,11 +357,11 @@ theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
       rw [mul_apply_hol, mul_apply_hol, hG, ← hF x]
       ring
     rw [hF0, hG0] at key
-    have key2 : polyHol K φ * (monoHol K (-(φ.natDegree : ℤ)) * holScale K c (PF * PG)) =
-        polyHol K φ * (algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * (PF * PG)) := by
+    have key2 : polyHol K (Omega K) φ * (monoHol K (Omega K) (-(φ.natDegree : ℤ)) * holScale K c (PF * PG)) =
+        polyHol K (Omega K) φ * (algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * (PF * PG)) := by
       linear_combination key
     have key3 := mul_left_cancel₀ hφne key2
-    have := congrArg (fun y => monoHol K (φ.natDegree : ℤ) * y) key3
+    have := congrArg (fun y => monoHol K (Omega K) (φ.natDegree : ℤ) * y) key3
     simp only at this
     rw [← mul_assoc, ← monoHol_add, show (φ.natDegree : ℤ) + -(φ.natDegree : ℤ) = 0 by ring,
       monoHol_zero, one_mul] at this

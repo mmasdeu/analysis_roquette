@@ -1,4 +1,7 @@
-import AnalyticTheory.Holomorphic
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.Base
+import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+import Mathlib.Topology.GDelta.MetrizableSpace
 
 /-!
 # Dominant terms of convergent Laurent series
@@ -10,7 +13,7 @@ of that radius neither series vanishes.
 
 open Filter Topology
 
-namespace AnalyticTheory
+namespace EntireLaurent
 
 universe u
 
@@ -53,18 +56,21 @@ theorem norm_hasSum_of_dominant {E : Type*} [NormedAddCommGroup E] [IsUltrametri
 
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
+  [Algebra.IsIntegral K L] [IsAlgClosed L]
 
 /-- The radius `r` is *good* for `a`: the term `a_N r^N` is strictly larger than all others. -/
 def GoodRadius (a : ℤ → K) (r : ℝ) : Prop :=
   ∃ N : ℤ, ∀ n, n ≠ N → ‖a n‖ * r ^ n < ‖a N‖ * r ^ N
 
+omit [IsUltrametricDist K] [CompleteSpace K] [Algebra.IsIntegral K L] [IsAlgClosed L] in
 /-- At a point whose radius is good, a convergent Laurent series does not vanish. -/
-theorem sum_ne_zero_of_good {a : ℤ → K} (ha : IsConvergentLaurent K a) {α S : Omega K}
-    (hα : α ≠ 0) (hS : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α ^ n) S)
+theorem sum_ne_zero_of_good {a : ℤ → K} (ha : IsConvergentLaurent K a) {α S : L}
+    (hα : α ≠ 0) (hS : HasSum (fun n : ℤ => algebraMap K L (a n) * α ^ n) S)
     (hg : GoodRadius K a ‖α‖) : S ≠ 0 := by
   obtain ⟨N, hN⟩ := hg
   have hr : 0 < ‖α‖ := norm_pos_iff.mpr hα
-  have hnorm : ∀ n, ‖algebraMap K (Omega K) (a n) * α ^ n‖ = ‖a n‖ * ‖α‖ ^ n := fun n => by
+  have hnorm : ∀ n, ‖algebraMap K L (a n) * α ^ n‖ = ‖a n‖ * ‖α‖ ^ n := fun n => by
     rw [norm_mul, norm_zpow, norm_algebraMap_omega]
   obtain ⟨δ, hδ, hδ0, hle⟩ := exists_gap (fun n => ‖a n‖ * ‖α‖ ^ n)
     (fun n => by positivity) (ha _ hr) N hN
@@ -98,6 +104,7 @@ theorem zpow_inj_of_ne {r s : ℝ} (hr : 0 < r) (hs : 0 < s) {k : ℤ} (hk : k �
     exact mul_left_cancel₀ this ‹_›
   exact Real.log_injOn_pos (Set.mem_Ioi.mpr hr) (Set.mem_Ioi.mpr hs) h2
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- For a non-zero convergent Laurent series, the bad radii in `[1,2]` form a finite set. -/
 theorem bad_radii_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : ∃ n, a n ≠ 0) :
     {r : ℝ | r ∈ Set.Icc (1 : ℝ) 2 ∧ ¬ GoodRadius K a r}.Finite := by
@@ -154,10 +161,12 @@ theorem bad_radii_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : �
     exact ⟨by linarith [hr.1], hnN, htie, hpos⟩
 
 
+omit [IsUltrametricDist L] [Algebra.IsIntegral K L] in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- A point of `Ω^×` whose radius is good for two given non-zero convergent Laurent series. -/
 theorem exists_good_point {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsConvergentLaurent K b)
     (ha0 : ∃ n, a n ≠ 0) (hb0 : ∃ n, b n ≠ 0) :
-    ∃ α : Omega K, α ≠ 0 ∧ GoodRadius K a ‖α‖ ∧ GoodRadius K b ‖α‖ := by
+    ∃ α : L, α ≠ 0 ∧ GoodRadius K a ‖α‖ ∧ GoodRadius K b ‖α‖ := by
   set Z : Set ℝ := {r : ℝ | r ∈ Set.Icc (1 : ℝ) 2 ∧ ¬ GoodRadius K a r} ∪
     {r : ℝ | r ∈ Set.Icc (1 : ℝ) 2 ∧ ¬ GoodRadius K b r} with hZ
   have hZfin : Z.Finite := (bad_radii_finite K ha ha0).union (bad_radii_finite K hb hb0)
@@ -174,8 +183,8 @@ theorem exists_good_point {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb :
     rw [Real.rpow_logb hc0 hc1.ne hu0pos]; exact hu0
   obtain ⟨q, hq⟩ := Rat.denseRange_cast.exists_mem_open hV ⟨_, ht0⟩
   have hqU : ρ ^ (q : ℝ) ∈ U := hq
-  have hcΩ : algebraMap K (Omega K) c ≠ 0 := (map_ne_zero _).mpr (norm_pos_iff.mp hc0)
-  obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap K (Omega K) c ^ q.num) q.den_pos
+  have hcΩ : algebraMap K L c ≠ 0 := (map_ne_zero _).mpr (norm_pos_iff.mp hc0)
+  obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap K L c ^ q.num) q.den_pos
   have hz0 : z ≠ 0 := by
     rintro rfl
     rw [zero_pow q.den_ne_zero] at hz
@@ -192,4 +201,4 @@ theorem exists_good_point {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb :
   · exact Or.inl ⟨⟨by linarith [hqU.1.1, hnz], by linarith [hqU.1.2, hnz]⟩, hbad⟩
   · exact Or.inr ⟨⟨by linarith [hqU.1.1, hnz], by linarith [hqU.1.2, hnz]⟩, hbad⟩
 
-end AnalyticTheory
+end EntireLaurent
