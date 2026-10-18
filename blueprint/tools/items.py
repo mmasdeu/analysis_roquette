@@ -430,6 +430,11 @@ _upd('def:FKQ', text=r'The field $F_K(\mathbf Q)$ of $\mathbf Q$-semi-periodic f
      lean=['semiFixed', 'kConstFq', 'FKQ', 'FKQAlgebra', 'semiFixedAlgebra'])
 _adduses('def:FKQ', 'def:galois-action')
 _adduses('def:char-invariant', 'def:H1-Lq')
+_upd('def:char-invariant', lean=['IsCharInvariant', 'charOfCocycle'])
+_upd('thm:IX', lean=['thmIX_realise','thmIX_classification','thmIX_exists','thmIX_every','isCharInvariant_unique','Ezeta_iso_iff','Ezeta_splitsOver','Ezeta_isElliptic','jacobian_descent'],
+     text=r'Elliptic fields of period $q$ split by $L$ correspond to pairs $\{\chi,\chi^{-1}\}$ of $q$-trivial characters. Proved in model form: the fields $E_\zeta$ are classified up to $K$-isomorphism by $e_q(\zeta)^{\pm1}$ (Galois descent for $F_L(q)$); the abstract bridges (genus of a Galois descent, Jacobian descent, Appendix A2) remain open.')
+_upd('thm:XI', lean=['thmXI_model','exists_cocycle_of_triple'],
+     text=r'$F_K(\mathbf Q)$ equals the model field $E_\zeta$ of a cocycle $\zeta$ with $e_q(\zeta)(\sigma)=\exp(2\pi i/n)$, $n=[L:K]$; hence it is elliptic and split by $L$ (modulo the open ellipticity bridge).')
 _adduses('def:tau-Q-sigma', 'def:galois-action')
 _upd('thm:XI', text=r'$F_K(\mathbf Q)$ is an elliptic function field over $K$ split by $L$, with character invariant $\chi(\sigma)=\exp(2\pi i/n)$ (up to inversion), $n=[L:K]$.')
 _upd('thm:XII', text=r'$F_K(\mathbf Q)$ is an elliptic function field over $K$ whose constant field extension with $L$ is $F_L(q)$.')

@@ -186,38 +186,6 @@ noncomputable def charInvariant (q : K) (E : Type u) [Field E] [Algebra K E]
         ∀ c : K, ((φ (algebraMap K E c) : semiFixed K L (algebraMap K L q) _) :
           FqSub L (algebraMap K L q)) = kConstFq K L q c
 
-/-- Book, §4, Theorem IX: the elliptic fields `E | K` of period `q` split by `L` correspond
-`1 − 1` (up to `K`-isomorphism) to the pairs `{χ, χ⁻¹}` of mutually inverse `q`-trivial
-characters. Formulated as: every `q`-trivial `χ` is realised, and fields with the same invariant
-`χ` or `χ⁻¹` are `K`-isomorphic. Blueprint: `thm:IX`. -/
-theorem thmIX_realise (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hp : HasPrimeOfDegreeOne K (FqSub K q)) (χ : CharGroup K L) (hχ : IsQTrivial K L q χ) :
-    ∃ (E : Type u) (_ : Field E) (_ : Algebra K E) (hE : IsEllipticOver K E)
-      (hsplit : SplitsOver K E L),
-      IsJacobianField K E (FqSub K q) hE hp ∧ charInvariant K L q E hE hsplit = χ := by
-  sorry
-
-theorem thmIX_classification (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hp : HasPrimeOfDegreeOne K (FqSub K q))
-    (E E' : Type u) [Field E] [Field E'] [Algebra K E] [Algebra K E']
-    (hE : IsEllipticOver K E) (hE' : IsEllipticOver K E')
-    (hJ : IsJacobianField K E (FqSub K q) hE hp) (hJ' : IsJacobianField K E' (FqSub K q) hE' hp)
-    (hs : SplitsOver K E L) (hs' : SplitsOver K E' L) :
-    Nonempty (E ≃ₐ[K] E') ↔
-      (charInvariant K L q E hE hs = charInvariant K L q E' hE' hs' ∨
-        charInvariant K L q E hE hs = (charInvariant K L q E' hE' hs')⁻¹) := by
-  sorry
-
-/-- Book, §4, Theorem X: the cyclic field `K_χ` is the unique minimal algebraic splitting field
-of `E`: it splits `E`, and it lies in every splitting field algebraic over `K`.
-Blueprint: `thm:X`. -/
-theorem thmX_minimal_splitting (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (E : Type u) [Field E] [Algebra K E] (hE : IsEllipticOver K E)
-    (hsplit : SplitsOver K E L) (M : IntermediateField K L) (hM : IsGalois K M)
-    (hsM : SplitsOver K E M) :
-    Kchi K L (charInvariant K L q E hE hsplit) ≤ M := by
-  sorry
-
 /-- Book, §4: the semi-periodic data `𝐐 = (L, σ, Q)`: a generator `σ` of the cyclic group `G`
 and `Q ∈ L` with `N(Q) = q`. Blueprint: `def:semi-periodic-triple`. -/
 structure SemiPeriodicTriple (q : K) where
@@ -242,18 +210,6 @@ def FKQ (q : K) (T : SemiPeriodicTriple K L q) : Subfield (FqSub L (algebraMap K
 noncomputable instance FKQAlgebra (q : K) (T : SemiPeriodicTriple K L q) :
     Algebra K (FKQ K L q T) :=
   semiFixedAlgebra K L q _
-
-/-- Book, §4, Theorem XI: `F_K(𝐐)` is an elliptic function field over `K` (of period `q`) split by
-`L`, with character invariant `χ(σ) = exp(2πi/n)`, `n = [L:K]` (up to inversion).
-Blueprint: `thm:XI`. -/
-theorem thmXI_semi_periodic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    ∃ (hE : IsEllipticOver K (FKQ K L q T)) (hs : SplitsOver K (FKQ K L q T) L),
-      charInvariant K L q (FKQ K L q T) hE hs T.gen =
-          Circle.exp (2 * Real.pi / Module.finrank K L) ∨
-        charInvariant K L q (FKQ K L q T) hE hs T.gen =
-          Circle.exp (-(2 * Real.pi / Module.finrank K L)) := by
-  sorry
 
 /-! ### §5: properties of semi-periodic function fields -/
 

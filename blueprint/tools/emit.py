@@ -28,7 +28,7 @@ CHAPTERS=[
  ('The Weierstra\\ss\\ function and the absolute invariant (\\S 3)', lambda l: l.startswith(('def:D-','def:theta-M','def:zeta','def:wp','prop:wp','lem:wp','def:s-k','def:coeff','thm:VI','def:reflection','rem:normal','def:Delta','def:jq','lem:1','thm:VII','rem:delta','thm:VIII'))),
  ('Semi-periodic functions (\\S\\S 4--5)', lambda l: l.startswith(('def:galois','def:characters','def:K-chi','def:q-trivial','def:H1','lem:2','def:char-inv','thm:IX','thm:X','def:semi','def:tau','def:FKQ','thm:XI','thm:XII','thm:XIII','thm:XIV','cor:XIII','thm:XV','cor:XVa','thm:XVI','tab:','cor:XVI'))),
  ('Elliptic subfields and isogenies (\\S 6)', lambda l: l.startswith(('def:commensurable','def:rel','def:Fq-qbar','def:elliptic-sub','lem:XVII','thm:XVII','thm:XVIII','def:isogeny','cor:XVIII','def:complex','prop:abs','thm:XIX','cor:XIX'))),
- ('Appendix \\S A1: fields with a prime divisor of degree 1', lambda l: l.startswith(('def:square','def:pi','def:normal','def:weierstrass','def:absolute-invariant','def:hasse-invariant','prop:absinv','prop:hasse','lem:A','rem:A','thm:A-'))),
+ ('Appendix \\S A1: fields with a prime divisor of degree 1', lambda l: l.startswith(('def:square','def:pi','def:normal','def:weierstrass','def:absolute-invariant','def:hasse-invariant','prop:absinv','prop:hasse','lem:A','lem:rr','lem:Fq-hom','rem:A','thm:A-'))),
  ('Appendix \\S A2: arbitrary elliptic fields', lambda l: l.startswith(('def:splits','def:absolute-invariant-gen','def:hasse-general','thm:A2','def:jacobian','def:char-cocycle','def:translation-group','def:H1-GT','prop:A2'))),
 ]
 def esc(s): return s

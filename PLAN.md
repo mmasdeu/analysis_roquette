@@ -173,3 +173,9 @@ Our `genus` definition gives `dim L(D) = deg D` for `deg D` large. On top of tha
 5. Phase 6a and the general Phase 3 last, if wanted.
 
 Main risks: the divisor-class bridge in Phase 5, and the size of 6a.
+
+## Status (after Sec4)
+
+* Done: Lemma 2, Galois descent for `F_L(q)`, model Theorems IX and XI (`Sec4.lean`).
+* Open bridges (pragmatic approach 6b): `Ezeta_isElliptic`, `Ezeta_isJacobian`,
+  `jacobian_descent`, `thmX_minimal_splitting`; then §5–§6.

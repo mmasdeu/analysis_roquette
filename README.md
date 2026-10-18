@@ -129,9 +129,17 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   `y ∈ L(3𝔭)`), change of variables through Mathlib's `WeierstrassCurve.VariableChange` and normal forms,
   `F ≅ K(X)[Y]/(P)` through `PowerBasis.equivOfMinpoly`.  **Section 3 is complete** (no `sorry` in its
   dependency chain; `#print axioms` shows only `propext`, `Classical.choice`, `Quot.sound`).
-* Remaining in the appendices for §4: Lemma A, Remark 3, and the whole of §A2 (Jacobian field,
-  characteristic cocycle), see `PLAN.md`.
-* Not started (statements only): §§4–6; Appendices A1, A2.
+* Appendix A1: Lemma A (`A1LemmaA.lean`), independence and uniqueness of Weierstraß data, homogeneity
+  of `F_K(q)` under translations (`FqHomogeneous.lean`); existence of `A` and general homogeneity remain.
+* §4, pragmatic form (`Lemma2.lean`, `Lemma2b.lean`, `FieldExt.lean`, `FqDescent.lean`, `Sec4.lean`):
+  Lemma 2 (`H¹(G, L^×/q) ≅ Ĝ(q)`), Galois descent of `F_L(q)` along the twisted action
+  `ρ_σ = τ_{ζ(σ)}σ`, the model fields `E_ζ`, their classification up to `K`-isomorphism by
+  `e_q(ζ)^{±1}` (model Theorem IX), `E_ζ` is split by `L`, and the model Theorem XI
+  (`thmXI_model`): `F_K(𝐐) = E_ζ` with `e_q(ζ)(σ) = exp(2πi/[L:K])`. The characters invariant is
+  `IsCharInvariant` (defined through `E_ζ`).
+  Unproved bridges, clearly marked `sorry`: `Ezeta_isElliptic` (genus of a Galois descent),
+  `Ezeta_isJacobian`, `jacobian_descent` (Appendix A2) and `thmX_minimal_splitting` (Theorem X).
+* Not started (statements only): §§5–6; Appendix A2 in general.
 
 ## Zero theory of holomorphic functions (third step)
 

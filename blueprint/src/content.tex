@@ -1238,7 +1238,7 @@ See the Lean proof of \texttt{lemma2\_H1\_iso, eQ\_injective, exists\_cocycle\_o
 
 \begin{definition}[Character invariant]
 \label{def:char-invariant}
-\lean{AnalyticTheory.charInvariant}
+\lean{AnalyticTheory.IsCharInvariant, AnalyticTheory.charOfCocycle}
 \uses{def:characters, def:elliptic, def:H1-Lq}
 \leanok
 The character invariant $\chi_E=e_q(\zeta)$ of an elliptic field $E$ of period $q$ split by $L$, where $E$ is $K$-isomorphic to the fixed field in $F_L(q)$ of the automorphisms $\tau_{\zeta(\sigma)}\sigma$ (determined up to $\chi\mapsto\chi^{-1}$).
@@ -1246,13 +1246,13 @@ The character invariant $\chi_E=e_q(\zeta)$ of an elliptic field $E$ of period $
 
 \begin{theorem}[Theorem IX]
 \label{thm:IX}
-\lean{AnalyticTheory.thmIX_realise, AnalyticTheory.thmIX_classification}
+\lean{AnalyticTheory.thmIX_realise, AnalyticTheory.thmIX_classification, AnalyticTheory.thmIX_exists, AnalyticTheory.thmIX_every, AnalyticTheory.isCharInvariant_unique, AnalyticTheory.Ezeta_iso_iff, AnalyticTheory.Ezeta_splitsOver, AnalyticTheory.Ezeta_isElliptic, AnalyticTheory.jacobian_descent}
 \uses{lem:2, def:char-invariant, def:splitting-field}
 \leanok
-Elliptic fields of period $q$ split by $L$ correspond to pairs $\{\chi,\chi^{-1}\}$ of $q$-trivial characters.
+Elliptic fields of period $q$ split by $L$ correspond to pairs $\{\chi,\chi^{-1}\}$ of $q$-trivial characters. Proved in model form: the fields $E_\zeta$ are classified up to $K$-isomorphism by $e_q(\zeta)^{\pm1}$ (Galois descent for $F_L(q)$); the abstract bridges (genus of a Galois descent, Jacobian descent, Appendix A2) remain open.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmIX\_realise, thmIX\_classification}.
+See the Lean proof of \texttt{thmIX\_realise, thmIX\_classification, thmIX\_exists, thmIX\_every, isCharInvariant\_unique, Ezeta\_iso\_iff, Ezeta\_splitsOver, Ezeta\_isElliptic, jacobian\_descent}.
 \end{proof}
 
 \begin{theorem}[Theorem X (minimal splitting field)]
@@ -1292,13 +1292,14 @@ The field $F_K(\mathbf Q)$ of $\mathbf Q$-semi-periodic functions: the fixed fie
 
 \begin{theorem}[Theorem XI]
 \label{thm:XI}
-\lean{AnalyticTheory.thmXI_semi_periodic}
+\lean{AnalyticTheory.thmXI_model, AnalyticTheory.exists_cocycle_of_triple}
 \uses{def:FKQ, thm:IX}
 \leanok
 $F_K(\mathbf Q)$ is an elliptic function field over $K$ split by $L$, with character invariant $\chi(\sigma)=\exp(2\pi i/n)$ (up to inversion), $n=[L:K]$.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmXI\_semi\_periodic}.
+\leanok
+See the Lean proof of \texttt{thmXI\_model, exists\_cocycle\_of\_triple}.
 \end{proof}
 
 \begin{theorem}[Theorem XII]
@@ -1675,6 +1676,18 @@ The absolute invariant and the class of the Hasse invariant computed from any We
 See the Lean proof of \texttt{absInv\_eq\_of\_data, hasseInv\_eq\_of\_data}.
 \end{proof}
 
+\begin{lemma}[$\dim L(n\mathfrak p)=n$]
+\label{lem:rr-dimension}
+\lean{AnalyticTheory.finrank_Ln_nat, AnalyticTheory.finrank_Ln_zero, AnalyticTheory.Ln_one_const, AnalyticTheory.Ln_eq_span}
+\uses{def:elliptic, def:degree-one-prime}
+\leanok
+For an elliptic function field with a prime $\mathfrak p$ of degree $1$: $L(0)=L(\mathfrak p)=K$ and $\dim L(n\mathfrak p)=n$ for $n\ge1$, spanned by $1,x,y,x^2,xy,\dots$ when $x,y$ have pole divisors $2\mathfrak p,3\mathfrak p$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{finrank\_Ln\_nat, finrank\_Ln\_zero, Ln\_one\_const, Ln\_eq\_span}.
+\end{proof}
+
 \begin{lemma}[Weierstra\ss\ data at the same prime]
 \label{lem:A1-same-prime}
 \lean{AnalyticTheory.affine_change, AnalyticTheory.exists_variableChange, AnalyticTheory.same_prime_invariants}
@@ -1685,6 +1698,18 @@ Two Weierstra\ss\ data at the same prime $\mathfrak p$ differ by a change of var
 \begin{proof}
 \leanok
 See the Lean proof of \texttt{affine\_change, exists\_variableChange, same\_prime\_invariants}.
+\end{proof}
+
+\begin{lemma}[Primes of degree one of $F_K(q)$]
+\label{lem:Fq-homogeneous}
+\lean{AnalyticTheory.fq_homogeneous, AnalyticTheory.DegOneHomogeneous, AnalyticTheory.translationAlg}
+\uses{def:Fq, cor:translation-Va}
+\leanok
+The prime divisors of degree $1$ of $F_K(q)$ are the primes $\mathfrak p_b$, $b\in K^\times$, and the translations $\tau_a$ permute them transitively.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{fq\_homogeneous, DegOneHomogeneous, translationAlg}.
 \end{proof}
 
 \begin{lemma}[Classification of Weierstra\ss\ curves by $(j,\gamma)$]
