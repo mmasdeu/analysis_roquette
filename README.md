@@ -141,6 +141,14 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   `Ezeta_isJacobian`, `jacobian_descent` (Appendix A2) and `thmX_minimal_splitting` (Theorem X).
 * Not started (statements only): §§5–6; Appendix A2 in general.
 
+## Buzzard's identity (MathOverflow 469021)
+
+`AnalyticTheory/buzzard.lean` proves the identity `Y² + XY = X³ + a₄X + a₆` in `ℚ(u)⟦q⟧` asked
+for in [MathOverflow 469021](https://mathoverflow.net/questions/469021) (`Buzzard.buzzard_identity`,
+axioms: `propext`, `Classical.choice`, `Quot.sound`). It is derived from Theorem VI (relation (32)):
+clearing denominators gives an identity over `ℤ[T,T⁻¹]⟦q⟧`, which is checked by evaluating at units
+`y = 3k+2` of `ℤ₃` and at `q = 3ᵏ` in `ℚ₃`, where it is Roquette's relation for `℘(y), ℘′(y)`.
+
 ## Zero theory of holomorphic functions (third step)
 
 New files: `Dominance.lean`, `Taylor.lean`, `Identity.lean`, `WeierstrassPrep.lean`, `Zeros.lean`,
