@@ -173,13 +173,6 @@ noncomputable def eQ (q : K) (c : H1Lq K L q) : CharGroup K L :=
   Classical.epsilon fun χ : CharGroup K L =>
     ∃ ζ : CocycleModQ K L q, Quot.mk _ ζ = c ∧ ∀ σ, χ σ = expq K L q (ζ.1 σ)
 
-/-- Book, §4, Lemma 2: `e_q` is injective and its image is the set of `q`-trivial characters:
-`H¹(G, L^×/q) ≅ Ĝ(q)`. Blueprint: `lem:2`. -/
-theorem lemma2_H1_iso (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    Function.Injective (eQ K L q) ∧
-      Set.range (eQ K L q) = {χ : CharGroup K L | IsQTrivial K L q χ} := by
-  sorry
-
 /-- Book, §4: the character invariant `χ_E` of an elliptic field `E | K` of period `q` split by
 `L`: a character `χ = e_q(ζ)` where `E` is `K`-isomorphic to the fixed field in `F_L(q)` of the
 automorphisms `τ_{ζ(σ)} σ` (determined by `E` up to `χ ↦ χ⁻¹`, Theorem IX).

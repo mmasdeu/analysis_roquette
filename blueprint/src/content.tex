@@ -1226,13 +1226,14 @@ $H^1(G,L^\times/q)$: cocycles $G\to L^\times/q$ (represented by maps $G\to L^\ti
 
 \begin{lemma}[Lemma 2]
 \label{lem:2}
-\lean{AnalyticTheory.lemma2_H1_iso}
+\lean{AnalyticTheory.lemma2_H1_iso, AnalyticTheory.eQ_injective, AnalyticTheory.exists_cocycle_of_qtrivial, AnalyticTheory.qtrivial_of_cocycle, AnalyticTheory.exact_cocycle, AnalyticTheory.norm_eq_prod_pow, AnalyticTheory.exists_generator_exp}
 \uses{def:q-trivial, def:H1-Lq}
 \leanok
 $e_q$ is injective with image the $q$-trivial characters: $H^1(G,L^\times/q)\cong\widehat G(q)$.
 \end{lemma}
 \begin{proof}
-See the Lean proof of \texttt{lemma2\_H1\_iso}.
+\leanok
+See the Lean proof of \texttt{lemma2\_H1\_iso, eQ\_injective, exists\_cocycle\_of\_qtrivial, qtrivial\_of\_cocycle, exact\_cocycle, norm\_eq\_prod\_pow, exists\_generator\_exp}.
 \end{proof}
 
 \begin{definition}[Character invariant]

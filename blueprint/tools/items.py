@@ -155,7 +155,7 @@ add('definition','def:q-trivial','$q$-trivial characters',['IsQTrivial'],['def:K
  r'$\chi$ is $q$-trivial if $q=N_{K_\chi|K}(Q)$ for some $Q\in K_\chi$.')
 add('definition','def:H1-Lq','$H^1(G,L^\\times/q)$ (placeholder)',['H1Lq','eQ'],['def:galois-group'],True,
  r'The cohomology group $H^1(G,L^\times/q)$ and the map $e_q$ of formula (51). Placeholder.')
-add('lemma','lem:2','Lemma 2',['lemma2_H1_iso'],['def:q-trivial','def:H1-Lq'],True,
+add('lemma','lem:2','Lemma 2',['lemma2_H1_iso','eQ_injective','exists_cocycle_of_qtrivial','qtrivial_of_cocycle','exact_cocycle','norm_eq_prod_pow','exists_generator_exp'],['def:q-trivial','def:H1-Lq'],False,
  r'$e_q$ is injective with image the $q$-trivial characters: $H^1(G,L^\times/q)\cong\widehat G(q)$.')
 add('definition','def:char-invariant','Character invariant (placeholder)',['charInvariant'],['def:characters','def:elliptic'],True,
  r'The character invariant $\chi_E$ of a split elliptic field. Placeholder.')

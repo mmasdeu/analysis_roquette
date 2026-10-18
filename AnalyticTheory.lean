@@ -66,3 +66,5 @@ import AnalyticTheory.A1Unique
 import AnalyticTheory.A1Classify
 import AnalyticTheory.A1Determine
 import AnalyticTheory.A1LemmaA
+import AnalyticTheory.Lemma2
+import AnalyticTheory.Lemma2b
