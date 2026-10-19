@@ -34,7 +34,7 @@ theorem cauchy_omega (S : IntermediateField K L) [FiniteDimensional K S]
   obtain ⟨A, B, hA, hB, hfib, hAB⟩ := hasSum_cauchy_product hu'd hv'd
   have mapS : ∀ {ι : Type _} {f : ι → S} {a : S}, HasSum f a →
       HasSum (fun i => ((f i : S) : L)) (a : L) := fun {ι f a} h => by
-    simpa using h.map (S.val : S →+ L) continuous_subtype_val
+    exact h.map (S.val : S →+ L) continuous_subtype_val
   refine ⟨A, B, fun m => ((∑' i, u' i * v' (m - i) : S) : L), mapS hA, mapS hB,
     fun m => ?_, ?_⟩
   · have := mapS (hfib m)
@@ -88,6 +88,7 @@ theorem prep_eval (S : IntermediateField K L) [FiniteDimensional K S]
       show ((Q i : S) : L) * y ^ i * (((H (m - i) : S) : L) * y ^ (m - i)) =
         ((Q i * H (m - i) : S) : L) * y ^ m
       rw [e, ← this]; ring
+      rfl
     exact (hc m).unique h3
   set r : ℕ → L := fun i => ((R (i : ℤ) : S) : L) with hr
   have hes_sum : HasSum (fun m : ℤ => (((eSeq (s : ℤ) : ℤ → S) m : S) : L) * y ^ m) (y ^ s) := by

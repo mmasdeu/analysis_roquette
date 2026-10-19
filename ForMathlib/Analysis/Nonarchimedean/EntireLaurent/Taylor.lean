@@ -87,7 +87,7 @@ theorem omega_hasSum_mem {ι : Type*} (S : IntermediateField K L) [FiniteDimensi
   have hs : Summable g' := NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero ht'
   obtain ⟨s', hs'⟩ := hs
   have := hs'.map (S.val : S →+ L) continuous_subtype_val
-  exact ⟨(s' : L), s'.2, by simpa using this⟩
+  exact ⟨(s' : L), s'.2, this⟩
 
 theorem tendsto_mul_cofinite_prod {u : ℤ → ℝ} {v : ℕ → ℝ} (hu0 : ∀ n, 0 ≤ u n)
     (hv0 : ∀ k, 0 ≤ v k) (hv1 : ∀ k, v k ≤ 1) (hu : Tendsto u cofinite (𝓝 0))
@@ -213,6 +213,7 @@ theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L �
       have hz : (((⟨α, hαS⟩ : S2) ^ (n - (k : ℤ)) : S2) : L) = α ^ (n - (k : ℤ)) :=
         map_zpow₀ S2.val (⟨α, hαS⟩ : S2) (n - (k : ℤ))
       simp [hT, hτ, mul_assoc, hz]
+      simp [map_zpow₀]
     have hσ1 : HasSum (fun n : ℤ => algebraMap K L (a n) * (α + h) ^ n) σ :=
       hσ.prod_fiberwise hfib
     have hσF : σ = F (α + h) := hσ1.unique (hF _ hα2)

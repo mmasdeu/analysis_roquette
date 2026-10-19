@@ -667,7 +667,7 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
   have hlip : LipschitzWith ⟨ε, hε0⟩ Φ := by
     refine LipschitzWith.of_dist_le_mul (fun Q Q' => ?_)
     rw [dist_eq_norm, dist_eq_norm]
-    refine c0le _ _ (by positivity) (fun n => ?_)
+    refine c0le _ _ (mul_nonneg hε0 (norm_nonneg _)) (fun n => ?_)
     set u := (e_s - cvT T (fun n => Q n)) - (e_s - cvT T (fun n => Q' n)) with hu
     have hud : Dec u := dec_sub (hmapd Q) (hmapd Q')
     have hdb : Bd (fun n => Q n - Q' n) ‖Q - Q'‖ := fun n => by
@@ -689,9 +689,10 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
     have h6 : (Φ Q - Φ Q') n = divD hP u n := by
       rw [h5]; rfl
     rw [h6]
-    simpa [mul_comm] using h4
-  have hcon : ContractingWith ⟨ε, hε0⟩ Φ := ⟨by
-    rw [← NNReal.coe_lt_coe]; simpa using hε1, hlip⟩
+    show ‖divD hP u n‖ ≤ ε * ‖Q - Q'‖
+    rw [mul_comm]
+    exact h4
+  have hcon : ContractingWith ⟨ε, hε0⟩ Φ := ⟨by exact_mod_cast hε1, hlip⟩
   haveI : Nonempty (ZeroAtInftyContinuousMap ℤ F) := ⟨0⟩
   set Qc := ContractingWith.fixedPoint Φ hcon with hQc
   have hfix : Φ Qc = Qc := ContractingWith.fixedPoint_isFixedPt (f := Φ) hcon

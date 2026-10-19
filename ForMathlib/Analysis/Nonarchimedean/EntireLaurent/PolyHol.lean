@@ -195,11 +195,6 @@ theorem coe_eq_sum_basis {α : L} (hint : IsIntegral K α)
   have h := (IntermediateField.adjoin.powerBasis hint).basis.sum_repr y
   conv_lhs => rw [← h]
   simp [Algebra.smul_def]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  congr 1
-  have := congrFun (PowerBasis.coe_basis (IntermediateField.adjoin.powerBasis hint)) i
-  simpa [IntermediateField.adjoin.powerBasis_gen] using
-    congrArg (fun z : IntermediateField.adjoin K ({α} : Set L) => (z : L)) this
 
 omit [IsAlgClosed L] in
 /-- Coordinates of `αᵏ` with respect to the power basis of `K(α)`, with a norm bound. -/

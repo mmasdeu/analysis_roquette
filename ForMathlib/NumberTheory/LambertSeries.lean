@@ -79,6 +79,7 @@ theorem hasSum_lambert_pnat [CompleteSpace 𝕜] {q : 𝕜} (hq : ‖q‖ < 1) (
     have := hasSum_fintype (fun x : {x // x ∈ (n : ℕ).divisorsAntidiagonal} =>
       φ (sigmaAntidiagonalEquivProd ⟨n, x⟩))
     convert this using 1
+    all_goals first | rfl | skip
     rw [Finset.sum_mul, ← Nat.sum_divisorsAntidiagonal (fun i _ => F i * q ^ (n : ℕ))]
     rw [← Finset.sum_attach ((n : ℕ).divisorsAntidiagonal) (fun i => F i.1 * q ^ (n : ℕ))]
     refine Finset.sum_congr rfl (fun x _ => ?_)

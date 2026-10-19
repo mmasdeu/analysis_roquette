@@ -117,8 +117,7 @@ theorem norm_tsumEval_sub_le (f : R⟦X⟧) :
       (add_left_injective 1)
   have hg : HasSum (fun n : ℕ => ‖q‖ ^ (n + 1)) (‖q‖ / (1 - ‖q‖)) := by
     have := (hasSum_geometric_of_lt_one (norm_nonneg q) hq).mul_left ‖q‖
-    convert this using 1
-    funext n; ring
+    convert this using 1 <;> first | (funext n; ring) | rw [div_eq_mul_inv]
   rw [e]
   refine (norm_tsum_le_tsum_norm hs').trans ?_
   rw [← hg.tsum_eq]
@@ -164,7 +163,8 @@ theorem eq_zero_of_tsumEval_eq_zero (hφi : Function.Injective φ) {f : R⟦X⟧
   -- `‖u n‖ / (1 - ‖u n‖) → 0`
   have hnu : Tendsto (fun n => ‖u n‖) atTop (𝓝 0) := by simpa using hu.norm
   have hratio : Tendsto (fun n => ‖u n‖ / (1 - ‖u n‖)) atTop (𝓝 0) := by
-    simpa using hnu.div (tendsto_const_nhds.sub hnu) (by norm_num)
+    have h := hnu.div (tendsto_const_nhds.sub hnu) (by norm_num : (1 : ℝ) - 0 ≠ 0)
+    simpa only [sub_zero, div_one, Pi.div_def] using h
   obtain ⟨N, hN⟩ := ((hratio.eventually (gt_mem_nhds hc)).and
     (hnu.eventually (gt_mem_nhds one_pos))).exists_forall_of_atTop
   obtain ⟨h1, h2⟩ := hN N le_rfl

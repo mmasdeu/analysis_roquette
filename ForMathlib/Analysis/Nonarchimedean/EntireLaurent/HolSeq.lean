@@ -175,7 +175,8 @@ theorem monoHol_apply (n : ℤ) (α : Punct L) : (monoHol K L n).1 α = α.1 ^ n
       algebraMap K L (if m = n then (1 : K) else 0) * α.1 ^ m) n
     (fun m hm => by simp [hm])
   have := h.unique h2
-  simpa using this
+  simp only [if_true, map_one, one_mul] at this
+  exact this
 
 /-- The units of `H_K` are the functions `c Xⁿ`. -/
 theorem hol_unit {f g : holSubring K L} (h : f * g = 1) :

@@ -21,7 +21,7 @@ theorem exists_zpow_generator_circle (χ : G →* Circle) :
     ∃ σ : G, ∀ g : G, ∃ a : ℤ, χ g = χ σ ^ a := by
   haveI : Finite χ.range := Finite.of_surjective χ.rangeRestrict χ.rangeRestrict_surjective
   have hcyc : IsCyclic χ.range := by
-    refine isCyclic_of_subgroup_isDomain (Circle.coeHom.comp χ.range.subtype) ?_
+    refine isCyclic_of_injective_ringHom (Circle.coeHom.comp χ.range.subtype) ?_
     intro a b h
     exact Subtype.ext (Circle.coe_injective h)
   obtain ⟨⟨g, hg⟩, hgen⟩ := hcyc.exists_generator
