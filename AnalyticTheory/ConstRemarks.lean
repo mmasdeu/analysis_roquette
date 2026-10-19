@@ -891,16 +891,17 @@ theorem galAct_fix_holExt {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L
     (x : holSubring K) :
     ρ (algebraMap (holSubring L) (MeroRing L) (holExt x)) =
       algebraMap (holSubring L) (MeroRing L) (holExt x) := by
-  obtain ⟨g'', hg'', hsum⟩ := hρ.2 (holExt x) (holCoeff L (holExt x)) (holCoeff_convergent L _)
-    (holCoeff_hasSum L _)
-  rw [hg'']
-  congr 1
+  obtain ⟨g, hgx⟩ : ∃ g : holSubring L, g = holExt x := ⟨_, rfl⟩
+  have hc := holCoeff_convergent L (L := Omega L) g
+  have hh := holCoeff_hasSum L (L := Omega L) g
+  obtain ⟨g'', hg'', hsum⟩ := hρ.2 g (holCoeff L g) hc hh
+  have hfix : ∀ n, σ (holCoeff L g n) = holCoeff L g n := fun n => by
+    rw [hgx, holCoeff_holExt]; exact σ.commutes _
+  rw [← hgx, hg'']
+  refine congrArg (algebraMap (holSubring L) (MeroRing L)) ?_
   apply holCoeff_injective L
-  refine holCoeff_eq L (holCoeff_convergent L (holExt x)) (fun α => ?_)
-  have e : (fun n => algebraMap L (Omega L) (σ (holCoeff L (holExt x) n)) * α.1 ^ n) =
-      (fun n => algebraMap L (Omega L) (holCoeff L (holExt x) n) * α.1 ^ n) := by
-    funext n; rw [holCoeff_holExt]; simp only [AlgEquiv.commutes]
-  rw [← e]; exact hsum α
+  refine holCoeff_eq L hc (fun α => ?_)
+  simpa only [hfix] using hsum α
 
 theorem hol_descend {g : holSubring L} (hg : ∀ σ : L ≃ₐ[K] L, holGal σ g = g) :
     ∃ g₀ : holSubring K, holExt g₀ = g := by

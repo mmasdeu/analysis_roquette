@@ -246,6 +246,7 @@ theorem relK {A B C : K} (hrel : wpPrimeAlg hq0 hq1 ^ 2 + wpAlg hq0 hq1 * wpPrim
       convert h2 using 1
       funext n
       simp [Function.comp, tW, map_div₀, map_zpow₀, x]
+      rfl
     have hG : (Gw hq0 hq1).1 x = (GP hq0 hq1).1 x -
         algebraMap K (Omega K) (2 * sK K 1 q) * (Th hq0 hq1).1 x ^ 2 := by
       simp only [Gw, sub_apply_hol, mul_apply_hol, pow_apply_hol, algebraMap_apply_hol]
@@ -259,12 +260,13 @@ theorem relK {A B C : K} (hrel : wpPrimeAlg hq0 hq1 ^ 2 + wpAlg hq0 hq1 * wpPrim
       convert h2 using 1
       funext n
       simp [Function.comp, tPp, map_div₀, map_zpow₀, x]
+      rfl
     have hG : (Gw' hq0 hq1).1 x = (GP' hq0 hq1).1 x +
         algebraMap K (Omega K) (sK K 1 q) * (Th hq0 hq1).1 x ^ 3 := by
       simp only [Gw', add_apply_hol, mul_apply_hol, pow_apply_hol, algebraMap_apply_hol]
     rw [hG, add_div, mul_div_cancel_right₀ _ (pow_ne_zero 3 hx), e, hPdef, map_add]
   have hrp := rel_pointwise hq0 hq1 hrel x hx
-  simp only at hrp
+  try simp only at hrp
   rw [hW, hP] at hrp
   apply (algebraMap K (Omega K)).injective
   simp only [map_add, map_mul, map_pow]

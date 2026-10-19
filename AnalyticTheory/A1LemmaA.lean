@@ -56,9 +56,9 @@ theorem stab_u_one (W : WeierstrassCurve K) (h2 : (2 : K) ≠ 0) (h3 : (3 : K) �
     exact (mul_eq_zero.mp this).resolve_left h2
   ext
   · simpa [VariableChange.one_def] using hu
-  · simpa using hr
-  · simpa using hs
-  · simpa using ht
+  · simpa [VariableChange.one_def] using hr
+  · simpa [VariableChange.one_def] using hs
+  · simpa [VariableChange.one_def] using ht
 
 end stab
 
@@ -93,9 +93,9 @@ theorem stab_char2 (W : WeierstrassCurve K) [CharP K 2] (ha : W.a₁ ≠ 0) (C :
       exact (mul_eq_zero.mp this).resolve_right ha
     ext
     · simp [VariableChange.one_def, hCu]
-    · simpa using hr
-    · simpa using h0
-    · simpa using ht0
+    · simpa [VariableChange.one_def] using hr
+    · simpa [VariableChange.one_def] using h0
+    · simpa [VariableChange.one_def] using ht0
   · right
     have hs1 : C.s = -W.a₁ := by linear_combination h0
     have ht1 : C.t = -W.a₃ := by

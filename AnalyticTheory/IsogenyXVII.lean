@@ -322,7 +322,8 @@ theorem tX_pow_linearIndependent {m : ℕ} (hm : 0 < m) :
     simp only [mul_zero, Finset.mul_sum] at this
     rw [← this]
     refine Finset.sum_congr rfl (fun j _ => ?_)
-    rw [hh j, Algebra.smul_def, map_mul, Subfield.smul_def, smul_eq_mul, ← hy j]
+    have e : g j • tX K ^ (j : ℕ) = ((g j : Sm K m) : MeroRing K) * tX K ^ (j : ℕ) := rfl
+    rw [hh j, Algebra.smul_def, map_mul, e, ← hy j]
     ring
   let G : ℕ → holSubring K := fun j => if hj : j < m then h ⟨j, hj⟩ else 0
   have hsum : ∑ j ∈ Finset.range m, monoHol K (Omega K) (-(j : ℤ)) *
@@ -950,7 +951,7 @@ theorem qSub_inf_ker : qSub hq0 hqb0 (m := m) ⊓ (psiHom hqb0 hqb1 (m := m)).ke
   obtain ⟨k, hk⟩ := h1
   have hk' : Units.mk0 q (norm_pos_iff.mp hq0) ^ k = u := hk
   have h2' := (mem_ker_psiHom hqb0 hqb1 _).mp h2
-  simp only at h2'
+  try simp only at h2'
   rw [← hk', Units.val_zpow_eq_zpow_val, Units.val_mk0, ← zpow_natCast, ← zpow_mul] at h2'
   have hk0 : k * m = 0 := by
     have := congrArg norm h2'
@@ -1057,7 +1058,7 @@ noncomputable def autFixingEquiv {M : Type*} [Field M] {E F : Subfield M} (h : E
   letI := (Subfield.inclusion h).toAlgebra
   { toFun := fun φ => ⟨φ.toRingEquiv, fun x hx => by
       have := φ.commutes ⟨x, hx⟩
-      convert this using 1⟩
+      convert this using 1 <;> rfl⟩
     invFun := fun ψ => AlgEquiv.ofRingEquiv (f := ψ.1) (fun c => ψ.2 _ c.2)
     left_inv := fun φ => by ext x; rfl
     right_inv := fun ψ => by ext x; rfl }
@@ -1087,7 +1088,7 @@ theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (Nat.card_congr (autFixingEquiv hle)).trans (Nat.card_congr e.toEquiv)
   have hcount := card_quot_mul_index hq0 hq1 hqb0 hqb1 hm hqd
   have hW : Nat.card (rootsOfUnity m K) ≤ m := by
-    rw [Nat.card_eq_fintype_card]; exact card_rootsOfUnity K m
+    exact card_rootsOfUnity K m
   have hW1 : 1 ≤ Nat.card (rootsOfUnity m K) := Nat.card_pos (α := rootsOfUnity m K)
   have hgal : IsRelGalois (FqbarXm K qbar m) (FqSub K q) ↔
       Nat.card (FqSub K q ≃ₐ[FqbarXm K qbar m] FqSub K q) = d * m := by
@@ -1105,7 +1106,6 @@ theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   set W := Nat.card (rootsOfUnity m K)
   have hroots : W = m ↔ ∃ ζ : K, IsPrimitiveRoot ζ m := by
     show Nat.card (rootsOfUnity m K) = m ↔ _
-    rw [Nat.card_eq_fintype_card]
     exact card_rootsOfUnity_eq_iff_exists_isPrimitiveRoot
   have hi1 : i = 1 ↔ ∃ r : K, r ^ m = qbar := by
     rw [Subgroup.index_eq_one]; exact range_psiHom_eq_top_iff hqb0 hqb1 hm
@@ -1453,7 +1453,7 @@ theorem thmXVII_inseparability (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ <
       (RingHom.charZero_iff (FqSub K q).subtype.injective).mpr inferInstance
     rw [isPurelyInseparable_iff_pow_mem _ 1]
     intro x
-    exact ⟨0, ⟨x, by simp⟩⟩
+    exact ⟨0, ⟨x, by simp only [pow_zero, pow_one]; rfl⟩⟩
 
 
 end upper

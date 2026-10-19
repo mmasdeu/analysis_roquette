@@ -362,7 +362,7 @@ theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
       linear_combination key
     have key3 := mul_left_cancel₀ hφne key2
     have := congrArg (fun y => monoHol K (Omega K) (φ.natDegree : ℤ) * y) key3
-    simp only at this
+    try simp only at this
     rw [← mul_assoc, ← monoHol_add, show (φ.natDegree : ℤ) + -(φ.natDegree : ℤ) = 0 by ring,
       monoHol_zero, one_mul] at this
     rw [this]; ring

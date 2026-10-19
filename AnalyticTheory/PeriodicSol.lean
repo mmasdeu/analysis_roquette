@@ -152,7 +152,7 @@ theorem solSpace_eq_bot_of_neg {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {
       exact_mod_cast mul_right_cancel₀ (by exact_mod_cast hepos.ne' : (e : ℤ) ≠ 0) this
     have := hc.comp hinj.tendsto_cofinite
     rw [← Nat.cofinite_eq_atTop]
-    simpa [hh, Function.comp] using this
+    simpa [hh, Function.comp_def] using this
   have hpos : 0 < ‖h j0‖ := norm_pos_iff.mpr (hne j0)
   have := ((htend.eventually (gt_mem_nhds hpos)).and (eventually_ge_atTop j0)).exists
   obtain ⟨j, hj1, hj2⟩ := this
@@ -242,7 +242,7 @@ theorem seqOf_rec {q κ : K} (hq0 : q ≠ 0) (hκ : κ ≠ 0) {d : ℤ} (hd : 0 
   rw [e1, e2]
   set i := n % d
   set j := n / d
-  have hn : n = i + d * j := (Int.emod_add_ediv n d).symm
+  have hn : n = i + d * j := (Int.emod_add_mul_ediv n d).symm
   have hT : triZ j = triZ (j - 1) + j := by
     have := triZ_succ (j - 1); simp only [sub_add_cancel] at this; exact this
   have hk : κ ^ j = κ * κ ^ (j - 1) := by
@@ -284,7 +284,7 @@ theorem seqOf_convergent {q κ : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hκ
   have hid : n % d < d := Int.emod_lt_of_pos n hd
   set i := n % d with hi
   set j := n / d with hj
-  have hn' : n = i + d * j := (Int.emod_add_ediv n d).symm
+  have hn' : n = i + d * j := (Int.emod_add_mul_ediv n d).symm
   simp only [Set.mem_iUnion, Set.mem_image, Finset.coe_range, Set.mem_Iio]
   refine ⟨i.toNat, by omega, j, ?_, by rw [Int.toNat_of_nonneg hi0]; exact hn'.symm⟩
   simp only [hJ, Set.mem_setOf_eq]

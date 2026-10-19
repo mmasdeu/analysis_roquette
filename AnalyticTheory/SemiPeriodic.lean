@@ -73,7 +73,7 @@ abbrev GalGroup := L ≃ₐ[K] L
 abbrev CharGroup := GalGroup K L →* Circle
 
 /-- Book, §4: `K_χ`, the field of fixed elements of the kernel of `χ`. -/
-def Kchi (χ : CharGroup K L) : IntermediateField K L :=
+noncomputable def Kchi (χ : CharGroup K L) : IntermediateField K L :=
   IntermediateField.fixedField (MonoidHom.ker χ)
 
 /-- Book, §4, Definition: `χ` is *`q`-trivial* if `q` is the norm of some `Q ∈ K_χ`. -/

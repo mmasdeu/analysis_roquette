@@ -389,7 +389,7 @@ theorem hasSum_rhoC {h : K} (hh : ‖h‖ < 1) :
   have := hasSum_binom_two hq1 (fun m => (m : K) * Qn q m) (fun m => (m : K) * Qn q m)
     (norm_mQn hq1) (norm_mQn hq1) hh
   convert this using 1
-  refine tsum_congr (fun m => ?_); ring
+  all_goals first | rfl | exact tsum_congr (fun m => by ring)
 
 include hq1 in
 theorem hasSum_piC {h : K} (hh : ‖h‖ < 1) :
@@ -400,7 +400,7 @@ theorem hasSum_piC {h : K} (hh : ‖h‖ < 1) :
     (fun m => -((((m + 1).choose 2 : ℕ) : K) * Qn q m)) (fun m => norm_cQn hq1 (m.choose 2) m)
     (fun m => by rw [norm_neg]; exact norm_cQn hq1 ((m + 1).choose 2) m) hh
   convert this using 1
-  refine tsum_congr (fun m => ?_); ring
+  all_goals first | rfl | exact tsum_congr (fun m => by ring)
 
 include hq1 in
 theorem norm_rhoC_le (k : ℕ) : ‖rhoC q k‖ ≤ 1 := by

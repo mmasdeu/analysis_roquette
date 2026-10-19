@@ -30,7 +30,7 @@ variable (χ : (L ≃ₐ[K] L) →* Circle) (σ : L ≃ₐ[K] L)
 variable (hσ : ∀ g : L ≃ₐ[K] L, ∃ a : ℤ, χ g = χ σ ^ a)
 
 /-- The field `K_χ`. -/
-abbrev Mχ : IntermediateField K L := IntermediateField.fixedField (MonoidHom.ker χ)
+noncomputable abbrev Mχ : IntermediateField K L := IntermediateField.fixedField (MonoidHom.ker χ)
 
 include hσ in
 theorem act_eq_pow (g : L ≃ₐ[K] L) (a : ℤ) (ha : χ g = χ σ ^ a) {x : L} (hx : x ∈ Mχ χ) :

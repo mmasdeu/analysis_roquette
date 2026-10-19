@@ -861,7 +861,7 @@ theorem AddValuation_nonneg_of_isIntegral {F : Type*} [Field F] [Algebra K F]
   have hn : 0 < n := by
     by_contra h0
     push_neg at h0
-    have : p = 1 := (Polynomial.Monic.natDegree_eq_zero_iff_eq_one hmon).mp (by omega)
+    have : p = 1 := (Polynomial.Monic.natDegree_eq_zero hmon).mp (by omega)
     rw [this, Polynomial.eval₂_one] at heval
     exact one_ne_zero heval
   rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finset_sum] at heval
@@ -1243,7 +1243,7 @@ theorem isUnit_ringAt_iff {α : Omega K} (hα : α ≠ 0) (x : ringAt q hα) :
   · rintro ⟨u, rfl⟩
     have h1 := congrArg (fun y : ringAt q hα => anVal K α (((y : FqSub K q)) : MeroRing K))
       u.mul_inv
-    simp only at h1
+    try simp only at h1
     change anVal K α ((((u : ringAt q hα) : FqSub K q) : MeroRing K) *
       (((u⁻¹ : (ringAt q hα)ˣ) : ringAt q hα) : FqSub K q)) = anVal K α 1 at h1
     rw [(anVal_isValuation K α hα).2.2.1, (anVal_isValuation K α hα).2.1] at h1
@@ -1291,7 +1291,7 @@ theorem ringAt_isDVR {α : Omega K} (hα : α ≠ 0) : IsDiscreteValuationRing (
   refine ⟨T, ⟨fun hu => ?_, fun a b hab => ?_⟩, fun {x} hx => ?_⟩
   · rw [isUnit_ringAt_iff, hT1] at hu; exact one_ne_zero hu
   · have h1 := congrArg (fun y : ringAt q hα => anVal K α (((y : FqSub K q)) : MeroRing K)) hab
-    simp only at h1
+    try simp only at h1
     change anVal K α ((T : FqSub K q) : MeroRing K) =
       anVal K α (((a : FqSub K q) : MeroRing K) * ((b : FqSub K q) : MeroRing K)) at h1
     rw [hT1, (anVal_isValuation K α hα).2.2.1] at h1
@@ -1535,7 +1535,7 @@ theorem Valuation_le_one_of_isIntegral {F : Type*} [Field F] [Algebra K F]
   have hn : 0 < n := by
     by_contra h0
     push_neg at h0
-    have : p = 1 := (Polynomial.Monic.natDegree_eq_zero_iff_eq_one hmon).mp (by omega)
+    have : p = 1 := (Polynomial.Monic.natDegree_eq_zero hmon).mp (by omega)
     rw [this, Polynomial.eval₂_one] at heval
     exact one_ne_zero heval
   rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finset_sum] at heval
@@ -1546,7 +1546,7 @@ theorem Valuation_le_one_of_isIntegral {F : Type*} [Field F] [Algebra K F]
     have hi' : i ≤ n - 1 := by have := Finset.mem_range.mp hi; omega
     rw [Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_X_pow, v.map_mul, v.map_pow]
     have hc : v (algebraMap R F (p.coeff i)) ≤ 1 := hR _ (p.coeff i).2
-    calc _ ≤ 1 * v f ^ i := mul_le_mul_right' hc _
+    calc _ ≤ 1 * v f ^ i := mul_le_mul_left hc _
       _ = v f ^ i := one_mul _
       _ ≤ v f ^ (n - 1) := pow_le_pow_right' hgt.le hi'
   have hfn : f ^ n = -(∑ i ∈ Finset.range n,

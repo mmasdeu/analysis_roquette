@@ -369,9 +369,9 @@ theorem anPt_isValuation (α : Omega K) (hα : α ≠ 0) :
     obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring K) f
     exact ⟨x, y, nonZeroDivisors.ne_zero hy, hxy.symm⟩
   refine ⟨?_, ?_, ?_, ?_⟩
-  · rw [anPt_eq_of_rep K hα 0 0 1 one_ne_zero (by simp)]
+  · rw [anPt_eq_of_rep K hα 0 0 1 (one_ne_zero (α := holSubring K)) (by simp)]
     simp [anOrdHol_zero, anOrdHol_one K hα]
-  · rw [anPt_eq_of_rep K hα 1 1 1 one_ne_zero (by simp)]
+  · rw [anPt_eq_of_rep K hα 1 1 1 (one_ne_zero (α := holSubring K)) (by simp)]
     simp [anOrdHol_one K hα]
   · intro f f'
     obtain ⟨g, h, hh, hf⟩ := rep f

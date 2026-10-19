@@ -187,7 +187,7 @@ theorem ev_sub {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK 
     evK hq0 hq1 a ha - evK hq0 hq1 b hb =
       (-(Pc q ^ 4) / (b * thK q b ^ 2)) * thK q (b⁻¹ * a) * thK q (b * a) / thK q a ^ 2 := by
   have h := congrArg (fun H => valK H a ha) (Nb_eq_const hq0 hq1 hb hbm hT)
-  simp only at h
+  try simp only at h
   unfold Nb at h
   rw [valK_sub, valK_mul, valK_pow_aux, valK_const, valK_mul, valK_const,
     valK_Mb hq0 hq1 hb a ha, valK_Th_eq hq0 hq1 a ha] at h
@@ -221,7 +221,7 @@ theorem ev_root {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK
     rw [map_zero, zero_mul, add_zero]; exact hrel
   have hp := rel_pointwise hq0 hq1 hrel' (ptK b hb) hTh
   have htor := torsion_Gw' hq0 hq1 hb hbm hTh
-  simp only at hp
+  try simp only at hp
   have hGw := valK_spec (Gw hq0 hq1) b hb
   have hT' := valK_spec (Th hq0 hq1) b hb
   have hv := valK_Th_ne_zero hq0 hq1 hb hTh
@@ -250,7 +250,7 @@ include hq0 hq1 in
 theorem thK_shift {x : K} (hx : x ≠ 0) : thK q (q⁻¹ * x) = -x * thK q x := by
   have hq0' := norm_pos_iff.mp hq0
   have h := congrArg (fun H => valK H x hx) (Th_FE hq0 hq1)
-  simp only at h
+  try simp only at h
   rw [show (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ = Units.mk0 q⁻¹ (inv_ne_zero hq0') from Units.ext rfl,
     valK_holScale, valK_neg, valK_mul, valK_monoHol, zpow_one, valK_Th_eq hq0 hq1,
     valK_Th_eq hq0 hq1] at h

@@ -328,13 +328,10 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
       have hper : meroGal σ (f : MeroRing L) ∈ FqSub L (algebraMap K L q) := galFq_mem q σ f
       have hper' : translation L Q' (meroGal σ (f : MeroRing L)) ∈ FqSub L (algebraMap K L q) :=
         (translationFq (algebraMap K L q) Q' (galFq q σ f)).2
-      rw [Subtype.ext_iff, rhoZ_coe]
-      show translation L (ζU σ) _ = _ ↔ _
+      rw [Subtype.ext_iff]
+      show translation L (ζU σ) (meroGal σ (f : MeroRing L)) = (f : MeroRing L) ↔ _
       rw [hk0, translation_mul]
-      first
-        | rw [translation_zpow_of_periodic (a := qU) rfl hper']
-        | rw [translation_zpow_of_periodic (a := qU) rfl hper]
-        | skip
+      rw [translation_zpow_of_periodic (a := qU) rfl hper]
     have hFKQ : f ∈ FKQ K L q T ↔ translation L Q' (meroGal σ (f : MeroRing L)) = (f : MeroRing L) := by
       constructor
       · intro h
@@ -342,7 +339,8 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
       · intro h p hp ρ hρ
         rw [hp] at *
         rw [eq_meroGal hρ]; exact h
-    rw [hFKQ, ← hkey, mem_semiFixed_iff]
+    rw [hFKQ, ← hkey]
+    refine Iff.trans ?_ (mem_semiFixed_iff q ⟨ζU, hcoc⟩ f).symm
     constructor
     · intro h g
       obtain ⟨m, rfl⟩ := gen_zpow q T g

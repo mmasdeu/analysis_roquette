@@ -286,7 +286,7 @@ theorem hol_val_one (G : holSubring K) : ∃ s : K, G.1 oneX = algebraMap K (Ome
   obtain ⟨s, hs⟩ := NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero ht
   refine ⟨s, h.unique ?_⟩
   have := hs.map (algebraMap K (Omega K) : K →+* Omega K) (continuous_algebraMap_omega K)
-  simpa [oneX] using this
+  simpa [oneX, Function.comp_def] using this
 
 
 omit hq0 hq1 in

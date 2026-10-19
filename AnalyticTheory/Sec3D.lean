@@ -80,7 +80,7 @@ theorem sum_identity :
   have h2 := GP_hasSum hq0 hq1 x
   have h3 := GP'_hasSum hq0 hq1 x
   have hL : HasSum (fun n => (2 * tP' hq0 hq1 n).1 x) (2 * (GP' hq0 hq1).1 x) := by
-    simpa [mul_apply_hol] using h3.mul_left 2
+    simpa [mul_apply_hol, two_apply_hol] using h3.mul_left 2
   have hR : HasSum (fun n => ((Th hq0 hq1 * holD (tP hq0 hq1 n) - 2 * tP hq0 hq1 n * holD (Th hq0 hq1) -
       Th hq0 hq1 * tP hq0 hq1 n)).1 x)
       ((Th hq0 hq1).1 x * (holD (GP hq0 hq1)).1 x - 2 * (GP hq0 hq1).1 x * (holD (Th hq0 hq1)).1 x -

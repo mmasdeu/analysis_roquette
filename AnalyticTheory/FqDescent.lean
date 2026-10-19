@@ -403,6 +403,7 @@ theorem holCoeff_holReflect (g : holSubring L) (n : ℤ) :
     convert h2 using 1
     funext n
     simp [Function.comp, zpow_neg, inv_zpow]
+    rfl
 
 end reflect
 

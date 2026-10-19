@@ -432,7 +432,6 @@ theorem exists_cocycle_of_qtrivial (χ : CharGroup K L) (hχ : IsQTrivial K L q 
   refine ⟨⟨ζU, hcoc⟩, ?_⟩
   apply MonoidHom.ext
   intro g
-  rw [charOfCocycle_apply]
   show expq K L q ((Qp σ Q' (i g) : Lˣ) : L) = χ g
   rw [expq_unit q hq0 hq1, vq_Qp, hχi g]
   show _ = (χ σ) ^ (i g)
@@ -486,6 +485,9 @@ theorem exists_beta (ζ : CocycleModQ K L q) :
       intro τ τ'
       obtain ⟨k, hk⟩ := ζ.2 (τ.restrictScalars K) (τ'.restrictScalars K)
       refine ⟨k, Units.ext ?_⟩
+      have e : AlgEquiv.restrictScalars K τ * AlgEquiv.restrictScalars K τ' =
+          AlgEquiv.restrictScalars K (τ * τ') := by ext; rfl
+      rw [e] at hk
       simpa [hQdef] using hk)
     hint
   refine ⟨β, fun h hh => ?_⟩
@@ -495,8 +497,11 @@ theorem exists_beta (ζ : CocycleModQ K L q) :
   let τ : L ≃ₐ[E] L := AlgEquiv.ofRingEquiv (f := h.toRingEquiv) (fun x => hfix x.1 x.2)
   obtain ⟨k, hk⟩ := hβ τ
   refine ⟨k, ?_⟩
+  have hτ : AlgEquiv.restrictScalars K τ = h := by ext; rfl
+  rw [hτ] at hk
+  have hτx : ∀ x, τ x = h x := fun x => rfl
   have := congrArg (fun u : Lˣ => (u : L)) hk
-  simpa [hQdef, div_eq_mul_inv, τ] using this
+  simpa [hQdef, div_eq_mul_inv, hτx] using this
 
 end inj2
 
@@ -644,7 +649,7 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
   have hexp : Circle.exp (2 * Real.pi * vq q u) = Circle.exp (2 * Real.pi / n) := by
     have h1 : expq K L q (u : L) = χ σ := by
       have := congrArg (fun χ' : CharGroup K L => χ' σ) hχ''
-      simpa [charOfCocycle_apply, ζ'', hu] using this
+      exact this
     rw [← hχσ, ← h1]; rfl
   obtain ⟨m, hm⟩ := Circle.exp_eq_exp.mp hexp
   have hn0' : (n : ℝ) ≠ 0 := by exact_mod_cast hn0.ne'
