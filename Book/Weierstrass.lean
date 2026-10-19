@@ -1,58 +1,73 @@
-import VersoManual
 import AnalyticTheory
 
-open Verso.Genre Manual
-open Verso.Genre.Manual.InlineLean
+set_option doc.verso true
+set_option doc.verso.suggestions false
 
-set_option verso.docstring.allowMissing true
-set_option verso.code.warnLineLength 72
+/-!
+# §3. The absolute and the Hasse invariant of the fields of periodic functions
 
-#doc (Manual) "§3. The absolute and the Hasse invariant of the fields of periodic functions" =>
-%%%
-tag := "sec3"
-number := false
-file := "Weierstrass-function"
-shortTitle := "§3. The absolute and the Hasse invariant"
-%%%
 
 The Lean code on this page refers to the following context.
+-/
 
-```lean
 open AnalyticTheory
 universe u
 variable (K : Type u) [NontriviallyNormedField K]
   [IsUltrametricDist K] [CompleteSpace K]
-```
+
+/-!
 
 Note that $`F_K(q)` has a prime divisor of degree $`1`, for instance $`\mathfrak{p}_1` in the
 notation of §2. Hence $`F_K(q)` can be generated over $`K` by two elements whose defining relation
-over $`K` is a cubic (see {ref "appA1"}[§A1] of the appendix). We are now going to exhibit
+over $`K` is a cubic (see §A1 of the appendix). We are now going to exhibit
 explicitly two such functions and compute the coefficients of their defining relation over $`K`.
 
-{docstring AnalyticTheory.fq_hasPrime}
+> Book, §3: `F_K(q)` has a prime divisor of degree `1` (for instance `𝔭₁`).
+-/
 
-# The functions ℘ and ℘′
-%%%
-tag := "sec3-wp"
-%%%
+#check @AnalyticTheory.fq_hasPrime
+
+/-!
+
+## The functions ℘ and ℘′
 
 Let $`D` denote the differential operator of $`M_K` defined by $`D = X\frac{d}{dX}`. Note that
 $`D` commutes with the translation $`f(X) \mapsto f(q^{-1}X)`; in particular, the derivative of a
 $`q`-periodic function is again $`q`-periodic. As usual, we write $`D\log f` for
 $`\frac{Df}{f}`.
 
-{docstring AnalyticTheory.Dop}
+> The derivation `D = X d/dX` on `M_K`: `D(g/h) = (Dg · h − g · Dh)/h²` for holomorphic `g, h` (with `D` acting on Laurent coefficients). That `D` is a well-defined derivation of `M_K` is `Dop_derivation`.
+-/
 
-{docstring AnalyticTheory.Dop_derivation}
+#print AnalyticTheory.Dop
+
+/-!
+
+> `D` is a derivation of `M_K`.
+-/
+
+#check @AnalyticTheory.Dop_derivation
+
+/-!
 
 If we define $`\zeta(X) = D\log\Theta(X)` then $`\zeta(X)` satisfies the functional equation
 $`\zeta(q^{-1}X) = \zeta(X) + 1` as follows from formula (7), §2. Hence the function
 $`\wp(X) = -D\zeta(X)` satisfies $`\wp(q^{-1}X) = \wp(X)`, i.e. $`\wp` is $`q`-periodic.
 (Below, $`\wp` will be renormalized by an additive constant, see (29).)
 
-{docstring AnalyticTheory.thetaM}
+> The meromorphic function `Θ(X)` (book, §2, (6)) viewed in `M_K` (it is holomorphic on `Ω^×`).
+-/
 
-{docstring AnalyticTheory.zetaM}
+#print AnalyticTheory.thetaM
+
+/-!
+
+> `ζ = D log Θ`.
+-/
+
+#print AnalyticTheory.zetaM
+
+/-!
 
 From formula (6) in §2 we see that $`\Theta` has its zeros at the points $`q^n` ($`n \in \mathbb{Z}`)
 and that these zeros are of order $`1`. Hence, $`\zeta` has its poles at these points, which are of
@@ -74,7 +89,12 @@ $$`\wp'(X) = \sum_{n \in \mathbb{Z}} \frac{q^{2n}X^2}{(1-q^nX)^3} \qquad (19)`
 automorphism of $`M_K`. It induces in $`F_K(q)` a certain $`K`-automorphism which is denoted by
 $`\varepsilon`.
 
-{docstring AnalyticTheory.reflectionM}
+> Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`.
+-/
+
+#print AnalyticTheory.reflectionM
+
+/-!
 
 The book first works with the functions (16), (19) and shows that they satisfy a relation
 $`\wp'^2 + \wp\wp' = \wp^3 + A\wp^2 + B\wp + C` (24) with $`A = -6s_1`, where
@@ -84,7 +104,12 @@ $$`s_k = \sum_{m > 0} \frac{m^kq^m}{1-q^m}. \qquad (35)`
 It then normalizes the functions by adding suitable constants so that the quadratic term
 disappears; this is a universal procedure for every characteristic.
 
-{docstring AnalyticTheory.sK}
+> The sums `s_k = ∑_{m>0} m^k q^m/(1 − q^m) = ∑_n (∑_{d|n} d^k) qⁿ` (book, (35)).
+-/
+
+#print AnalyticTheory.sK
+
+/-!
 
 *New definition of the functions $`\wp` and $`\wp'`:*
 
@@ -95,13 +120,33 @@ Henceforth, the symbols $`\wp, \wp'` will be used according to this new definiti
 $`\wp'` as quotients of explicit holomorphic functions by $`\Theta^2` and $`\Theta^3`, and shows
 that their values are given by the series (29).
 
-{docstring AnalyticTheory.wpM}
+> Book, §3, (30) (new definition): `℘(X) = ∑_{n∈ℤ} qⁿX/(1 − qⁿX)² − 2 s₁`, the element of `M_K` with these values on `Ω^×`.
+-/
 
-{docstring AnalyticTheory.wpPrimeM}
+#print AnalyticTheory.wpM
 
-{docstring AnalyticTheory.wp_eq_neg_D_zeta}
+/-!
 
-{docstring AnalyticTheory.wpPrime_spec}
+> Book, §3, (18) and (new definition): `℘′(X) = ∑_{n∈ℤ} q²ⁿX²/(1 − qⁿX)³ + s₁`, i.e. `½(D℘ − ℘)` formally in every characteristic.
+-/
+
+#print AnalyticTheory.wpPrimeM
+
+/-!
+
+> Book, §3, (16): `℘ = −Dζ − 2 s₁`.
+-/
+
+#check @AnalyticTheory.wp_eq_neg_D_zeta
+
+/-!
+
+> Book, §3, (18): `2℘′ = D℘ − ℘`.
+-/
+
+#check @AnalyticTheory.wpPrime_spec
+
+/-!
 
 From (29) it is clear that $`\varepsilon\wp = \wp`, hence $`\varepsilon` is the non-trivial
 automorphism of the quadratic extension $`F_K(q)` over $`K(\wp)`. Since $`D` anticommutes with
@@ -114,10 +159,7 @@ hence contained in $`K(\wp)`. Since this is a function with no pole except $`\ma
 can be written as a _polynomial_ in $`\wp` with coefficients in $`K`, of degree $`3` and with
 highest coefficient $`1`.
 
-# The coefficients B and C
-%%%
-tag := "sec3-coefficients"
-%%%
+## The coefficients B and C
 
 It remains to compute the coefficients $`B, C` of the relation
 
@@ -141,9 +183,19 @@ The formalization does not pass through characteristic $`0`: it compares the exp
 sides of (32) at points $`X = 1 + h` with $`h \in K`, $`|h|` small, directly in $`K`, which works in
 every characteristic.
 
-{docstring AnalyticTheory.coeffB}
+> The coefficient `B = −5 s₃` (book, (37)).
+-/
 
-{docstring AnalyticTheory.coeffC}
+#print AnalyticTheory.coeffB
+
+/-!
+
+> The coefficient `C = −(5 s₃ + 7 s₅)/12` (book, (38)), written as the universal power series with integral coefficients `c_n = −(5σ₃(n) + 7σ₅(n))/12`.
+-/
+
+#print AnalyticTheory.coeffC
+
+/-!
 
 We collect our results into the following statement:
 
@@ -159,23 +211,44 @@ $$`\wp'^2 + \wp\wp' = \wp^3 + B\wp + C \qquad (39)`
 _where the coefficients $`B, C \in K` can be expressed as universal power series in $`q` with
 integral coefficients. Explicitly, these expressions are given by the formulas (35), (37), (38)._
 
-{docstring AnalyticTheory.thmVI_generation}
+> Book, §3, Theorem VI: the functions `℘, ℘′` generate `F_K(q)` over `K`, the pole divisors are `2𝔭₁` and `3𝔭₁`, and they satisfy the relation (32)/(39).
+-/
 
-{docstring AnalyticTheory.thmVI_poles}
+#check @AnalyticTheory.thmVI_generation
 
-{docstring AnalyticTheory.thmVI_relation}
+/-!
 
-{docstring AnalyticTheory.thmVI_reflection}
+> Book, §3, Theorem VI: `℘` has a pole of order `2` and `℘′` a pole of order `3` at `1` (their pole divisors are `2𝔭₁` and `3𝔭₁`).
+-/
+
+#check @AnalyticTheory.thmVI_poles
+
+/-!
+
+> Book, §3, Theorem VI, (39): `℘′² + ℘℘′ = ℘³ + B℘ + C` with `B = −5s₃`, `C = −(5s₃ + 7s₅)/12`.
+-/
+
+#check @AnalyticTheory.thmVI_relation
+
+/-!
+
+> Book, §3, (20)–(21): the reflection fixes `℘` and sends `℘′ ↦ −℘′ − ℘`.
+-/
+
+#check @AnalyticTheory.thmVI_reflection
+
+/-!
 
 As a Lean statement, the relation (39) reads:
+-/
 
-```lean
 example (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     wpPrimeM K q ^ 2 + wpM K q * wpPrimeM K q =
       wpM K q ^ 3 + algebraMap K (MeroRing K) (coeffB K q) * wpM K q +
         algebraMap K (MeroRing K) (coeffC K q) :=
   thmVI_relation K q hq0 hq1
-```
+
+/-!
 
 *Remark.* If $`\operatorname{char}(K) \ne 2, 3` then we can use the function
 $`\wp + \frac{1}{12}` and its derivative $`D\wp` as generators for $`F_K(q)` over $`K`. Their
@@ -187,12 +260,14 @@ where the coefficients $`g_2, g_3` are given by the classical $`q`-expansions
 
 $$`g_2 = \tfrac{1}{12} + 20s_3, \qquad g_3 = -\tfrac{1}{216} + \tfrac{7}{3}s_5. \qquad (41)`
 
-{docstring AnalyticTheory.thmVI_weierstrass_form}
+> Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with `g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
+-/
 
-# The absolute invariant
-%%%
-tag := "sec3-j"
-%%%
+#check @AnalyticTheory.thmVI_weierstrass_form
+
+/-!
+
+## The absolute invariant
 
 Now we turn to the determination of the absolute invariant $`j(q)` of $`F_K(q)`. It follows from
 its definition that $`j(q)` is a certain rational function of the coefficients $`B, C` in (39).
@@ -200,9 +275,19 @@ According to the formulas of Remark 1 of the appendix (§A1) we have explicitly
 
 $$`j(q) = \frac{(1-48B)^3}{\Delta}, \qquad \Delta = B^2 - C - 64B^3 + 72BC - 432C^2. \qquad (42)`
 
-{docstring AnalyticTheory.deltaPoly}
+> Book, §3, (42): `Δ = B² − C − 64B³ + 72BC − 432C²`.
+-/
 
-{docstring AnalyticTheory.jInvQ}
+#print AnalyticTheory.deltaPoly
+
+/-!
+
+> Book, §3, (42): the absolute invariant `j(q) = (1 − 48B)³/Δ`.
+-/
+
+#print AnalyticTheory.jInvQ
+
+/-!
 
 If we substitute (37), (38) into these expressions we obtain a universal representation of
 $`j(q)` as a Laurent series in $`q` with integral coefficients. To investigate this, let us regard
@@ -223,7 +308,12 @@ $`|c_i| \le 1`. Then the function $`u \mapsto \frac{1}{u} + R(u)` defines a bije
 interior $`0 < |u| < 1` of the unit circle of $`K` onto its exterior $`|v| > 1`. We have
 $`\left|\frac{1}{u} + R(u)\right| = \frac{1}{|u|}` if $`0 < |u| < 1`._
 
-{docstring AnalyticTheory.lemma1_inversion}
+> Book, §3, Lemma 1: for `R = ∑ cᵢ Xⁱ` with `|cᵢ| ≤ 1`, the map `u ↦ 1/u + R(u)` is a bijection from `0 < |u| < 1` onto `|v| > 1`, and `|1/u + R(u)| = 1/|u|`.
+-/
+
+#check @AnalyticTheory.lemma1_inversion
+
+/-!
 
 _Proof._ Since $`|c_i| \le 1` it is clear from the non-archimedean property of $`K` that
 $`|R(u)| \le 1` if $`0 < |u| < 1`, and $`\left|\frac{1}{u} + R(u)\right| = \frac{1}{|u|}`. Also, if
@@ -248,15 +338,30 @@ _where $`R(q)` is a universal power series with integral coefficients. We have
 $`|j(q)| = \frac{1}{|q|} > 1`. To every element $`j \in K` with $`|j| > 1` there exists one and only
 one $`q \in K` with $`0 < |q| < 1` such that $`j = j(q)`._
 
-{docstring AnalyticTheory.thmVII_absinv}
+> Book, §3, Theorem VII: `j(q) = 1/q + R(q)` with `R` a universal power series with integral coefficients; `|j(q)| = 1/|q| > 1`; and every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one `q` with `0 < |q| < 1`.
+-/
 
-{docstring AnalyticTheory.thmVII_bijective}
+#check @AnalyticTheory.thmVII_absinv
+
+/-!
+
+> Book, §3, Theorem VII (last part): every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one `q` with `0 < |q| < 1`.
+-/
+
+#check @AnalyticTheory.thmVII_bijective
+
+/-!
 
 In the formalization, the universality is made precise by working with $`B`, $`C` and $`\Delta`
 as elements of $`\mathbb{Z}[[q]]` and by the evaluation homomorphism
 $`\mathbb{Z}[[q]] \to K`, $`q \mapsto q`.
 
-{docstring AnalyticTheory.evalZHom}
+> Evaluation as a ring homomorphism.
+-/
+
+#print AnalyticTheory.evalZHom
+
+/-!
 
 *Remark 2.* The classically well known product representation
 
@@ -272,12 +377,14 @@ the 2-torsion points of the cubic (32) and Euler's identity, first over fields o
 $`\ne 2` containing $`\sqrt q`, and then transferring it to arbitrary $`K` through the universal
 power series (and the $`2`-adic field $`\mathbb{Q}_2`).
 
-{docstring AnalyticTheory.remark3_delta_product}
+> Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic.
+-/
 
-# The Hasse invariant
-%%%
-tag := "sec3-hasse"
-%%%
+#check @AnalyticTheory.remark3_delta_product
+
+/-!
+
+## The Hasse invariant
 
 Note that, from VII, we have $`j(q) \ne 0, 12^3` since the valuation of $`K` is non-archimedean.
 It follows that the _Hasse invariant_ of $`F_K(q)`, as described in §A1 of the appendix, is
@@ -289,7 +396,12 @@ $`K^+/\pi K^+` if $`\operatorname{char}(K) = 2`; here we put $`\pi(a) = a^2 + a`
 
 $$`\gamma_K(q) \equiv \begin{cases} 1 \bmod K^{\times 2} & \text{if } \operatorname{char}(K) \ne 2,\\ 0 \bmod \pi K^+ & \text{if } \operatorname{char}(K) = 2. \end{cases}`
 
-{docstring AnalyticTheory.thmVIII_hasse}
+> Book, §3, Theorem VIII: the Hasse invariant of `F_K(q)` is trivial: `γ ≡ 1 mod K^{×2}` if `char K ≠ 2`, and `γ ≡ 0 mod π(K⁺)` if `char K = 2`. Here `F_K(q)` has a prime divisor of degree `1` (`fq_hasPrime`). Modulo the independence of the invariants of the choice of Weierstraß datum (`A1Invariance.lean`).
+-/
+
+#check @AnalyticTheory.thmVIII_hasse
+
+/-!
 
 _Proof._ If $`\operatorname{char}(K) = 2` then $`\gamma_K(q) \equiv 0` since the cubic polynomial
 on the right hand side of (39) has no quadratic term. If $`\operatorname{char}(K) \ne 2` then from
@@ -316,7 +428,12 @@ $$`u_0 = 1, \qquad u_{i+1} = u_i + \frac{1}{2}\left(\frac{v}{u_i} - u_i\right), 
 In the formalization, the last step is a general lemma of the library `ForMathlib` (the Newton
 iteration above, which needs $`2 \ne 0`):
 
-{docstring IsUltrametricDist.exists_sq_eq_one_add_four_mul}
+> If `2 ≠ 0` and `|s| < 1`, then `1 + 4s` is a square (Newton's iteration `u ↦ u + (v/u − u)/2` from `u₀ = 1` converges).
+-/
+
+#check @IsUltrametricDist.exists_sq_eq_one_add_four_mul
+
+/-!
 
 The absolute invariant and the Hasse invariant of $`F_K(q)` suffice to characterize $`F_K(q)` as an
 elliptic function field over $`K` (see Appendix §A1). Hence we obtain from VII and VIII the
@@ -333,6 +450,14 @@ $`0 < |q| < 1`: this is the case if and only if the following conditions are sat
 _If this is the case, then from statement VII we see that the element $`q` for which $`F` is
 $`K`-isomorphic to $`F_K(q)` is uniquely determined. $`q` is called the period of $`F`._
 
-{docstring AnalyticTheory.thmVIIIa_characterization}
+> Book, §3, Theorem VIIIa: an elliptic function field `F | K` with a prime divisor of degree `1` is `K`-isomorphic to some `F_K(q)`, `0 < |q| < 1`, if and only if `|j| > 1` and the Hasse invariant is trivial.
+-/
 
-{docstring AnalyticTheory.thmVIIIa_period_unique}
+#check @AnalyticTheory.thmVIIIa_characterization
+
+/-!
+
+> Book, §3, after Theorem VIIIa: the period `q` of `F` is unique.
+-/
+
+#check @AnalyticTheory.thmVIIIa_period_unique

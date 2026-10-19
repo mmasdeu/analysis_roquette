@@ -1,22 +1,11 @@
-import VersoManual
-import Book.Introduction
-import Book.Periodic
-import Book.Weierstrass
-import Book.Jacobian
-import Book.Isogenies
-import Book.AppendixA1
+import AnalyticTheory
 
-open Verso.Genre Manual
-open Verso.Genre.Manual.InlineLean
+set_option doc.verso true
+set_option doc.verso.suggestions false
 
-set_option verso.docstring.allowMissing true
+/-!
+# Analytic Theory of Elliptic Functions over Local Fields
 
-#doc (Manual) "Analytic Theory of Elliptic Functions over Local Fields" =>
-%%%
-authors := ["Peter Roquette"]
-authorshipNote := "A Lean 4 companion to the 1970 monograph (Hamburger Mathematische Einzelschriften, Neue Folge, Heft 1)"
-shortTitle := "Roquette: Analytic Theory"
-%%%
 
 This is a companion to Peter Roquette's monograph _Analytic theory of elliptic functions over
 local fields_. It reproduces the text of the book and places, next to each definition and result,
@@ -51,12 +40,7 @@ corollaries) and Appendix §A2 are not reproduced. Their proofs rest on parts of
 theory of function fields (genus under Galois descent, Jacobians of fields without a rational
 point) that are not yet formalized.
 
-# Conventions of the formalization
-%%%
-tag := "conventions"
-number := false
-file := "Conventions"
-%%%
+## Conventions of the formalization
 
 The following translations are used throughout.
 
@@ -74,21 +58,10 @@ The following translations are used throughout.
   $`M_K`.
 * Function fields, prime divisors, divisors, Riemann–Roch spaces and the genus are defined in the
   project itself (Mathlib does not have them yet); see the
-  {ref "terminology"}[terminology section].
+  terminology section.
 
 Sometimes a construction of the book is only meaningful after a theorem has been proved; for
 instance the translation $`\tau_a` of $`M_K`. In such cases the formal definition chooses an
 object with the characterising property, and its existence and uniqueness are proved as
 theorems.
-
-{include 1 Book.Introduction}
-
-{include 1 Book.Periodic}
-
-{include 1 Book.Weierstrass}
-
-{include 1 Book.Jacobian}
-
-{include 1 Book.Isogenies}
-
-{include 1 Book.AppendixA1}
+-/

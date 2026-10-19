@@ -1,6 +1,6 @@
 # Analytic theory of elliptic functions over local fields — Lean formalization
 
-Lean 4 (v4.28.0) + Mathlib (v4.28.0) formalization of the statements of
+Lean 4 (v4.35.0) + Mathlib (v4.35.0) formalization of the statements of
 P. Roquette, *Analytic theory of elliptic functions over local fields*
 (Hamburger Mathematische Einzelschriften, 1970). Each definition, lemma, proposition,
 theorem and corollary of the book is a Lean declaration with a `sorry` proof; the
@@ -36,19 +36,26 @@ leanblueprint pdf                # builds blueprint/print/print.pdf
 
 ### The companion book
 
-`Book.lean` and `Book/*.lean` form a [Verso](https://github.com/leanprover/verso) book in the
-spirit of the Lean companion to *Analysis I*: the text of Roquette's monograph, chapter by chapter,
-with the Lean declarations of each definition and result shown next to it (`{docstring …}` blocks
-and checked Lean examples). Only completely formalized parts appear (results whose proofs and
-dependencies are free of `sorry`); §5, Theorems IX (general form), X, XVIII, XIX, their corollaries
-and Appendix §A2 are left out.
+`Book.lean` and `Book/*.lean` form a book in the spirit of the Lean companion to *Analysis I*, in
+Verso's literate-Lean format: the text of Roquette's monograph, chapter by chapter, is written in
+Verso docstrings (`/-! … -/`) and the Lean declarations of each definition and result are shown
+next to it with `#print` / `#check`, so the displayed statements are the ones the library actually
+proves. Only completely formalized parts appear (results whose proofs and dependencies are free of
+`sorry`); §5, Theorems IX (general form), X, XVIII, XIX, their corollaries and Appendix §A2 are
+left out. The site is configured by `literate.toml`.
 
 ```
-./build-book.sh                                     # lake build roquette-book + render
-python3 -m http.server 8000 --directory _out/html-multi
+./build-book.sh                  # builds the pages, prints the output directory
+python3 -m http.server 8000 --directory "$(lake query :literateHtml)"
 ```
 
-The first build of the executable compiles Mathlib to native code (about 30 minutes).
+### Website (GitHub Pages)
+
+`.github/workflows/site.yml` builds the project, the book and the blueprint on every push and
+publishes them with GitHub Pages: `/` (landing page `site/index.html`), `/book/` (the companion
+book), `/blueprint/` (the blueprint, with the dependency graph at
+`/blueprint/dep_graph_document.html`) and `/blueprint.pdf`. One-time setup: in the repository
+settings, Pages → Source → "GitHub Actions".
 
 The blueprint is generated from `blueprint/tools/items.py`:
 

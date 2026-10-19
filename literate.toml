@@ -1,0 +1,44 @@
+# Literate rendering of the companion book (`lake query :literateHtml`).
+landing_page = "Book"
+hide_commands = ["import", "set_option"]
+show_output = ["#check", "#print"]
+show_imports = false
+show_docstrings = true
+
+[order_children]
+"Book" = [
+  "Book.Introduction",
+  "Book.Periodic",
+  "Book.Weierstrass",
+  "Book.Jacobian",
+  "Book.Isogenies",
+  "Book.AppendixA1",
+]
+
+[modules."Book"]
+title = "Analytic Theory of Elliptic Functions over Local Fields"
+
+[modules."Book.Introduction"]
+title = "§1. Introduction"
+
+[modules."Book.Periodic"]
+title = "§2. Fields of periodic functions"
+
+[modules."Book.Weierstrass"]
+title = "§3. The absolute and the Hasse invariant"
+
+[modules."Book.Jacobian"]
+title = "§4. Periodic Jacobian fields"
+
+[modules."Book.Isogenies"]
+title = "§6. Elliptic subfields and isogenies"
+
+[modules."Book.AppendixA1"]
+title = "Appendix §A1. Fields with a prime divisor of degree 1"
+
+[metadata]
+title = "Roquette: Analytic Theory of Elliptic Functions over Local Fields"
+description = "A Lean 4 companion to Roquette's monograph, with the formalized parts of the book and their Lean statements."
+
+[[targets]]
+library = "Book"

@@ -1,19 +1,11 @@
-import VersoManual
 import AnalyticTheory
 
-open Verso.Genre Manual
-open Verso.Genre.Manual.InlineLean
+set_option doc.verso true
+set_option doc.verso.suggestions false
 
-set_option verso.docstring.allowMissing true
-set_option verso.code.warnLineLength 72
+/-!
+# §4. Elliptic function fields having a periodic Jacobian field
 
-#doc (Manual) "§4. Elliptic function fields having a periodic Jacobian field" =>
-%%%
-tag := "sec4"
-number := false
-file := "Periodic-Jacobian"
-shortTitle := "§4. Periodic Jacobian fields"
-%%%
 
 As before, $`q` denotes an element in $`K` with $`0 < |q| < 1` and $`F_K(q)` is the corresponding
 field of $`q`-periodic functions.
@@ -39,8 +31,8 @@ fields.
 
 The Lean code on this page refers to the following context: $`L` is a finite Galois extension of
 $`K`, with the absolute value extending that of $`K`.
+-/
 
-```lean
 open AnalyticTheory
 universe u
 variable {K : Type u} [NontriviallyNormedField K]
@@ -49,12 +41,10 @@ variable {L : Type u} [NontriviallyNormedField L]
   [IsUltrametricDist L] [CompleteSpace L]
 variable [NormedAlgebra K L] [FiniteDimensional K L]
   [IsGalois K L]
-```
 
-# The fields obtained by twisted Galois descent
-%%%
-tag := "sec4-descent"
-%%%
+/-!
+
+## The fields obtained by twisted Galois descent
 
 If $`\zeta` is any given element in $`H^1(G, L^\times/q)` then an elliptic field $`E\,|\,K` with
 period $`q` and the cohomological invariant $`\zeta` can be obtained in the following way: Choose a
@@ -68,36 +58,88 @@ $$`\sigma \mapsto \tau_{\zeta(\sigma)}\,\sigma`
 is then a monomorphism from $`G` to the automorphism group of $`F_L(q)`, and its field
 $`E_\zeta` of fixed elements satisfies our requirements.
 
-{docstring AnalyticTheory.GalGroup}
+> The Galois group `G` of `L | K`.
+-/
 
-{docstring AnalyticTheory.IsCocycleModQ}
+#print AnalyticTheory.GalGroup
 
-{docstring AnalyticTheory.CocycleModQ}
+/-!
 
-{docstring AnalyticTheory.CocycleEquiv}
+> Book, §4: a 1-cocycle `G → L^×/q`, represented by a map `ζ : G → L^×` satisfying the cocycle relation modulo `q`.
+-/
 
-{docstring AnalyticTheory.H1Lq}
+#print AnalyticTheory.IsCocycleModQ
 
-{docstring AnalyticTheory.rhoZ}
+/-!
 
-{docstring AnalyticTheory.twistAction}
+> The subtype of cocycles `G → L^×/q`.
+-/
 
-{docstring AnalyticTheory.Ezeta}
+#print AnalyticTheory.CocycleModQ
+
+/-!
+
+> Two cocycles are cohomologous if they differ by a coboundary `σ a / a` mod `q`.
+-/
+
+#print AnalyticTheory.CocycleEquiv
+
+/-!
+
+> The cohomology group `H¹(G, L^×/q)` of the Galois module `L^×/q`: cocycles modulo coboundaries.
+-/
+
+#print AnalyticTheory.H1Lq
+
+/-!
+
+> The twisted action `ρ_σ = τ_{ζ(σ)} ∘ σ` on `F_L(q)`.
+-/
+
+#print AnalyticTheory.rhoZ
+
+/-!
+
+> The twisted action of `G` on `F_L(q)`.
+-/
+
+#print AnalyticTheory.twistAction
+
+/-!
+
+> The field `E_ζ = F_K(ζ)`: the fixed field of the twisted action (book §4, 𝐐-semi-periodic functions for cyclic `G`).
+-/
+
+#print AnalyticTheory.Ezeta
+
+/-!
 
 The Galois descent gives back $`F_L(q)` after extending the constants to $`L`: $`F_L(q)` is
 generated over $`E_\zeta` by a primitive element of $`L\,|\,K`. Since $`F_L(q)` has a prime divisor
 of degree $`1`, $`L` splits $`E_\zeta`.
 
-{docstring AnalyticTheory.Ezeta_adjoin}
+> `F_L(q)` is generated over the descended field `E_ζ` by a primitive element of `L | K`.
+-/
 
-{docstring AnalyticTheory.SplitsOver}
+#check @AnalyticTheory.Ezeta_adjoin
 
-{docstring AnalyticTheory.Ezeta_splitsOver}
+/-!
 
-# The structure of the group H¹(G, L^×/q)
-%%%
-tag := "sec4-lemma2"
-%%%
+> Book, §A2: `E | K` splits over `L` if the constant extension `E L | L` has a prime divisor of degree `1`, i.e. there is a constant field extension `EL` with `HasPrimeOfDegreeOne`.
+-/
+
+#print AnalyticTheory.SplitsOver
+
+/-!
+
+> `L` splits `E_ζ`: the constant extension `E_ζ L = F_L(q)` has a prime divisor of degree one (Artin's theorem for the Galois descent of `F_L(q)`).
+-/
+
+#check @AnalyticTheory.Ezeta_splitsOver
+
+/-!
+
+## The structure of the group H¹(G, L^×/q)
 
 Let $`\exp` and $`\log` denote the ordinary complex exponential and logarithm. Let us put
 
@@ -112,26 +154,56 @@ $`e_q\colon H^1(G, L^\times/q) \to H^1(G, \mathbf{W})`, where
 $`H^1(G, \mathbf{W}) = \operatorname{Hom}(G, \mathbf{W}) = \widehat{G}` is the character group of
 $`G`.
 
-{docstring AnalyticTheory.expq}
+> Book, §4, (50): `e_q(a) = exp(2πi log|a| / log|q|)`.
+-/
 
-{docstring AnalyticTheory.CharGroup}
+#print AnalyticTheory.expq
 
-{docstring AnalyticTheory.charOfCocycle}
+/-!
 
-{docstring AnalyticTheory.eQ}
+> Book, §4: characters `χ : G → W` of `G` (values in the unit circle).
+-/
+
+#print AnalyticTheory.CharGroup
+
+/-!
+
+> The character `σ ↦ e_q(ζ(σ))` of a cocycle.
+-/
+
+#print AnalyticTheory.charOfCocycle
+
+/-!
+
+> Book, §4, (51): the map `e_q : H¹(G, L^×/q) → Ĝ`, `ζ ↦ (σ ↦ e_q(ζ(σ)))`.
+-/
+
+#print AnalyticTheory.eQ
+
+/-!
 
 We shall see that this is in fact a monomorphism. In order to describe its image, let us make the
 following definitions: For $`\chi \in \widehat{G}` let $`G_\chi` denote the kernel of $`\chi` in
 $`G`, and let $`K_\chi` be the field of fixed elements of $`G_\chi` in $`L`. The field extension
 $`K_\chi\,|\,K` is cyclic of degree equal to the order of $`\chi`.
 
-{docstring AnalyticTheory.Kchi}
+> Book, §4: `K_χ`, the field of fixed elements of the kernel of `χ`.
+-/
+
+#print AnalyticTheory.Kchi
+
+/-!
 
 *Definition.* The character $`\chi` of $`G` is called _$`q`-trivial_ if $`q` is the norm of some
 element $`Q` in $`K_\chi`: $`q = N_{K_\chi|K}(Q)`. The set of $`q`-trivial characters of $`G` will
 be denoted by $`\widehat{G}(q)`.
 
-{docstring AnalyticTheory.IsQTrivial}
+> Book, §4, Definition: `χ` is *`q`-trivial* if `q` is the norm of some `Q ∈ K_χ`.
+-/
+
+#print AnalyticTheory.IsQTrivial
+
+/-!
 
 (If $`K` is locally compact and $`L\,|\,K` finite then $`\widehat{G}` can be identified, via the
 reciprocity law, with the character group of $`K^\times/NL^\times`. After this identification,
@@ -145,7 +217,12 @@ _defined by (50) induces an isomorphism $`H^1(G, L^\times/q) \approx \widehat{G}
 $`\widehat{G}(q)` consists of the $`q`-trivial characters of $`G`. In particular,
 $`\widehat{G}(q)` is a subgroup of $`\widehat{G}`._
 
-{docstring AnalyticTheory.lemma2_H1_iso}
+> Book, §4, Lemma 2: `e_q` is injective and its image is the set of `q`-trivial characters: `H¹(G, L^×/q) ≅ Ĝ(q)`.
+-/
+
+#check @AnalyticTheory.lemma2_H1_iso
+
+/-!
 
 _Proof (outline of the book's argument)._ (i) The map (51) is _monomorphic_. One considers the
 exact and commutative diagram
@@ -173,16 +250,28 @@ correcting it by the real-valued valuation $`v_q`. Surjectivity onto the $`q`-tr
 uses a generator $`\sigma` of $`G/G_\chi` and the cocycle
 $`\sigma^i \mapsto Q\cdot\sigma Q\cdots\sigma^{i-1}Q`.
 
-{docstring AnalyticTheory.eQ_injective}
+> Book, §4, Lemma 2 (i): the map `e_q : H¹(G, L^×/q) → Ĝ` is injective.
+-/
 
-{docstring AnalyticTheory.exists_cocycle_of_qtrivial}
+#check @AnalyticTheory.eQ_injective
 
-{docstring AnalyticTheory.qtrivial_of_cocycle}
+/-!
 
-# Classification of the fields obtained by descent
-%%%
-tag := "sec4-classification"
-%%%
+> Book, §4, Lemma 2: every `q`-trivial character is `e_q(ζ)` for some cocycle `ζ`.
+-/
+
+#check @AnalyticTheory.exists_cocycle_of_qtrivial
+
+/-!
+
+> Book, §4, Lemma 2: the character `e_q(ζ)` of every cocycle `ζ : G → L^×/q` is `q`-trivial.
+-/
+
+#check @AnalyticTheory.qtrivial_of_cocycle
+
+/-!
+
+## Classification of the fields obtained by descent
 
 Following the book, a field $`E\,|\,K` that is $`K`-isomorphic to $`E_\zeta` is said to have the
 _character invariant_ $`\chi = e_q(\zeta)`. The cocycle $`\zeta` is determined by $`E` up to a
@@ -191,27 +280,54 @@ to the fact that an elliptic function field has the automorphism $`\varepsilon`,
 Accordingly, the character invariant is determined by $`E` up to the substitution
 $`\chi \mapsto \chi^{-1}`.
 
-{docstring AnalyticTheory.IsCharInvariant}
+> Book, §4: `E | K` has *character invariant* `χ` (with respect to `L`): `E` is `K`-isomorphic to `E_ζ` for a cocycle `ζ` with `e_q ζ = χ`. By Theorem IX, `χ` is determined up to `χ ↦ χ⁻¹`.
+-/
+
+#print AnalyticTheory.IsCharInvariant
+
+/-!
 
 Lemma 2 together with the Galois descent and Lemma A of the appendix gives the classification
 contained in the book's Theorem IX: _the fields $`E_\zeta` obtained from the cocycles
 $`G \to L^\times/q` correspond $`1`–$`1`, up to $`K`-isomorphism, to the pairs $`\chi, \chi^{-1}`
 of mutually inverse $`q`-trivial characters of $`G`._
 
-{docstring AnalyticTheory.Ezeta_iso_iff}
+> Book, §4, Theorem IX (classification, model form): the fields `E_ζ` and `E_ζ'` are `K`-isomorphic iff `χ_ζ' = χ_ζ^{±1}`.
+-/
 
-{docstring AnalyticTheory.thmIX_classification}
+#check @AnalyticTheory.Ezeta_iso_iff
 
-{docstring AnalyticTheory.isCharInvariant_unique}
+/-!
 
-{docstring AnalyticTheory.thmIX_exists}
+> Book, §4, Theorem IX (classification): two fields with character invariants `χ`, `χ'` are `K`-isomorphic iff `χ' = χ^{±1}`. In particular the character invariant is determined up to inversion.
+-/
 
-{docstring AnalyticTheory.qtrivial_of_isCharInvariant}
+#check @AnalyticTheory.thmIX_classification
 
-# Semi-periodic functions
-%%%
-tag := "sec4-semiperiodic"
-%%%
+/-!
+
+> The character invariant is unique up to inversion.
+-/
+
+#check @AnalyticTheory.isCharInvariant_unique
+
+/-!
+
+> Every `q`-trivial character is the character invariant of some `E_ζ` (Lemma 2).
+-/
+
+#check @AnalyticTheory.thmIX_exists
+
+/-!
+
+> Conversely the character invariant of any `E_ζ` is `q`-trivial.
+-/
+
+#check @AnalyticTheory.qtrivial_of_isCharInvariant
+
+/-!
+
+## Semi-periodic functions
 
 Now we ask the following question: Given a $`q`-trivial character $`\chi`, how can we explicitly
 construct a field of character invariant $`\chi`? First we note that the field to be constructed
@@ -231,7 +347,12 @@ with a given triple $`\mathbf{Q} = (L, \sigma, Q)` where
 * $`\sigma` a generator of the Galois group $`G` of $`L`,
 * $`Q` an element of $`L` with $`NQ = q`.
 
-{docstring AnalyticTheory.SemiPeriodicTriple}
+> Book, §4: the semi-periodic data `𝐐 = (L, σ, Q)`: a generator `σ` of the cyclic group `G` and `Q ∈ L` with `N(Q) = q`.
+-/
+
+#print AnalyticTheory.SemiPeriodicTriple
+
+/-!
 
 First, we have to look for a $`1`-cocycle $`\zeta\colon G \to L^\times/q` which corresponds to
 $`\chi` under the isomorphism $`e_q` of Lemma 2. We claim that such a cocycle $`\zeta` is given by
@@ -260,12 +381,25 @@ $`\tau_q f = f`, i.e. $`f` is contained in $`F_L(q)`.
 *Definition.* The function $`f \in M_L` is called _semi-periodic with respect to_ $`\mathbf{Q}` if
 it satisfies the functional equation (59). These functions form a subfield $`F_K(\mathbf{Q})`.
 
-{docstring AnalyticTheory.tauQSigma}
+> Book, §4, (59): the automorphism `τ_Q σ` of `M_L` (translation by `Q` after `σ`).
+-/
 
-{docstring AnalyticTheory.FKQ}
+#print AnalyticTheory.tauQSigma
+
+/-!
+
+> Book, §4, the field `F_K(𝐐)` of `𝐐`-semi-periodic functions: the fixed field of `τ_Q σ` in `F_L(q)`.
+-/
+
+#print AnalyticTheory.FKQ
+
+/-!
 
 The computation above shows that $`F_K(\mathbf{Q})` is one of the fields $`E_\zeta`, with the
 character given by (55). This is the part of the book's Theorem XI that does not depend on the
 theory of §A2.
 
-{docstring AnalyticTheory.exists_cocycle_of_triple}
+> The cocycle attached to a triple `(L, σ, Q)`: `ζ(σ^i) = Q · σQ ⋯ σ^{i-1}Q`.
+-/
+
+#check @AnalyticTheory.exists_cocycle_of_triple

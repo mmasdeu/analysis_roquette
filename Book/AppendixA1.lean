@@ -1,19 +1,11 @@
-import VersoManual
 import AnalyticTheory
 
-open Verso.Genre Manual
-open Verso.Genre.Manual.InlineLean
+set_option doc.verso true
+set_option doc.verso.suggestions false
 
-set_option verso.docstring.allowMissing true
-set_option verso.code.warnLineLength 72
+/-!
+# Appendix §A1. Fields with a prime divisor of degree 1
 
-#doc (Manual) "Appendix §A1. Fields with a prime divisor of degree 1" =>
-%%%
-tag := "appA1"
-number := false
-file := "Appendix-A1"
-shortTitle := "Appendix §A1"
-%%%
 
 In this appendix, $`K` may be an arbitrary field. §A1 contains the definition of the absolute and
 the Hasse invariant for an elliptic function field $`F\,|\,K` which has a prime divisor of degree
@@ -25,18 +17,25 @@ independence of the choices made, Lemma A, and the theorem that $`F\,|\,K` is de
 $`K`-isomorphism by $`j` and $`\gamma`. Not reproduced are the existence of a field with given
 invariants, Remarks 1–3 and §A2 (arbitrary elliptic fields), which are not formalized.
 
-# Weierstraß equations
-%%%
-tag := "appA1-equations"
-%%%
+## Weierstraß equations
 
 Let $`F\,|\,K` be an elliptic function field having a prime divisor $`\mathfrak{p}` of degree
 $`1`. By the Riemann–Roch theorem, there exists an element $`x \in F` having $`2\mathfrak{p}` as
 its pole divisor, and an element $`y \in F` having $`3\mathfrak{p}` as its pole divisor.
 
-{docstring AnalyticTheory.Ln}
+> `L(n𝔭)`.
+-/
 
-{docstring AnalyticTheory.finrank_Ln_nat}
+#print AnalyticTheory.Ln
+
+/-!
+
+> Riemann–Roch for an elliptic function field: `dim L(n𝔭) = n` for a prime divisor `𝔭` of degree `1` and `n ≥ 1`.
+-/
+
+#check @AnalyticTheory.finrank_Ln_nat
+
+/-!
 
 The $`7` elements $`1, x, y, x^2, xy, x^3, y^2` are $`K`-linearly dependent since their pole
 divisors divide $`6\mathfrak{p}`. Hence there is a relation of the form
@@ -53,9 +52,19 @@ substitution $`x \mapsto a_0x`, $`y \mapsto a_0y` and thus assume that $`a_0 = 1
 
 $$`y^2 + (ux+v)y = x^3 + a_1x^2 + a_2x + a_3. \qquad (A1.26)`
 
-{docstring AnalyticTheory.IsNormalFormA1}
+> Book, §A1, equation (A1.1)/(A1.26) (with `a₀ = 1`): `y² + (ux + v)y = x³ + a₁x² + a₂x + a₃`.
+-/
 
-{docstring AnalyticTheory.WeierstrassData}
+#print AnalyticTheory.IsNormalFormA1
+
+/-!
+
+> Transport of a Weierstraß datum along a `K`-isomorphism.
+-/
+
+#print AnalyticTheory.WeierstrassData
+
+/-!
 
 If $`\operatorname{char}(K) \ne 2` we may apply the substitution $`y \mapsto 2y + (ux+v)` and
 thus transform the equation into the form $`y^2 = 4x^3 + b_1x^2 + b_2x + b_3` (A1.3). If,
@@ -68,16 +77,28 @@ In characteristic $`3` (with $`j \ne 0`) the form $`y^2 = x^3 + b_1x^2 + b_3'` (
 characteristic $`2` (with $`j \ne 0`) the form $`y^2 + xy = x^3 + A'x^2 + C'` (A1.32), serve as
 substitutes of the Weierstraß normal form.
 
-{docstring AnalyticTheory.IsNormalFormA3}
+> Book, §A1, equation (A1.3): `y² = 4x³ + b₁x² + b₂x + b₃` over `F`.
+-/
 
-{docstring AnalyticTheory.IsWeierstrassNormal}
+#print AnalyticTheory.IsNormalFormA3
 
-{docstring AnalyticTheory.IsNormalFormA32}
+/-!
 
-# The absolute and the Hasse invariant
-%%%
-tag := "appA1-invariants"
-%%%
+> Book, §A1, equation (A1.6): Weierstraß normal form `y² = 4x³ − g₂x − g₃`.
+-/
+
+#print AnalyticTheory.IsWeierstrassNormal
+
+/-!
+
+> Book, §A1, equation (A1.32) (characteristic 2): `y² + xy = x³ + A′x² + C′`.
+-/
+
+#print AnalyticTheory.IsNormalFormA32
+
+/-!
+
+## The absolute and the Hasse invariant
 
 If $`\operatorname{char}(K) \ne 2, 3`, the absolute invariant $`j` is defined by the classical
 formula
@@ -107,28 +128,73 @@ description, in the classical notation $`j = c_4^3/\Delta` of Mathlib's Weierstr
 Hasse invariant is represented by an element of $`K`, to be read modulo squares (resp. modulo
 $`\pi(K^+)` in characteristic $`2`).
 
-{docstring AnalyticTheory.SquareEquiv}
+> Book, §A1: `u ∈ K` and `v ∈ K` with `a` and `b` in the same class modulo squares, i.e. `a = t² b` for some `t ∈ K^×`.
+-/
 
-{docstring AnalyticTheory.PiEquiv}
+#print AnalyticTheory.SquareEquiv
 
-{docstring AnalyticTheory.wC4}
+/-!
 
-{docstring AnalyticTheory.wDisc}
+> Book, §A1, char 2: `a` and `b` agree modulo `π(K⁺)`, `π(z) = z² + z`.
+-/
 
-{docstring AnalyticTheory.jOfData}
+#print AnalyticTheory.PiEquiv
 
-{docstring AnalyticTheory.hasseOfData}
+/-!
 
-{docstring AnalyticTheory.absInv}
+> `c₄ = b₂² − 24 b₄`.
+-/
 
-{docstring AnalyticTheory.hasseInv}
+#print AnalyticTheory.wC4
+
+/-!
+
+> The discriminant `Δ = −b₂²b₈ − 8b₄³ − 27b₆² + 9b₂b₄b₆`.
+-/
+
+#print AnalyticTheory.wDisc
+
+/-!
+
+> The absolute invariant `j = c₄³/Δ` of a Weierstraß equation.
+-/
+
+#print AnalyticTheory.jOfData
+
+/-!
+
+> The Hasse invariant (as a representative in `K`) of a Weierstraß equation, following (A1.13) (characteristic `≠ 2, 3`: `−c₄/c₆`, equivalent to `−½ g₂/g₃` modulo squares), (A1.25) (characteristic `3`: `b₂`) and (A1.36) (characteristic `2`: `a₁/u² + v/u³`, the class of `A′` modulo `π(K⁺)`).
+-/
+
+#print AnalyticTheory.hasseOfData
+
+/-!
+
+> Book, §A1: the absolute invariant `j` of an elliptic function field `F | K` with a prime divisor of degree `1`: computed from any Weierstraß equation of `F`. (Independence of the choice is a theorem of the book.)
+-/
+
+#print AnalyticTheory.absInv
+
+/-!
+
+> Book, §A1: the Hasse invariant `γ` of `F | K` (with `j ≠ 0, 12³`), represented by an element of `K` (see the module documentation), computed from any Weierstraß equation.
+-/
+
+#print AnalyticTheory.hasseInv
+
+/-!
 
 *Independence of the choices.* The invariants do not depend on the choice of the generators
 $`x, y` at a fixed prime $`\mathfrak{p}`: the substitutions preserving the normal forms change
 $`j` not at all and $`\gamma` by squares (resp. by elements $`\pi(\beta')`), by (A1.12), (A1.24),
 (A1.35).
 
-{docstring AnalyticTheory.same_prime_invariants}
+> Invariance of `j` and of the Hasse class for two data at the same prime divisor (A1.12), (A1.24), (A1.35).
+-/
+
+#check @AnalyticTheory.same_prime_invariants
+
+/-!
 
 They also do not depend on the choice of the prime $`\mathfrak{p}` of degree $`1`, since for any
 two prime divisors $`\mathfrak{p}, \mathfrak{p}'` of degree $`1` of $`F\,|\,K` there is an
@@ -136,18 +202,35 @@ automorphism of $`F` transforming $`\mathfrak{p}` into $`\mathfrak{p}'`. In the 
 homogeneity is an explicit hypothesis, which is proved for the fields $`F_K(q)` (by the
 translations of §2).
 
-{docstring AnalyticTheory.DegOneHomogeneous}
+> Prime divisors of degree one of `F | K` are permuted transitively by `K`-automorphisms (book, footnote of §A1).
+-/
 
-{docstring AnalyticTheory.fq_homogeneous}
+#print AnalyticTheory.DegOneHomogeneous
 
-{docstring AnalyticTheory.absInv_eq_of_data}
+/-!
 
-{docstring AnalyticTheory.hasseInv_eq_of_data}
+> The prime divisors of degree `1` of `F_K(q)` are permuted transitively by its `K`-automorphisms (the translations `τ_a`, `a ∈ K^×`).
+-/
 
-# Determination of F by j and γ
-%%%
-tag := "appA1-determination"
-%%%
+#check @AnalyticTheory.fq_homogeneous
+
+/-!
+
+> Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv`.
+-/
+
+#check @AnalyticTheory.absInv_eq_of_data
+
+/-!
+
+> Book, §A1: the Hasse invariant computed from any Weierstraß datum is equivalent to `hasseInv` (modulo squares, resp. modulo `π(K⁺)` in characteristic `2`).
+-/
+
+#check @AnalyticTheory.hasseInv_eq_of_data
+
+/-!
+
+## Determination of F by j and γ
 
 If an element $`\gamma \in K^\times` representing the Hasse invariant of $`F\,|\,K` is given
 ($`\operatorname{char}(K) \ne 2, 3`), then the generators $`x, y` of $`F\,|\,K` can be chosen in
@@ -167,22 +250,39 @@ the same $`j \ne 0, 12^3` and equivalent Hasse classes differ by a change of var
 fact that two function fields generated by solutions of the same Weierstraß equation, with pole
 orders $`2` and $`3` at a prime of degree $`1`, are $`K`-isomorphic.
 
-{docstring AnalyticTheory.exists_variableChange_of_invariants}
+> Classification of Weierstraß curves by `(j, γ)`: equal `j ≠ 0, 12³` and equivalent Hasse classes imply that the curves differ by a change of variables. This is `WeierstrassCurve.exists_variableChange_of_c₄_pow_div_eq` (`ForMathlib`) in the book's notation.
+-/
 
-{docstring AnalyticTheory.exists_algEquiv_of_normalForm}
+#check @AnalyticTheory.exists_variableChange_of_invariants
 
-{docstring AnalyticTheory.absolute_hasse_determine}
+/-!
 
-# Lemma A
-%%%
-tag := "lemmaA"
-%%%
+> Two function fields generated by solutions `(x, y)`, `(x', y')` of the same Weierstraß equation with pole orders `(2, 3)` are `K`-isomorphic, by an isomorphism mapping `x ↦ x'`, `y ↦ y'`.
+-/
+
+#check @AnalyticTheory.exists_algEquiv_of_normalForm
+
+/-!
+
+> Book, §A1, uniqueness: two fields with a prime divisor of degree 1 and equal absolute invariants and equivalent Hasse invariants are `K`-isomorphic (for `j ≠ 0, 12³`).
+-/
+
+#check @AnalyticTheory.absolute_hasse_determine
+
+/-!
+
+## Lemma A
 
 *Lemma A.* _Let $`F\,|\,K` be an elliptic function field with a prime $`\mathfrak{p}` of degree
 $`1`, and let $`j` be its absolute invariant. If $`j \ne 0, 12^3` then there is only one
 non-trivial automorphism $`\varepsilon` of $`F\,|\,K` which leaves $`\mathfrak{p}` fixed._
 
-{docstring AnalyticTheory.lemmaA}
+> Book, Appendix §A1, Lemma A: if `j ≠ 0, 12³`, there is exactly one non-trivial automorphism `ε` of `F | K` fixing a given prime divisor `𝔭` of degree `1`.
+-/
+
+#check @AnalyticTheory.lemmaA
+
+/-!
 
 _Proof._ We choose generators $`x, y` of $`F\,|\,K` such that $`x, y` have pole divisors
 $`2\mathfrak{p}`, $`3\mathfrak{p}` respectively. We may assume that their defining relation over
@@ -210,6 +310,12 @@ $`\varepsilon(y) = y + x` if $`\operatorname{char}(K) = 2`. ∎
 The formalization proves the lemma uniformly in all characteristics, using the long Weierstraß
 form (A1.26): the non-trivial automorphism is $`x \mapsto x`, $`y \mapsto -y - ux - v`.
 
-{docstring AnalyticTheory.lemmaA_data}
+> Lemma A in terms of a Weierstraß datum `(x, y)` at `𝔭`: the non-trivial automorphism fixing `𝔭` is `x ↦ x`, `y ↦ −y − ux − v`.
+-/
+
+#check @AnalyticTheory.lemmaA_data
+
+/-!
 
 If $`j = 0` or $`j = 12^3` then the lemma is false in general.
+-/

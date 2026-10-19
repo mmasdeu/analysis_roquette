@@ -1,0 +1,115 @@
+name: Build and publish the website
+
+# Builds the Lean project, the Verso companion book (literate Lean pages) and the
+# blueprint (web version with dependency graph, and PDF), and publishes all of them
+# on GitHub Pages:
+#
+#   <pages-url>/            landing page
+#   <pages-url>/book/       the Verso companion book
+#   <pages-url>/blueprint/  the blueprint, with the dependency graph
+#                           (<pages-url>/blueprint/dep_graph_document.html)
+#   <pages-url>/blueprint.pdf
+#
+# One-time setup: Settings > Pages > Build and deployment > Source = "GitHub Actions".
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build project, book and blueprint
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install Lean and build the project
+        uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
+        with:
+          build: true
+          use-mathlib-cache: true
+          use-github-cache: true
+
+      - name: Build the Verso companion book
+        run: |
+          set -euo pipefail
+          lake build Book
+          out="$(lake query :literateHtml)"
+          echo "book output: $out"
+          mkdir -p _site/book
+          cp -r "$out"/. _site/book/
+
+      - name: Build the blueprint (web and PDF)
+        uses: xu-cheng/texlive-action@f886de8159e5952a131848a5fa9c3196a2132b5d # v2
+        with:
+          docker_image: ghcr.io/xu-cheng/texlive-full:20250401
+          run: |
+            apk update
+            apk add --update make py3-pip git pkgconfig graphviz graphviz-dev gcc musl-dev
+            git config --global --add safe.directory "$GITHUB_WORKSPACE"
+            git config --global --add safe.directory "$(pwd)"
+            python3 -m venv env
+            . env/bin/activate
+            pip install --upgrade pip requests wheel
+            pip install pygraphviz --config-settings="--global-option=build_ext" --config-settings="--global-option=-L/usr/lib/graphviz/" --config-settings="--global-option=-R/usr/lib/graphviz/"
+            pip install leanblueprint
+            # link the blueprint to this repository and to the book
+            repo="https://github.com/${GITHUB_REPOSITORY}"
+            owner="${GITHUB_REPOSITORY%%/*}"
+            name="${GITHUB_REPOSITORY#*/}"
+            site="https://${owner}.github.io/${name}"
+            sed -i "s|\\\\github{[^}]*}|\\\\github{${repo}}|; s|\\\\home{[^}]*}|\\\\home{${site}}|; s|\\\\dochome{[^}]*}|\\\\dochome{${site}/book}|" blueprint/src/web.tex
+            leanblueprint pdf
+            leanblueprint web
+            mkdir -p _site
+            cp -r blueprint/web _site/blueprint
+            cp blueprint/print/print.pdf _site/blueprint.pdf
+
+      - name: Check that the declarations named in the blueprint exist
+        run: lake exe checkdecls blueprint/lean_decls
+
+      - name: Landing page
+        run: cp site/index.html _site/index.html
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
