@@ -98,7 +98,7 @@ theorem poly_bad_radii_finite (e : ℕ → ℝ) (he : ∀ j, 0 ≤ e j) (hfin : 
     have hNpos : 0 < e N * r ^ N := lt_of_lt_of_le hpos0 (hNmax j0 hj0F)
     have : ∃ n, n ≠ N ∧ e N * r ^ N ≤ e n * r ^ n := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       exact hbad ⟨N, fun n hn => hcon n hn⟩
     obtain ⟨n, hnN, hn⟩ := this
     have hne' : 0 < e n := by
@@ -106,7 +106,7 @@ theorem poly_bad_radii_finite (e : ℕ → ℝ) (he : ∀ j, 0 ≤ e j) (hfin : 
       exact (mul_pos_iff_of_pos_right (pow_pos hr n)).mp h1
     have hnF : n ∈ Fs := by simpa [hFs] using hne'.ne'
     have htie : e n * r ^ n = e N * r ^ N := le_antisymm (hNmax n hnF) hn
-    simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_ofPred_eq]
     exact ⟨(n, N), Finset.mem_coe.mpr (Finset.mem_product.mpr ⟨hnF, hNF⟩), hr, hnN, htie, hne'⟩
 
 
@@ -151,7 +151,7 @@ theorem sumM_le (c : ℤ → L) (Ms : Finset ℤ) (δ : ℝ) (hδ : 0 ≤ δ)
     refine hasSum_norm_le h2 hδ (fun n => ?_)
     by_cases hn : n ∈ Ms
     · simpa [hn] using hδ
-    · simp only [hn, if_false, sub_zero, norm_mul, norm_zpow, norm_one_add ht, one_zpow, mul_one]
+    · simp only [hn, ite_false, sub_zero, norm_mul, norm_zpow, norm_one_add ht, one_zpow, mul_one]
       exact hout n hn
   simpa using h3
 
@@ -173,14 +173,14 @@ theorem exists_poly_of_max (c : ℤ → L) (Ms : Finset ℤ) (hMs : Ms.Nonempty)
   refine ⟨∑ n ∈ Ms, Polynomial.C (c n) * (1 + Polynomial.X) ^ (n - n1).toNat, (n2 - n1).toNat, n1,
     ?_, ?_, ?_⟩
   · intro j
-    rw [Polynomial.finset_sum_coeff]
+    rw [Polynomial.finsetSum_coeff]
     have hw0 : 0 ≤ w := by rw [← hw n1 hn1m]; exact norm_nonneg _
     refine sum_norm_le_of_forall _ _ hw0 (fun n hn => ?_)
     rw [Polynomial.coeff_C_mul, Polynomial.coeff_one_add_X_pow, norm_mul, hw n hn]
     calc w * ‖(((n - n1).toNat.choose j : ℕ) : L)‖ ≤ w * 1 :=
           mul_le_mul_of_nonneg_left (IsUltrametricDist.norm_natCast_le_one _ _) hw0
       _ = w := mul_one w
-  · rw [Polynomial.finset_sum_coeff]
+  · rw [Polynomial.finsetSum_coeff]
     rw [Finset.sum_eq_single n2]
     · rw [Polynomial.coeff_C_mul, Polynomial.coeff_one_add_X_pow]
       simp [hw n2 hn2m]
@@ -193,7 +193,7 @@ theorem exists_poly_of_max (c : ℤ → L) (Ms : Finset ℤ) (hMs : Ms.Nonempty)
       simp [Nat.choose_eq_zero_of_lt this]
     · intro h; exact absurd hn2m h
   · intro t ht
-    rw [Polynomial.eval_finset_sum, Finset.mul_sum]
+    rw [Polynomial.eval_finsetSum, Finset.mul_sum]
     refine Finset.sum_congr rfl (fun n hn => ?_)
     simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_add,
       Polynomial.eval_one, Polynomial.eval_X]
@@ -215,7 +215,7 @@ theorem exists_large_value (Q : Polynomial L) (d : ℕ) (w δ : ℝ) (hw : 0 < w
   set e : ℕ → ℝ := fun j => ‖Q.coeff j‖ with he
   have hfin : {j | e j ≠ 0}.Finite := by
     refine (Finset.range (Q.natDegree + 1)).finite_toSet.subset (fun j hj => ?_)
-    simp only [Set.mem_setOf_eq, he, ne_eq, norm_eq_zero] at hj
+    simp only [Set.mem_ofPred_eq, he, ne_eq, norm_eq_zero] at hj
     simp only [Finset.coe_range, Set.mem_Iio]
     by_contra hcon
     exact hj (Polynomial.coeff_eq_zero_of_natDegree_lt (by omega))
@@ -232,7 +232,7 @@ theorem exists_large_value (Q : Polynomial L) (d : ℕ) (w δ : ℝ) (hw : 0 < w
   have hUopen : IsOpen U := isOpen_Ioo.sdiff hZ.isClosed
   have hU0 : U ⊆ Set.Ioi 0 := fun ρ hρ => by
     have := hρ.1.1; simp only [Set.mem_Ioi]; exact lt_trans (by positivity) this
-  have hUne : U.Nonempty := (Set.Ioo_infinite hρ0lt).diff hZ |>.nonempty
+  have hUne : U.Nonempty := (Set.Ioo_infinite hρ0lt).sdiff hZ |>.nonempty
   obtain ⟨t, ht0, htU⟩ := exists_norm_in_open K (L := L) U hUopen hU0 hUne
   set ρ := ‖t‖ with hρ
   have hρ1 : ρ < 1 := htU.1.2
@@ -287,7 +287,7 @@ theorem laurent_eq_zero_of_vanishing {a : ℤ → K} (ha : IsConvergentLaurent K
     ∀ n, a n = 0 := by
   classical
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   obtain ⟨n0, hn0⟩ := hcon
   have hr : 0 < ‖α‖ := norm_pos_iff.mpr hα
   set c : ℤ → L := fun n => algebraMap K L (a n) * α ^ n with hc
@@ -316,7 +316,7 @@ theorem laurent_eq_zero_of_vanishing {a : ℤ → K} (ha : IsConvergentLaurent K
   have hMfin : {n | wn n = w}.Finite := by
     refine (Filter.eventually_cofinite.mp (hwt.eventually (gt_mem_nhds hwpos))).subset
       (fun n hn => ?_)
-    simp only [Set.mem_setOf_eq] at hn ⊢
+    simp only [Set.mem_ofPred_eq] at hn ⊢
     rw [hn]; exact lt_irrefl _
   set Ms := hMfin.toFinset with hMs
   have hMsne : Ms.Nonempty := ⟨N, by simp [hMs, hw]⟩
@@ -362,7 +362,7 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → L
   obtain ⟨b, -, ⟨C, hC⟩, hb⟩ := taylor_expansion K ha hF hα
   have hex : ∃ k, b k ≠ 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     obtain ⟨n, hn⟩ := h0
     refine hn (laurent_eq_zero_of_vanishing K ha hF hα (fun h hh => ?_) n)
     have := hb h hh
@@ -371,7 +371,7 @@ theorem exists_order {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → L
   set k0 := Nat.find hex with hk0
   have hbk0 : b k0 ≠ 0 := Nat.find_spec hex
   have hlow : ∀ i < k0, b i = 0 := fun i hi => by
-    have := Nat.find_min hex hi; push_neg at this; exact this
+    have := Nat.find_min hex hi; push Not at this; exact this
   have hC0 : 0 ≤ C := le_trans (by positivity) (hC 0)
   have hFα : F α = b 0 := by
     have h1 := hb 0 (by rw [norm_zero]; exact hr)

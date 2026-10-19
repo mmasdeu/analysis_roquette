@@ -35,7 +35,7 @@ theorem absInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K F
   obtain ⟨d', h𝔭, hu, hv, ha1, ha2, ha3⟩ := exists_transfer_at K F hom d d₀
   have := (same_prime_invariants hE d' d₀ h𝔭.symm).1
   unfold absInv
-  rw [dif_pos hne]
+  rw [dite_eq_left hne]
   rw [hu, hv, ha1, ha2, ha3] at this
   exact this.symm ▸ rfl
 
@@ -51,7 +51,7 @@ theorem hasseInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K
   obtain ⟨d', h𝔭, hu, hv, ha1, ha2, ha3⟩ := exists_transfer_at K F hom d d₀
   obtain ⟨-, h1, h2⟩ := same_prime_invariants hE d' d₀ h𝔭.symm
   unfold hasseInv
-  rw [dif_pos hne]
+  rw [dite_eq_left hne]
   rw [hu, hv, ha1, ha2, ha3] at h1 h2
   exact ⟨h1, h2⟩
 

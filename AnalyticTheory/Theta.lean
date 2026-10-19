@@ -34,7 +34,7 @@ theorem gnorm_poly_le (P : Polynomial K) (N : ℕ) (hP : ∀ j, N ≤ j → P.co
     · rw [hP m hmN]
       simp only [norm_zero, zero_mul]
       positivity
-    · push_neg at hmN
+    · push Not at hmN
       have h1 : ρ ^ m ≤ max 1 ρ ^ N :=
         le_trans (pow_le_pow_left₀ hρ.le (le_max_right 1 ρ) m)
           (pow_le_pow_right₀ hmax hmN.le)
@@ -64,7 +64,7 @@ theorem psi_sub_coeff_bound {q : K} (hq : ‖q‖ < 1) {φ : Polynomial K} (hφ 
   have hq0 : 0 ≤ ‖q‖ := norm_nonneg _
   rw [Polynomial.coeff_sub, psi_coeff]
   by_cases hj : j < φ.natDegree
-  · rw [Polynomial.coeff_X_pow, if_neg hj.ne, sub_zero, norm_mul, norm_pow, zpow_natCast, norm_pow]
+  · rw [Polynomial.coeff_X_pow, ite_eq_right hj.ne, sub_zero, norm_mul, norm_pow, zpow_natCast, norm_pow]
     have h1 : ‖φ.coeff j‖ ≤ ∑ i ∈ Finset.range φ.natDegree, ‖φ.coeff i‖ :=
       Finset.single_le_sum (f := fun i => ‖φ.coeff i‖) (fun i _ => norm_nonneg _)
         (Finset.mem_range.mpr hj)
@@ -72,12 +72,12 @@ theorem psi_sub_coeff_bound {q : K} (hq : ‖q‖ < 1) {φ : Polynomial K} (hφ 
       have : φ.natDegree - j ≠ 0 := by omega
       exact pow_le_of_le_one (by positivity) (pow_le_one₀ hq0 hq.le) this
     exact mul_le_mul h1 h2 (by positivity) (Finset.sum_nonneg (fun i _ => norm_nonneg _))
-  · push_neg at hj
+  · push Not at hj
     rcases eq_or_lt_of_le hj with h | h
-    · rw [← h, Polynomial.coeff_X_pow, if_pos rfl, Nat.sub_self, pow_zero, mul_one, hφ.coeff_natDegree]
+    · rw [← h, Polynomial.coeff_X_pow, ite_eq_left rfl, Nat.sub_self, pow_zero, mul_one, hφ.coeff_natDegree]
       simp only [sub_self, norm_zero]
       positivity
-    · rw [Polynomial.coeff_X_pow, if_neg h.ne', Polynomial.coeff_eq_zero_of_natDegree_lt h]
+    · rw [Polynomial.coeff_X_pow, ite_eq_right h.ne', Polynomial.coeff_eq_zero_of_natDegree_lt h]
       simp only [zero_mul, sub_zero, norm_zero]
       positivity
 
@@ -86,8 +86,8 @@ theorem psi_sub_coeff_zero {q : K} {φ : Polynomial K} (hφ : φ.Monic) (k : ℤ
     (hj : φ.natDegree ≤ j) : (psi q φ k - X ^ φ.natDegree).coeff j = 0 := by
   rw [Polynomial.coeff_sub, psi_coeff, Polynomial.coeff_X_pow]
   rcases eq_or_lt_of_le hj with h | h
-  · rw [← h, if_pos rfl, Nat.sub_self, pow_zero, mul_one, hφ.coeff_natDegree]; simp
-  · rw [if_neg h.ne', Polynomial.coeff_eq_zero_of_natDegree_lt h]; simp
+  · rw [← h, ite_eq_left rfl, Nat.sub_self, pow_zero, mul_one, hφ.coeff_natDegree]; simp
+  · rw [ite_eq_right h.ne', Polynomial.coeff_eq_zero_of_natDegree_lt h]; simp
 
 /-- `F_n = X^{-N} ψ_n`. -/
 noncomputable def thF (q : K) (φ : Polynomial K) (n : ℕ) : holSubring K :=
@@ -161,7 +161,7 @@ theorem thGpoly_coeff_bound {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Pol
     · subst hj0
       simp [div_self hc0]
       positivity
-    · simp only [hj0, if_false, sub_zero, norm_mul, norm_zpow]
+    · simp only [hj0, ite_false, sub_zero, norm_mul, norm_zpow]
       have h1 : ‖φ.coeff j / φ.coeff 0‖ ≤ ∑ i ∈ Finset.range (φ.natDegree + 1), ‖φ.coeff i / φ.coeff 0‖ :=
         Finset.single_le_sum (f := fun i => ‖φ.coeff i / φ.coeff 0‖) (fun i _ => norm_nonneg _)
           (Finset.mem_range.mpr (by omega))
@@ -172,10 +172,10 @@ theorem thGpoly_coeff_bound {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Pol
         rw [this]
         exact pow_le_pow_of_le_one hq0'.le hq.le (by nlinarith [Nat.pos_of_ne_zero hj0])
       exact mul_le_mul h1 h2 (by positivity) (Finset.sum_nonneg (fun i _ => norm_nonneg _))
-  · push_neg at hj
+  · push Not at hj
     have : (thGpoly q φ n).coeff j = 0 := by
       rw [thGpoly, Polynomial.coeff_sub, Polynomial.coeff_C_mul, psi_coeff,
-        Polynomial.coeff_eq_zero_of_natDegree_lt hj, Polynomial.coeff_one, if_neg (by omega)]
+        Polynomial.coeff_eq_zero_of_natDegree_lt hj, Polynomial.coeff_one, ite_eq_right (by omega)]
       simp
     rw [this, norm_zero]
     positivity
@@ -183,7 +183,7 @@ theorem thGpoly_coeff_bound {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Pol
 theorem thGpoly_coeff_zero {q : K} {φ : Polynomial K} (n : ℕ) (j : ℕ) (hj : φ.natDegree < j) :
     (thGpoly q φ n).coeff j = 0 := by
   rw [thGpoly, Polynomial.coeff_sub, Polynomial.coeff_C_mul, psi_coeff,
-    Polynomial.coeff_eq_zero_of_natDegree_lt hj, Polynomial.coeff_one, if_neg (by omega)]
+    Polynomial.coeff_eq_zero_of_natDegree_lt hj, Polynomial.coeff_one, ite_eq_right (by omega)]
   simp
 
 theorem tendsto_gnorm_thG {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial K}

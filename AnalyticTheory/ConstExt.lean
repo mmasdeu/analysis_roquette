@@ -239,7 +239,7 @@ theorem mcombo_injective : Function.Injective (mcombo (L := L) b) := by
 /-- `M_L = ⊕ bᵢ M_K`. -/
 theorem mero_decomp (f : MeroRing L) : ∃ e : ι → MeroRing K, f = mcombo b e := by
   classical
-  letI : Algebra (MeroRing K) (MeroRing L) := (meroExt (L := L)).toAlgebra
+  let : Algebra (MeroRing K) (MeroRing L) := (meroExt (L := L)).toAlgebra
   set V := Submodule.span (MeroRing K) (Set.range fun i => algebraMap L (MeroRing L) (b i)) with hV
   have hmemV : ∀ y : MeroRing L, y ∈ V ↔ ∃ e : ι → MeroRing K, y = mcombo b e := by
     intro y
@@ -345,9 +345,9 @@ theorem exists_algEquiv_constExt {q : K} (hq0 : q ≠ 0) (FL : Type u) [Field FL
     [IsScalarTower K L FL] (hFL : IsConstantExtension K (FqSub K q) L FL) :
     Nonempty (FL ≃ₐ[L] FqSub L (algebraMap K L q)) := by
   classical
-  letI : Algebra K (FqSub L (algebraMap K L q)) :=
+  let : Algebra K (FqSub L (algebraMap K L q)) :=
     ((algebraMap L (FqSub L (algebraMap K L q))).comp (algebraMap K L)).toAlgebra
-  haveI : IsScalarTower K L (FqSub L (algebraMap K L q)) := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  have : IsScalarTower K L (FqSub L (algebraMap K L q)) := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   let b := Module.finBasis K L
   let ιF : FqSub K q →ₐ[K] FqSub L (algebraMap K L q) :=
     { fqExt hq0 with
@@ -359,8 +359,7 @@ theorem exists_algEquiv_constExt {q : K} (hq0 : q ≠ 0) (FL : Type u) [Field FL
   have hdec : ∀ t : L ⊗[K] FqSub K q, ∃ e : Fin (Module.finrank K L) → FqSub K q,
       t = ∑ i, b i ⊗ₜ e i := by
     intro t
-    induction t using TensorProduct.induction_on with
-    | zero => exact ⟨0, by simp⟩
+    induction t with
     | tmul l f =>
       refine ⟨fun i => b.repr l i • f, ?_⟩
       conv_lhs => rw [← b.sum_repr l]
@@ -443,7 +442,7 @@ def ringTransfer (σ : E ≃ₐ[k] E') (A : ValuationSubring E) :
 def PrimeDivisor.transfer (σ : E ≃ₐ[k] E') (P : PrimeDivisor k E) : PrimeDivisor k E' where
   ring := P.ring.comap (σ.symm : E' →+* E)
   isDVR := by
-    haveI := P.isDVR
+    have := P.isDVR
     exact IsDiscreteValuationRing.RingEquivClass.isDiscreteValuationRing (ringTransfer σ P.ring)
   contains := fun c => by rw [ValuationSubring.mem_comap]; simpa using P.contains c
 
@@ -465,9 +464,9 @@ def primeEquiv (σ : E ≃ₐ[k] E') : PrimeDivisor k E ≃ PrimeDivisor k E' wh
 theorem PrimeDivisor.transfer_degree (σ : E ≃ₐ[k] E') (P : PrimeDivisor k E) :
     (P.transfer σ).degree = P.degree := by
   unfold PrimeDivisor.degree
-  letI : Algebra k (IsLocalRing.ResidueField P.ring) :=
+  let : Algebra k (IsLocalRing.ResidueField P.ring) :=
     ((IsLocalRing.residue P.ring).comp P.toRing).toAlgebra
-  letI : Algebra k (IsLocalRing.ResidueField (P.transfer σ).ring) :=
+  let : Algebra k (IsLocalRing.ResidueField (P.transfer σ).ring) :=
     ((IsLocalRing.residue (P.transfer σ).ring).comp (P.transfer σ).toRing).toAlgebra
   let r : P.ring ≃+* (P.transfer σ).ring := ringTransfer σ P.ring
   let e := IsLocalRing.ResidueField.mapEquiv r
@@ -514,7 +513,7 @@ theorem mem_mul_zpow_of_irreducible {F : Type u} [Field F] (A : ValuationSubring
 
 theorem uniformizer_spec' {F : Type u} [Field F] [Algebra k F] (P : PrimeDivisor k F) :
     ∃ h : P.uniformizer ∈ P.ring, Irreducible (⟨P.uniformizer, h⟩ : P.ring) := by
-  haveI := P.isDVR
+  have := P.isDVR
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible P.ring
   exact Classical.epsilon_spec (p := fun π : F => ∃ h : π ∈ P.ring, Irreducible (⟨π, h⟩ : P.ring))
     ⟨ϖ, ϖ.2, hϖ⟩
@@ -530,7 +529,7 @@ theorem rrSpace_transfer (σ : E ≃ₐ[k] E') (D : FFDivisor k E) :
         σ.symm g * P.uniformizer ^ (D P) ∈ P.ring) := by
     intro P
     set P' := (primeEquiv σ) P
-    haveI := P.isDVR
+    have := P.isDVR
     show g * P'.uniformizer ^ (D P) ∈ P.ring.comap (σ.symm : E' →+* E) ↔ _
     rw [ValuationSubring.mem_comap]
     simp only [RingHom.coe_coe, map_mul, map_zpow₀]

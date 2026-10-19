@@ -104,7 +104,7 @@ theorem ι_apply (z : ℤ_[3]) : ι z = (z : ℚ_[3]) := rfl
 theorem ι_injective : Function.Injective ι := fun _ _ h => Subtype.ext h
 
 theorem norm_ι_le (z : ℤ_[3]) : ‖ι z‖ ≤ 1 := by
-  rw [show ι z = (z : ℚ_[3]) from rfl, PadicInt.padic_norm_e_of_padicInt]; exact PadicInt.norm_le_one z
+  rw [show ι z = (z : ℚ_[3]) from rfl, PadicInt.norm_coe]; exact PadicInt.norm_le_one z
 
 /-- Evaluation of a power series over `ℤ₃` at `q ∈ ℚ₃` (`PowerSeries.tsumEval`, `ForMathlib`). -/
 abbrev evalP (q : ℚ_[3]) (f : PowerSeries ℤ_[3]) : ℚ_[3] := PowerSeries.tsumEval ι q f
@@ -137,7 +137,7 @@ def E : R →+* ℤ_[3] := eval₂ (Int.castRingHom _) y
 abbrev yK : ℚ_[3] := ((y : ℤ_[3]) : ℚ_[3])
 
 theorem norm_yK : ‖yK y‖ = 1 := by
-  rw [PadicInt.padic_norm_e_of_padicInt]
+  rw [PadicInt.norm_coe]
   exact PadicInt.isUnit_iff.mp y.isUnit
 
 theorem E_T_nat (d : ℕ) : E y (T d) = (y : ℤ_[3]) ^ d := by simp [E]
@@ -171,7 +171,7 @@ theorem evalP_XI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     rw [PowerSeries.coeff_map, XI, PowerSeries.coeff_mk]
     by_cases hn : n = 0
     · subst hn; simp [E_T_one]
-    · simp only [hn, if_false, zero_add, map_add, map_mul, map_pow, map_sub, map_one, map_sum,
+    · simp only [hn, ite_false, zero_add, map_add, map_mul, map_pow, map_sub, map_one, map_sum,
         E_T_one, hF]
       rw [mul_assoc, Finset.sum_mul]; rfl
   have hS : Summable (fun n : ℕ => (∑ d ∈ n.divisors, F d) * q ^ n) := by
@@ -211,7 +211,7 @@ theorem evalP_YI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     rw [PowerSeries.coeff_map, YI, PowerSeries.coeff_mk]
     by_cases hn : n = 0
     · subst hn; simp [E_T_two]
-    · simp only [hn, if_false, zero_add, map_add, map_mul, map_pow, map_sub, map_one, map_sum,
+    · simp only [hn, ite_false, zero_add, map_add, map_mul, map_pow, map_sub, map_one, map_sum,
         E_T_one, hF]
       rw [mul_assoc, Finset.sum_mul]; rfl
   have hS : Summable (fun n : ℕ => (∑ d ∈ n.divisors, F d) * q ^ n) := by
@@ -339,7 +339,7 @@ theorem map_XI : PowerSeries.map ψ XI = PowerSeries.C ((1 - u) ^ 2) * X := by
     ψ_T_neg, map_ofNat]
   have h := one_sub_u_ne_zero
   by_cases hn : n = 0
-  · subst hn; simp only [if_true, Nat.divisors_zero, Finset.sum_empty, mul_zero, add_zero, ψ_T_one]
+  · subst hn; simp only [ite_true, Nat.divisors_zero, Finset.sum_empty, mul_zero, add_zero, ψ_T_one]
     field_simp
   · simp [hn]
 
@@ -352,7 +352,7 @@ theorem map_YI : PowerSeries.map ψ YI = PowerSeries.C ((1 - u) ^ 3) * Y := by
   have h := one_sub_u_ne_zero
   by_cases hn : n = 0
   · subst hn
-    simp only [if_true, Nat.divisors_zero, Finset.sum_empty, mul_zero, add_zero]
+    simp only [ite_true, Nat.divisors_zero, Finset.sum_empty, mul_zero, add_zero]
     rw [show ψ (T 2) = u ^ 2 by simpa using ψ_T_nat 2]
     field_simp
   · simp [hn]

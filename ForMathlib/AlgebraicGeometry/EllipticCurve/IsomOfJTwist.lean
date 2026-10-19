@@ -45,11 +45,11 @@ section TwistEquiv
 
 theorem twistEquiv_iff_of_ringChar_eq_two (h : ringChar K = 2) {a b : K} :
     TwistEquiv a b ↔ ∃ z : K, a = z ^ 2 + z + b := by
-  rw [TwistEquiv, if_pos h]
+  rw [TwistEquiv, ite_eq_left h]
 
 theorem twistEquiv_iff_of_ringChar_ne_two (h : ringChar K ≠ 2) {a b : K} :
     TwistEquiv a b ↔ ∃ t : K, t ≠ 0 ∧ a = t ^ 2 * b := by
-  rw [TwistEquiv, if_neg h]
+  rw [TwistEquiv, ite_eq_right h]
 
 theorem TwistEquiv.refl (a : K) : TwistEquiv a a := by
   by_cases h : ringChar K = 2
@@ -58,7 +58,7 @@ theorem TwistEquiv.refl (a : K) : TwistEquiv a a := by
 
 theorem TwistEquiv.symm {a b : K} (hab : TwistEquiv a b) : TwistEquiv b a := by
   by_cases h : ringChar K = 2
-  · haveI : CharP K 2 := ringChar.of_eq h
+  · have : CharP K 2 := ringChar.of_eq h
     obtain ⟨z, rfl⟩ := (twistEquiv_iff_of_ringChar_eq_two h).mp hab
     have h20 : (2 : K) = 0 := CharP.cast_eq_zero K 2
     exact (twistEquiv_iff_of_ringChar_eq_two h).mpr
@@ -69,7 +69,7 @@ theorem TwistEquiv.symm {a b : K} (hab : TwistEquiv a b) : TwistEquiv b a := by
 theorem TwistEquiv.trans {a b c : K} (hab : TwistEquiv a b) (hbc : TwistEquiv b c) :
     TwistEquiv a c := by
   by_cases h : ringChar K = 2
-  · haveI : CharP K 2 := ringChar.of_eq h
+  · have : CharP K 2 := ringChar.of_eq h
     obtain ⟨z, rfl⟩ := (twistEquiv_iff_of_ringChar_eq_two h).mp hab
     obtain ⟨w, rfl⟩ := (twistEquiv_iff_of_ringChar_eq_two h).mp hbc
     have h20 : (2 : K) = 0 := CharP.cast_eq_zero K 2
@@ -85,15 +85,15 @@ section Invariance
 
 theorem twistInvariant_of_ringChar_ne_two_three (W : WeierstrassCurve K) (h2 : ringChar K ≠ 2)
     (h3 : ringChar K ≠ 3) : W.twistInvariant = -W.c₄ / W.c₆ := by
-  rw [twistInvariant, if_neg h2, if_neg h3]
+  rw [twistInvariant, ite_eq_right h2, ite_eq_right h3]
 
 theorem twistInvariant_of_ringChar_eq_three (W : WeierstrassCurve K) (h3 : ringChar K = 3) :
     W.twistInvariant = W.b₂ := by
-  rw [twistInvariant, if_neg (by rw [h3]; norm_num), if_pos h3]
+  rw [twistInvariant, ite_eq_right (by rw [h3]; norm_num), ite_eq_left h3]
 
 theorem twistInvariant_of_ringChar_eq_two (W : WeierstrassCurve K) (h2 : ringChar K = 2) :
     W.twistInvariant = W.a₂ / W.a₁ ^ 2 + W.a₃ / W.a₁ ^ 3 := by
-  rw [twistInvariant, if_pos h2]
+  rw [twistInvariant, ite_eq_left h2]
 
 /-- The class of the twist invariant does not change under a change of variables. -/
 theorem twistEquiv_twistInvariant_variableChange (W : WeierstrassCurve K)
@@ -101,7 +101,7 @@ theorem twistEquiv_twistInvariant_variableChange (W : WeierstrassCurve K)
   have hu : (C.u : K) ≠ 0 := C.u.ne_zero
   have hinv : ((C.u⁻¹ : Kˣ) : K) = (C.u : K)⁻¹ := by simp
   by_cases h2 : ringChar K = 2
-  · haveI : CharP K 2 := ringChar.of_eq h2
+  · have : CharP K 2 := ringChar.of_eq h2
     have h20 : (2 : K) = 0 := CharP.cast_eq_zero K 2
     rw [twistEquiv_iff_of_ringChar_eq_two h2, twistInvariant_of_ringChar_eq_two _ h2,
       twistInvariant_of_ringChar_eq_two _ h2]
@@ -118,7 +118,7 @@ theorem twistEquiv_twistInvariant_variableChange (W : WeierstrassCurve K)
       linear_combination (W.a₁ * (-(C.s * W.a₁) + C.r - C.s ^ 2)) * h20
   · rw [twistEquiv_iff_of_ringChar_ne_two h2]
     by_cases h3 : ringChar K = 3
-    · haveI : CharP K 3 := ringChar.of_eq h3
+    · have : CharP K 3 := ringChar.of_eq h3
       have h12 : (12 : K) = 0 := by
         have : (12 : K) = 4 * 3 := by norm_num
         rw [this, show (3 : K) = 0 from CharP.cast_eq_zero K 3, mul_zero]
@@ -347,14 +347,14 @@ theorem exists_variableChange_of_c₄_pow_div_eq (W W' : WeierstrassCurve K) (h�
     ∃ C : VariableChange K, C • W = W' := by
   by_cases h2 : ringChar K = 2
   · classical
-    haveI : CharP K 2 := ringChar.of_eq h2
+    have : CharP K 2 := ringChar.of_eq h2
     have ha : W.a₁ ≠ 0 := by
       intro h0; apply hj0; rw [c₄_eq_a₁_pow_four_of_charP_two, h0]; simp
     have ha' : W'.a₁ ≠ 0 := by
       intro h0; apply (hj ▸ hj0 : W'.c₄ ^ 3 / W'.Δ ≠ 0)
       rw [c₄_eq_a₁_pow_four_of_charP_two, h0]; simp
-    haveI := W.toCharTwoJNeZeroNF_spec ha
-    haveI := W'.toCharTwoJNeZeroNF_spec ha'
+    have := W.toCharTwoJNeZeroNF_spec ha
+    have := W'.toCharTwoJNeZeroNF_spec ha'
     set C₁ := W.toCharTwoJNeZeroNF ha
     set C₁' := W'.toCharTwoJNeZeroNF ha'
     have hγ2 : TwistEquiv (C₁ • W).twistInvariant (C₁' • W').twistInvariant :=
@@ -368,14 +368,14 @@ theorem exists_variableChange_of_c₄_pow_div_eq (W W' : WeierstrassCurve K) (h�
     obtain ⟨z, hz⟩ := hγ2
     exact ⟨z, by simpa using hz⟩
   · by_cases h3 : ringChar K = 3
-    · haveI : CharP K 3 := ringChar.of_eq h3
+    · have : CharP K 3 := ringChar.of_eq h3
       have hb : W.b₂ ≠ 0 := by
         intro h0; apply hj0; rw [c₄_eq_b₂_sq_of_charP_three, h0]; simp
       have hb' : W'.b₂ ≠ 0 := by
         intro h0; apply (hj ▸ hj0 : W'.c₄ ^ 3 / W'.Δ ≠ 0)
         rw [c₄_eq_b₂_sq_of_charP_three, h0]; simp
-      haveI := W.toCharThreeNF_spec_of_b₂_ne_zero hb
-      haveI := W'.toCharThreeNF_spec_of_b₂_ne_zero hb'
+      have := W.toCharThreeNF_spec_of_b₂_ne_zero hb
+      have := W'.toCharThreeNF_spec_of_b₂_ne_zero hb'
       set C₁ := W.toCharThreeNF
       set C₁' := W'.toCharThreeNF
       have hγ2 : TwistEquiv (C₁ • W).twistInvariant (C₁' • W').twistInvariant :=
@@ -390,10 +390,10 @@ theorem exists_variableChange_of_c₄_pow_div_eq (W W' : WeierstrassCurve K) (h�
         exact_mod_cast natCast_ne_zero_of_ringChar_ne Nat.prime_two h2
       have h3' : (3 : K) ≠ 0 := by
         exact_mod_cast natCast_ne_zero_of_ringChar_ne Nat.prime_three h3
-      letI : Invertible (2 : K) := invertibleOfNonzero h2'
-      letI : Invertible (3 : K) := invertibleOfNonzero h3'
-      haveI := W.toShortNF_spec
-      haveI := W'.toShortNF_spec
+      let : Invertible (2 : K) := invertibleOfNonzero h2'
+      let : Invertible (3 : K) := invertibleOfNonzero h3'
+      have := W.toShortNF_spec
+      have := W'.toShortNF_spec
       set C₁ := W.toShortNF
       set C₁' := W'.toShortNF
       have hγ2 : TwistEquiv (C₁ • W).twistInvariant (C₁' • W').twistInvariant :=

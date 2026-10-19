@@ -61,7 +61,7 @@ theorem exists_data_of_absInv_ne_zero (hF : HasPrimeOfDegreeOne K F) (h : absInv
   by_contra hne
   apply h
   unfold absInv
-  rw [dif_neg hne]
+  rw [dite_eq_right hne]
 
 /-- Book, §A1, uniqueness: two fields with a prime divisor of degree 1 and equal absolute
 invariants and equivalent Hasse invariants are `K`-isomorphic (for `j ≠ 0, 12³`). -/
@@ -75,10 +75,10 @@ theorem absolute_hasse_determine (hE : IsEllipticOver K F) (hE' : IsEllipticOver
   have hne' := exists_data_of_absInv_ne_zero K F' hF' (hj ▸ hj0.1)
   set d := Classical.choice hne with hd
   set d' := Classical.choice hne' with hd'
-  have hjF : absInv K F hF = jc d.curve := by unfold absInv; rw [dif_pos hne]; rfl
-  have hjF' : absInv K F' hF' = jc d'.curve := by unfold absInv; rw [dif_pos hne']; rfl
-  have hhF : hasseInv K F hF = hc d.curve := by unfold hasseInv; rw [dif_pos hne]; rfl
-  have hhF' : hasseInv K F' hF' = hc d'.curve := by unfold hasseInv; rw [dif_pos hne']; rfl
+  have hjF : absInv K F hF = jc d.curve := by unfold absInv; rw [dite_eq_left hne]; rfl
+  have hjF' : absInv K F' hF' = jc d'.curve := by unfold absInv; rw [dite_eq_left hne']; rfl
+  have hhF : hasseInv K F hF = hc d.curve := by unfold hasseInv; rw [dite_eq_left hne]; rfl
+  have hhF' : hasseInv K F' hF' = hc d'.curve := by unfold hasseInv; rw [dite_eq_left hne']; rfl
   have hΔ : d.curve.Δ ≠ 0 := by
     have := d.disc
     rwa [wDisc_eq] at this

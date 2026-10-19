@@ -149,11 +149,11 @@ theorem eq_zero_of_tsumEval_eq_zero (hφi : Function.Injective φ) {f : R⟦X⟧
   classical
   by_contra hne
   have hex : ∃ n, coeff n f ≠ 0 := by
-    by_contra h'; push_neg at h'; exact hne (ext fun n => by simpa using h' n)
+    by_contra h'; push Not at h'; exact hne (ext fun n => by simpa using h' n)
   set m := Nat.find hex
   have hm : coeff m f ≠ 0 := Nat.find_spec hex
   have hlt : ∀ k < m, coeff k f = 0 := fun k hk => by
-    have := Nat.find_min hex hk; push_neg at this; exact this
+    have := Nat.find_min hex hk; push Not at this; exact this
   set g : R⟦X⟧ := mk (fun n => coeff (n + m) f)
   have hfg : f = X ^ m * g := eq_X_pow_mul_shift hlt
   have hg0 : constantCoeff g = coeff m f := by

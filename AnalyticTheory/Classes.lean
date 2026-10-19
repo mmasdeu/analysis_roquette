@@ -26,8 +26,8 @@ theorem conjModQ_symm {q : K} (hq0 : q ≠ 0) {α β : Omega K} (h : ConjModQ K 
   classical
   unfold chi at hk ⊢
   have hk' : minpoly K β = minpoly K (algebraMap K (Omega K) (q ^ k) * α) := by
-    by_contra h; rw [if_neg h] at hk; exact zero_ne_one hk
-  rw [if_pos]
+    by_contra h; rw [ite_eq_right h] at hk; exact zero_ne_one hk
+  rw [ite_eq_left]
   have hroot : Polynomial.aeval β (minpoly K (algebraMap K (Omega K) (q ^ k) * α)) = 0 := by
     rw [← hk']; exact minpoly.aeval K β
   obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root
@@ -46,10 +46,10 @@ theorem conjModQ_trans {q : K} (hq0 : q ≠ 0) {α β δ : Omega K} (h1 : ConjMo
   classical
   unfold chi at hk hj ⊢
   have hk' : minpoly K β = minpoly K (algebraMap K (Omega K) (q ^ k) * α) := by
-    by_contra h; rw [if_neg h] at hk; exact zero_ne_one hk
+    by_contra h; rw [ite_eq_right h] at hk; exact zero_ne_one hk
   have hj' : minpoly K δ = minpoly K (algebraMap K (Omega K) (q ^ j) * β) := by
-    by_contra h; rw [if_neg h] at hj; exact zero_ne_one hj
-  rw [if_pos]
+    by_contra h; rw [ite_eq_right h] at hj; exact zero_ne_one hj
+  rw [ite_eq_left]
   have hroot : Polynomial.aeval β (minpoly K (algebraMap K (Omega K) (q ^ k) * α)) = 0 := by
     rw [← hk']; exact minpoly.aeval K β
   obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root

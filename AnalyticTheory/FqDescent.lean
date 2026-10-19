@@ -65,7 +65,7 @@ theorem galFq_mem (σ : L ≃ₐ[K] L) (f : FqSub L (algebraMap K L q)) :
     meroGal σ (f : MeroRing L) ∈ FqSub L (algebraMap K L q) := by
   intro a ha
   have hσa : Units.map (σ : L →* L) a = a := Units.ext (by
-    simp only [Units.coe_map, MonoidHom.coe_coe, ha]; exact σ.commutes q)
+    simp only [Units.coe_map, MonoidHom.coe_ofClass, ha]; exact σ.commutes q)
   calc translation L a (meroGal σ (f : MeroRing L))
       = translation L (Units.map (σ : L →* L) a) (meroGal σ (f : MeroRing L)) := by rw [hσa]
     _ = meroGal σ (translation L a (f : MeroRing L)) := (meroGal_translation σ a _).symm
@@ -249,7 +249,7 @@ theorem FqHom_injective : Function.Injective (FqHom L (algebraMap K L q)) := by
 theorem twist_faithful (ζ : CocycleModQ K L q) :
     @FaithfulSMul (L ≃ₐ[K] L) (FqSub L (algebraMap K L q))
       (twistAction q hq0 ζ).toMulAction.toSMul := by
-  letI := twistAction q hq0 ζ
+  let := twistAction q hq0 ζ
   refine ⟨fun {σ τ} h => ?_⟩
   apply AlgEquiv.ext
   intro l
@@ -289,7 +289,7 @@ include hq0 in
 theorem Ezeta_eq_fixed (ζ : CocycleModQ K L q) :
     Ezeta q ζ = (letI := twistAction q hq0 ζ; FixedPoints.subfield (L ≃ₐ[K] L)
       (FqSub L (algebraMap K L q))) := by
-  letI := twistAction q hq0 ζ
+  let := twistAction q hq0 ζ
   ext f
   rw [mem_semiFixed_iff]
   show _ ↔ f ∈ MulAction.fixedPoints (L ≃ₐ[K] L) (FqSub L (algebraMap K L q))
@@ -299,8 +299,8 @@ theorem Ezeta_eq_fixed (ζ : CocycleModQ K L q) :
 include hq0 in
 theorem Ezeta_finrank (ζ : CocycleModQ K L q) :
     Module.finrank (Ezeta q ζ) (FqSub L (algebraMap K L q)) = Fintype.card (L ≃ₐ[K] L) := by
-  letI := twistAction q hq0 ζ
-  haveI := twist_faithful q hq0 ζ
+  let := twistAction q hq0 ζ
+  have := twist_faithful q hq0 ζ
   have := FixedPoints.finrank_eq_card (L ≃ₐ[K] L) (FqSub L (algebraMap K L q))
   rw [← Ezeta_eq_fixed q hq0 ζ] at this
   exact this
@@ -311,7 +311,7 @@ theorem isGalois_of_subfield_eq {F : Type*} [Field F] {S T : Subfield F} (h : S 
 include hq0 in
 theorem Ezeta_isGalois (ζ : CocycleModQ K L q) :
     IsGalois (Ezeta q ζ) (FqSub L (algebraMap K L q)) := by
-  letI := twistAction q hq0 ζ
+  let := twistAction q hq0 ζ
   have h1 : IsGalois (FixedPoints.subfield (L ≃ₐ[K] L) (FqSub L (algebraMap K L q)))
       (FqSub L (algebraMap K L q)) := inferInstance
   exact isGalois_of_subfield_eq (Ezeta_eq_fixed q hq0 ζ).symm h1
@@ -337,9 +337,9 @@ theorem Ezeta_adjoin (ζ : CocycleModQ K L q) {α : L}
       Set (FqSub L (algebraMap K L q))) = ⊤ := by
   set F := FqSub L (algebraMap K L q)
   set E := Ezeta q ζ with hE
-  haveI : IsGalois E F := Ezeta_isGalois q hq0 ζ
-  haveI : Module.Free E F := Module.Free.of_divisionRing E F
-  haveI : FiniteDimensional E F := by
+  have : IsGalois E F := Ezeta_isGalois q hq0 ζ
+  have : Module.Free E F := Module.Free.of_divisionRing E F
+  have : FiniteDimensional E F := by
     refine Module.finite_of_finrank_pos ?_
     rw [Ezeta_finrank q hq0 ζ]; exact Fintype.card_pos
   let ρ : (L ≃ₐ[K] L) → (F ≃ₐ[E] F) := fun σ =>
@@ -597,7 +597,7 @@ theorem kConst_mem_Ezeta (ζ : CocycleModQ K L q) (c : K) :
 include hq0 in
 theorem Ezeta_finiteDimensional (ζ : CocycleModQ K L q) :
     FiniteDimensional (Ezeta q ζ) (FqSub L (algebraMap K L q)) := by
-  haveI : Module.Free (Ezeta q ζ) (FqSub L (algebraMap K L q)) := Module.Free.of_divisionRing _ _
+  have : Module.Free (Ezeta q ζ) (FqSub L (algebraMap K L q)) := Module.Free.of_divisionRing _ _
   refine Module.finite_of_finrank_pos ?_
   rw [Ezeta_finrank q hq0 ζ]; exact Fintype.card_pos
 
@@ -608,7 +608,7 @@ theorem minpoly_Ezeta (ζ : CocycleModQ K L q) {α : L}
       (minpoly K α).map (algebraMap K (Ezeta q ζ)) := by
   set F := FqSub L (algebraMap K L q)
   set E := Ezeta q ζ with hE
-  haveI : FiniteDimensional E F := Ezeta_finiteDimensional q hq0 ζ
+  have : FiniteDimensional E F := Ezeta_finiteDimensional q hq0 ζ
   set a : F := FqHom L (algebraMap K L q) α with ha
   have hint : IsIntegral E a := IsIntegral.of_finite E a
   have hα' : IsIntegral K α := IsIntegral.of_finite K α
@@ -639,7 +639,7 @@ theorem extend_Ezeta (ζ ζ' : CocycleModQ K L q)
   obtain ⟨α, hα⟩ := Field.exists_primitive_element K L
   set F := FqSub L (algebraMap K L q)
   set a : F := FqHom L (algebraMap K L q) α with ha
-  haveI : FiniteDimensional (Ezeta q ζ) F := Ezeta_finiteDimensional q hq0 ζ
+  have : FiniteDimensional (Ezeta q ζ) F := Ezeta_finiteDimensional q hq0 ζ
   have hmin : ∀ p : Polynomial (Ezeta q ζ), Polynomial.aeval a p = 0 →
       Polynomial.aeval a (p.map (φ : Ezeta q ζ →+* Ezeta q ζ')) = 0 := by
     intro p hp
@@ -777,7 +777,7 @@ theorem unit_compat_of_equiv (ζ ζ' : CocycleModQ K L q) (h : CocycleEquiv K L 
   refine ⟨k, Units.ext ?_⟩
   have hσa : σ (a : L) ≠ 0 := (map_ne_zero_iff _ σ.injective).mpr a.ne_zero
   have ha0 : (a : L) ≠ 0 := a.ne_zero
-  simp only [Units.val_mul, Units.coe_map, MonoidHom.coe_coe, Units.val_inv_eq_inv_val,
+  simp only [Units.val_mul, Units.coe_map, MonoidHom.coe_ofClass, Units.val_inv_eq_inv_val,
     Units.val_zpow_eq_zpow_val, qUnit, Units.val_mk0, map_inv₀] 
   rw [hk]
   field_simp
@@ -841,7 +841,7 @@ theorem cocycleEquiv_of_trans_rho (hq1 : ‖q‖ < 1) (ζ ζ' : CocycleModQ K L 
   have hQ : algebraMap K L q ≠ 0 := (map_ne_zero_iff _ (algebraMap K L).injective).mpr
     (norm_pos_iff.mp hq0)
   have hy0 : ((ζ'.1 σ : Lˣ) : L) ≠ 0 := (ζ'.1 σ).ne_zero
-  simp only [hx, hy, Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_coe,
+  simp only [hx, hy, Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_ofClass,
     mul_inv] at hk
   simp only [Units.val_inv_eq_inv_val, map_inv₀, zpow_neg, inv_inv]
   have hk' : (a : L) * (ζ.1 σ : L) = (algebraMap K L q) ^ k * ((ζ'.1 σ : L) * σ (a : L)) := by

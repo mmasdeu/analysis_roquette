@@ -35,12 +35,12 @@ theorem anVal_polyHol_minpoly {ξ β : Omega K} (hξ : ξ ≠ 0) (hβ : β ≠ 0
   have hintβ : IsIntegral K β := Algebra.IsIntegral.isIntegral β
   have hintξ : IsIntegral K ξ := Algebra.IsIntegral.isIntegral ξ
   by_cases h : minpoly K ξ = minpoly K β
-  · rw [if_pos h, ← h]
+  · rw [ite_eq_left h, ← h]
     have h1 : anPt K ξ (algebraMap (holSubring K) (MeroRing K) (polyHol K (Omega K) (minpoly K ξ))) =
         (((eIdx K ξ : ℤ) * 1 : ℤ) : WithTop ℤ) := by
       rw [anPt_alg_hol K hξ, anOrdHol_minpoly K hξ]; simp
     rw [anVal_of_anPt K hξ h1]; rfl
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     have hne : (polyHol K (Omega K) (minpoly K β)).1 ⟨ξ, hξ⟩ ≠ 0 := by
       rw [polyHol_apply_eq_aeval K _ hξ]
       intro h0
@@ -67,9 +67,9 @@ theorem chi_unique {q : K} (hq0 : 0 < ‖q‖) (hq : ‖q‖ < 1) {α ξ : Omega
   classical
   unfold chi at hk hj
   have hk' : minpoly K ξ = minpoly K (algebraMap K (Omega K) (q ^ k) * α) := by
-    by_contra h; rw [if_neg h] at hk; exact zero_ne_one hk
+    by_contra h; rw [ite_eq_right h] at hk; exact zero_ne_one hk
   have hj' : minpoly K ξ = minpoly K (algebraMap K (Omega K) (q ^ j) * α) := by
-    by_contra h; rw [if_neg h] at hj; exact zero_ne_one hj
+    by_contra h; rw [ite_eq_right h] at hj; exact zero_ne_one hj
   have hroot : Polynomial.aeval (algebraMap K (Omega K) (q ^ j) * α)
       (minpoly K (algebraMap K (Omega K) (q ^ k) * α)) = 0 := by
     rw [← hk', hj']; exact minpoly.aeval K _
@@ -168,12 +168,12 @@ theorem conjModQ_iff_chi {q : K} {α ξ : Omega K} :
   · rintro ⟨γ, hγ, k, hk⟩
     refine ⟨k, ?_⟩
     unfold chi
-    rw [if_pos]
+    rw [ite_eq_left]
     rw [← hγ, hk, map_zpow₀, mul_comm]
   · rintro ⟨k, hk⟩
     unfold chi at hk
     have h : minpoly K ξ = minpoly K (algebraMap K (Omega K) (q ^ k) * α) := by
-      by_contra h; rw [if_neg h] at hk; exact zero_ne_one hk
+      by_contra h; rw [ite_eq_right h] at hk; exact zero_ne_one hk
     refine ⟨algebraMap K (Omega K) (q ^ k) * α, h.symm, k, ?_⟩
     rw [map_zpow₀, mul_comm]
 
@@ -225,7 +225,7 @@ theorem sum_chi_eq_one {c : ℤ → ℤ} (hc : ∀ k, c k = 0 ∨ c k = 1) (J : 
         · have := hu _ h; omega
       rw [h1, h2]; ring
     · intro h; exact absurd (Finset.mem_range.mpr hn0J) h
-  · push_neg at hk
+  · push Not at hk
     set n0 : ℕ := (-k0 - 1).toNat with hn0
     have hn0k : (n0 : ℤ) = -k0 - 1 := Int.toNat_of_nonneg (by omega)
     have hk' : -((n0 + 1 : ℕ) : ℤ) = k0 := by push_cast; omega
@@ -307,12 +307,12 @@ theorem theta_spec {q : K} (hq0 : 0 < ‖q‖) (hq : ‖q‖ < 1) {α : Omega K}
     have h5 := chi_nonneg q α ξ (-((n + 1 : ℕ) : ℤ))
     constructor <;> omega
   by_cases hconj : ConjModQ K q α ξ
-  · rw [if_pos hconj]
+  · rw [ite_eq_left hconj]
     obtain ⟨k0, hk0⟩ := conjModQ_iff_chi.mp hconj
     rw [hJ0 J0 le_rfl, sum_chi_eq_one (chi_eq_zero_or_one q α ξ) J0 hzero hk0
       (fun k hk => chi_unique hq0 hq hα hk hk0)]
     rfl
-  · rw [if_neg hconj]
+  · rw [ite_eq_right hconj]
     have hall : ∀ k, chi q α ξ k = 0 := by
       intro k
       rcases chi_eq_zero_or_one q α ξ k with h | h

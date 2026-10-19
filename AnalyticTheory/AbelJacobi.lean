@@ -80,7 +80,7 @@ theorem mem_Fq_iff {q : K} (hq0 : q ≠ 0) (f : MeroRing K) :
 theorem anVal_of_divisorOf {f : MeroRing K} (hf0 : f ≠ 0) {m : Omega K → ℤ}
     (h : divisorOf K f = m) {ξ : Omega K} (hξ : ξ ≠ 0) : anVal K ξ f = (m ξ : WithTop ℤ) := by
   have h1 := congrFun h ξ
-  simp only [divisorOf, if_neg hξ] at h1
+  simp only [divisorOf, ite_eq_right hξ] at h1
   obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hξ hf0)
   rw [← hv] at h1 ⊢
   simp only [WithTop.untopD_coe] at h1
@@ -186,7 +186,7 @@ theorem aj_backward (hd : degQ K q m = 0) (hΦ : PhiQ K q (norm_pos_iff.mp hq0) 
         rw [(anVal_isValuation K ξ hξ).2.2.1, anVal_thetaDiv hq0 hq1 hm hξ]
         have : anVal K ξ (Xm (-k)) = 0 := anVal_monoHol hξ (-k)
         rw [this, add_zero]
-      simp only [divisorOf, if_neg hξ, hv, WithTop.untopD_coe]
+      simp only [divisorOf, ite_eq_right hξ, hv, WithTop.untopD_coe]
 
 end aj
 
@@ -197,7 +197,7 @@ theorem eq_of_conjModQ_K {q : K} (hq0 : q ≠ 0) {γ : Omega K} {y : K}
   obtain ⟨k, hk⟩ := h'
   unfold chi at hk
   have hk' : minpoly K γ = minpoly K (algebraMap K (Omega K) (q ^ k) * algebraMap K (Omega K) y) := by
-    by_contra hc; rw [if_neg hc] at hk; exact zero_ne_one hk
+    by_contra hc; rw [ite_eq_right hc] at hk; exact zero_ne_one hk
   rw [← map_mul, minpoly.eq_X_sub_C (Omega K)] at hk'
   have := minpoly.aeval K γ
   rw [hk'] at this
@@ -355,7 +355,7 @@ theorem cor_construct {α : Omega K} (hα : α ≠ 0) {β : Omega K} (hβ : β �
     rw [hf, (anVal_isValuation K α hα).2.2.1, (anVal_isValuation K α hα).2.2.1,
       (anVal_isValuation K α hα).2.2.1, anVal_thM_zpow hq0 hq1 hα _ hα,
       anVal_thM_zpow hq0 hq1 haw _ hα, anVal_thM_zpow hq0 hq1 hau _ hα,
-      anVal_thM_zpow hq0 hq1 hav _ hα, if_pos (conjModQ_refl q α), if_neg h1, if_neg h2, if_neg h3]
+      anVal_thM_zpow hq0 hq1 hav _ hα, ite_eq_left (conjModQ_refl q α), ite_eq_right h1, ite_eq_right h2, ite_eq_right h3]
     norm_cast
     simp
   · intro hαβ
@@ -368,7 +368,7 @@ theorem cor_construct {α : Omega K} (hα : α ≠ 0) {β : Omega K} (hβ : β �
     rw [hf, (anVal_isValuation K β hβ).2.2.1, (anVal_isValuation K β hβ).2.2.1,
       (anVal_isValuation K β hβ).2.2.1, anVal_thM_zpow hq0 hq1 hα _ hβ,
       anVal_thM_zpow hq0 hq1 haw _ hβ, anVal_thM_zpow hq0 hq1 hau _ hβ,
-      anVal_thM_zpow hq0 hq1 hav _ hβ, if_neg hαβ, if_neg h1, if_neg h2, if_neg h3]
+      anVal_thM_zpow hq0 hq1 hav _ hβ, ite_eq_right hαβ, ite_eq_right h1, ite_eq_right h2, ite_eq_right h3]
     norm_cast
     simp
 
@@ -433,7 +433,7 @@ theorem normGen_conj {q : K} (hq0 : q ≠ 0) {β γ : Omega K} (h : ConjModQ K q
   obtain ⟨k, hk⟩ := conjModQ_iff_chi.mp h
   unfold chi at hk
   have hk' : minpoly K γ = minpoly K (algebraMap K (Omega K) (q ^ k) * β) := by
-    by_contra hc; rw [if_neg hc] at hk; exact zero_ne_one hk
+    by_contra hc; rw [ite_eq_right hc] at hk; exact zero_ne_one hk
   refine ⟨k, ?_⟩
   unfold normGen
   rw [norm_gen_eq (Algebra.IsIntegral.isIntegral γ), norm_gen_eq (Algebra.IsIntegral.isIntegral β),
@@ -453,7 +453,7 @@ theorem annPart_prod_eq {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Ome
   rw [finprod_mem_eq_prod_of_inter_mulSupport_eq]
   ext α
   simp only [Set.mem_inter_iff, Function.mem_mulSupport, Finset.mem_coe, Set.Finite.mem_toFinset,
-    Set.mem_setOf_eq]
+    Set.mem_ofPred_eq]
   constructor
   · rintro ⟨hα, hne⟩
     exact ⟨⟨hα, fun h0 => hne (by simp [h0])⟩, hne⟩
@@ -546,7 +546,7 @@ theorem degQ_eq_of_system (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m : O
       (QuotientGroup.mk (Units.mk0 _ h) : Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq0')) else 1) =
     (if h : ∏ᶠ α ∈ annPart q R, normGen α ^ m α ≠ 0 then
       (QuotientGroup.mk (Units.mk0 _ h) : Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq0')) else 1)
-  rw [dif_pos h0, dif_pos h1, QuotientGroup.eq, Subgroup.mem_zpowers_iff]
+  rw [dite_eq_left h0, dite_eq_left h1, QuotientGroup.eq, Subgroup.mem_zpowers_iff]
   refine ⟨E, Units.ext ?_⟩
   simp only [Units.val_zpow_eq_zpow_val, Units.val_mk0, Units.val_mul, Units.val_inv_eq_inv_val]
   rw [hE]

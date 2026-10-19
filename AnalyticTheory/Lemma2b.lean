@@ -58,7 +58,7 @@ theorem pow_ord_mem_ker : σ ^ orderOf (χ σ) ∈ MonoidHom.ker χ := by
 include hσ in
 theorem norm_eq_prod_pow (x : Mχ χ) :
     algebraMap K L (Algebra.norm K x) = ∏ j ∈ Finset.range (orderOf (χ σ)), (σ ^ j) (x : L) := by
-  haveI : (MonoidHom.ker χ).Normal := MonoidHom.normal_ker χ
+  have : (MonoidHom.ker χ).Normal := MonoidHom.normal_ker χ
   set n := orderOf (χ σ) with hn
   have hnpos : 0 < n := (MonoidHom.isOfFinOrder χ (isOfFinOrder_of_finite σ)).orderOf_pos
   have h1 := Algebra.norm_eq_prod_automorphisms K x

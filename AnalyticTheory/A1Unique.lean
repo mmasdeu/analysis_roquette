@@ -223,11 +223,11 @@ theorem exists_algEquiv_of_normalForm' {𝔭 : PrimeDivisor K F} {𝔭' : PrimeD
     (hgen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤)
     (hgen' : IntermediateField.adjoin K ({x', y'} : Set F') = ⊤) :
     ∃ ψ : F ≃ₐ[K] F', ψ x = x' ∧ ψ y = y' := by
-  letI i1 : Algebra (RatFunc K) F := (phiAlg hx).toRingHom.toAlgebra
-  letI i2 : Algebra (RatFunc K) F' := (phiAlg hx').toRingHom.toAlgebra
-  haveI : IsScalarTower K (RatFunc K) F :=
+  let i1 : Algebra (RatFunc K) F := (phiAlg hx).toRingHom.toAlgebra
+  let i2 : Algebra (RatFunc K) F' := (phiAlg hx').toRingHom.toAlgebra
+  have : IsScalarTower K (RatFunc K) F :=
     IsScalarTower.of_algebraMap_eq fun r => ((phiAlg hx).commutes r).symm
-  haveI : IsScalarTower K (RatFunc K) F' :=
+  have : IsScalarTower K (RatFunc K) F' :=
     IsScalarTower.of_algebraMap_eq fun r => ((phiAlg hx').commutes r).symm
   have ha : algebraMap (RatFunc K) F RatFunc.X = x := phiAlg_X hx
   have ha' : algebraMap (RatFunc K) F' RatFunc.X = x' := phiAlg_X hx'

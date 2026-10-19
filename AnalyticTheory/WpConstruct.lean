@@ -112,7 +112,7 @@ theorem Th_zero (n : ℤ) :
     (Th hq0 hq1).1 ⟨ptQ (q := q) n, ptQ_ne_zero (norm_pos_iff.mp hq0) n⟩ = 0 := by
   classical
   refine hol_eval_zero_of_anVal (Th_ne_zero hq0 hq1) (ptQ_ne_zero (norm_pos_iff.mp hq0) n) ?_
-  rw [anVal_Th hq0 hq1 (ptQ_ne_zero (norm_pos_iff.mp hq0) n), if_pos]
+  rw [anVal_Th hq0 hq1 (ptQ_ne_zero (norm_pos_iff.mp hq0) n), ite_eq_left]
   · exact one_ne_zero
   · rw [conjModQ_one_iff (norm_pos_iff.mp hq0)]
     exact ⟨-n, by rw [ptQ, map_zpow₀]⟩
@@ -145,11 +145,11 @@ theorem gnorm_linF {ρ : ℝ} (hρ : 0 < ρ) (n : ℤ) :
     intro m
     rw [linF, holCoeff_polyHol]
     by_cases h0 : 0 ≤ m
-    · rw [if_pos h0]
+    · rw [ite_eq_left h0]
       obtain ⟨k, rfl⟩ : ∃ k : ℕ, m = k := ⟨m.toNat, by omega⟩
       simp only [Int.toNat_natCast, Polynomial.coeff_sub, Polynomial.coeff_X, Polynomial.coeff_C]
       rcases k with _ | _ | k <;> simp <;> split_ifs <;> first | rfl | omega
-    · rw [if_neg h0]; simp [show m ≠ 1 by omega, show m ≠ 0 by omega]
+    · rw [ite_eq_right h0]; simp [show m ≠ 1 by omega, show m ≠ 0 by omega]
   refine le_antisymm ((gnorm_le_iff hρ _).mpr (fun m => ?_)) (max_le ?_ ?_)
   · simp only [wt, hc]
     split_ifs with h1 h2
@@ -436,7 +436,7 @@ theorem anVal_add_eq_of_lt {ξ : Omega K} (hξ : ξ ≠ 0) {f g : MeroRing K}
   have h2 := (anVal_isValuation K ξ hξ).2.2.2 (f + g) (-g)
   rw [add_neg_cancel_right, anVal_neg hξ] at h2
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have : anVal K ξ f < min (anVal K ξ (f + g)) (anVal K ξ g) := lt_min hcon h
   exact absurd h2 (not_le.mpr this)
 
@@ -451,7 +451,7 @@ theorem hol_ne_zero_at_of_anVal_zero {f : holSubring K} (hf : f ≠ 0) {ξ : Ome
   have hd := (phi_dvd_iff K hξ f).mpr h0
   have : 1 ≤ m := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have : m = 0 := by omega
     subst this
     exact hm2 (by simpa using hd)
@@ -469,7 +469,7 @@ noncomputable def oneX : OmegaX K := ⟨1, one_ne_zero⟩
 
 theorem anVal_Th_one :
     anVal K 1 (algebraMap (holSubring K) (MeroRing K) (Th hq0 hq1)) = 1 := by
-  rw [anVal_Th hq0 hq1 one_ne_zero, if_pos (conjModQ_refl q 1)]
+  rw [anVal_Th hq0 hq1 one_ne_zero, ite_eq_left (conjModQ_refl q 1)]
 
 theorem Rq_ne_zero (n : ℤ) : Rq hq0 hq1 n ≠ 0 := by
   intro h
@@ -486,7 +486,7 @@ theorem anVal_R0_one :
     have e : linF (q := q) 0 = polyHol K (Omega K) (minpoly K (1 : Omega K)) := by
       rw [linF, show (1 : Omega K) = algebraMap K (Omega K) 1 from (map_one _).symm, minpoly_alg]
       simp
-    rw [e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, if_pos rfl]
+    rw [e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, ite_eq_left rfl]
   rw [hl] at h
   obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K one_ne_zero
     (alg_hol_ne_zero (Rq_ne_zero hq0 hq1 0)))

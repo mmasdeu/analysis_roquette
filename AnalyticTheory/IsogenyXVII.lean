@@ -30,16 +30,16 @@ variable {M : Type*} [Field M]
 
 theorem relDeg_eq {E F : Subfield M} (h : E ≤ F) :
     relDeg E F = letI := (Subfield.inclusion h).toAlgebra; Module.finrank E F := by
-  rw [relDeg, dif_pos h]
+  rw [relDeg, dite_eq_left h]
 
 /-- Multiplicativity of relative degrees in towers. -/
 theorem relDeg_mul {E E' F : Subfield M} (h1 : E ≤ E') (h2 : E' ≤ F) :
     relDeg E F = relDeg E E' * relDeg E' F := by
   rw [relDeg_eq h1, relDeg_eq h2, relDeg_eq (h1.trans h2)]
-  letI : Algebra E E' := (Subfield.inclusion h1).toAlgebra
-  letI : Algebra E' F := (Subfield.inclusion h2).toAlgebra
-  letI : Algebra E F := (Subfield.inclusion (h1.trans h2)).toAlgebra
-  haveI : IsScalarTower E E' F := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  let : Algebra E E' := (Subfield.inclusion h1).toAlgebra
+  let : Algebra E' F := (Subfield.inclusion h2).toAlgebra
+  let : Algebra E F := (Subfield.inclusion (h1.trans h2)).toAlgebra
+  have : IsScalarTower E E' F := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   exact (Module.finrank_mul_finrank E E' F).symm
 
 /-- A subfield is isomorphic to its image under a ring homomorphism of fields. -/
@@ -54,8 +54,8 @@ theorem relDeg_map {M' : Type*} [Field M'] (μ : M →+* M') {E F : Subfield M} 
     relDeg (E.map μ) (F.map μ) = relDeg E F := by
   have h' : E.map μ ≤ F.map μ := fun _ ⟨y, hy, hyx⟩ => ⟨y, h hy, hyx⟩
   rw [relDeg_eq h, relDeg_eq h']
-  letI : Algebra E F := (Subfield.inclusion h).toAlgebra
-  letI : Algebra (E.map μ) (F.map μ) := (Subfield.inclusion h').toAlgebra
+  let : Algebra E F := (Subfield.inclusion h).toAlgebra
+  let : Algebra (E.map μ) (F.map μ) := (Subfield.inclusion h').toAlgebra
   exact (Algebra.finrank_eq_of_equiv_equiv (subfieldMapEquiv μ E)
     (subfieldMapEquiv μ F) (by ext x; rfl)).symm
 
@@ -73,7 +73,7 @@ theorem exists_zpow_of_translation_fix {Q : K} (hQ0 : 0 < ‖Q‖) (hQ1 : ‖Q�
   rw [mul_one, show Units.mk0 (c : K) hc0 = c from Units.ext rfl, hwp, anVal_wpAlg_one] at h1
   have hcΩ : algebraMap K (Omega K) (c : K) ≠ 0 := (map_ne_zero _).mpr hc0
   by_contra hno
-  push_neg at hno
+  push Not at hno
   have hnc : ¬ ConjModQ K Q 1 (algebraMap K (Omega K) (c : K)) := by
     rw [conjModQ_one_iff (norm_pos_iff.mp hQ0)]
     rintro ⟨k, hk⟩
@@ -170,14 +170,14 @@ theorem relDeg_FqSub_bar : relDeg (FqSub K qbar) (FqSub K Q) = d := by
   set T := tauBar qbar hqb0 Q with hT
   set G := Subgroup.zpowers T with hG
   have hord := orderOf_tauBar hQ0 hQ1 hqb0 hqb1 hd hqd
-  haveI : Finite G :=
+  have : Finite G :=
     (isOfFinOrder_iff_pow_eq_one.mpr ⟨d, hd, by rw [← hord]; exact pow_orderOf_eq_one T⟩).finite_zpowers
-  letI : Fintype G := Fintype.ofFinite G
+  let : Fintype G := Fintype.ofFinite G
   have hcard : Fintype.card G = d := by
     rw [Fintype.card_eq_nat_card, Nat.card_zpowers, hord]
   have hart := FixedPoints.finrank_eq_card G (FqSub K Q)
   rw [relDeg_eq hle, ← hcard, ← hart]
-  letI : Algebra (FqSub K qbar) (FqSub K Q) := (Subfield.inclusion hle).toAlgebra
+  let : Algebra (FqSub K qbar) (FqSub K Q) := (Subfield.inclusion hle).toAlgebra
   have hfix : ∀ x : FqSub K Q, (x : MeroRing K) ∈ FqSub K qbar →
       x ∈ FixedPoints.subfield G (FqSub K Q) := by
     intro x hx g
@@ -208,13 +208,13 @@ theorem isRelSeparable_FqSub_bar : IsRelSeparable (FqSub K qbar) (FqSub K Q) := 
   set T := tauBar qbar hqb0 Q with hT
   set G := Subgroup.zpowers T with hG
   have hord := orderOf_tauBar hQ0 hQ1 hqb0 hqb1 hd hqd
-  haveI : Finite G :=
+  have : Finite G :=
     (isOfFinOrder_iff_pow_eq_one.mpr ⟨d, hd, by rw [← hord]; exact pow_orderOf_eq_one T⟩).finite_zpowers
-  letI : Fintype G := Fintype.ofFinite G
+  let : Fintype G := Fintype.ofFinite G
   have hcard : Fintype.card G = d := by
     rw [Fintype.card_eq_nat_card, Nat.card_zpowers, hord]
   refine ⟨hle, ?_⟩
-  letI : Algebra (FqSub K qbar) (FqSub K Q) := (Subfield.inclusion hle).toAlgebra
+  let : Algebra (FqSub K qbar) (FqSub K Q) := (Subfield.inclusion hle).toAlgebra
   have hfix : ∀ x : FqSub K Q, (x : MeroRing K) ∈ FqSub K qbar →
       x ∈ FixedPoints.subfield G (FqSub K Q) := by
     intro x hx g
@@ -235,7 +235,7 @@ theorem isRelSeparable_FqSub_bar : IsRelSeparable (FqSub K qbar) (FqSub K Q) := 
       right_inv := fun y => rfl
       map_mul' := fun x y => rfl
       map_add' := fun x y => rfl }
-  haveI : Algebra.IsSeparable (FixedPoints.subfield G (FqSub K Q)) (FqSub K Q) :=
+  have : Algebra.IsSeparable (FixedPoints.subfield G (FqSub K Q)) (FqSub K Q) :=
     IsGalois.to_isSeparable
   exact Algebra.IsSeparable.of_equiv_equiv i.symm (RingEquiv.refl _) (by ext x; rfl)
 
@@ -336,7 +336,7 @@ theorem tX_pow_linearIndependent {m : ℕ} (hm : 0 < m) :
     rw [map_mul, alg_monoHol_neg_nat, ← substPow_alg hmz]
     simp [G, j.2]
   have hGi := EntireLaurent.eq_zero_of_sum_mono_mul_holExpand K hm G hsum i i.2
-  simp only [G, i.2, dif_pos] at hGi
+  simp only [G, i.2, dite_eq_left] at hGi
   have hGi' : h i = 0 := by simpa using hGi
   have h1 : (b : holSubring K) • y i = 0 := by
     rw [← hh i, hGi', map_zero]
@@ -393,14 +393,14 @@ theorem inv_alg_mem_Vm {m : ℕ} (hm : 0 < m) {b : holSubring K} (hb : b ≠ 0) 
     (algebraMap (holSubring K) (MeroRing K) b)⁻¹ ∈ Vm (K := K) m := by
   set B := algebraMap (holSubring K) (MeroRing K) b
   have hB0 : B ≠ 0 := alg_hol_ne_zero hb
-  letI : Module (Sm K m) (Vm (K := K) m) := Submodule.module _
+  let : Module (Sm K m) (Vm (K := K) m) := Submodule.module _
   let φ : Vm (K := K) m →ₗ[Sm K m] Vm (K := K) m :=
     { toFun := fun v => ⟨B * v, mul_mem_Vm hm (alg_mem_Vm hm b) v.2⟩
       map_add' := fun v w => Subtype.ext (mul_add _ _ _)
       map_smul' := fun c v => Subtype.ext (mul_smul_comm c B (v : MeroRing K)) }
   have hinj : Function.Injective φ := fun v w h =>
     Subtype.ext (mul_left_cancel₀ hB0 (show B * v = B * w from congrArg Subtype.val h))
-  haveI : FiniteDimensional (Sm K m) (Vm (K := K) m) :=
+  have : FiniteDimensional (Sm K m) (Vm (K := K) m) :=
     FiniteDimensional.span_of_finite _ (Set.finite_range _)
   obtain ⟨v, hv⟩ := (LinearMap.injective_iff_surjective.mp hinj)
     ⟨1, by simpa using tX_pow_mem_Vm (K := K) hm 0⟩
@@ -594,9 +594,9 @@ theorem relDeg_upper :
       hmz ⟨1, by simp⟩).1
   have hF0S : ∀ x ∈ FqbarXm K (q ^ m) m, x ∈ Sm K m := fun _ ⟨y, _, hy⟩ => ⟨y, hy⟩
   rw [relDeg_eq h0]
-  letI iA : Algebra (FqbarXm K (q ^ m) m) (FqSub K q) := (Subfield.inclusion h0).toAlgebra
-  letI : SMul (FqbarXm K (q ^ m) m) (FqSub K q) := iA.toSMul
-  letI : Module (FqbarXm K (q ^ m) m) (FqSub K q) := iA.toModule
+  let iA : Algebra (FqbarXm K (q ^ m) m) (FqSub K q) := (Subfield.inclusion h0).toAlgebra
+  let : SMul (FqbarXm K (q ^ m) m) (FqSub K q) := iA.toSMul
+  let : Module (FqbarXm K (q ^ m) m) (FqSub K q) := iA.toModule
   let v : Fin m → FqSub K q := fun i => ⟨uq hq0 hq1 hm i, uq_mem hq0 hq1 hm i⟩
   have hcoe : ∀ (g : FqbarXm K (q ^ m) m) (y : FqSub K q),
       ((g • y : FqSub K q) : MeroRing K) = (g : MeroRing K) * y := fun _ _ => rfl
@@ -606,7 +606,7 @@ theorem relDeg_upper :
     have h := Fintype.linearIndependent_iff.mp (uq_linearIndependent hq0 hq1 hm)
       (fun j => ⟨(g j : MeroRing K), hF0S _ (g j).2⟩) (by
         have := congrArg (fun z : FqSub K q => (z : MeroRing K)) hg
-        simp only [AddSubmonoidClass.coe_finset_sum, hcoe, ZeroMemClass.coe_zero] at this
+        simp only [AddSubmonoidClass.coe_finsetSum, hcoe, ZeroMemClass.coe_zero] at this
         rw [← this]
         rfl) i
     have h' : ((g i : FqbarXm K (q ^ m) m) : MeroRing K) = 0 := by
@@ -646,7 +646,7 @@ theorem relDeg_upper :
       exact hfix j
     rw [Submodule.mem_span_range_iff_exists_fun]
     refine ⟨fun j => ⟨e j, hmemF0 j⟩, Subtype.ext ?_⟩
-    simp only [AddSubmonoidClass.coe_finset_sum, hcoe]
+    simp only [AddSubmonoidClass.coe_finsetSum, hcoe]
     rw [← he]
     rfl
   rw [Module.finrank_eq_card_basis (Module.Basis.mk hli hsp), Fintype.card_fin]
@@ -708,7 +708,7 @@ theorem exists_zpow_of_translation_wp {Q : K} (hQ0 : 0 < ‖Q‖) (hQ1 : ‖Q‖
   rw [mul_one, show Units.mk0 (c : K) hc0 = c from Units.ext rfl, hwp, anVal_wpAlg_one] at h1
   have hcΩ : algebraMap K (Omega K) (c : K) ≠ 0 := (map_ne_zero _).mpr hc0
   by_contra hno
-  push_neg at hno
+  push Not at hno
   have hnc : ¬ ConjModQ K Q 1 (algebraMap K (Omega K) (c : K)) := by
     rw [conjModQ_one_iff (norm_pos_iff.mp hQ0)]
     rintro ⟨k, hk⟩
@@ -1071,15 +1071,15 @@ theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (hqd : qbar ^ d = q ^ m) :
     IsRelGalois (FqbarXm K qbar m) (FqSub K q) ↔
       (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar) := by
-  haveI : NeZero m := ⟨hm.ne'⟩
+  have : NeZero m := ⟨hm.ne'⟩
   have hmz := EntireLaurent.mHol_ne_zero hm
   have hle : FqbarXm K qbar m ≤ FqSub K q :=
     (fq_qbar_Xm_subset K q qbar hq0 hq1 hqb0 hqb1 m hmz
       ⟨d, by rw [zpow_natCast, zpow_natCast]; exact hqd⟩).1
-  letI := (Subfield.inclusion hle).toAlgebra
+  let := (Subfield.inclusion hle).toAlgebra
   have hdeg : Module.finrank (FqbarXm K qbar m) (FqSub K q) = d * m := by
     rw [← relDeg_eq hle]; exact relDeg_FqbarXm hq0 hq1 hqb0 hqb1 hm hd hqd
-  haveI : FiniteDimensional (FqbarXm K qbar m) (FqSub K q) :=
+  have : FiniteDimensional (FqbarXm K qbar m) (FqSub K q) :=
     Module.finite_of_finrank_pos (by rw [hdeg]; positivity)
   -- the number of automorphisms is `|U/q|`
   obtain ⟨e⟩ := (thmXVII_automorphisms K q qbar hq0 hq1 hqb0 hqb1 m d hm hd hqd).2
@@ -1094,7 +1094,7 @@ theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
       Nat.card (FqSub K q ≃ₐ[FqbarXm K qbar m] FqSub K q) = d * m := by
     constructor
     · rintro ⟨h', hG⟩
-      haveI : IsGalois (FqbarXm K qbar m) (FqSub K q) := hG
+      have : IsGalois (FqbarXm K qbar m) (FqSub K q) := hG
       rw [← hdeg]
       exact IsGalois.card_aut_eq_finrank (FqbarXm K qbar m) (FqSub K q)
     · intro h
@@ -1111,7 +1111,7 @@ theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     rw [Subgroup.index_eq_one]; exact range_psiHom_eq_top_iff hqb0 hqb1 hm
   have hchar : (∃ ζ : K, IsPrimitiveRoot ζ m) → ¬ (ringChar K ∣ m) := by
     rintro ⟨ζ, hζ⟩ hdvd
-    haveI := hζ.neZero'
+    have := hζ.neZero'
     exact NeZero.ne ((m : ℕ) : K) ((ringChar.spec K m).mpr hdvd)
   constructor
   · intro hN
@@ -1146,8 +1146,8 @@ theorem isRelSeparable_map {M' : Type*} [Field M'] (μ : M →+* M') {E F : Subf
   obtain ⟨hle, hsep⟩ := h
   have hle' : E.map μ ≤ F.map μ := fun _ ⟨y, hy, hyx⟩ => ⟨y, hle hy, hyx⟩
   refine ⟨hle', ?_⟩
-  letI : Algebra E F := (Subfield.inclusion hle).toAlgebra
-  letI : Algebra (E.map μ) (F.map μ) := (Subfield.inclusion hle').toAlgebra
+  let : Algebra E F := (Subfield.inclusion hle).toAlgebra
+  let : Algebra (E.map μ) (F.map μ) := (Subfield.inclusion hle').toAlgebra
   exact Algebra.IsSeparable.of_equiv_equiv (subfieldMapEquiv μ E) (subfieldMapEquiv μ F)
     (by ext x; rfl)
 
@@ -1156,40 +1156,40 @@ theorem isRelSeparable_trans {E E' F : Subfield M} (h1 : IsRelSeparable E E')
   obtain ⟨hle1, hs1⟩ := h1
   obtain ⟨hle2, hs2⟩ := h2
   refine ⟨hle1.trans hle2, ?_⟩
-  letI : Algebra E E' := (Subfield.inclusion hle1).toAlgebra
-  letI : Algebra E' F := (Subfield.inclusion hle2).toAlgebra
-  letI : Algebra E F := (Subfield.inclusion (hle1.trans hle2)).toAlgebra
-  haveI : IsScalarTower E E' F := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  let : Algebra E E' := (Subfield.inclusion hle1).toAlgebra
+  let : Algebra E' F := (Subfield.inclusion hle2).toAlgebra
+  let : Algebra E F := (Subfield.inclusion (hle1.trans hle2)).toAlgebra
+  have : IsScalarTower E E' F := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   exact Algebra.IsSeparable.trans E E' F
 
 theorem relInsepDeg_eq {E F : Subfield M} (h : E ≤ F) :
     relInsepDeg E F = letI := (Subfield.inclusion h).toAlgebra; Field.finInsepDegree E F := by
-  rw [relInsepDeg, dif_pos h]
+  rw [relInsepDeg, dite_eq_left h]
 
 /-- Tower law for inseparable degrees. -/
 theorem relInsepDeg_mul {E E' F : Subfield M} (h1 : E ≤ E') (h2 : E' ≤ F)
     (hfin : 0 < relDeg E E') :
     relInsepDeg E F = relInsepDeg E E' * relInsepDeg E' F := by
   rw [relInsepDeg_eq h1, relInsepDeg_eq h2, relInsepDeg_eq (h1.trans h2)]
-  letI : Algebra E E' := (Subfield.inclusion h1).toAlgebra
-  letI : Algebra E' F := (Subfield.inclusion h2).toAlgebra
-  letI : Algebra E F := (Subfield.inclusion (h1.trans h2)).toAlgebra
-  haveI : IsScalarTower E E' F := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  let : Algebra E E' := (Subfield.inclusion h1).toAlgebra
+  let : Algebra E' F := (Subfield.inclusion h2).toAlgebra
+  let : Algebra E F := (Subfield.inclusion (h1.trans h2)).toAlgebra
+  have : IsScalarTower E E' F := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   rw [relDeg_eq h1] at hfin
-  haveI : FiniteDimensional E E' := Module.finite_of_finrank_pos hfin
+  have : FiniteDimensional E E' := Module.finite_of_finrank_pos hfin
   exact (Field.finInsepDegree_mul_finInsepDegree_of_isAlgebraic E E' F).symm
 
 theorem relInsepDeg_eq_one {E F : Subfield M} (h : IsRelSeparable E F) : relInsepDeg E F = 1 := by
   obtain ⟨hle, hs⟩ := h
   rw [relInsepDeg_eq hle]
-  letI : Algebra E F := (Subfield.inclusion hle).toAlgebra
+  let : Algebra E F := (Subfield.inclusion hle).toAlgebra
   exact (isSeparable_iff_finInsepDegree_eq_one E F).mp hs
 
 theorem relInsepDeg_eq_relDeg {E F : Subfield M} (h : IsRelPurelyInseparable E F) :
     relInsepDeg E F = relDeg E F := by
   obtain ⟨hle, hs⟩ := h
   rw [relInsepDeg_eq hle, relDeg_eq hle]
-  letI : Algebra E F := (Subfield.inclusion hle).toAlgebra
+  let : Algebra E F := (Subfield.inclusion hle).toAlgebra
   exact IsPurelyInseparable.finInsepDegree_eq E F
 
 end separability
@@ -1297,7 +1297,7 @@ theorem isRelSeparable_upper {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {n 
     (fq_qbar_Xm_subset K q (q ^ n) hq0 hq1 (norm_pow_pos hq0 n) (norm_pow_lt_one hq1 hn) n
       hnz ⟨1, by simp⟩).1
   refine ⟨h0, ?_⟩
-  letI iA : Algebra (FqbarXm K (q ^ n) n) (FqSub K q) := (Subfield.inclusion h0).toAlgebra
+  let iA : Algebra (FqbarXm K (q ^ n) n) (FqSub K q) := (Subfield.inclusion h0).toAlgebra
   have hnE : ((n : ℕ) : FqbarXm K (q ^ n) n) ≠ 0 := by
     intro h
     apply hnK
@@ -1323,7 +1323,7 @@ theorem isRelSeparable_upper {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {n 
       ⟨uq hq0 hq1 hn j, uq_mem hq0 hq1 hn j⟩ := by
     apply Subtype.ext
     rw [← hsum]
-    simp only [AddSubmonoidClass.coe_finset_sum, MulMemClass.coe_mul]
+    simp only [AddSubmonoidClass.coe_finsetSum, MulMemClass.coe_mul]
     rfl
   rw [hf]
   refine Finset.sum_induction _ (IsSeparable (FqbarXm K (q ^ n) n))
@@ -1349,9 +1349,9 @@ theorem isRelPurelyInseparable_upper {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ 
     (fq_qbar_Xm_subset K q (q ^ (p ^ v)) hq0 hq1 (norm_pow_pos hq0 _) (norm_pow_lt_one hq1 hn)
       _ hnz ⟨1, by rw [zpow_one, zpow_natCast]⟩).1
   refine ⟨h0, ?_⟩
-  letI : Algebra (FqbarXm K (q ^ (p ^ v)) ((p ^ v : ℕ) : ℤ)) (FqSub K q) :=
+  let : Algebra (FqbarXm K (q ^ (p ^ v)) ((p ^ v : ℕ) : ℤ)) (FqSub K q) :=
     (Subfield.inclusion h0).toAlgebra
-  haveI : CharP (FqbarXm K (q ^ (p ^ v)) ((p ^ v : ℕ) : ℤ)) p := by
+  have : CharP (FqbarXm K (q ^ (p ^ v)) ((p ^ v : ℕ) : ℤ)) p := by
     rw [CharP.charP_iff_prime_eq_zero hp.out]
     apply Subtype.ext
     simp only [SubringClass.coe_natCast, ZeroMemClass.coe_zero]
@@ -1391,8 +1391,8 @@ theorem thmXVII_inseparability (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ <
   rcases CharP.char_is_prime_or_zero K (ringChar K) with hpr | h0
   · -- characteristic `p`
     set p := ringChar K with hpdef
-    haveI : Fact p.Prime := ⟨hpr⟩
-    haveI : CharP K p := ringChar.charP K
+    have : Fact p.Prime := ⟨hpr⟩
+    have : CharP K p := ringChar.charP K
     set v := m.factorization p
     set P := p ^ v
     have hP : 0 < P := pow_pos hpr.pos v
@@ -1434,22 +1434,22 @@ theorem thmXVII_inseparability (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ <
     have hv : ringChar K ^ m.factorization (ringChar K) = 1 := by
       rw [h0, Nat.factorization_zero_right, pow_zero]
     simp only [hv, pow_one, Nat.cast_one, FqbarXm_one]
-    haveI : CharP K 0 := ringChar.of_eq h0
-    haveI : CharZero K := CharP.charP_to_charZero K
-    haveI : CharZero (MeroRing K) :=
+    have : CharP K 0 := ringChar.of_eq h0
+    have : CharZero K := CharP.charP_to_charZero K
+    have : CharZero (MeroRing K) :=
       (RingHom.charZero_iff (algebraMap K (MeroRing K)).injective).mp inferInstance
     have hsep : IsRelSeparable (FqbarXm K qbar m) (FqSub K q) := by
       refine ⟨hF0, ?_⟩
-      letI : Algebra (FqbarXm K qbar m) (FqSub K q) := (Subfield.inclusion hF0).toAlgebra
-      haveI : CharZero (FqbarXm K qbar m) :=
+      let : Algebra (FqbarXm K qbar m) (FqSub K q) := (Subfield.inclusion hF0).toAlgebra
+      have : CharZero (FqbarXm K qbar m) :=
         (RingHom.charZero_iff (FqbarXm K qbar m).subtype.injective).mpr inferInstance
       have hfr : 0 < Module.finrank (FqbarXm K qbar m) (FqSub K q) := by
         rw [← relDeg_eq hF0, hdeg]; exact Nat.mul_pos hd hm
-      haveI : FiniteDimensional (FqbarXm K qbar m) (FqSub K q) := Module.finite_of_finrank_pos hfr
+      have : FiniteDimensional (FqbarXm K qbar m) (FqSub K q) := Module.finite_of_finrank_pos hfr
       exact Algebra.IsAlgebraic.isSeparable_of_perfectField
     refine ⟨relInsepDeg_eq_one hsep, hsep, le_rfl, ?_⟩
-    letI : Algebra (FqSub K q) (FqSub K q) := (Subfield.inclusion (le_refl (FqSub K q))).toAlgebra
-    haveI : CharZero (FqSub K q) :=
+    let : Algebra (FqSub K q) (FqSub K q) := (Subfield.inclusion (le_refl (FqSub K q))).toAlgebra
+    have : CharZero (FqSub K q) :=
       (RingHom.charZero_iff (FqSub K q).subtype.injective).mpr inferInstance
     rw [isPurelyInseparable_iff_pow_mem _ 1]
     intro x

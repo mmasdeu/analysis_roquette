@@ -125,7 +125,7 @@ theorem coeff_vanish (N : ℕ) (c : ℕ → K) (M : ℝ)
     have hlim0 : Tendsto (fun j : ℕ => q ^ (j + 1)) atTop (𝓝 0) :=
       (tendsto_pow_atTop_nhds_zero_of_norm_lt_one hq1).comp (tendsto_add_atTop_nat 1)
     have hcont : Continuous r :=
-      continuous_finset_sum _ (fun i _ => continuous_const.mul (continuous_pow i))
+      continuous_finsetSum _ (fun i _ => continuous_const.mul (continuous_pow i))
     have h1 : Tendsto (fun j : ℕ => r (q ^ (j + 1))) atTop (𝓝 (r 0)) := (hcont.tendsto 0).comp hlim0
     have h2 : Tendsto (fun j : ℕ => r (q ^ (j + 1))) atTop (𝓝 0) := by
       refine squeeze_zero_norm hle ?_

@@ -83,9 +83,9 @@ noncomputable def holExpand (m : ℤ) (hm : m ≠ 0) : holSubring K L →+* holS
     refine ⟨fun x => if hx : x = 0 then 0 else g.1 ⟨x ^ m, zpow_ne_zero m hx⟩,
       ⟨expandSeq K m (holCoeff K g), expandSeq_convergent K hm (holCoeff_convergent K g),
         fun x hx => ?_⟩, ?_⟩
-    · simp only [dif_neg hx]
+    · simp only [dite_eq_right hx]
       exact hasSum_expandSeq K hm (holCoeff_hasSum K g ⟨x ^ m, zpow_ne_zero m hx⟩)
-    · funext α; exact dif_neg α.2⟩
+    · funext α; exact dite_eq_right α.2⟩
   map_one' := Subtype.ext rfl
   map_mul' _ _ := Subtype.ext rfl
   map_zero' := Subtype.ext rfl
@@ -192,11 +192,11 @@ theorem hol_decomp {m : ℕ} (hm : 0 < m) (f : holSubring K L) :
     rw [h1, Int.dvd_iff_emod_eq_zero, Int.add_emod, Int.emod_emod_of_dvd _ (dvd_refl _),
       ← Int.add_emod, add_neg_cancel, Int.zero_emod]
   rw [Finset.sum_eq_single i0]
-  · rw [holCoeff_mono_mul_holExpand K hm, holComponent, holCoeff_holOfSeq, if_pos hdvd0]
+  · rw [holCoeff_mono_mul_holExpand K hm, holComponent, holCoeff_holOfSeq, ite_eq_left hdvd0]
     simp only [residueSeq]
     rw [Int.mul_ediv_cancel' hdvd0, add_sub_cancel_right]
   · intro j hj hji
-    rw [holCoeff_mono_mul_holExpand K hm, if_neg]
+    rw [holCoeff_mono_mul_holExpand K hm, ite_eq_right]
     intro hdj
     exact hji (dvd_add_iff_eq hm n (Finset.mem_range.mp hj) hi0m hdj hdvd0)
   · intro h; exact absurd (Finset.mem_range.mpr hi0m) h
@@ -212,11 +212,11 @@ theorem eq_zero_of_sum_mono_mul_holExpand {m : ℕ} (hm : 0 < m) (g : ℕ → ho
   have := congrFun (congrArg (holCoeff K) h) ((m : ℤ) * k - i)
   rw [holCoeff_sum, holCoeff_zero] at this
   rw [Finset.sum_eq_single i] at this
-  · rw [holCoeff_mono_mul_holExpand K hm, if_pos ⟨k, by ring⟩, sub_add_cancel,
+  · rw [holCoeff_mono_mul_holExpand K hm, ite_eq_left ⟨k, by ring⟩, sub_add_cancel,
       Int.mul_ediv_cancel_left _ (mHol_ne_zero hm)] at this
     rw [this, holCoeff_zero]
   · intro j hj hji
-    rw [holCoeff_mono_mul_holExpand K hm, if_neg]
+    rw [holCoeff_mono_mul_holExpand K hm, ite_eq_right]
     intro hdj
     have hdi : (m : ℤ) ∣ (m : ℤ) * k - i + i := ⟨k, by ring⟩
     exact hji (dvd_add_iff_eq hm _ (Finset.mem_range.mp hj) hi hdj hdi)

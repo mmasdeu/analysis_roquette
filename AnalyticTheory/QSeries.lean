@@ -356,7 +356,7 @@ omit hq0 hq1 in
 theorem binomZ_neg_nat {m : ℕ} (hm : 0 < m) (k : ℕ) :
     binomZ (-(m : ℤ)) k = (-1) ^ k * ((k + m - 1).choose k : ℤ) := by
   unfold binomZ
-  rw [if_neg (by omega)]
+  rw [ite_eq_right (by omega)]
   simp
 
 /-- The coefficients of `Σₘ m Qₘ ((1+h)ᵐ + (1+h)⁻ᵐ)` in powers of `h`. -/

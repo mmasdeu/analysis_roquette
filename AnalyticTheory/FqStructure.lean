@@ -148,15 +148,15 @@ theorem fq_is_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     IsEllipticOver K (FqSub K q) := by
   refine ⟨fq_is_function_field K q hq0 hq1, fq_genus hq0 hq1, ?_⟩
   intro L _ _ hfin FL _ _ _ _ _ _ hFL
-  haveI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
-  letI : NontriviallyNormedField L := spectralNorm.nontriviallyNormedField K L
-  letI : NormedAlgebra K L :=
+  have : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  let : NontriviallyNormedField L := spectralNorm.nontriviallyNormedField K L
+  let : NormedAlgebra K L :=
     { (inferInstance : Algebra K L) with
       norm_smul_le := (spectralNorm.normedSpace K L).norm_smul_le }
-  haveI : IsUltrametricDist L :=
+  have : IsUltrametricDist L :=
     IsUltrametricDist.isUltrametricDist_of_isNonarchimedean_norm
       (isNonarchimedean_spectralNorm (K := K) (L := L))
-  haveI : CompleteSpace L := FiniteDimensional.complete K L
+  have : CompleteSpace L := FiniteDimensional.complete K L
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
   have hn : ‖algebraMap K L q‖ = ‖q‖ := norm_algebraMap' L q
   obtain ⟨e⟩ := exists_algEquiv_constExt (L := L) hq0' FL hFL
@@ -173,7 +173,7 @@ theorem abel_jacobi_iso (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
           PhiQ K q (norm_pos_iff.mp hq0) (m : Omega K → ℤ) := by
   classical
   have hq0' := norm_pos_iff.mp hq0
-  haveI : (Subgroup.zpowers (Units.mk0 q hq0')).Normal := Subgroup.normal_of_comm _
+  have : (Subgroup.zpowers (Units.mk0 q hq0')).Normal := Subgroup.normal_of_isMulCommutative _
   have hΦ0 : PhiQ K q hq0' 0 = 1 := by
     have := PhiQ_add K q hq0 hq1 0 0 (DivisorsPeriodic K q).zero_mem (DivisorsPeriodic K q).zero_mem
     rw [add_zero] at this
@@ -257,7 +257,7 @@ theorem translation_analytic_eq_algebraic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖
       translation K (Units.mk0 a ha) (x : MeroRing K) := by
   classical
   have hq0' := norm_pos_iff.mp hq0
-  haveI : (Subgroup.zpowers (Units.mk0 q hq0')).Normal := Subgroup.normal_of_comm _
+  have : (Subgroup.zpowers (Units.mk0 q hq0')).Normal := Subgroup.normal_of_isMulCommutative _
   set a' := Units.mk0 a ha with ha'
   have hΦ0 : PhiQ K q hq0' 0 = 1 := by
     have := PhiQ_add K q hq0 hq1 0 0 (DivisorsPeriodic K q).zero_mem (DivisorsPeriodic K q).zero_mem

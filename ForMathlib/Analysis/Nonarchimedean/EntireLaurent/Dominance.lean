@@ -148,7 +148,7 @@ theorem bad_radii_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : �
       le_trans (hw_lb r hr) (hNmax n0 hn0F)
     have : ∃ n, n ≠ N ∧ ‖a N‖ * r ^ N ≤ ‖a n‖ * r ^ n := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       exact hbad ⟨N, fun n hn => hcon n hn⟩
     obtain ⟨n, hnN, hn⟩ := this
     have hnF : n ∈ Fs := (hmemF n).mpr (le_trans hNge (le_trans hn (hw_le r hr n)))
@@ -156,7 +156,7 @@ theorem bad_radii_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 : �
     have hpos : 0 < ‖a n‖ := by
       have h1 : 0 < ‖a n‖ * r ^ n := lt_of_lt_of_le hκpos (le_trans hNge hn)
       exact (mul_pos_iff_of_pos_right (zpow_pos (by linarith [hr.1]) n)).mp h1
-    simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_ofPred_eq]
     refine ⟨(n, N), Finset.mem_coe.mpr (Finset.mem_product.mpr ⟨hnF, hNF⟩), ?_⟩
     exact ⟨by linarith [hr.1], hnN, htie, hpos⟩
 
@@ -172,7 +172,7 @@ theorem exists_good_point {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb :
   have hZfin : Z.Finite := (bad_radii_finite K ha ha0).union (bad_radii_finite K hb hb0)
   set U : Set ℝ := Set.Ioo 1 2 \ Z with hU
   have hUopen : IsOpen U := isOpen_Ioo.sdiff hZfin.isClosed
-  obtain ⟨u0, hu0⟩ : U.Nonempty := (Set.Ioo_infinite (by norm_num : (1 : ℝ) < 2)).diff hZfin |>.nonempty
+  obtain ⟨u0, hu0⟩ : U.Nonempty := (Set.Ioo_infinite (by norm_num : (1 : ℝ) < 2)).sdiff hZfin |>.nonempty
   obtain ⟨c, hc0, hc1⟩ := NormedField.exists_norm_lt_one K
   set ρ : ℝ := ‖c‖ with hρ
   have hu0pos : 0 < u0 := by linarith [hu0.1.1]

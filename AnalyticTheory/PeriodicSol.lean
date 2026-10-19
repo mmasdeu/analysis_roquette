@@ -61,11 +61,11 @@ theorem holScale_algebraMap (c : Kˣ) (a : K) :
 noncomputable def solSpace (q : K) (hq0 : q ≠ 0) (κ : K) (d : ℤ) : Submodule K (holSubring K) where
   carrier := {G | holScale K (Units.mk0 q hq0)⁻¹ G = algebraMap K (holSubring K) κ * monoHol K (Omega K) d * G}
   add_mem' := fun {G H} hG hH => by
-    simp only [Set.mem_setOf_eq] at hG hH ⊢
+    simp only [Set.mem_ofPred_eq] at hG hH ⊢
     rw [map_add, hG, hH]; ring
   zero_mem' := by simp
   smul_mem' := fun c G hG => by
-    simp only [Set.mem_setOf_eq] at hG ⊢
+    simp only [Set.mem_ofPred_eq] at hG ⊢
     rw [Algebra.smul_def, map_mul, hG, holScale_algebraMap]; ring
 
 theorem mem_solSpace_iff {q : K} (hq0 : q ≠ 0) {κ : K} {d : ℤ} (G : holSubring K) :
@@ -214,15 +214,15 @@ theorem finite_quad {A s : ℝ} (hA : 0 < A) (hs0 : 0 < s) (hs1 : s < 1) {ε : �
   obtain ⟨M1, hM1⟩ := (h1.eventually (gt_mem_nhds hε)).exists_forall_of_atTop
   obtain ⟨M2, hM2⟩ := (h2.eventually (gt_mem_nhds hε)).exists_forall_of_atTop
   refine (Set.finite_Ioo (-(M2 : ℤ)) (M1 : ℤ)).subset (fun j hj => ?_)
-  simp only [Set.mem_setOf_eq] at hj
+  simp only [Set.mem_ofPred_eq] at hj
   simp only [Set.mem_Ioo]
   constructor
   · by_contra h
-    push_neg at h
+    push Not at h
     obtain ⟨m, rfl⟩ : ∃ m : ℕ, j = -(m : ℤ) := ⟨(-j).toNat, by omega⟩
     exact absurd hj (not_le.mpr (hM2 m (by omega)))
   · by_contra h
-    push_neg at h
+    push Not at h
     obtain ⟨m, rfl⟩ : ∃ m : ℕ, j = (m : ℤ) := ⟨j.toNat, by omega⟩
     exact absurd hj (not_le.mpr (hM1 m (by omega)))
 
@@ -269,17 +269,17 @@ theorem seqOf_convergent {q κ : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hκ
     intro i
     by_cases hci : c i = 0
     · refine Set.finite_empty.subset (fun j hj => ?_)
-      simp only [hJ, Set.mem_setOf_eq, hci, norm_zero, zero_mul] at hj
+      simp only [hJ, Set.mem_ofPred_eq, hci, norm_zero, zero_mul] at hj
       linarith
     · have hC : 0 < ‖c i‖ * r ^ (i : ℤ) := mul_pos (norm_pos_iff.mpr hci) (zpow_pos hr _)
       refine (finite_quad (A := ‖κ‖ * s ^ (i : ℤ) * r ^ d)
         (by positivity) hq0 hq1 (div_pos hε hC)).subset (fun j hj => ?_)
-      simp only [hJ, Set.mem_setOf_eq] at hj ⊢
+      simp only [hJ, Set.mem_ofPred_eq] at hj ⊢
       rw [div_le_iff₀ hC]; linarith
   have hfin : (⋃ i ∈ ((Finset.range d.toNat : Finset ℕ) : Set ℕ), (fun j : ℤ => (i : ℤ) + d * j) '' J i).Finite :=
     Set.Finite.biUnion (Finset.finite_toSet _) (fun i _ => (hJfin i).image _)
   refine hfin.subset (fun n hn => ?_)
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, not_lt] at hn
+  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, not_lt] at hn
   have hi0 : 0 ≤ n % d := Int.emod_nonneg n hd.ne'
   have hid : n % d < d := Int.emod_lt_of_pos n hd
   set i := n % d with hi
@@ -287,7 +287,7 @@ theorem seqOf_convergent {q κ : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hκ
   have hn' : n = i + d * j := (Int.emod_add_mul_ediv n d).symm
   simp only [Set.mem_iUnion, Set.mem_image, Finset.coe_range, Set.mem_Iio]
   refine ⟨i.toNat, by omega, j, ?_, by rw [Int.toNat_of_nonneg hi0]; exact hn'.symm⟩
-  simp only [hJ, Set.mem_setOf_eq]
+  simp only [hJ, Set.mem_ofPred_eq]
   rw [Int.toNat_of_nonneg hi0]
   rw [abs_of_nonneg (by positivity)] at hn
   refine le_trans hn ?_
@@ -413,7 +413,7 @@ theorem solSpace_zero_finrank {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {�
   rw [holCoeff_monoHol]
   by_cases hn : n = -k
   · subst hn; simp
-  · rw [if_neg hn, mul_zero]
+  · rw [ite_eq_right hn, mul_zero]
     have hrec := (mem_solSpace_iff hq0' (G : holSubring K)).mp G.2 n
     rw [sub_zero] at hrec
     have hne : q ^ (-n) ≠ κ := by

@@ -274,7 +274,7 @@ theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
     linarith
   have hNne : ∀ α ∈ repAnnulus K q, N α ≠ 0 := by
     intro α hα
-    haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set (Omega K))) :=
+    have : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set (Omega K))) :=
       IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α)
     simp only [hN]
     rw [Ne, Algebra.norm_eq_zero_iff]
@@ -303,7 +303,7 @@ theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
   have h3 : (∏ᶠ α ∈ repAnnulus K q, N α ^ (m + n) α) ≠ 0 := by rw [hmul]; exact mul_ne_zero h1 h2
   unfold PhiQ
   simp only [hN] at *
-  rw [dif_pos h1, dif_pos h2, dif_pos h3]
+  rw [dite_eq_left h1, dite_eq_left h2, dite_eq_left h3]
   simp only [hmul]
   rw [← QuotientGroup.mk_mul]
   congr 1
@@ -324,7 +324,7 @@ noncomputable def thetaAlpha (q : K) (α β : Omega K) : Omega K :=
 theorem multipliable_one_sub_omega (S : IntermediateField K (Omega K)) [FiniteDimensional K S]
     {x : ℕ → Omega K} (hx : ∀ n, x n ∈ S) (hs : Summable fun n => ‖x n‖) :
     Multipliable fun n => 1 - x n := by
-  haveI : CompleteSpace S := FiniteDimensional.complete K S
+  have : CompleteSpace S := FiniteDimensional.complete K S
   set y : ℕ → S := fun n => ⟨x n, hx n⟩ with hy
   have hs' : Summable fun n => ‖-y n‖ := by
     simpa [hy, norm_neg] using hs
@@ -336,7 +336,7 @@ theorem multipliable_one_sub_omega (S : IntermediateField K (Omega K)) [FiniteDi
 theorem multipliable_geom_omega (q : K) (hq1 : ‖q‖ < 1) (α γ : Omega K)
     (hγ : γ ∈ IntermediateField.adjoin K ({α} : Set (Omega K))) (m : ℕ) :
     Multipliable fun n : ℕ => 1 - (algebraMap K (Omega K) q) ^ (n + m) * γ := by
-  haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set (Omega K))) :=
+  have : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set (Omega K))) :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α)
   refine multipliable_one_sub_omega K (IntermediateField.adjoin K ({α} : Set (Omega K)))
     (fun n => ?_) ?_

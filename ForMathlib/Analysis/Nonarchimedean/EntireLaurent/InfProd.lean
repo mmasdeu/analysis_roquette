@@ -97,7 +97,7 @@ theorem exists_infprod_sum {g : ℕ → holSubring K L}
       by_contra hcon
       exact absurd (hJ0 J (not_lt.mp hcon)) (not_lt.mpr hJ)
     refine hfin.subset (fun J ⟨n, hn⟩ => ?_)
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     have h1 : wt K r (holCoeff K (D J)) n ≤ gnorm K r (D J) := wt_le_gnorm hr _ n
     have h2 : gnorm K r (D J) ≤ B * gnorm K r (g J) := by
       rw [hD]; simp only

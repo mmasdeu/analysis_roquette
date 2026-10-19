@@ -193,7 +193,7 @@ theorem vq_mul (x y : Lˣ) : vq q (x * y) = vq q x + vq q y := by
 
 theorem vq_gal (σ : L ≃ₐ[K] L) (x : Lˣ) : vq q (Units.map (σ : L →* L) x) = vq q x := by
   unfold vq
-  simp only [Units.coe_map, MonoidHom.coe_coe]
+  simp only [Units.coe_map, MonoidHom.coe_ofClass]
   rw [gal_norm]
 
 include hq0 hq1 in
@@ -251,7 +251,7 @@ theorem cocycleEquiv_of_char_eq (ζ ζ' : CocycleModQ K L q)
   obtain ⟨k, hk⟩ := hβ σ
   refine ⟨k, ?_⟩
   have := congrArg (fun u : Lˣ => (u : L)) hk
-  simp only [Units.val_mul, Units.coe_map, MonoidHom.coe_coe,
+  simp only [Units.val_mul, Units.coe_map, MonoidHom.coe_ofClass,
     Units.val_zpow_eq_zpow_val, hQdef, Units.val_mk0, div_eq_mul_inv, Units.val_inv_eq_inv_val]
     at this ⊢
   field_simp at this ⊢
@@ -331,7 +331,7 @@ theorem exists_cocycle_of_qtrivial (χ : CharGroup K L) (hχ : IsQTrivial K L q 
   have hqL : algebraMap K L q ≠ 0 := (map_ne_zero_iff _ (algebraMap K L).injective).mpr hq0'
   obtain ⟨Q, hQ⟩ := hχ
   obtain ⟨σ, n, hn0, hord, hχσ, hgen⟩ := exists_generator_exp χ
-  haveI : NeZero n := ⟨hn0.ne'⟩
+  have : NeZero n := ⟨hn0.ne'⟩
   have hnorm : algebraMap K L q = ∏ j ∈ Finset.range n, (σ ^ j) (Q : L) := by
     calc algebraMap K L q = algebraMap K L (Algebra.norm K Q) := by rw [hQ]
       _ = ∏ j ∈ Finset.range (orderOf (χ σ)), (σ ^ j) (Q : L) := norm_eq_prod_pow χ σ hgen Q
@@ -347,7 +347,7 @@ theorem exists_cocycle_of_qtrivial (χ : CharGroup K L) (hχ : IsQTrivial K L q 
   have hQpn : Qp σ Q' n = qU := by
     apply Units.ext
     rw [Qp, Units.coe_prod]
-    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_coe, hQ']
+    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_ofClass, hQ']
     rw [Units.val_mk0 (a := (Q : L)) hQne]
     rw [← hnorm]
     rfl
@@ -376,7 +376,7 @@ theorem exists_cocycle_of_qtrivial (χ : CharGroup K L) (hχ : IsQTrivial K L q 
   have hact : ∀ (g : L ≃ₐ[K] L) (l : ℕ), g • ((σ ^ l) • Q') = (σ ^ (i g + l)) • Q' := by
     intro g l
     apply Units.ext
-    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_coe, hQ', Units.val_mk0]
+    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_ofClass, hQ', Units.val_mk0]
     have h1 : (g * σ ^ l) (Q : L) = (σ ^ ((a g + l : ℤ))) (Q : L) := by
       refine act_eq_pow χ σ hgen0 (g * σ ^ l) (a g + l) ?_ hQM
       rw [map_mul, map_pow, ha g, zpow_add, zpow_natCast]
@@ -563,7 +563,7 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
     rw [Units.val_mul, expq_mul q (ζ.1 g).ne_zero (Units.ne_zero _)]
     have : expq K L q ((β / (g • β) : Lˣ) : L) = 1 := by
       rw [Units.val_div_eq_div_val, div_eq_mul_inv, expq_mul q β.ne_zero (inv_ne_zero (Units.ne_zero _)),
-        expq_inv q (Units.ne_zero _), AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_coe,
+        expq_inv q (Units.ne_zero _), AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_ofClass,
         expq_gal, mul_inv_cancel]
     rw [this, mul_one]
   have hker' : ∀ h ∈ MonoidHom.ker χ, ∃ k : ℤ, ζ' h = qU ^ k := by
@@ -572,7 +572,7 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
     refine ⟨k, Units.ext ?_⟩
     have hbh : ((h • β : Lˣ) : L) ≠ 0 := Units.ne_zero _
     simp only [ζ', Units.val_mul, Units.val_div_eq_div_val, AlgEquiv.smul_units_def,
-      Units.coe_map, MonoidHom.coe_coe] at hbh ⊢
+      Units.coe_map, MonoidHom.coe_ofClass] at hbh ⊢
     rw [hk]
     have hβ0 : (β : L) ≠ 0 := β.ne_zero
     simp only [Units.val_zpow_eq_zpow_val, hqU, Units.val_mk0]
@@ -585,7 +585,7 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
     intro h hh
     obtain ⟨kh, hkh⟩ := hker' h hh
     have hh' : g⁻¹ * h * g ∈ MonoidHom.ker χ := by
-      haveI : (MonoidHom.ker χ).Normal := MonoidHom.normal_ker χ
+      have : (MonoidHom.ker χ).Normal := MonoidHom.normal_ker χ
       exact Subgroup.Normal.conj_mem' inferInstance h hh g
     obtain ⟨kh', hkh'⟩ := hker' _ hh'
     obtain ⟨k1, hk1⟩ := hcoc' h g
@@ -612,7 +612,7 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
     simpa [AlgEquiv.smul_units_def] using this
   obtain ⟨σ, n, hn0, hord, hχσ, hgen⟩ := exists_generator_exp χ
   have hgen0 := hgen
-  haveI : NeZero n := ⟨hn0.ne'⟩
+  have : NeZero n := ⟨hn0.ne'⟩
   set u : Lˣ := ζ' σ with hu
   -- `ζ'(σ^m) = u · σu ⋯ σ^{m-1}u · q^c`
   have hind : ∀ m : ℕ, ∃ c : ℤ, ζ' (σ ^ m) = Qp σ u m * qU ^ c := by
@@ -676,7 +676,7 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
     exact this
   have hprod : ((Qp σ Q₀ n : Lˣ) : L) = ∏ j ∈ Finset.range n, (σ ^ j) (Q₀ : L) := by
     rw [Qp, Units.coe_prod]
-    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_coe]
+    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_ofClass]
   have hQ₀n : Qp σ Q₀ n = qU := by
     have e1 : Qp σ Q₀ n = Qp σ u n * (qU ^ (-m)) ^ n := by
       have h1 : ∀ j : ℕ, σ ^ j • Q₀ = σ ^ j • u * qU ^ (-m) := by

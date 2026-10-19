@@ -4,7 +4,7 @@ import Mathlib.Algebra.Order.Ring.Star
 import Mathlib.Analysis.Normed.Group.Ultra
 import Mathlib.Analysis.Normed.Order.Lattice
 import Mathlib.Analysis.RCLike.Basic
-import Mathlib.Data.Int.Star
+import Mathlib.Algebra.Order.Star.Int
 import Mathlib.RingTheory.Henselian
 import Mathlib.Topology.Algebra.Algebra
 import Mathlib.Topology.Algebra.InfiniteSum.Nonarchimedean
@@ -194,9 +194,9 @@ theorem eventually_small_outside {A : ℤ → ℝ} (hA : Tendsto A cofinite (�
   obtain ⟨L, hL⟩ := hev.bddBelow
   refine ⟨U.natAbs + L.natAbs, fun j hj => ?_⟩
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   have hmem : j ∈ {j : ℤ | ¬ A j < δ} := by
-    simp only [Set.mem_setOf_eq, not_lt]
+    simp only [Set.mem_ofPred_eq, not_lt]
     exact hcon.le
   have h1 : j ≤ U := hU hmem
   have h2 : L ≤ j := hL hmem
@@ -471,7 +471,7 @@ theorem hasSum_convolution {a b : ℤ → K} (ha : IsConvergentLaurent K a)
       · have h0 : term k - corr k = 0 := by simp [corr, hk]
         rw [h0, norm_zero]
         linarith
-      · simp only [corr, hk, if_false, sub_zero]
+      · simp only [corr, hk, ite_false, sub_zero]
         simp only [term, norm_mul, norm_algebraMap_omega, norm_zpow]
         have hcase : (N : ℤ) < k ∨ k < -(N : ℤ) ∨ (N : ℤ) < n - k ∨ n - k < -(N : ℤ) := by
           rw [hI, Finset.mem_Icc, Finset.mem_Icc] at hk

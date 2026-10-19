@@ -47,9 +47,9 @@ theorem NullFamily.exists_finite {c : ι → ℤ → K} (hn : NullFamily K c)
     exact not_lt.mpr (le_of_lt hn)
   · intro n hnT i
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     apply hnT
-    simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_ofPred_eq]
     refine ⟨i, ?_, hlt⟩
     simpa using ⟨n, hlt⟩
 
@@ -64,10 +64,10 @@ theorem NullFamily.tendsto_prod {c : ι → ℤ → K} (hn : NullFamily K c)
   have : {p : ι × ℤ | ¬ dist (‖c p.1 p.2‖ * r ^ p.2) 0 < ε} ⊆
       ⋃ i ∈ hF.toFinset, (fun n => (i, n)) '' {n | ε ≤ ‖c i n‖ * r ^ n} := by
     intro p hp
-    simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, not_lt] at hp
+    simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, not_lt] at hp
     have hpn : 0 ≤ ‖c p.1 p.2‖ * r ^ p.2 := mul_nonneg (norm_nonneg _) (zpow_nonneg hr.le _)
     rw [abs_of_nonneg hpn] at hp
-    simp only [Set.mem_iUnion, Set.mem_image, Set.mem_setOf_eq, Set.Finite.mem_toFinset]
+    simp only [Set.mem_iUnion, Set.mem_image, Set.mem_ofPred_eq, Set.Finite.mem_toFinset]
     exact ⟨p.1, ⟨p.2, by linarith⟩, p.2, hp, rfl⟩
   refine Set.Finite.subset (Set.Finite.biUnion (Finset.finite_toSet _) (fun i _ => ?_)) this
   refine Set.Finite.image _ ?_
@@ -83,7 +83,7 @@ theorem NullFamily.hasSum_coeff {c : ι → ℤ → K} (hn : NullFamily K c) (n 
     intro ε hε
     rw [Filter.eventually_cofinite]
     refine (hn 1 one_pos (ε / 2) (by positivity)).subset (fun i hi => ?_)
-    simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, abs_norm, not_lt] at hi
+    simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, abs_norm, not_lt] at hi
     exact ⟨n, by simp; linarith⟩
   exact (NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero this)
 
@@ -123,7 +123,7 @@ theorem NullFamily.approx {c : ι → ℤ → K} (hn : NullFamily K c) {r : ℝ}
       _ = ε := by field_simp
   · rw [le_div_iff₀ hp]
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     exact hi (by simpa using ⟨n, hlt⟩)
 
 theorem NullFamily.sum_convergent {c : ι → ℤ → K} (hn : NullFamily K c)
@@ -142,7 +142,7 @@ theorem NullFamily.sum_convergent {c : ι → ℤ → K} (hn : NullFamily K c)
   have h2 : ‖hn.sum n‖ * r ^ n ≤ ε / 2 := by
     calc _ ≤ ε / 2 / r ^ n * r ^ n := mul_le_mul_of_nonneg_right h1 hp.le
       _ = ε / 2 := by field_simp
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, not_not]
+  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, not_not]
   rw [abs_of_nonneg (mul_nonneg (norm_nonneg _) hp.le)]
   linarith
 
@@ -154,7 +154,7 @@ theorem hol_hasSum_family {f : ι → holSubring K L} (hn : NullFamily K (fun i 
   have hb := hn.sum_convergent hc
   refine ⟨holOfSeq K L hn.sum hb, holCoeff_holOfSeq K _ hb, fun α => ?_⟩
   set S := IntermediateField.adjoin K ({α.1} : Set L) with hS
-  haveI : FiniteDimensional K S :=
+  have : FiniteDimensional K S :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α.1)
   have hαS : α.1 ∈ S := IntermediateField.mem_adjoin_simple_self K α.1
   set u : ι × ℤ → L := fun p => algebraMap K L (holCoeff K (f p.1) p.2) * α.1 ^ p.2

@@ -273,8 +273,8 @@ theorem anVal_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {α : Om
       refine ⟨j + m, ?_⟩
       rw [hj, zpow_add₀ hQ, ← hB2]; ring
   by_cases hc : ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b
-  · rw [if_pos (hcls1.mpr hc), if_pos (hcls2.mpr hc), if_pos hc]; norm_cast
-  · rw [if_neg (fun h => hc (hcls1.mp h)), if_neg (fun h => hc (hcls2.mp h)), if_neg hc]; simp
+  · rw [ite_eq_left (hcls1.mpr hc), ite_eq_left (hcls2.mpr hc), ite_eq_left hc]; norm_cast
+  · rw [ite_eq_right (fun h => hc (hcls1.mp h)), ite_eq_right (fun h => hc (hcls2.mp h)), ite_eq_right hc]; simp
 
 end anValMb
 
@@ -306,7 +306,7 @@ theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {
     refine hol_dvd_of_anVal_le K hM0 (fun α hα => ?_)
     rw [anVal_Mb hq0 hq1 hb hbm hα]
     by_cases hc : ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b
-    · rw [if_pos hc]
+    · rw [ite_eq_left hc]
       obtain ⟨j, hj⟩ := hc
       have haj : q ^ j * b ≠ 0 := mul_ne_zero (zpow_ne_zero j hq0') hb
       obtain ⟨v0, v1⟩ := prop_zpow hq0' hG hb h0 h1 j
@@ -317,7 +317,7 @@ theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {
           (monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ j * b))) = 1 := by
         have := anVal_polyHol_minpoly (K := K) (ξ := algebraMap K (Omega K) (q ^ j * b))
           (β := algebraMap K (Omega K) (q ^ j * b)) ((map_ne_zero _).mpr haj) ((map_ne_zero _).mpr haj)
-        rw [if_pos rfl, minpoly.eq_X_sub_C (Omega K)] at this
+        rw [ite_eq_left rfl, minpoly.eq_X_sub_C (Omega K)] at this
         simpa [polyHol] using this
       rw [hG2, map_mul (algebraMap (holSubring K) (MeroRing K)),
         (anVal_isValuation K _ ((map_ne_zero _).mpr haj)).2.2.1,
@@ -326,7 +326,7 @@ theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {
       have hn := anVal_hol_nonneg ((map_ne_zero _).mpr haj : algebraMap K (Omega K) (q ^ j * b) ≠ 0) G2
       calc ((2 : ℕ) : WithTop ℤ) = ((2 : ℕ) • (1 : WithTop ℤ)) + 0 := by simp
         _ ≤ _ := by gcongr
-    · rw [if_neg hc]; exact_mod_cast anVal_hol_nonneg hα G
+    · rw [ite_eq_right hc]; exact_mod_cast anVal_hol_nonneg hα G
   obtain ⟨u, hu⟩ := hdvd
   have hfeM := Mb_FE hq0 hq1 hb
   unfold FE2 at hG hfeM

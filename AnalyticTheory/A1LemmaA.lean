@@ -147,7 +147,7 @@ theorem stab_eq (W : WeierstrassCurve K) (hΔ : W.Δ ≠ 0) (hc4 : W.c₄ ≠ 0)
       rcases this with h1 | h1
       · exact absurd h1 (CharP.ringChar_ne_one)
       · exact h1
-    haveI : CharP K 2 := ringChar.of_eq hrc
+    have : CharP K 2 := ringChar.of_eq hrc
     have ha : W.a₁ ≠ 0 := by
       intro h0; apply hc4; rw [WeierstrassCurve.c₄_eq_a₁_pow_four_of_charP_two, h0]; ring
     have hu : (C.u : K) = 1 := by
@@ -262,7 +262,7 @@ theorem lemmaA_data (hE : IsEllipticOver K F) (d : WeierstrassData K F) (hc4 : d
         rcases this with h1 | h1
         · exact absurd h1 (CharP.ringChar_ne_one)
         · exact h1
-      haveI : CharP K 2 := ringChar.of_eq hrc
+      have : CharP K 2 := ringChar.of_eq hrc
       have ha : W.a₁ ≠ 0 := by
         intro h0; apply hc4; rw [WeierstrassCurve.c₄_eq_a₁_pow_four_of_charP_two, h0]; ring
       have hpo := d.poleOrd_x.affine2 ha W.a₃

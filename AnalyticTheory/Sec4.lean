@@ -99,10 +99,10 @@ theorem splitsOver_of_adjoin (S : Subfield (FqSub L (algebraMap K L q))) [Algebr
     (α : L) (hgen : IntermediateField.adjoin S
       ({FqHom L (algebraMap K L q) α} : Set (FqSub L (algebraMap K L q))) = ⊤)
     (hp : HasPrimeOfDegreeOne L (FqSub L (algebraMap K L q))) : SplitsOver K S L := by
-  letI i1 : Algebra K (FqSub L (algebraMap K L q)) := (kConstFq K L q).toAlgebra
-  haveI i3 : IsScalarTower K S (FqSub L (algebraMap K L q)) :=
+  let i1 : Algebra K (FqSub L (algebraMap K L q)) := (kConstFq K L q).toAlgebra
+  have i3 : IsScalarTower K S (FqSub L (algebraMap K L q)) :=
     IsScalarTower.of_algebraMap_eq fun c => (hcomm c).symm
-  haveI i4 : IsScalarTower K L (FqSub L (algebraMap K L q)) :=
+  have i4 : IsScalarTower K L (FqSub L (algebraMap K L q)) :=
     IsScalarTower.of_algebraMap_eq fun c => rfl
   refine ⟨FqSub L (algebraMap K L q), inferInstance, inferInstance, inferInstance, i1, i3, i4, ?_,
     hp⟩
@@ -246,17 +246,17 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
   set n := Module.finrank K L with hnn
   have hn : orderOf σ = n := orderOf_gen q T
   have hnpos : 0 < n := by rw [← hn]; exact orderOf_pos _
-  haveI : NeZero n := ⟨hnpos.ne'⟩
+  have : NeZero n := ⟨hnpos.ne'⟩
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
   set Q' : Lˣ := Units.mk0 T.Q T.Q_ne with hQ'
   set qU : Lˣ := qUnit q hq0 with hqU
   have hqσ : ∀ τ : L ≃ₐ[K] L, τ • qU = qU := fun τ => Units.ext (by
-    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_coe, hqU, qUnit,
+    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_ofClass, hqU, qUnit,
       Units.val_mk0]; exact τ.commutes q)
   have hQpn : Qp σ Q' n = qU := by
     apply Units.ext
     rw [Qp, Units.coe_prod]
-    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_coe, hQ', Units.val_mk0]
+    simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_ofClass, hQ', Units.val_mk0]
     rw [← prod_aut_eq_prod_pow q T, ← Algebra.norm_eq_prod_automorphisms, T.norm_eq]
     rfl
   -- indices
@@ -344,7 +344,7 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
     constructor
     · intro h g
       obtain ⟨m, rfl⟩ := gen_zpow q T g
-      letI := twistAction q hq0 ⟨ζU, hcoc⟩
+      let := twistAction q hq0 ⟨ζU, hcoc⟩
       have hmem : σ ∈ MulAction.stabilizer (L ≃ₐ[K] L) f := h
       exact (zpow_mem hmem m : σ ^ m ∈ MulAction.stabilizer (L ≃ₐ[K] L) f)
     · intro h; exact h σ

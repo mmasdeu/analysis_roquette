@@ -45,7 +45,7 @@ theorem quotFun_aut (σ : Omega K ≃ₐ[K] Omega K) (α : Omega K) (f : holSubr
   by_cases hx : x = 0
   · simp [hx]
   · have hx' : σ.symm x ≠ 0 := by simpa using hx
-    rw [dif_pos hx, dif_pos hx']
+    rw [dite_eq_left hx, dite_eq_left hx']
     have := hol_apply_aut K σ f (σ.symm x) hx'
     have e : (⟨σ (σ.symm x), (map_ne_zero σ).mpr hx'⟩ : {y : Omega K // y ≠ 0}) = ⟨x, hx⟩ := by
       apply Subtype.ext; simp

@@ -26,7 +26,7 @@ theorem cauchy_omega (S : IntermediateField K L) [FiniteDimensional K S]
     {u v : ℤ → L} (hu : ∀ i, u i ∈ S) (hv : ∀ i, v i ∈ S) (hud : Dec u) (hvd : Dec v) :
     ∃ (A B : L) (c : ℤ → L), HasSum u A ∧ HasSum v B ∧
       (∀ m, HasSum (fun i => u i * v (m - i)) (c m)) ∧ HasSum c (A * B) := by
-  haveI : CompleteSpace S := FiniteDimensional.complete K S
+  have : CompleteSpace S := FiniteDimensional.complete K S
   set u' : ℤ → S := fun i => ⟨u i, hu i⟩ with hu'
   set v' : ℤ → S := fun i => ⟨v i, hv i⟩ with hv'
   have hu'd : Dec u' := hud
@@ -56,9 +56,9 @@ theorem prep_eval (S : IntermediateField K L) [FiniteDimensional K S]
   classical
   have hy0 : y ≠ 0 := by intro h; rw [h, norm_zero] at hy1; exact zero_ne_one hy1
   set S' := IntermediateField.adjoin K ({y} : Set L) ⊔ S with hS'
-  haveI : FiniteDimensional K (IntermediateField.adjoin K ({y} : Set L)) :=
+  have : FiniteDimensional K (IntermediateField.adjoin K ({y} : Set L)) :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral y)
-  haveI : FiniteDimensional K S' := by
+  have : FiniteDimensional K S' := by
     rw [hS']; infer_instance
   have hSS' : S ≤ S' := le_sup_right
   have hyS' : y ∈ S' :=
@@ -102,7 +102,7 @@ theorem prep_eval (S : IntermediateField K L) [FiniteDimensional K S]
       intro m hm
       have : R m = 0 := hRs m (by
         by_contra hcon
-        push_neg at hcon
+        push Not at hcon
         exact hm (Finset.mem_image.mpr ⟨m.toNat, Finset.mem_range.mpr (by omega), by omega⟩))
       simp [this]
     have hsumeq : ∑ i ∈ Finset.range s, r i * y ^ i =
@@ -164,9 +164,9 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
   have hx00 : x0 ≠ 0 := by
     intro h; rw [h, norm_zero] at hx0norm; linarith
   set S := IntermediateField.adjoin K ({x0} : Set L) with hS
-  haveI : FiniteDimensional K S :=
+  have : FiniteDimensional K S :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral x0)
-  haveI : CompleteSpace S := FiniteDimensional.complete K S
+  have : CompleteSpace S := FiniteDimensional.complete K S
   have hx0S : x0 ∈ S := IntermediateField.mem_adjoin_simple_self K x0
   set g : ℤ → L := fun n => algebraMap K L (a n) * x0 ^ n with hg
   have hgS : ∀ n, g n ∈ S := fun n =>
@@ -184,7 +184,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
   have hMfin : {n | wn n = w}.Finite := by
     refine (Filter.eventually_cofinite.mp (hwt.eventually (gt_mem_nhds hpos))).subset
       (fun n hn => ?_)
-    simp only [Set.mem_setOf_eq] at hn ⊢
+    simp only [Set.mem_ofPred_eq] at hn ⊢
     rw [hn]; exact lt_irrefl _
   set Ms := hMfin.toFinset with hMs
   have hn1M : n1 ∈ Ms := by simp [hMs, hwn1]
@@ -245,7 +245,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
   have hcnorm : ‖(H (s : ℤ))⁻¹‖ = 1 := by rw [norm_inv, hsn, inv_one]
   have hQ0 : ‖Q 0‖ = 1 := by
     have h1 := hQclose 0
-    simp only [if_true] at h1
+    simp only [ite_true] at h1
     have h2 : ‖Q 0 - (H (s : ℤ))⁻¹‖ < ‖(H (s : ℤ))⁻¹‖ := by rw [hcnorm]; exact lt_of_le_of_lt h1 hε1
     have h3 : Q 0 = (H (s : ℤ))⁻¹ + (Q 0 - (H (s : ℤ))⁻¹) := by ring
     rw [h3, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h2.ne', max_eq_left h2.le, hcnorm]
@@ -272,7 +272,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
   have hp0deg : p0.degree < s := by
     rw [Polynomial.degree_lt_iff_coeff_zero]
     intro m hm
-    simp only [hp0, Polynomial.finset_sum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow]
+    simp only [hp0, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow]
     refine Finset.sum_eq_zero (fun i hi => ?_)
     have : m ≠ i := by have := Finset.mem_range.mp hi; omega
     simp [this]
@@ -287,7 +287,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
   have hPeval : ∀ y, P.eval y = y ^ s - ∑ i ∈ Finset.range s, r i * y ^ i := by
     intro y
     simp only [hP, hp0, Polynomial.eval_sub, Polynomial.eval_pow,
-      Polynomial.eval_X, Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_C]
+      Polynomial.eval_X, Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C]
   have hrb : ∀ i, ‖r i‖ ≤ 1 := fun i => hRb _
   have hroot : ∀ y, P.IsRoot y → ‖y‖ = 1 := by
     intro y hy
@@ -297,7 +297,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
       exact sub_eq_zero.mp this
     have hyle : ‖y‖ ≤ 1 := by
       by_contra hgt
-      push_neg at hgt
+      push Not at hgt
       have h1 : ‖y ^ s‖ ≤ ‖y‖ ^ (s - 1) := by
         rw [hyeval]
         refine sum_norm_le_of_forall _ _ (by positivity) (fun i hi => ?_)
@@ -313,7 +313,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
       nlinarith
     have hyge : 1 ≤ ‖y‖ := by
       by_contra hlt
-      push_neg at hlt
+      push Not at hlt
       have h1 : ‖r 0‖ < 1 := by
         obtain ⟨m, hm⟩ : ∃ m, s = m + 1 := ⟨s - 1, by omega⟩
         have hy2 := hyeval
@@ -462,7 +462,7 @@ theorem bad_radii_finite_Icc {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 
       le_trans (hw_lb ρ hρ) (hNmax n0 hn0F)
     have : ∃ n, n ≠ N ∧ ‖a N‖ * ρ ^ N ≤ ‖a n‖ * ρ ^ n := by
       by_contra hcon
-      push_neg at hcon
+      push Not at hcon
       exact hbad ⟨N, fun n hn => hcon n hn⟩
     obtain ⟨n, hnN, hn⟩ := this
     have hnF : n ∈ Fs := (hmemF n).mpr (le_trans hNge (le_trans hn (hw_le ρ hρ n)))
@@ -470,7 +470,7 @@ theorem bad_radii_finite_Icc {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 
     have hpos : 0 < ‖a n‖ := by
       have h1 : 0 < ‖a n‖ * ρ ^ n := lt_of_lt_of_le hκpos (le_trans hNge hn)
       exact (mul_pos_iff_of_pos_right (zpow_pos hρ0 n)).mp h1
-    simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_ofPred_eq]
     exact ⟨(n, N), Finset.mem_coe.mpr (Finset.mem_product.mpr ⟨hnF, hNF⟩), hρ0, hnN, htie, hpos⟩
 
 
@@ -497,7 +497,7 @@ theorem exists_tie_of_not_good {a : ℤ → K} (ha : IsConvergentLaurent K a) (h
   have hNpos : 0 < wn N := lt_of_lt_of_le hwpos0 (hNmax' n0)
   have : ∃ n, n ≠ N ∧ wn N ≤ wn n := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     exact hbad ⟨N, fun n hn => hcon n hn⟩
   obtain ⟨n, hnN, hn⟩ := this
   have htie : wn n = wn N := le_antisymm (hNmax' n) hn
@@ -539,7 +539,7 @@ theorem zeros_annulus_finite {a : ℤ → K} (ha : IsConvergentLaurent K a) (h0 
   have hbad := bad_radii_finite_Icc K ha h0 hr hrr'
   refine (hbad.biUnion (fun ρ hρ => zeros_sphere_finite K ha h0 hF
     (lt_of_lt_of_le hr hρ.1.1))).subset (fun x ⟨hx0, h1, h2, hFx⟩ => ?_)
-  simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+  simp only [Set.mem_iUnion, Set.mem_ofPred_eq]
   refine ⟨‖x‖, ⟨⟨h1, h2⟩, fun hgood => ?_⟩, hx0, rfl, hFx⟩
   exact sum_ne_zero_of_good K ha hx0 (hF x hx0) hgood hFx
 

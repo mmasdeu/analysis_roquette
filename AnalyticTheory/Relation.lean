@@ -25,7 +25,7 @@ theorem anVal_ellM : anVal K 1 (ellM (q := q)) = ((1 : ℤ) : WithTop ℤ) := by
   have e : linF (q := q) 0 = polyHol K (Omega K) (minpoly K (1 : Omega K)) := by
     rw [linF, show (1 : Omega K) = algebraMap K (Omega K) 1 from (map_one _).symm, minpoly_alg]
     simp
-  rw [ellM, e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, if_pos rfl]; rfl
+  rw [ellM, e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, ite_eq_left rfl]; rfl
 
 theorem ellM_ne_zero : ellM (q := q) ≠ 0 := by
   intro h

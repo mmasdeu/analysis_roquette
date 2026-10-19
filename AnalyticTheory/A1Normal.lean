@@ -122,14 +122,14 @@ theorem poleOrd_bas {x y : F} (hx : PoleOrd 𝔭 x 2) (hy : PoleOrd 𝔭 y 3) (i
     PoleOrd 𝔭 (bas x y i) (mbas i) := by
   unfold bas mbas
   by_cases h0 : i = 0
-  · simp only [h0, if_true]; simpa using poleOrd_one (𝔭 := 𝔭)
-  · simp only [h0, if_false]
+  · simp only [h0, ite_true]; simpa using poleOrd_one (𝔭 := 𝔭)
+  · simp only [h0, ite_false]
     by_cases h2 : (i + 1) % 2 = 0
-    · rw [if_pos h2]
+    · rw [ite_eq_left h2]
       have := hx.pow ((i + 1) / 2)
       have e : (((i + 1) / 2 : ℕ) : ℤ) * 2 = (i : ℤ) + 1 := by omega
       rwa [e] at this
-    · rw [if_neg h2]
+    · rw [ite_eq_right h2]
       have := (hx.pow ((i - 2) / 2)).mul hy
       have e : (((i - 2) / 2 : ℕ) : ℤ) * 2 + 3 = (i : ℤ) + 1 := by omega
       rwa [e] at this
@@ -154,7 +154,7 @@ theorem Ln_eq_span {x y : F} (hE : IsEllipticOver K F) (h : 𝔭.degree = 1)
     (hx : PoleOrd 𝔭 x 2) (hy : PoleOrd 𝔭 y 3) {n : ℕ} (hn : 1 ≤ n) :
     Ln 𝔭 n = Submodule.span K (Set.range fun i : Fin n => bas x y i) := by
   symm
-  haveI := finiteDimensional_Ln hE h n
+  have := finiteDimensional_Ln hE h n
   refine Submodule.eq_of_le_of_finrank_eq ?_ ?_
   · rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩

@@ -1,5 +1,5 @@
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
-import Mathlib.Data.Real.StarOrdered
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Topology.MetricSpace.Contracting
 import Mathlib.Topology.UniformSpace.Uniformizable
@@ -77,16 +77,16 @@ theorem Hop_e0 (h : ℕ → F) (s : ℕ) (n : ℤ) :
   classical
   simp only [Hop, eSeq]
   by_cases hn : 0 ≤ n ∧ n ≤ s
-  · rw [if_pos hn]
+  · rw [ite_eq_left hn]
     rw [Finset.sum_eq_single n.toNat]
     · have : n - (n.toNat : ℤ) = 0 := by omega
-      rw [if_pos this, mul_one]
+      rw [ite_eq_left this, mul_one]
     · intro j hj hne
       have : n - (j : ℤ) ≠ 0 := by
         intro h0; apply hne; omega
       simp [this]
     · intro hn'; exfalso; apply hn'; simp; omega
-  · rw [if_neg hn]
+  · rw [ite_eq_right hn]
     refine Finset.sum_eq_zero (fun j hj => ?_)
     have hj' : j < s + 1 := Finset.mem_range.mp hj
     have : n - (j : ℤ) ≠ 0 := by intro h0; apply hn; omega
@@ -106,14 +106,14 @@ theorem sum_e_shift (a : ℕ → F) (k : ℤ) (t : ℕ) (n : ℤ) :
   rw [Finset.sum_apply]
   simp only [Pi.smul_apply, eSeq, smul_eq_mul]
   by_cases hn : 0 ≤ n - k ∧ n - k < t
-  · rw [if_pos hn, Finset.sum_eq_single (n - k).toNat]
+  · rw [ite_eq_left hn, Finset.sum_eq_single (n - k).toNat]
     · have : n = k + ((n - k).toNat : ℤ) := by omega
-      rw [if_pos this, mul_one]
+      rw [ite_eq_left this, mul_one]
     · intro j hj hne
       have : n ≠ k + (j : ℤ) := by intro h0; apply hne; omega
       simp [this]
     · intro hn'; exfalso; apply hn'; simp; omega
-  · rw [if_neg hn]
+  · rw [ite_eq_right hn]
     refine Finset.sum_eq_zero (fun j hj => ?_)
     have hj' : j < t := Finset.mem_range.mp hj
     have : n ≠ k + (j : ℤ) := by intro h0; apply hn; omega
@@ -201,7 +201,7 @@ theorem Pair_e_nat : ∀ k : ℕ, Pair h s (eSeq (k : ℤ)) := by
         · omega
         · rfl
       · simp [Hop]
-    · push_neg at hk
+    · push Not at hk
       set c : F := (h s)⁻¹ with hc
       have hcn : ‖c‖ = 1 := by rw [hc, norm_inv, hs, inv_one]
       have hcs : c * h s = 1 := by
@@ -216,16 +216,16 @@ theorem Pair_e_nat : ∀ k : ℕ, Pair h s (eSeq (k : ℤ)) := by
         · have hnk : n = k := by omega
           have h2 : 0 ≤ n - ((k : ℤ) - s) ∧ n - ((k : ℤ) - s) ≤ s := by omega
           have h3 : ¬ (0 ≤ n - ((k : ℤ) - s) ∧ n - ((k : ℤ) - s) < s) := by omega
-          rw [if_pos h2, if_neg h3, if_pos hnk]
+          rw [ite_eq_left h2, ite_eq_right h3, ite_eq_left hnk]
           have : (n - ((k : ℤ) - s)).toNat = s := by omega
           rw [this]; simpa using hcs.symm
         · have hnk : n ≠ k := by omega
-          rw [if_neg hnk]
+          rw [ite_eq_right hnk]
           by_cases h2 : 0 ≤ n - ((k : ℤ) - s) ∧ n - ((k : ℤ) - s) ≤ s
           · have h3 : (0 ≤ n - ((k : ℤ) - s) ∧ n - ((k : ℤ) - s) < s) := by omega
-            rw [if_pos h2, if_pos h3]; ring
+            rw [ite_eq_left h2, ite_eq_left h3]; ring
           · have h3 : ¬ (0 ≤ n - ((k : ℤ) - s) ∧ n - ((k : ℤ) - s) < s) := by omega
-            rw [if_neg h2, if_neg h3]; ring
+            rw [ite_eq_right h2, ite_eq_right h3]; ring
       rw [heq, sub_eq_add_neg]
       refine Pair.add (Pair.smul ?_ hcn.le) (Pair.neg (Pair.sum _ _ (fun j hj => ?_)))
       · refine Pair.of_Hop ?_ ?_
@@ -265,17 +265,17 @@ theorem Pair_e : ∀ m : ℤ, Pair h s (eSeq m) := by
         by_cases h1 : x = m
         · have h2 : 0 ≤ x - m ∧ x - m ≤ s := by omega
           have h3 : ¬ (0 ≤ x - (m + 1) ∧ x - (m + 1) < s) := by omega
-          rw [if_pos h2, if_neg h3, if_pos h1]
+          rw [ite_eq_left h2, ite_eq_right h3, ite_eq_left h1]
           have : (x - m).toNat = 0 := by omega
           rw [this]; simpa using hcs.symm
-        · rw [if_neg h1]
+        · rw [ite_eq_right h1]
           by_cases h2 : 0 ≤ x - m ∧ x - m ≤ s
           · have h3 : (0 ≤ x - (m + 1) ∧ x - (m + 1) < s) := by omega
-            rw [if_pos h2, if_pos h3]
+            rw [ite_eq_left h2, ite_eq_left h3]
             have : (x - m).toNat = (x - (m + 1)).toNat + 1 := by omega
             rw [this]; ring
           · have h3 : ¬ (0 ≤ x - (m + 1) ∧ x - (m + 1) < s) := by omega
-            rw [if_neg h2, if_neg h3]; ring
+            rw [ite_eq_right h2, ite_eq_right h3]; ring
       rw [heq, sub_eq_add_neg]
       refine Pair.add (Pair.smul ?_ hcn.le) (Pair.neg (Pair.sum _ _ (fun j hj => ?_)))
       · refine Pair.of_Hop ?_ ?_
@@ -345,7 +345,7 @@ theorem witProp_s : WitProp h s (s : ℤ) ((h s)⁻¹ • eSeq 0)
       simp [eSeq, this]⟩
   · refine ⟨(Finset.range s).image (fun j : ℕ => (j : ℤ)), fun n hn => ?_⟩
     simp only [Pi.neg_apply, neg_eq_zero, hsum n]
-    rw [if_neg]
+    rw [ite_eq_right]
     rintro ⟨h1, h2⟩
     apply hn
     exact Finset.mem_image.mpr ⟨n.toNat, Finset.mem_range.mpr (by omega), by omega⟩
@@ -359,18 +359,18 @@ theorem witProp_s : WitProp h s (s : ℤ) ((h s)⁻¹ • eSeq 0)
     · simp
   · intro n hn
     simp only [Pi.neg_apply, neg_eq_zero, hsum n]
-    rw [if_neg]; omega
+    rw [ite_eq_right]; omega
   · intro n
     simp only [Pi.neg_apply, hsum n, Hop_smul, Pi.smul_apply, smul_eq_mul, Hop_e0]
     by_cases h1 : n = s
     · subst h1
-      rw [if_pos ⟨by omega, le_rfl⟩, if_neg (by omega)]
+      rw [ite_eq_left ⟨by omega, le_rfl⟩, ite_eq_right (by omega)]
       simp [eSeq, hcs]
     · by_cases h2 : 0 ≤ n ∧ n < s
-      · rw [if_pos ⟨h2.1, by omega⟩, if_pos h2]
+      · rw [ite_eq_left ⟨h2.1, by omega⟩, ite_eq_left h2]
         have : n ≠ s := h1
         simp [eSeq, this]
-      · rw [if_neg (by omega), if_neg h2]
+      · rw [ite_eq_right (by omega), ite_eq_right h2]
         have : n ≠ s := h1
         simp [eSeq, this]
 
@@ -385,8 +385,8 @@ theorem wit_prop (m : ℤ) : WitProp h s m (wit hP m).1 (wit hP m).2 := by
   classical
   unfold wit
   by_cases hm : m = (s : ℤ)
-  · rw [if_pos hm]; subst hm; exact witProp_s hP
-  · rw [if_neg hm]
+  · rw [ite_eq_left hm]; subst hm; exact witProp_s hP
+  · rw [ite_eq_right hm]
     exact (Pair_e hP.le_one hP.h0 hP.hs m).choose_spec.choose_spec
 
 /-- Quotient of a null sequence by the polynomial part. -/
@@ -443,7 +443,7 @@ theorem divD_dec {u : ℤ → F} (hu : Dec u) : Dec (divD hP u) := by
   have hsupp : (⋃ m ∈ hA.toFinset, (((wit_prop hP m).1).choose : Set ℤ)).Finite :=
     (hA.toFinset.finite_toSet).biUnion (fun m _ => ((wit_prop hP m).1).choose.finite_toSet)
   refine hsupp.subset (fun n hn => ?_)
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, abs_norm, not_lt] at hn
+  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, abs_norm, not_lt] at hn
   by_contra hnot
   apply absurd hn
   rw [not_le]
@@ -586,7 +586,7 @@ theorem cvT_dec {T Q : ℤ → F} {c : ℝ} (hT : Dec T) (hQd : Dec Q) (hQ : Bd 
       exact ⟨(i, k), ⟨hi, hk⟩, hnk.symm⟩
     exact (Finset.finite_toSet _).subset this
   refine hfin.subset (fun n hn => ?_)
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, abs_norm, not_lt] at hn
+  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, abs_norm, not_lt] at hn
   by_contra hnot
   apply absurd hn
   rw [not_le]
@@ -693,7 +693,7 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
     rw [mul_comm]
     exact h4
   have hcon : ContractingWith ⟨ε, hε0⟩ Φ := ⟨by exact_mod_cast hε1, hlip⟩
-  haveI : Nonempty (ZeroAtInftyContinuousMap ℤ F) := ⟨0⟩
+  have : Nonempty (ZeroAtInftyContinuousMap ℤ F) := ⟨0⟩
   set Qc := ContractingWith.fixedPoint Φ hcon with hQc
   have hfix : Φ Qc = Qc := ContractingWith.fixedPoint_isFixedPt (f := Φ) hcon
   have hfixn : ∀ n, divD hP (e_s - cvT T (fun n => Qc n)) n = Qc n := fun n => by
@@ -720,7 +720,7 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
       split_ifs <;> simp [hcn]
     have hM1 : ‖Qc‖ ≤ max 1 (‖Qc‖ * ε) := c0le Qc _ (le_trans zero_le_one (le_max_left _ _)) hle1
     by_contra hgt
-    push_neg at hgt
+    push Not at hgt
     rcases max_cases 1 (‖Qc‖ * ε) with ⟨h1, _⟩ | ⟨h1, _⟩
     · rw [h1] at hM1; linarith
     · rw [h1] at hM1; nlinarith
@@ -754,7 +754,7 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
         rintro ⟨h1, h2⟩
         apply hi
         exact Finset.mem_image.mpr ⟨(n - i).toNat, Finset.mem_range.mpr (by omega), by omega⟩
-      have h2 : Hf (n - i) = 0 := by simp only [hHf]; rw [if_neg this]
+      have h2 : Hf (n - i) = 0 := by simp only [hHf]; rw [ite_eq_right this]
       rw [h2, mul_zero]
     have hsumeq : Hop hseq s (fun n => Qc n) n = ∑ i ∈ S, Qc i * Hf (n - i) := by
       rw [hS, Finset.sum_image (fun a _ b _ hab => by simpa using hab)]
@@ -762,7 +762,7 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
       refine Finset.sum_congr rfl (fun j hj => ?_)
       have hj' : j < s + 1 := Finset.mem_range.mp hj
       have : 0 ≤ (n - (n - (j : ℤ))) ∧ n - (n - (j : ℤ)) ≤ s := by omega
-      rw [if_pos this]
+      rw [ite_eq_left this]
       have : n - (n - (j : ℤ)) = j := by ring
       rw [this]; simp [hhs, mul_comm]
     rw [hsumeq]
@@ -805,7 +805,7 @@ theorem tendsto_mul_prod_int {u v : ℤ → ℝ} (hu0 : ∀ n, 0 ≤ u n) (hv0 :
     have := Filter.eventually_cofinite.mp (hv.eventually (gt_mem_nhds hη0))
     exact this.subset (fun m hm => by simpa using hm)
   refine (hA.prod hB).subset (fun p hp => ?_)
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, abs_mul, abs_of_nonneg (hu0 _),
+  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, abs_mul, abs_of_nonneg (hu0 _),
     abs_of_nonneg (hv0 _), not_lt] at hp
   have hηU : η * (U + V + 1) = ε := by rw [hη]; field_simp
   refine ⟨?_, ?_⟩

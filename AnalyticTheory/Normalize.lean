@@ -41,7 +41,7 @@ theorem hasOrd_minpoly {α : Omega K} (hα : α ≠ 0) :
     (eventually_ne_nhds hα).filter_mono nhdsWithin_le_nhds
   filter_upwards [hne, self_mem_nhdsWithin] with x hx hxα
   have hxα' : x - α ≠ 0 := sub_ne_zero.mpr hxα
-  simp only [quotFun, dif_pos hx]
+  simp only [quotFun, dite_eq_left hx]
   have h1 : (polyHol K (Omega K) (minpoly K α)).1 ⟨x, hx⟩ = P.eval x := polyHol_apply K _ _
   rw [h1]
   conv_rhs => rw [hq]
@@ -199,7 +199,7 @@ theorem divisorOf_rational (f : MeroRing K) {α β : Omega K} (h : minpoly K α 
   · have hroot : Polynomial.aeval α (minpoly K β) = 0 := by rw [← h]; exact minpoly.aeval K α
     obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root (Algebra.IsAlgebraic.isAlgebraic β) hroot
     have hβ : β ≠ 0 := by rw [← hσ]; exact (map_ne_zero σ).mpr hα
-    simp only [divisorOf, if_neg hα, if_neg hβ]
+    simp only [divisorOf, ite_eq_right hα, ite_eq_right hβ]
     rw [← hσ, anVal_aut K σ hα]
 
 /-- Finiteness condition: a meromorphic function has finitely many zeros and poles in each closed
@@ -232,7 +232,7 @@ theorem divisorOf_finite (f : MeroRing K) {r r' : ℝ} (hr : 0 < r) (hrr' : r �
   by_cases hz : kx = 0 ∧ ky = 0
   · exfalso
     apply h3
-    simp only [divisorOf, if_neg hα, anVal, h4, e1, e2, hz.1, hz.2]
+    simp only [divisorOf, ite_eq_right hα, anVal, h4, e1, e2, hz.1, hz.2]
     simp
   · rcases not_and_or.mp hz with h | h
     · left
@@ -255,7 +255,7 @@ theorem divisorOf_mul {f g : MeroRing K} (hf : f ≠ 0) (hg : g ≠ 0) :
   funext α
   by_cases hα : α = 0
   · simp [divisorOf, hα]
-  · simp only [divisorOf, if_neg hα, Pi.add_apply]
+  · simp only [divisorOf, ite_eq_right hα, Pi.add_apply]
     have h1 := anVal_ne_top K hα hf
     have h2 := anVal_ne_top K hα hg
     obtain ⟨x, hx⟩ := WithTop.ne_top_iff_exists.mp h1

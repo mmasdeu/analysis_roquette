@@ -27,7 +27,7 @@ theorem hol_rep {p : holSubring K L} (hp : p ≠ 0) :
   obtain ⟨g, ⟨a, ha, hsum⟩, hgf⟩ := p.2
   refine ⟨g, a, ha, ?_, hsum, fun x hx => (congrFun hgf ⟨x, hx⟩).symm⟩
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   apply hp
   apply Subtype.ext
   funext x

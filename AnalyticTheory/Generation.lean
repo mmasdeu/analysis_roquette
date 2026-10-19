@@ -30,7 +30,7 @@ theorem pDiv_eq_divisorOf (n : ℕ) :
   funext α
   by_cases hα : α = 0
   · simp [pDiv, divisorOf, hα]
-  · simp only [pDiv, divisorOf, if_neg hα, ne_eq, not_false_eq_true, true_and]
+  · simp only [pDiv, divisorOf, ite_eq_right hα, ne_eq, not_false_eq_true, true_and]
     rw [anVal_pow_of hα (v := if ConjModQ K q 1 α then 1 else 0) (by
       rw [anVal_Th hq0 hq1 hα]; split_ifs <;> rfl)]
     by_cases h : ConjModQ K q 1 α <;> simp [h, hα] <;> rfl
@@ -64,14 +64,14 @@ theorem eq_one_of_ann {α : Omega K} (h1 : ‖q‖ < omegaNorm K α) (h2 : omega
   rw [hn] at h1 h2
   have hk0 : 0 ≤ k := by
     by_contra h
-    push_neg at h
+    push Not at h
     have : ‖q‖ ^ (-1 : ℤ) ≤ ‖q‖ ^ k := zpow_le_zpow_right_of_le_one₀ hq0 hq1.le (by omega)
     rw [zpow_neg_one] at this
     have h3 : 1 < ‖q‖⁻¹ := (one_lt_inv₀ hq0).mpr hq1
     linarith
   have hk1 : k < 1 := by
     by_contra h
-    push_neg at h
+    push Not at h
     have : ‖q‖ ^ k ≤ ‖q‖ ^ (1 : ℤ) := zpow_le_zpow_right_of_le_one₀ hq0 hq1.le h
     rw [zpow_one] at this
     linarith
@@ -93,7 +93,7 @@ theorem degQ_pDiv (n : ℕ) : degQ K q (pDiv (q := q) n) = n := by
   have hzero : ∀ α ∈ repAnnulus K q, α ≠ 1 → pDiv (q := q) n α = 0 := by
     intro α hα hne
     simp only [pDiv]
-    rw [if_neg]
+    rw [ite_eq_right]
     rintro ⟨-, hc⟩
     exact hne (eq_one_of_ann hq0 hq1 hα.2.1 hα.2.2 hc)
   rw [finsum_mem_eq_sum_of_inter_support_eq (t := {1})]
@@ -119,7 +119,7 @@ theorem Th_ne_zero_at {α : Omega K} (hα : α ≠ 0) (h : ¬ ConjModQ K q 1 α)
     (Th hq0 hq1).1 ⟨α, hα⟩ ≠ 0 := by
   classical
   refine hol_ne_zero_at_of_anVal_zero (Th_ne_zero hq0 hq1) hα ?_
-  rw [anVal_Th hq0 hq1 hα, if_neg h]
+  rw [anVal_Th hq0 hq1 hα, ite_eq_right h]
 
 theorem anVal_quot_nonneg {α : Omega K} (hα : α ≠ 0) (h : ¬ ConjModQ K q 1 α) (G : holSubring K)
     (k : ℕ) : 0 ≤ anVal K α (algebraMap (holSubring K) (MeroRing K) G /
@@ -127,7 +127,7 @@ theorem anVal_quot_nonneg {α : Omega K} (hα : α ≠ 0) (h : ¬ ConjModQ K q 1
   classical
   have hΘ := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
   have h0 : anVal K α (algebraMap (holSubring K) (MeroRing K) (Th hq0 hq1)) = ((0 : ℤ) : WithTop ℤ) := by
-    rw [anVal_Th hq0 hq1 hα, if_neg h]; rfl
+    rw [anVal_Th hq0 hq1 hα, ite_eq_right h]; rfl
   rw [div_eq_mul_inv, (anVal_isValuation K α hα).2.2.1,
     anVal_inv_of hα (pow_ne_zero k hΘ) (anVal_pow_of hα h0 k)]
   simpa using anVal_hol_nonneg hα G
@@ -166,9 +166,9 @@ theorem InL_iff (n : ℕ) (f : MeroRing K) : InL (q := q) n f ↔ f ∈ LSet K q
   · rintro ⟨hF, h1, h2⟩
     refine ⟨hF, fun α hα => ?_⟩
     by_cases hc : ConjModQ K q 1 α
-    · simp only [pDiv, hα, hc, ne_eq, not_false_eq_true, and_self, if_true]
+    · simp only [pDiv, hα, hc, ne_eq, not_false_eq_true, and_self, ite_true]
       rw [anVal_conj_one hq0 hF hα hc]; exact h1
-    · simp only [pDiv, hc, and_false, if_false, neg_zero]
+    · simp only [pDiv, hc, and_false, ite_false, neg_zero]
       exact h2 α hα hc
   · rintro ⟨hF, h⟩
     refine ⟨hF, ?_, fun α hα hc => ?_⟩
@@ -268,7 +268,7 @@ theorem InL_one_const {f : MeroRing K} (hf : InL (q := q) 1 f) :
   have hle : Submodule.span K {(1 : MeroRing K)} ≤ Submodule.span K (LSet K q (pDiv (q := q) 1)) :=
     Submodule.span_mono (Set.singleton_subset_iff.mpr h1)
   have heq : Submodule.span K {(1 : MeroRing K)} = Submodule.span K (LSet K q (pDiv (q := q) 1)) := by
-    haveI : FiniteDimensional K (Submodule.span K (LSet K q (pDiv (q := q) 1))) :=
+    have : FiniteDimensional K (Submodule.span K (LSet K q (pDiv (q := q) 1))) :=
       Module.finite_of_finrank_eq_succ hfin
     refine Submodule.eq_of_le_of_finrank_eq hle ?_
     rw [hfin, finrank_span_singleton one_ne_zero]
@@ -389,10 +389,10 @@ theorem InL_mem_spanMono : ∀ (n : ℕ) (f : MeroRing K), InL (q := q) n f → 
         rw [h1, Algebra.smul_def, mul_one]
       rw [this]
       exact Submodule.smul_mem _ c (spanMono_mono hq0 hq1 (by omega) (mono_mem_spanMono hq0 hq1 (i := 0) (j := 0) (by norm_num)))
-    push_neg at hn
+    push Not at hn
     by_cases hf1 : ((-((n - 1 : ℕ) : ℤ) : ℤ) : WithTop ℤ) ≤ anVal K 1 f
     · exact spanMono_mono hq0 hq1 (by omega) (ih (n - 1) (by omega) f ⟨hf.1, hf1, hf.2.2⟩)
-    · push_neg at hf1
+    · push Not at hf1
       obtain ⟨i, j, hj, hij⟩ : ∃ i j : ℕ, j ≤ 1 ∧ 2 * i + 3 * j = n := by
         rcases Nat.even_or_odd n with ⟨k, hk⟩ | ⟨k, hk⟩
         · exact ⟨k, 0, by omega, by omega⟩
@@ -440,7 +440,7 @@ theorem divisorOf_periodic {f : MeroRing K} (hf : f ∈ Fq K q) :
   · simp [hα]
   have := anVal_periodic hq0' hf hα 1
   rw [zpow_one] at this
-  simp only [divisorOf, if_neg hα, if_neg (mul_ne_zero hQ hα), this]
+  simp only [divisorOf, ite_eq_right hα, ite_eq_right (mul_ne_zero hQ hα), this]
 
 /-- The pole divisor `max(-m, 0)`. -/
 def polePart (m : Omega K → ℤ) : Omega K → ℤ := fun α => max (-(m α)) 0
@@ -505,7 +505,7 @@ theorem Fq_le_adjoin {f : MeroRing K} (hf : f ∈ Fq K q) :
   have hRR := (riemann_roch_analytic K q hq0 hq1 E hEm).2.2 hpos
   obtain ⟨h, hhL, hh0⟩ : ∃ h ∈ LSet K q E, h ≠ 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have : Submodule.span K (LSet K q E) = ⊥ := by
       rw [eq_bot_iff, Submodule.span_le]
       intro x hx; rw [hcon x hx]; exact (⊥ : Submodule K (MeroRing K)).zero_mem
@@ -518,13 +518,13 @@ theorem Fq_le_adjoin {f : MeroRing K} (hf : f ∈ Fq K q) :
       refine le_trans ?_ this
       have : -(E 1) ≥ -(N : ℤ) := by
         simp only [hE, Pi.add_apply, Pi.neg_apply, pDiv, ne_eq, one_ne_zero, not_false_eq_true,
-          conjModQ_refl, and_self, if_true]
+          conjModQ_refl, and_self, ite_true]
         linarith [hD0 1]
       exact_mod_cast this
     · have := hhv α hα
       refine le_trans ?_ this
       have : (0 : ℤ) ≤ -(E α) := by
-        simp only [hE, Pi.add_apply, Pi.neg_apply, pDiv, hc, and_false, if_false]
+        simp only [hE, Pi.add_apply, Pi.neg_apply, pDiv, hc, and_false, ite_false]
         linarith [hD0 α]
       exact_mod_cast this
   have hInLfh : InL (q := q) N (f * h) := by
@@ -534,7 +534,7 @@ theorem Fq_le_adjoin {f : MeroRing K} (hf : f ∈ Fq K q) :
       refine le_trans ?_ h1
       have : -(N : ℤ) ≤ m 1 + -(E 1) := by
         simp only [hE, hD, polePart, Pi.add_apply, Pi.neg_apply, pDiv, ne_eq, one_ne_zero,
-          not_false_eq_true, conjModQ_refl, and_self, if_true]
+          not_false_eq_true, conjModQ_refl, and_self, ite_true]
         have := le_max_left (-(m 1)) 0
         linarith
       exact_mod_cast this
@@ -542,7 +542,7 @@ theorem Fq_le_adjoin {f : MeroRing K} (hf : f ∈ Fq K q) :
       have h1 := anVal_le_add hα (le_of_eq hfv.symm) (hhv α hα)
       refine le_trans ?_ h1
       have : (0 : ℤ) ≤ m α + -(E α) := by
-        simp only [hE, hD, polePart, Pi.add_apply, Pi.neg_apply, pDiv, hc, and_false, if_false]
+        simp only [hE, hD, polePart, Pi.add_apply, Pi.neg_apply, pDiv, hc, and_false, ite_false]
         have := le_max_left (-(m α)) 0
         linarith
       exact_mod_cast this

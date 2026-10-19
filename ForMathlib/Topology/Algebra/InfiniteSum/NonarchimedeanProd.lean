@@ -63,10 +63,10 @@ theorem tendsto_pow_add_cofinite_zero {s : ℝ} (hs0 : 0 ≤ s) (hs1 : s < 1) :
     (gt_mem_nhds hε)).exists_forall_of_atTop
   rw [Filter.eventually_cofinite]
   refine ((Set.finite_lt_nat N).prod (Set.finite_lt_nat N)).subset (fun p hp => ?_)
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, not_lt] at hp
+  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, not_lt] at hp
   rw [abs_of_nonneg (pow_nonneg hs0 _)] at hp
-  simp only [Set.mem_prod, Set.mem_setOf_eq]
+  simp only [Set.mem_prod, Set.mem_ofPred_eq]
   by_contra h
   have : N ≤ p.1 + p.2 := by
-    rcases not_and_or.mp h with h1 | h1 <;> push_neg at h1 <;> omega
+    rcases not_and_or.mp h with h1 | h1 <;> push Not at h1 <;> omega
   exact absurd hp (not_le.mpr (hN _ this))

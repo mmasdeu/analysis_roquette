@@ -167,7 +167,7 @@ theorem quotFun_transfer (φ : Omega K₁ ≃+* Omega K₂) {g₁ : holSubring K
   by_cases hx : x = 0
   · simp [hx]
   · have hx' : φ.symm x ≠ 0 := by simpa using hx
-    rw [dif_pos hx, dif_pos hx']
+    rw [dite_eq_left hx, dite_eq_left hx']
     have := h (φ.symm x) hx'
     have e : (⟨φ (φ.symm x), (map_ne_zero φ).mpr hx'⟩ : {y : Omega K₂ // y ≠ 0}) = ⟨x, hx⟩ := by
       apply Subtype.ext; simp
@@ -243,7 +243,7 @@ end transfer
 section isometry
 
 theorem omegaL_norm_eq (y : Omega L) : ‖y‖ = spectralNorm K (Omega L) y := by
-  haveI : Algebra.IsAlgebraic K (Omega L) := Algebra.IsAlgebraic.trans K L (Omega L)
+  have : Algebra.IsAlgebraic K (Omega L) := Algebra.IsAlgebraic.trans K L (Omega L)
   let f : AbsoluteValue (Omega L) ℝ :=
     { toFun := fun z => ‖z‖
       map_mul' := norm_mul
@@ -292,7 +292,7 @@ theorem holRel_holExt (g : holSubring K) : HolRel (ψ : Omega K ≃+* Omega L) g
   refine h1.unique ?_
   convert h2 using 1
   funext n
-  simp only [Function.comp, AddMonoidHom.coe_coe, map_mul, map_zpow₀, AlgEquiv.commutes]
+  simp only [Function.comp, AddMonoidHom.coe_ofClass, map_mul, map_zpow₀, AlgEquiv.commutes]
   rw [IsScalarTower.algebraMap_apply K L (Omega L)]
 
 theorem holExt_monoHol (n : ℤ) : holExt (L := L) (monoHol K (Omega K) n) = monoHol L (Omega L) n := by
@@ -316,7 +316,7 @@ theorem eIdx_dvd {α : Omega K} (hα : α ≠ 0) : eIdx L (ψ α) ∣ eIdx K α 
   have hψ : ψ α ≠ 0 := (map_ne_zero ψ).mpr hα
   set f := algebraMap (holSubring K) (MeroRing K) (polyHol K (Omega K) (minpoly K α))
   have hf1 : anVal K α f = 1 := by
-    rw [anVal_polyHol_minpoly hα hα, if_pos rfl]
+    rw [anVal_polyHol_minpoly hα hα, ite_eq_left rfl]
   have hf0 : f ≠ 0 := by
     intro h; rw [h, anVal_zero K α hα] at hf1; exact WithTop.top_ne_one hf1
   obtain ⟨k, hk⟩ := anPt_eq_e_mul K hα hf0
@@ -382,7 +382,7 @@ noncomputable def divExtFun (m : Omega K → ℤ) : Omega L → ℤ :=
 theorem divExtFun_apply (m : Omega K → ℤ) {α : Omega K} (hα : α ≠ 0) :
     divExtFun ψ m (ψ α) = (ramIndex K L ψ α : ℤ) * m α := by
   unfold divExtFun
-  rw [if_neg ((map_ne_zero ψ).mpr hα), AlgEquiv.symm_apply_apply]
+  rw [ite_eq_right ((map_ne_zero ψ).mpr hα), AlgEquiv.symm_apply_apply]
 
 theorem divExtFun_zero_pt (m : Omega K → ℤ) : divExtFun ψ m 0 = 0 := by
   simp [divExtFun]
@@ -420,7 +420,7 @@ theorem divExtFun_mem {m : Omega K → ℤ} (hm : m ∈ Divisors K) : divExtFun 
     · show ‖ψ.symm β‖ ≤ r'
       rw [← psi_norm K L ψ, AlgEquiv.apply_symm_apply]; exact h2
     · intro h0; apply h3
-      unfold divExtFun; rw [if_neg hβ, h0, mul_zero]
+      unfold divExtFun; rw [ite_eq_right hβ, h0, mul_zero]
   · by_cases hβ : β = 0
     · have hβ' : β' = 0 := by
         have : minpoly L β' = Polynomial.X := by rw [← h, hβ, minpoly.zero]
@@ -434,7 +434,7 @@ theorem divExtFun_mem {m : Omega K → ℤ} (hm : m ∈ Divisors K) : divExtFun 
         have h3 := minpoly.aeval L β
         rw [h] at h3; simp at h3; exact hβ h3
       unfold divExtFun
-      rw [if_neg hβ, if_neg hβ', h1, hm.2.2 _ _ h2]
+      rw [ite_eq_right hβ, ite_eq_right hβ', h1, hm.2.2 _ _ h2]
 
 theorem divExtFun_periodic {q : K} {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) :
     divExtFun ψ m ∈ DivisorsPeriodic L (algebraMap K L q) := by
@@ -458,7 +458,7 @@ theorem divExtFun_periodic {q : K} {m : Omega K → ℤ} (hm : m ∈ DivisorsPer
   unfold divExtFun
   by_cases hβ : β = 0
   · simp [hβ]
-  rw [if_neg (mul_ne_zero hqΩ' hβ), if_neg hβ, e, hm.2]
+  rw [ite_eq_right (mul_ne_zero hqΩ' hβ), ite_eq_right hβ, e, hm.2]
   congr 2
   unfold ramIndex
   rw [map_mul, AlgEquiv.commutes, AlgEquiv.apply_symm_apply,
@@ -595,7 +595,7 @@ theorem degQ_PhiQ_divExt {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Om
       rw [he, mul_inv_eq_one₀ haL] at h
       exact h.symm
     simp only [Units.val_zpow_eq_zpow_val, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0,
-      Units.coe_map, MonoidHom.coe_coe, map_mul, map_zpow₀, map_neg, map_one]
+      Units.coe_map, MonoidHom.coe_ofClass, map_mul, map_zpow₀, map_neg, map_one]
     rw [hdd, he', zpow_neg]
     have hq'0 : algebraMap K L q ≠ 0 := hqL
     field_simp
@@ -652,9 +652,9 @@ theorem eIdx_le_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃ₐ[K] O
   have hle : E₁ ≤ E₂ := by
     rw [hE₁, IntermediateField.adjoin_simple_le_iff]
     exact IntermediateField.mem_adjoin_simple_self L (ψ α)
-  letI : Algebra E₁ E₂ := (IntermediateField.inclusion hle).toAlgebra
-  haveI : IsScalarTower K E₁ E₂ := .of_algebraMap_eq' rfl
-  haveI : FiniteDimensional K E₁ :=
+  let : Algebra E₁ E₂ := (IntermediateField.inclusion hle).toAlgebra
+  have : IsScalarTower K E₁ E₂ := .of_algebraMap_eq' rfl
+  have : FiniteDimensional K E₁ :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral (ψ α))
   have htower := Field.finInsepDegree_mul_finInsepDegree_of_isAlgebraic K E₁ E₂
   let eqv : E₂ ≃ₐ[K] M :=
@@ -702,7 +702,7 @@ section galAction
 variable {K L}
 
 theorem normL_eq_spectral (x : L) : ‖x‖ = spectralNorm K L x := by
-  haveI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  have : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
   let f : AbsoluteValue L ℝ :=
     { toFun := fun z => ‖z‖
       map_mul' := norm_mul
@@ -829,7 +829,7 @@ theorem galAct_holRel {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (h
   refine h1.unique ?_
   convert h2 using 1
   funext n
-  simp only [Function.comp, AddMonoidHom.coe_coe, map_mul, map_zpow₀]
+  simp only [Function.comp, AddMonoidHom.coe_ofClass, map_mul, map_zpow₀]
   rw [hσ']
 
 theorem minpoly_ext {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ')
@@ -983,7 +983,7 @@ theorem remark_galois_action_divisors (σ : GalGroup K L) (ρ : MeroRing L ≃+*
     divisorOf L (ρ f) (σ' α) = divisorOf L f α := by
   have hσα : σ' α ≠ 0 := (map_ne_zero σ').mpr hα
   unfold divisorOf
-  rw [if_neg hσα, if_neg hα, anVal_galAct hρ hσ' hα]
+  rw [ite_eq_right hσα, ite_eq_right hα, anVal_galAct hρ hσ' hα]
 
 /-- Book, §2, Remark 2: the group of `G`-fixed elements of `D_L` is `D_K` (embedded as in Remark 1). -/
 theorem remark_galois_fixed_divisors (ψ : Omega K ≃ₐ[K] Omega L) (ι : Divisors K →+ Divisors L)
@@ -1109,7 +1109,7 @@ theorem remark_galois_equivariance (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 
       funext β
       by_cases hβ : β = 0
       · simp [hndef, hβ, divisorOf, hm.1.1]
-      · simp only [divisorOf, if_neg hβ, hGv β hβ, WithTop.untopD_coe]
+      · simp only [divisorOf, ite_eq_right hβ, hGv β hβ, WithTop.untopD_coe]
     refine ⟨heq ▸ divisorOf_mem_Divisors L G, fun β => ?_⟩
     simp only [hndef, map_mul, hσ'q]
     exact hm.2 _

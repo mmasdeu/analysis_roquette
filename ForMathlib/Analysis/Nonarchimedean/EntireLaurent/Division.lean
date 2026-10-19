@@ -28,7 +28,7 @@ variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
   [Algebra.IsIntegral K L] [IsAlgClosed L]
 
 theorem holCoeff_exists_ne {f : holSubring K L} (hf : f ≠ 0) : ∃ n, holCoeff K f n ≠ 0 := by
-  by_contra h; push_neg at h
+  by_contra h; push Not at h
   apply hf
   apply holCoeff_injective K
   rw [holCoeff_zero]; funext n; exact h n
@@ -47,9 +47,9 @@ theorem unique_max_of_no_zero {U : holSubring K L} (hU : U ≠ 0) {ρ : ℝ} (h�
     classical
     obtain ⟨x, hx, hx0, hFx⟩ := exists_zero_of_tie K (holCoeff_convergent K U)
       (F := fun x => if h : x ≠ 0 then U.1 ⟨x, h⟩ else 0)
-      (fun x hx => by simpa [dif_pos hx] using holCoeff_hasSum K U ⟨x, hx⟩) hρ h
+      (fun x hx => by simpa [dite_eq_left hx] using holCoeff_hasSum K U ⟨x, hx⟩) hρ h
       (fun m => hL.1 m) heq hp
-    simp only [dif_pos hx0] at hFx
+    simp only [dite_eq_left hx0] at hFx
     exact hnz ⟨x, hx0⟩ hx hFx
 
 
@@ -224,9 +224,9 @@ theorem local_inverse {U : holSubring K L} (hU : U ≠ 0) {r r' : ℝ} (hr : 0 <
     rw [hEc n]
     by_cases hn : n = 0
     · subst hn
-      simp only [zero_add, if_true, hc, inv_mul_cancel₀ huN, sub_self, norm_zero, zero_mul]
+      simp only [zero_add, ite_true, hc, inv_mul_cancel₀ huN, sub_self, norm_zero, zero_mul]
       exact one_pos
-    · simp only [hn, if_false, zero_sub, norm_neg, norm_mul, hc, norm_inv]
+    · simp only [hn, ite_false, zero_sub, norm_neg, norm_mul, hc, norm_inv]
       have h1 := hN ρ hρ (n + N) (by omega)
       simp only [wt] at h1 hNpos
       have hρn : ρ ^ (n + N) = ρ ^ n * ρ ^ N := by rw [zpow_add₀ hρpos.ne']
@@ -249,7 +249,7 @@ theorem pow_dvd_iff_le {α : L} (hα : α ≠ 0) {f : holSubring K L} (hf : f �
   constructor
   · intro h
     by_contra hk
-    push_neg at hk
+    push Not at hk
     exact hm.2 (dvd_trans (pow_dvd_pow _ hk) h)
   · intro hk
     exact dvd_trans (pow_dvd_pow _ hk) hm.1
@@ -297,7 +297,7 @@ theorem norm_apply_le_gnorm (f : holSubring K L) (x : Punct L) :
 minimal polynomial of a point `α ≠ 0`. -/
 theorem exists_not_pow_dvd {α : L} (hα : α ≠ 0) {B : holSubring K L} (hB : B ≠ 0) :
     ∃ m : ℕ, ¬ polyHol K L (minpoly K α) ^ m ∣ B := by
-  haveI := nhdsNE_neBot_of_normedAlgebra K α
+  have := nhdsNE_neBot_of_normedAlgebra K α
   obtain ⟨g, a, ha, h0, hsum, hBg⟩ := hol_rep K hB
   obtain ⟨k, c, hc, -, hlim⟩ := exists_order K ha hsum hα h0
   refine ⟨k + 1, ?_⟩
@@ -354,7 +354,7 @@ theorem exists_exact_pow_dvd {α : L} (hα : α ≠ 0) {B : holSubring K L} (hB 
     intro h; apply hm0; rw [h, pow_zero]; exact one_dvd B
   refine ⟨m0 - 1, ?_, ?_⟩
   · have := Nat.find_min hex (show m0 - 1 < m0 by omega)
-    push_neg at this; exact this
+    push Not at this; exact this
   · rwa [Nat.sub_add_cancel (Nat.pos_of_ne_zero hpos)]
 
 /-- Removing the minimal-polynomial factors of `B` with zeros in the annulus `[r, r']`. -/
@@ -557,12 +557,12 @@ theorem hol_dvd_of_pow_dvd {A B : holSubring K L} (hB : B ≠ 0)
     have hfin := Filter.eventually_cofinite.mp
       ((wt_tendsto K (holCoeff_convergent K Y) hρ).eventually (gt_mem_nhds (half_pos hε)))
     refine hfin.subset (fun n hn => ?_)
-    simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, not_lt] at hn ⊢
+    simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, not_lt] at hn ⊢
     rw [abs_of_nonneg (mul_nonneg (norm_nonneg _) (zpow_nonneg hρ.le n))] at hn
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     apply absurd hn
-    push_neg
+    push Not
     have hpn : 0 ≤ ρ ^ n := zpow_nonneg hρ.le n
     have h1 := IsUltrametricDist.norm_add_le_max (c n - holCoeff K Y n) (holCoeff K Y n)
     rw [sub_add_cancel] at h1

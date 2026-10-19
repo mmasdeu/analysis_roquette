@@ -120,7 +120,7 @@ theorem evalZ_C (hq : ‖q‖ < 1) (n : ℤ) : evalZ q (C n) = n := by
   unfold evalZ
   rw [tsum_eq_single 0]
   · simp
-  · intro k hk; rw [coeff_C, if_neg hk]; simp
+  · intro k hk; rw [coeff_C, ite_eq_right hk]; simp
 
 theorem evalZ_serB (hq : ‖q‖ < 1) : evalZ q serB = coeffB K q := by
   unfold coeffB

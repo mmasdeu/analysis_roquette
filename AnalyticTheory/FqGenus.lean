@@ -59,7 +59,7 @@ theorem ptOf_spec (P : PrimeDivisor K (FqSub K q)) : ptOf P ≠ 0 ∧
     ∀ x : FqSub K q, x ∈ P.ring ↔ 0 ≤ anVal K (ptOf P) (x : MeroRing K) := by
   have h := primeDivisor_classify hq0 hq1 P
   unfold ptOf
-  rw [dif_pos h]
+  rw [dite_eq_left h]
   exact h.choose_spec
 
 include hq0 hq1 in
@@ -137,7 +137,7 @@ theorem anVal_irreducible {α : Omega K} (hα : α ≠ 0) {π : ringAt q hα} (h
 omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem uniformizer_spec {F : Type u} [Field F] [Algebra K F] (P : PrimeDivisor K F) :
     ∃ h : P.uniformizer ∈ P.ring, Irreducible (⟨P.uniformizer, h⟩ : P.ring) := by
-  haveI := P.isDVR
+  have := P.isDVR
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible P.ring
   exact Classical.epsilon_spec (p := fun π : F => ∃ h : π ∈ P.ring, Irreducible (⟨π, h⟩ : P.ring))
     ⟨ϖ, ϖ.2, hϖ⟩
@@ -183,10 +183,10 @@ theorem perDiv_apply (D : FFDivisor K (FqSub K q)) {α : Omega K} (hα : α ≠ 
     by_cases hc : ConjModQ K q (ptOf P) α
     · have : P = primeAt hq0 hq1 hα :=
         (eq_primeAt hq0 hq1 P).trans ((primeAt_eq_iff hq0 hq1 hβ hα).mpr hc)
-      rw [if_pos this]; simp [pointDivisor, hc]
+      rw [ite_eq_left this]; simp [pointDivisor, hc]
     · have : P ≠ primeAt hq0 hq1 hα := fun h =>
         hc ((primeAt_eq_iff hq0 hq1 hβ hα).mp ((eq_primeAt hq0 hq1 P).symm.trans h))
-      rw [if_neg this]; simp [pointDivisor, hc]
+      rw [ite_eq_right this]; simp [pointDivisor, hc]
   rw [Finset.sum_congr rfl key, Finset.sum_ite_eq']
   split_ifs with h
   · rfl
@@ -346,7 +346,7 @@ theorem exists_const_approx_K {b : K} (hb : b ≠ 0) {x : FqSub K q}
   have hdeg := primeAt_degree hq0 hq1 hβ
   rw [minpoly_alg, Polynomial.natDegree_X_sub_C] at hdeg
   unfold PrimeDivisor.degree at hdeg
-  letI : Algebra K (IsLocalRing.ResidueField P.ring) :=
+  let : Algebra K (IsLocalRing.ResidueField P.ring) :=
     ((IsLocalRing.residue P.ring).comp P.toRing).toAlgebra
   obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' (1 : IsLocalRing.ResidueField P.ring)
     one_ne_zero).mp hdeg (IsLocalRing.residue P.ring ⟨x, hx⟩)

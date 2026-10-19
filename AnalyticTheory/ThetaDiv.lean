@@ -97,7 +97,7 @@ theorem thetaFun_spec {α : Omega K} (hα : α ≠ 0) :
           (𝓝 ((thetaFun hq0 hq1 α).1 x)) := by
   classical
   unfold thetaFun
-  rw [dif_pos hα]
+  rw [dite_eq_left hα]
   exact Classical.choose_spec (theta_spec hq0 hq1 hα)
 
 end theta
@@ -171,9 +171,9 @@ theorem anVal_thetaDiv {ξ : Omega K} (hξ : ξ ≠ 0) :
   have hβξ : ConjModQ K q β ξ :=
     conjModQ_trans hq0' (conjModQ_symm hq0' hβc) (conjModQ_symm hq0' hξξ')
   rw [Finset.sum_eq_single β]
-  · rw [if_pos hβξ, mul_one, hmβ]
+  · rw [ite_eq_left hβξ, mul_one, hmβ]
   · intro α hα hne
-    rw [if_neg, mul_zero]
+    rw [ite_eq_right, mul_zero]
     intro hαξ
     have hαann := ((mem_thetaS hq0 hq1 hm).mp hα).1
     have h1 : ConjModQ K q ξ' α :=
@@ -344,7 +344,7 @@ theorem PhiQ_eq_mk (hq : q ≠ 0) :
         intro h0; apply hne; simp [h0]
       · rintro ⟨hα, hne⟩
         exact ⟨((mem_thetaS hq0 hq1 hm).mp hα).1, hne⟩
-  rw [hprod, dif_pos hx]
+  rw [hprod, dite_eq_left hx]
 
 end theta3
 

@@ -26,7 +26,7 @@ sum is taken in the finite extension `K⟮α⟯`). -/
 theorem laurent_summable {a : ℤ → K} (ha : IsConvergentLaurent K a) {α : L} (hα : α ≠ 0) :
     ∃ s : L, HasSum (fun n : ℤ => algebraMap K L (a n) * α ^ n) s := by
   set S := IntermediateField.adjoin K ({α} : Set L) with hS
-  haveI : FiniteDimensional K S :=
+  have : FiniteDimensional K S :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α)
   have hαS : α ∈ S := IntermediateField.mem_adjoin_simple_self K α
   have hmem : ∀ n : ℤ, algebraMap K L (a n) * α ^ n ∈ S := fun n =>
@@ -175,7 +175,7 @@ theorem monoHol_apply (n : ℤ) (α : Punct L) : (monoHol K L n).1 α = α.1 ^ n
       algebraMap K L (if m = n then (1 : K) else 0) * α.1 ^ m) n
     (fun m hm => by simp [hm])
   have := h.unique h2
-  simp only [if_true, map_one, one_mul] at this
+  simp only [ite_true, map_one, one_mul] at this
   exact this
 
 /-- The units of `H_K` are the functions `c Xⁿ`. -/

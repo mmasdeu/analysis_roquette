@@ -104,7 +104,7 @@ is `φ(O_P)`. -/
 noncomputable def PrimeDivisor.map (φ : F ≃ₐ[K] F) (P : PrimeDivisor K F) : PrimeDivisor K F where
   ring := P.ring.comap (φ.symm : F →+* F)
   isDVR := by
-    haveI := P.isDVR
+    have := P.isDVR
     let e : P.ring ≃+* (P.ring.comap (φ.symm : F →+* F)) :=
       { toFun := fun y => ⟨φ y.1, by
           rw [ValuationSubring.mem_comap]; simpa using y.2⟩

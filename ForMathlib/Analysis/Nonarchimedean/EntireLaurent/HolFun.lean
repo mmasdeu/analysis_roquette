@@ -79,12 +79,12 @@ noncomputable def holReflectHom : holSubring K L ≃+* holSubring K L where
 omit [Algebra.IsIntegral K L] in
 /-- Book, §2: `H_K` is an integral domain. -/
 theorem holSubring_isDomain : IsDomain (holSubring K L) := by
-  haveI : Nontrivial (holSubring K L) := ⟨⟨1, 0, fun h => by
+  have : Nontrivial (holSubring K L) := ⟨⟨1, 0, fun h => by
     have := congrFun (congrArg Subtype.val h) ⟨1, one_ne_zero⟩
     exact one_ne_zero this⟩⟩
-  haveI : NoZeroDivisors (holSubring K L) := ⟨fun {f g} h => by
+  have : NoZeroDivisors (holSubring K L) := ⟨fun {f g} h => by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     obtain ⟨hf, hg⟩ := hcon
     -- representations and non-vanishing coefficients
     have key : ∀ f : holSubring K L, f ≠ 0 → ∃ (a : ℤ → K), IsConvergentLaurent K a ∧
@@ -97,7 +97,7 @@ theorem holSubring_isDomain : IsDomain (holSubring K L) := by
         rw [← hFf]; exact hFa α.1 α.2
       refine ⟨a, ha, ?_, hsum⟩
       by_contra hno
-      push_neg at hno
+      push Not at hno
       apply hf
       apply Subtype.ext
       funext α

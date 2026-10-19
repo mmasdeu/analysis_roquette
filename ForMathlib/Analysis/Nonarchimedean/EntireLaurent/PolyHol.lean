@@ -140,12 +140,12 @@ theorem holCoeff_polyHol (P : K[X]) (n : ℤ) :
     show c * holCoeff K (monoHol K L (m : ℤ)) n = _
     rw [holCoeff_monoHol]
     by_cases h0 : 0 ≤ n
-    · simp only [h0, if_true, Polynomial.coeff_monomial]
+    · simp only [h0, ite_true, Polynomial.coeff_monomial]
       by_cases hm : n = (m : ℤ)
       · subst hm; simp
       · have : m ≠ n.toNat := fun h => hm (by omega)
         simp [hm, this]
-    · simp only [h0, if_false]
+    · simp only [h0, ite_false]
       have : n ≠ (m : ℤ) := fun h => h0 (by omega)
       simp [this]
 
@@ -163,7 +163,7 @@ theorem wt_le_of_conv {b : ℤ → K} (hb : IsConvergentLaurent K b) (h0 : ∃ n
     rw [this] at h1
     have h2 : wt K r a Na ≤ M / wt K r b Nb := (le_div_iff₀ hpb).mpr h1
     exact le_trans (hNa.1 n) h2
-  · push_neg at ha0
+  · push Not at ha0
     have hM0 : 0 ≤ M := le_trans (wt_nonneg K hr _ 0) (hM 0)
     simp [wt, ha0]
     positivity
@@ -172,8 +172,8 @@ omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 /-- Coordinates with respect to a basis of a finite extension are bounded by the norm. -/
 theorem coord_bound (S : IntermediateField K L) [FiniteDimensional K S] {n : ℕ}
     (b : Module.Basis (Fin n) K S) : ∃ C : ℝ, 0 ≤ C ∧ ∀ (x : S) (i : Fin n), ‖b.repr x i‖ ≤ C * ‖x‖ := by
-  letI : NormedAddCommGroup S := inferInstanceAs (NormedAddCommGroup S.toSubalgebra)
-  letI : NormedSpace K S := inferInstanceAs (NormedSpace K S.toSubalgebra)
+  let : NormedAddCommGroup S := inferInstanceAs (NormedAddCommGroup S.toSubalgebra)
+  let : NormedSpace K S := inferInstanceAs (NormedSpace K S.toSubalgebra)
   refine ⟨∑ i, ‖LinearMap.toContinuousLinearMap (b.coord i)‖,
     Finset.sum_nonneg (fun i _ => norm_nonneg _), fun x i => ?_⟩
   have h1 := (LinearMap.toContinuousLinearMap (b.coord i)).le_opNorm x
@@ -202,7 +202,7 @@ theorem exists_coord_bound {α : L} (hα : α ≠ 0) :
     ∃ (C : ℝ) (R : ℤ → K[X]), 0 ≤ C ∧ (∀ k, (R k).degree < (minpoly K α).degree) ∧
       (∀ k, Polynomial.aeval α (R k) = α ^ k) ∧ ∀ k j, ‖(R k).coeff j‖ ≤ C * ‖α‖ ^ k := by
   have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
-  haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set L)) :=
+  have : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set L)) :=
     IntermediateField.adjoin.finiteDimensional hint
   obtain ⟨C, hC0, hC⟩ := coord_bound K (IntermediateField.adjoin K ({α} : Set L))
     (IntermediateField.adjoin.powerBasis hint).basis
@@ -220,18 +220,18 @@ theorem exists_coord_bound {α : L} (hα : α ≠ 0) :
   · have h := coe_eq_sum_basis K hint (x k)
     simp only [map_sum, Polynomial.aeval_C, Polynomial.aeval_X, map_mul, map_pow]
     exact h.symm
-  · rw [Polynomial.finset_sum_coeff]
+  · rw [Polynomial.finsetSum_coeff]
     simp only [Polynomial.coeff_C_mul, Polynomial.coeff_X_pow]
     by_cases hj : ∃ i : Fin (IntermediateField.adjoin.powerBasis hint).dim, j = (i : ℕ)
     · obtain ⟨i0, hi0⟩ := hj
       rw [Finset.sum_eq_single i0]
-      · rw [hi0]; simp only [if_true, mul_one]
+      · rw [hi0]; simp only [ite_true, mul_one]
         exact le_trans (hC _ i0) (by rw [hxn])
       · intro i _ hi
         have : j ≠ (i : ℕ) := fun h => hi (Fin.ext (by omega))
         simp [this]
       · intro h; exact absurd (Finset.mem_univ _) h
-    · push_neg at hj
+    · push Not at hj
       have : ∀ i : Fin (IntermediateField.adjoin.powerBasis hint).dim,
           ((IntermediateField.adjoin.powerBasis hint).basis.repr (x k) i *
             if j = (i : ℕ) then 1 else 0) = 0 := fun i => by simp [hj i]
@@ -273,7 +273,7 @@ theorem poly_wt_le (P : K[X]) (N : ℕ) (hP : P.natDegree < N) (M : ℝ) (hM : �
     · rw [Polynomial.coeff_eq_zero_of_natDegree_lt (by omega)]
       simp only [norm_zero, zero_mul]
       positivity
-    · push_neg at hmN
+    · push Not at hmN
       have h1 : r ^ m ≤ max 1 r ^ N :=
         le_trans (pow_le_pow_left₀ hr.le (le_max_right 1 r) m)
           (pow_le_pow_right₀ hmax hmN.le)
@@ -351,7 +351,7 @@ theorem hol_phi_division {α : L} (hα : α ≠ 0) (f : holSubring K L) :
         ((r ^ k + C * max 1 r ^ (minpoly K α).natDegree * ‖α‖ ^ k) / B)}.Finite := by
       have := Filter.eventually_cofinite.mp (ht.eventually (gt_mem_nhds hε))
       refine this.subset (fun k hk => ?_)
-      simp only [Set.mem_setOf_eq] at hk ⊢
+      simp only [Set.mem_ofPred_eq] at hk ⊢
       exact not_lt.mpr hk.le
     refine hfin.subset (fun k ⟨n, hn⟩ => ?_)
     beta_reduce at hn
@@ -359,7 +359,7 @@ theorem hol_phi_division {α : L} (hα : α ≠ 0) (f : holSubring K L) :
     simp only [norm_mul] at hn
     have h3 := hBb k n
     simp only [wt] at h3
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     calc ε < ‖holCoeff K f k‖ * ‖holCoeff K (G k) n‖ * r ^ n := hn
       _ = ‖holCoeff K f k‖ * (‖holCoeff K (G k) n‖ * r ^ n) := by ring
       _ ≤ _ := mul_le_mul_of_nonneg_left h3 (norm_nonneg _)
@@ -396,7 +396,7 @@ theorem hol_phi_division {α : L} (hα : α ≠ 0) (f : holSubring K L) :
         ((polyHol K L (∑ i : Fin N, Polynomial.C (s i) * X ^ (i : ℕ))).1 x) := by
       have hpS : (polyHol K L (∑ i : Fin N, Polynomial.C (s i) * X ^ (i : ℕ))).1 x =
           ∑ i : Fin N, algebraMap K L (s i) * x.1 ^ (i : ℕ) := by
-        rw [polyHol_apply]; simp [Polynomial.eval_finset_sum]
+        rw [polyHol_apply]; simp [Polynomial.eval_finsetSum]
       rw [hpS]
       have := hasSum_sum (s := (Finset.univ : Finset (Fin N))) (fun (i : Fin N) _ =>
         (((hs i).map (algebraMap K L : K →+* L)

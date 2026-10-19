@@ -37,7 +37,7 @@ theorem coeff_prodN_stable (k N : ℕ) (hk : k ≤ N) (M : ℕ) :
   | zero => rfl
   | succ M ih =>
     obtain ⟨g, hg⟩ := prodN_succ (N + M)
-    rw [← add_assoc, hg, map_add, ih, coeff_X_pow_mul', if_neg (by omega), add_zero]
+    rw [← add_assoc, hg, map_add, ih, coeff_X_pow_mul', ite_eq_right (by omega), add_zero]
 
 /-- The limit of the products. -/
 noncomputable def prodInf : PowerSeries ℤ := PowerSeries.mk fun k => coeff k (prodN k)

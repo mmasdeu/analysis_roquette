@@ -66,7 +66,7 @@ variable {F : Type*} [Field F]
 theorem ringHom_ext_of_adjoin_eq_top {A : Type*} [CommSemiring A] (E : Subfield F)
     {s : Set F} (hs : adjoin E s = ⊤) {g₁ g₂ : F →+* A} (hE : ∀ e : E, g₁ e = g₂ e)
     (h : ∀ x ∈ s, g₁ x = g₂ x) : g₁ = g₂ := by
-  letI : Algebra E A := (g₁.comp E.subtype).toAlgebra
+  let : Algebra E A := (g₁.comp E.subtype).toAlgebra
   have hc : ∀ e : E, g₂ (e : F) = algebraMap E A e := fun e => (hE e).symm
   let φ₁ : F →ₐ[E] A := { g₁ with commutes' := fun _ => rfl }
   let φ₂ : F →ₐ[E] A := { g₂ with commutes' := fun e => hc e }

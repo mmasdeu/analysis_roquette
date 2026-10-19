@@ -63,7 +63,7 @@ theorem exists_leftMax {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ} 
   have hMfin : M.Finite := by
     refine (Filter.eventually_cofinite.mp ((wt_tendsto K ha hr).eventually
       (gt_mem_nhds hNpos))).subset (fun n hn => ?_)
-    simp only [Set.mem_setOf_eq, hM] at hn ⊢
+    simp only [Set.mem_ofPred_eq, hM] at hn ⊢
     rw [hn]; exact lt_irrefl _
   have hne : hMfin.toFinset.Nonempty := ⟨N, by simp [hM]⟩
   refine ⟨hMfin.toFinset.min' hne, ⟨?_, ?_⟩, ?_⟩
@@ -244,7 +244,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem leftMax_mono {a : ℤ → K} {r r' : ℝ} (hr : 0 < r) (hrr : r < r') {N N' : ℤ}
     (hN : IsLeftMax K r a N) (hN' : IsLeftMax K r' a N') (hp : 0 < wt K r a N) : N ≤ N' := by
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   have hr' : 0 < r' := lt_trans hr hrr
   have h1 : wt K r a N' < wt K r a N := hN.2 N' hlt
   have h2 : wt K r' a N ≤ wt K r' a N' := hN'.1 N
@@ -296,7 +296,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem leftMax_le_rightMax {a : ℤ → K} {r : ℝ} {L R : ℤ} (hL : IsLeftMax K r a L)
     (hR : IsRightMax K r a R) : L ≤ R := by
   by_contra h
-  push_neg at h
+  push Not at h
   exact absurd (hL.2 _ h) (not_lt.mpr (hR.1 L))
 
 omit [IsUltrametricDist K] [CompleteSpace K] in
@@ -322,13 +322,13 @@ omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem deltaSeq_leftMax {r : ℝ} (hr : 0 < r) : IsLeftMax K r (deltaSeq K) 0 := by
   refine ⟨fun n => ?_, fun n hn => ?_⟩
   · rw [deltaSeq_wt K hr, deltaSeq_wt K hr]; by_cases h : n = 0 <;> simp [h]
-  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr, if_neg hn.ne]; simp
+  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr, ite_eq_right hn.ne]; simp
 
 omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem deltaSeq_rightMax {r : ℝ} (hr : 0 < r) : IsRightMax K r (deltaSeq K) 0 := by
   refine ⟨fun n => ?_, fun n hn => ?_⟩
   · rw [deltaSeq_wt K hr, deltaSeq_wt K hr]; by_cases h : n = 0 <;> simp [h]
-  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr, if_neg hn.ne']; simp
+  · rw [deltaSeq_wt K hr, deltaSeq_wt K hr, ite_eq_right hn.ne']; simp
 
 theorem unit_aux {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsConvergentLaurent K b)
     (hc : convCoeff K a b = deltaSeq K) {r : ℝ} (hr : 0 < r) :
@@ -336,11 +336,11 @@ theorem unit_aux {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsConver
       IsLeftMax K r b (-N) := by
   have hne : ∀ c : ℤ → K, convCoeff K a b = deltaSeq K → ∃ n, c n ≠ 0 ∨ True := fun _ _ => ⟨0, Or.inr trivial⟩
   have h0a : ∃ n, a n ≠ 0 := by
-    by_contra h; push_neg at h
+    by_contra h; push Not at h
     have : convCoeff K a b 0 = 0 := by simp [convCoeff, h]
     rw [hc] at this; simp [deltaSeq] at this
   have h0b : ∃ n, b n ≠ 0 := by
-    by_contra h; push_neg at h
+    by_contra h; push Not at h
     have : convCoeff K a b 0 = 0 := by simp [convCoeff, h]
     rw [hc] at this; simp [deltaSeq] at this
   obtain ⟨La, hLa, hpa⟩ := exists_leftMax K ha hr h0a

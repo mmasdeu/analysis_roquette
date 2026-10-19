@@ -40,7 +40,7 @@ theorem hasOrd_exists {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f
   obtain ⟨g, ⟨a, ha, hsum⟩, hgf⟩ := f.2
   have h0 : ∃ n, a n ≠ 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     apply hf
     apply Subtype.ext
     funext x
@@ -55,7 +55,7 @@ theorem hasOrd_exists {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f
     (eventually_ne_nhds hα).filter_mono nhdsWithin_le_nhds
   refine ht.congr' ?_
   filter_upwards [hne] with x hx
-  simp only [quotFun, dif_pos hx, zpow_natCast]
+  simp only [quotFun, dite_eq_left hx, zpow_natCast]
   rw [← congrFun hgf ⟨x, hx⟩]
 
 theorem hasOrd_data {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f ≠ 0) :
@@ -63,7 +63,7 @@ theorem hasOrd_data {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f �
   obtain ⟨g, ⟨a, ha, hsum⟩, hgf⟩ := f.2
   have h0 : ∃ n, a n ≠ 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     apply hf
     apply Subtype.ext
     funext x
@@ -79,12 +79,12 @@ theorem hasOrd_data {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f �
     (eventually_ne_nhds hα).filter_mono nhdsWithin_le_nhds
   refine ht.congr' ?_
   filter_upwards [hne] with x hx
-  simp only [quotFun, dif_pos hx, zpow_natCast]
+  simp only [quotFun, dite_eq_left hx, zpow_natCast]
   rw [← congrFun hgf ⟨x, hx⟩]
 
 theorem hasOrd_lt_false {α : Omega K} {f : holSubring K} {n m : ℤ} (h : n < m)
     (h1 : HasOrd K α f n) (h2 : HasOrd K α f m) : False := by
-  haveI := omega_nhdsNE_neBot K α
+  have := omega_nhdsNE_neBot K α
   obtain ⟨c, hc, ht1⟩ := h1
   obtain ⟨d, hd, ht2⟩ := h2
   have hj : (m - n) = (((m - n).toNat : ℕ) : ℤ) := by omega
@@ -101,7 +101,7 @@ theorem hasOrd_lt_false {α : Omega K} {f : holSubring K} {n m : ℤ} (h : n < m
     have hxa : x - α ≠ 0 := sub_ne_zero.mpr hx
     by_cases hx0 : x = 0
     · simp [quotFun, hx0]
-    · simp only [quotFun, dif_pos hx0]
+    · simp only [quotFun, dite_eq_left hx0]
       have : (x - α) ^ m = (x - α) ^ (m - n) * (x - α) ^ n := by
         rw [← zpow_add₀ hxa]; congr 1; ring
       rw [this]
@@ -137,7 +137,7 @@ theorem tendsto_quot_zero {α : Omega K} {f : holSubring K} {n k : ℤ} (hn : Ha
     have hxa : x - α ≠ 0 := sub_ne_zero.mpr hx
     by_cases hx0 : x = 0
     · simp [quotFun, hx0]
-    · simp only [quotFun, dif_pos hx0]
+    · simp only [quotFun, dite_eq_left hx0]
       have : (x - α) ^ n = (x - α) ^ (n - k) * (x - α) ^ k := by
         rw [← zpow_add₀ hxa]; congr 1; ring
       rw [this]
@@ -152,7 +152,7 @@ theorem anOrdHol_zero (α : Omega K) : anOrdHol K α 0 = ⊤ := by
 
 theorem hasOrd_ne_zero {α : Omega K} {f : holSubring K} {n : ℤ} (h : HasOrd K α f n) : f ≠ 0 := by
   rintro rfl
-  haveI := omega_nhdsNE_neBot K α
+  have := omega_nhdsNE_neBot K α
   obtain ⟨c, hc, ht⟩ := h
   have h0 : quotFun K α (0 : holSubring K) n = fun _ => 0 := by
     funext x; simp [quotFun]
@@ -166,7 +166,7 @@ theorem anOrdHol_of_hasOrd {α : Omega K} {f : holSubring K} {n : ℤ} (h : HasO
   have hsp := Classical.epsilon_spec (p := fun n : ℤ => HasOrd K α f n) ⟨n, h⟩
   have := hasOrd_unique K hsp h
   unfold anOrdHol
-  rw [if_neg hf]
+  rw [ite_eq_right hf]
   congr 1
 
 theorem exists_anOrd {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f ≠ 0) :
@@ -184,7 +184,7 @@ theorem hasOrd_mul {α : Omega K} {f g : holSubring K} {n m : ℤ} (hf : HasOrd 
   have hxa : x - α ≠ 0 := sub_ne_zero.mpr hx
   by_cases hx0 : x = 0
   · simp [quotFun, hx0]
-  · simp only [quotFun, dif_pos hx0]
+  · simp only [quotFun, dite_eq_left hx0]
     rw [zpow_add₀ hxa]
     show _ = (f.1 ⟨x, hx0⟩ * g.1 ⟨x, hx0⟩) / _
     field_simp
@@ -206,7 +206,7 @@ theorem hasOrd_one {α : Omega K} (hα : α ≠ 0) : HasOrd K α (1 : holSubring
   have hne : ∀ᶠ x in 𝓝[≠] α, x ≠ 0 :=
     (eventually_ne_nhds hα).filter_mono nhdsWithin_le_nhds
   filter_upwards [hne] with x hx
-  simp only [quotFun, dif_pos hx, zpow_zero, div_one]
+  simp only [quotFun, dite_eq_left hx, zpow_zero, div_one]
   rfl
 
 theorem anOrdHol_one {α : Omega K} (hα : α ≠ 0) : anOrdHol K α 1 = 0 :=
@@ -214,7 +214,7 @@ theorem anOrdHol_one {α : Omega K} (hα : α ≠ 0) : anOrdHol K α 1 = 0 :=
 
 theorem anOrdHol_add_ge {α : Omega K} (hα : α ≠ 0) (f g : holSubring K) :
     min (anOrdHol K α f) (anOrdHol K α g) ≤ anOrdHol K α (f + g) := by
-  haveI := omega_nhdsNE_neBot K α
+  have := omega_nhdsNE_neBot K α
   by_cases hs : f + g = 0
   · rw [hs, anOrdHol_zero]; exact le_top
   by_cases hf : f = 0
@@ -242,7 +242,7 @@ theorem anOrdHol_add_ge {α : Omega K} (hα : α ≠ 0) (f g : holSubring K) :
     funext x
     by_cases hx : x = 0
     · simp [quotFun, hx]
-    · simp only [quotFun, dif_pos hx]
+    · simp only [quotFun, dite_eq_left hx]
       show (f.1 ⟨x, hx⟩ + g.1 ⟨x, hx⟩) / _ = _
       rw [add_div]
   rw [heq] at ht

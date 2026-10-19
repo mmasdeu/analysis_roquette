@@ -1,7 +1,7 @@
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 import Mathlib.Analysis.Normed.Ring.Ultra
 import Mathlib.Analysis.SpecificLimits.Normed
-import Mathlib.Data.Real.StarOrdered
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 import Mathlib.Topology.UniformSpace.Uniformizable
 
@@ -46,7 +46,7 @@ theorem hasSum_binom_expansion {F : Type*} [NormedField F] [CompleteSpace F] {x 
       ring
     rw [heq]
     exact hasSum_sum_of_ne_finset_zero hfin
-  · push_neg at hn
+  · push Not at hn
     obtain ⟨m', rfl⟩ : ∃ m' : ℕ, n = -((m' + 1 : ℕ) : ℤ) := ⟨n.natAbs - 1, by omega⟩
     set t : F := y / x with ht
     have htn : ‖-t‖ < 1 := by
@@ -60,7 +60,7 @@ theorem hasSum_binom_expansion {F : Type*} [NormedField F] [CompleteSpace F] {x 
         have h0 : ¬ (0 ≤ -(((m' + 1 : ℕ) : ℤ))) := by omega
         have h1 : (-(-(((m' + 1 : ℕ) : ℤ)))).toNat = m' + 1 := by simp
         have h2 : k + (m' + 1) - 1 = k + m' := by omega
-        rw [binomZ, if_neg h0, h1, h2]
+        rw [binomZ, ite_eq_right h0, h1, h2]
       have hc : (k + m').choose m' = (k + m').choose k := by
         rw [add_comm k m', Nat.choose_symm_add]
       have hpow : (-t) ^ k = (-1) ^ k * y ^ k / x ^ k := by
@@ -80,7 +80,7 @@ omit [IsUltrametricDist K] [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem omega_hasSum_mem {ι : Type*} (S : IntermediateField K L) [FiniteDimensional K S]
     {g : ι → L} (hg : ∀ i, g i ∈ S) (ht : Tendsto g cofinite (𝓝 0)) :
     ∃ s : L, s ∈ S ∧ HasSum g s := by
-  haveI : CompleteSpace S := FiniteDimensional.complete K S
+  have : CompleteSpace S := FiniteDimensional.complete K S
   set g' : ι → S := fun i => ⟨g i, hg i⟩
   have ht' : Tendsto g' cofinite (𝓝 0) := by
     rw [tendsto_subtype_rng]; simpa using ht
@@ -108,7 +108,7 @@ theorem tendsto_mul_cofinite_prod {u : ℤ → ℝ} {v : ℕ → ℝ} (hu0 : ∀
     have := Filter.eventually_cofinite.mp (hv.eventually (gt_mem_nhds h1))
     exact this.subset (fun n hn => by simpa using hn)
   refine (hA.prod hB).subset (fun p hp => ?_)
-  simp only [Set.mem_setOf_eq, Real.dist_eq, sub_zero, abs_mul, abs_of_nonneg (hu0 _),
+  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, abs_mul, abs_of_nonneg (hu0 _),
     abs_of_nonneg (hv0 _), not_lt] at hp
   refine ⟨?_, ?_⟩
   · calc ε ≤ u p.1 * v p.2 := hp
@@ -137,7 +137,7 @@ theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L �
       ∀ h : L, ‖h‖ < ‖α‖ → HasSum (fun k : ℕ => b k * h ^ k) (F (α + h)) := by
   have hr : 0 < ‖α‖ := norm_pos_iff.mpr hα
   set r := ‖α‖ with hrdef
-  haveI : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set L)) :=
+  have : FiniteDimensional K (IntermediateField.adjoin K ({α} : Set L)) :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral α)
   set τ : ℤ → ℕ → L := fun n k =>
     algebraMap K L (a n) * (binomZ n k : L) * α ^ (n - k) with hτ
@@ -178,9 +178,9 @@ theorem taylor_expansion {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L �
     have hα2 : α + h ≠ 0 := fun h0 => by
       rw [h0, norm_zero] at hnorm; linarith
     set S2 := IntermediateField.adjoin K ({α, h} : Set L) with hS2
-    haveI : FiniteDimensional K S2 :=
+    have : FiniteDimensional K S2 :=
       IntermediateField.finiteDimensional_adjoin (fun x _ => Algebra.IsIntegral.isIntegral x)
-    haveI : CompleteSpace S2 := FiniteDimensional.complete K S2
+    have : CompleteSpace S2 := FiniteDimensional.complete K S2
     have hαS : α ∈ S2 := IntermediateField.subset_adjoin K _ (by simp)
     have hhS : h ∈ S2 := IntermediateField.subset_adjoin K _ (by simp)
     set T : ℤ × ℕ → L := fun p => τ p.1 p.2 * h ^ p.2 with hT

@@ -25,7 +25,7 @@ variable (P : PrimeDivisor K F)
 
 theorem exists_irred_uniformizer :
     ∃ h : P.uniformizer ∈ P.ring, Irreducible (⟨P.uniformizer, h⟩ : P.ring) := by
-  haveI := P.isDVR
+  have := P.isDVR
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible P.ring
   exact Classical.epsilon_spec (p := fun π : F => ∃ h : π ∈ P.ring, Irreducible (⟨π, h⟩ : P.ring))
     ⟨ϖ, ϖ.2, hϖ⟩
@@ -45,7 +45,7 @@ theorem uniformizer_ne_zero : P.uniformizer ≠ 0 := by
 
 theorem exists_unit_zpow {f : F} (hf : f ≠ 0) :
     ∃ (u : P.ringˣ) (n : ℤ), f = (u : F) * P.uniformizer ^ n := by
-  haveI := P.isDVR
+  have := P.isDVR
   have hirr := P.uniformizer_irred
   rcases P.ring.mem_or_inv_mem f with h | h
   · have hne : (⟨f, h⟩ : P.ring) ≠ 0 := fun h0 => hf (congrArg Subtype.val h0)
@@ -75,7 +75,7 @@ theorem unit_zpow_unique {u u' : P.ringˣ} {n m : ℤ}
       (u' : F) * P.uniformizer ^ m → n ≤ m := by
     intro u u' n m h
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     -- then `π^(n-m)` is a unit of the ring
     obtain ⟨k, hk⟩ : ∃ k : ℕ, n - m = (k : ℤ) + 1 := ⟨(n - m - 1).toNat, by omega⟩
     have hπ0 := P.uniformizer_ne_zero
@@ -136,7 +136,7 @@ theorem ord_inv {f : F} (hf : f ≠ 0) : P.ord f⁻¹ = -P.ord f := by
   linarith
 
 theorem mem_ring_iff {f : F} (hf : f ≠ 0) : f ∈ P.ring ↔ 0 ≤ P.ord f := by
-  haveI := P.isDVR
+  have := P.isDVR
   constructor
   · intro hmem
     have hne : (⟨f, hmem⟩ : P.ring) ≠ 0 := fun h0 => hf (congrArg Subtype.val h0)
@@ -306,7 +306,7 @@ theorem finiteDimensional_Ln (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) (n 
     have := hN M (le_max_right _ _)
     have h1 : (1 : ℤ) ≤ M := hN1.trans (le_max_right _ _)
     omega
-  haveI := Module.finite_of_finrank_pos hM
+  have := Module.finite_of_finrank_pos hM
   exact Submodule.finiteDimensional_of_le (Ln_mono 𝔭 (le_max_left n N))
 
 end ell
@@ -367,7 +367,7 @@ theorem isUnit_iff_ord (P : PrimeDivisor K F) (x : P.ring) (hx : (x : F) ≠ 0) 
 
 theorem resLin_eq_zero_iff (n : ℤ) (f : Ln 𝔭 (n + 1)) :
     letI := resAlg 𝔭; resLin 𝔭 n f = 0 ↔ (f : F) ∈ Ln 𝔭 n := by
-  letI := resAlg 𝔭
+  let := resAlg 𝔭
   show IsLocalRing.residue 𝔭.ring (shiftRing 𝔭 n f) = 0 ↔ _
   rw [IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   have hf := (mem_Ln 𝔭).mp f.2
@@ -400,12 +400,12 @@ variable {𝔭 : PrimeDivisor K F}
 
 theorem finrank_Ln_succ_le (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) (n : ℤ) :
     Module.finrank K (Ln 𝔭 (n + 1)) ≤ Module.finrank K (Ln 𝔭 n) + 1 := by
-  letI := resAlg 𝔭
-  haveI := finiteDimensional_Ln hE h (n + 1)
-  haveI := finiteDimensional_Ln hE h n
+  let := resAlg 𝔭
+  have := finiteDimensional_Ln hE h (n + 1)
+  have := finiteDimensional_Ln hE h n
   have hres : Module.finrank K (IsLocalRing.ResidueField 𝔭.ring) = 1 := h
-  haveI : Module.Free K (IsLocalRing.ResidueField 𝔭.ring) := Module.Free.of_divisionRing K _
-  haveI : Module.Finite K (IsLocalRing.ResidueField 𝔭.ring) :=
+  have : Module.Free K (IsLocalRing.ResidueField 𝔭.ring) := Module.Free.of_divisionRing K _
+  have : Module.Finite K (IsLocalRing.ResidueField 𝔭.ring) :=
     Module.finite_of_finrank_pos (by rw [hres]; norm_num)
   set φ := resLin 𝔭 n
   have h1 := LinearMap.finrank_range_add_finrank_ker φ
@@ -457,7 +457,7 @@ theorem const_mem_Ln {n : ℤ} (hn : 0 ≤ n) (c : K) : algebraMap K F c ∈ Ln 
 
 theorem Ln_zero_const (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {f : F} (hf : f ∈ Ln 𝔭 0) :
     ∃ c : K, algebraMap K F c = f := by
-  haveI := finiteDimensional_Ln hE h 0
+  have := finiteDimensional_Ln hE h 0
   let S : Subalgebra K F :=
     { carrier := (Ln 𝔭 0 : Set F)
       mul_mem' := fun {a b} ha hb => by simpa using Ln_mul ha hb
@@ -466,7 +466,7 @@ theorem Ln_zero_const (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {f : F} (h
   have hfin : Module.Finite K S := by
     have hfg : (Ln 𝔭 0).FG := Module.Finite.iff_fg.mp inferInstance
     exact ⟨(Subalgebra.toSubmodule S).fg_top.mpr hfg⟩
-  haveI : Algebra.IsIntegral K S := Algebra.IsIntegral.of_finite K S
+  have : Algebra.IsIntegral K S := Algebra.IsIntegral.of_finite K S
   have hi : IsIntegral K (⟨f, hf⟩ : S) := Algebra.IsIntegral.isIntegral _
   have hi' : IsIntegral K f := by
     have := hi.map S.val
@@ -494,13 +494,13 @@ too many independent elements in `L(n𝔭)` for large `n`. -/
 theorem Ln_one_const (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {z : F} (hz : z ∈ Ln 𝔭 1) :
     ∃ c : K, algebraMap K F c = z := by
   by_contra hnc
-  push_neg at hnc
+  push Not at hnc
   have htr : Transcendental K z := by
     intro halg
     obtain ⟨c, hc⟩ := hE.functionField.algebraicallyClosed z halg.isIntegral
     exact hnc c hc
   obtain ⟨N, hN1, hN⟩ := finrank_Ln_large hE h
-  haveI := finiteDimensional_Ln hE h N
+  have := finiteDimensional_Ln hE h N
   have hinj : Function.Injective (Polynomial.aeval (R := K) z) :=
     transcendental_iff_injective.mp htr
   let V : Submodule K F := (Polynomial.degreeLT K (N.toNat + 1)).map
@@ -584,7 +584,7 @@ theorem finrank_Ln_nat (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) (n : ℕ)
   by_cases hnN : (N : ℤ) ≤ n
   · have := hN n hnN
     exact_mod_cast this
-  · push_neg at hnN
+  · push Not at hnN
     have := hlow (N - n).toNat
     have e : (N - ((N - n).toNat : ℕ) : ℤ) = n := by omega
     rw [e] at this

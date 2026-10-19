@@ -67,7 +67,7 @@ theorem pointDivisor_mem {α : Omega K} (hα : α ≠ 0) : pointDivisor K q α �
     · subst hξ; simp [pointDivisor, divisorOf, not_conjModQ_zero hq0' hα]
     · have := anVal_thM_zpow hq0 hq1 hα 1 hξ
       rw [zpow_one] at this
-      simp only [pointDivisor, divisorOf, if_neg hξ, this]
+      simp only [pointDivisor, divisorOf, ite_eq_right hξ, this]
       split_ifs <;> simp
   refine ⟨by rw [heq]; exact divisorOf_mem_Divisors K _, fun x => ?_⟩
   simp only [pointDivisor, conjModQ_shift_right hq0']
@@ -172,7 +172,7 @@ theorem PhiQ_pointDivisor_K {a : K} (ha : a ≠ 0) :
   have hx0 : q ^ k * a ≠ 0 := mul_ne_zero (zpow_ne_zero _ hq0') ha
   unfold PhiQ
   simp only [hprod]
-  rw [dif_pos hx0, QuotientGroup.eq, Subgroup.mem_zpowers_iff]
+  rw [dite_eq_left hx0, QuotientGroup.eq, Subgroup.mem_zpowers_iff]
   refine ⟨-k, Units.ext ?_⟩
   simp only [Units.val_zpow_eq_zpow_val, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0]
   rw [zpow_neg]
@@ -204,7 +204,7 @@ theorem anVal_nonneg_of_isIntegral {f : MeroRing K} (hf : IsIntegral K f) {ξ : 
   rw [← hv]
   by_contra hneg
   have hv0 : v < 0 := by
-    by_contra h; push_neg at h; exact hneg (by exact_mod_cast h)
+    by_contra h; push Not at h; exact hneg (by exact_mod_cast h)
   have hmon := minpoly.monic hf
   have hn : 0 < (minpoly K f).natDegree := minpoly.natDegree_pos hf
   have hroot := minpoly.aeval K f
@@ -329,7 +329,7 @@ theorem finiteDimensional_LS {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic 
     rw [degQ_add K q hq0 hq1 _ _ hm hN, degQ_pDiv hq0 hq1]
     omega
   have hfin := finrank_LS hq0 hq1 hmN hpos
-  haveI : FiniteDimensional K (LS q (m + pDiv (q := q) N)) :=
+  have : FiniteDimensional K (LS q (m + pDiv (q := q) N)) :=
     Module.finite_of_finrank_pos (by omega)
   refine Submodule.finiteDimensional_of_le (LS_mono (m' := m + pDiv (q := q) N) (fun α => ?_))
   show m α ≤ m α + pDiv (q := q) N α
@@ -403,16 +403,16 @@ theorem exists_exact_LS {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) 
     ∃ h ∈ LS q m, anVal K β (h : MeroRing K) = ((-(m β) : ℤ) : WithTop ℤ) := by
   have hq0' := norm_pos_iff.mp hq0
   have hfin := finrank_LS_sub_pt hq0 hq1 hm hβ hpos
-  haveI := finiteDimensional_LS hq0 hq1 hm
+  have := finiteDimensional_LS hq0 hq1 hm
   have hlt : LS q (m - pointDivisor K q β) < LS q m := by
     refine lt_of_le_of_ne LS_sub_pt_le (fun heq => ?_)
     rw [heq] at hfin
     have := natDegree_minpoly_pos (K := K) β
     omega
-  obtain ⟨h, hh, hhn⟩ := SetLike.exists_of_lt hlt
+  obtain ⟨h, hh, hhn⟩ := IsConcreteLE.exists_of_lt hlt
   refine ⟨h, hh, ?_⟩
   rw [mem_LS] at hhn
-  push_neg at hhn
+  push Not at hhn
   obtain ⟨α, hα, hlt'⟩ := hhn
   have hle := hh α hα
   by_cases hc : ConjModQ K q β α
@@ -475,8 +475,8 @@ theorem exists_inverse_mod {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K 
   set V' := LS q (m - pointDivisor K q β)
   set W := LS q m'
   set W' := LS q (m' - pointDivisor K q β)
-  haveI := finiteDimensional_LS hq0 hq1 hmP
-  haveI := finiteDimensional_LS hq0 hq1 hm'P
+  have := finiteDimensional_LS hq0 hq1 hmP
+  have := finiteDimensional_LS hq0 hq1 hm'P
   have hmβ : m β = 0 := by simp [hmdef, hDβ]
   have hm'β : m' β = 0 := by simp [hm'def, hDβ]
   have hgW : ∀ u ∈ V, g * u ∈ W := fun u hu => by
@@ -593,7 +593,7 @@ theorem le_degQ {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) (hm0 : �
           (IntermediateField.adjoin K ({x} : Set (Omega K))) : ℤ) * m x)
           (fun x _ => mul_nonneg (by positivity) (hm0 x)) hmem
   · ext x
-    simp only [Set.mem_inter_iff, Function.mem_support, Set.Finite.coe_toFinset, Set.mem_setOf_eq]
+    simp only [Set.mem_inter_iff, Function.mem_support, Set.Finite.coe_toFinset, Set.mem_ofPred_eq]
     constructor
     · rintro ⟨hx, hne⟩
       exact ⟨⟨hx, fun h => hne (by rw [h, mul_zero])⟩, hne⟩
@@ -700,11 +700,11 @@ theorem LS_succ_le {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
   have hfr : ∀ k : ℕ, 1 ≤ k → (Module.finrank K (LS q (k • D)) : ℤ) = k * degQ K q D := fun k hk => by
     rw [finrank_LS hq0 hq1 (hmem k) (by rw [degQ_nsmul hq0 hq1 hDP]; positivity),
       degQ_nsmul hq0 hq1 hDP]
-  haveI := fun k : ℕ => finiteDimensional_LS hq0 hq1 (hmem k)
-  haveI : FiniteDimensional K (LS q D) := finiteDimensional_LS hq0 hq1 hDP
+  have := fun k : ℕ => finiteDimensional_LS hq0 hq1 (hmem k)
+  have : FiniteDimensional K (LS q D) := finiteDimensional_LS hq0 hq1 hDP
   have hinj : Function.Injective (LinearMap.mulLeft K y) := mul_right_injective₀ hy0
   set Y := (LS q (n • D)).map (LinearMap.mulLeft K y) with hYdef
-  haveI : FiniteDimensional K Y :=
+  have : FiniteDimensional K Y :=
     LinearEquiv.finiteDimensional (Submodule.equivMapOfInjective _ hinj _)
   have hY : Module.finrank K Y = Module.finrank K (LS q (n • D)) :=
     (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ hinj _)).symm
@@ -806,7 +806,7 @@ theorem isIntegral_of_AD {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
         have hhN := ih n (by omega) hh
         exact N.smul_mem (⟨y, hyR⟩ : R) hhN
   have hfg : N.FG := by
-    haveI := finiteDimensional_LS hq0 hq1 ((DivisorsPeriodic K q).nsmul_mem hDP 2)
+    have := finiteDimensional_LS hq0 hq1 ((DivisorsPeriodic K q).nsmul_mem hDP 2)
     obtain ⟨s, hs⟩ := (Submodule.fg_iff_finiteDimensional (LS q (2 • D))).mpr inferInstance
     refine ⟨s, ?_⟩
     show Submodule.span R (s : Set (FqSub K q)) = Submodule.span R (LS q (2 • D) : Set (FqSub K q))
@@ -852,7 +852,7 @@ theorem AddValuation_nonneg_of_isIntegral {F : Type*} [Field F] [Algebra K F]
     (hf : IsIntegral R f) : 0 ≤ v f := by
   obtain ⟨p, hmon, heval⟩ := hf
   by_contra hneg
-  push_neg at hneg
+  push Not at hneg
   have hf0 : f ≠ 0 := by rintro rfl; rw [v.map_zero] at hneg; exact not_top_lt hneg
   obtain ⟨a, ha⟩ := WithTop.ne_top_iff_exists.mp ((v.ne_top_iff).mpr hf0)
   rw [← ha] at hneg
@@ -860,11 +860,11 @@ theorem AddValuation_nonneg_of_isIntegral {F : Type*} [Field F] [Algebra K F]
   set n := p.natDegree with hndef
   have hn : 0 < n := by
     by_contra h0
-    push_neg at h0
+    push Not at h0
     have : p = 1 := (Polynomial.Monic.natDegree_eq_zero hmon).mp (by omega)
     rw [this, Polynomial.eval₂_one] at heval
     exact one_ne_zero heval
-  rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finset_sum] at heval
+  rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum] at heval
   have hsum : (((((n - 1 : ℕ) : ℤ) * a : ℤ)) : WithTop ℤ) ≤ v (∑ i ∈ Finset.range n,
       Polynomial.eval₂ (algebraMap R F) f (Polynomial.C (p.coeff i) * Polynomial.X ^ i)) := by
     refine v.map_le_sum (fun i hi => ?_)
@@ -898,7 +898,7 @@ theorem degQ_polePart_pos {y : FqSub K q} (hy0 : y ≠ 0) {α : Omega K} (hα : 
     (hyα : anVal K α (y : MeroRing K) ≠ 0) :
     0 < degQ K q (polePart (divisorOf K (y : MeroRing K))) := by
   by_contra hle
-  push_neg at hle
+  push Not at hle
   have hP := polePart_mem (q := q) (divisorOf_periodic hq0 y.2)
   have hP0 : ∀ α, 0 ≤ polePart (divisorOf K (y : MeroRing K)) α := fun α => le_max_right _ _
   have hzero : ∀ β : Omega K, β ≠ 0 → polePart (divisorOf K (y : MeroRing K)) β = 0 := fun β hβ =>
@@ -961,7 +961,7 @@ theorem exists_denominator_ne {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic
   have hfr := finrank_LS hq0 hq1 hmP hpos
   obtain ⟨h, hh, hh0⟩ : ∃ h ∈ LS q m, h ≠ 0 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     have : LS q m = ⊥ := (Submodule.eq_bot_iff _).mpr hcon
     rw [this, finrank_bot] at hfr
     omega
@@ -1009,7 +1009,7 @@ theorem exists_center (v : AddValuation (FqSub K q) (WithTop ℤ)) {D : Omega K 
   -- Step 1: some zero of `g` is a centre.
   have hstep1 : ∃ β ∈ Z, ∀ f ∈ AD q D, 0 < anVal K β (f : MeroRing K) → 0 < v f := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     choose! fs hfsA hfsβ hfsv using hcon
     set N : ℕ := ∑ β ∈ Z, (divisorOf K (g : MeroRing K) β).toNat with hN
     set Fp : FqSub K q := ∏ β ∈ Z, fs β ^ N with hFp
@@ -1113,7 +1113,7 @@ theorem classify_valuation (v : AddValuation (FqSub K q) (WithTop ℤ))
       anVal K 1 (y : MeroRing K) ≠ 0 := by
     by_cases h : 0 ≤ v P
     · exact ⟨P, hP0, h, by rw [hP1]; exact WithTop.coe_ne_zero.mpr (by norm_num)⟩
-    · push_neg at h
+    · push Not at h
       refine ⟨P⁻¹, inv_ne_zero hP0, by rw [v.map_inv]; exact withTop_neg_nonneg h.le, ?_⟩
       have hP' : (P : MeroRing K) ≠ 0 := fun h' => hP0 (Subtype.ext h')
       rw [show ((P⁻¹ : FqSub K q) : MeroRing K) = (P : MeroRing K)⁻¹ from rfl,
@@ -1153,7 +1153,7 @@ theorem classify_valuation (v : AddValuation (FqSub K q) (WithTop ℤ))
     have hhA := LS_le_AD n hh
     refine ⟨h, hhA, le_antisymm ?_ (hAv h hhA), hhβ, hhz⟩
     by_contra hpos
-    push_neg at hpos
+    push Not at hpos
     have := (hβ h hhA).mpr hpos
     rw [hhβ] at this
     exact lt_irrefl _ this
@@ -1168,7 +1168,7 @@ theorem classify_valuation (v : AddValuation (FqSub K q) (WithTop ℤ))
     exact h2
   refine ⟨β, hβ0, fun z => ⟨fun hz => ?_, fun hz => ?_⟩⟩
   · by_contra hneg
-    push_neg at hneg
+    push Not at hneg
     have hz0 : z ≠ 0 := by
       rintro rfl
       rw [show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K β hβ0] at hneg
@@ -1418,7 +1418,7 @@ theorem primeAt_degree {α : Omega K} (hα : α ≠ 0) :
   have hdpos : 0 < d := natDegree_minpoly_pos α
   set P := primeAt hq0 hq1 hα with hPdef
   unfold PrimeDivisor.degree
-  letI : Algebra K (IsLocalRing.ResidueField P.ring) :=
+  let : Algebra K (IsLocalRing.ResidueField P.ring) :=
     ((IsLocalRing.residue P.ring).comp P.toRing).toAlgebra
   have hLSO : ∀ n : ℕ, ∀ f ∈ LS q (n • D), f ∈ P.ring := fun n f hf => by
     have := hf α hα
@@ -1468,7 +1468,7 @@ theorem primeAt_degree {α : Omega K} (hα : α ≠ 0) :
       simp only [Pi.sub_apply, Pi.smul_apply, hDα, smul_zero, hp, zero_sub, neg_neg] at this
       exact withTop_pos_iff_one_le.mpr (by exact_mod_cast this)
   have hmem : ∀ n : ℕ, n • D ∈ DivisorsPeriodic K q := fun n => (DivisorsPeriodic K q).nsmul_mem hD n
-  haveI := fun n : ℕ => finiteDimensional_LS hq0 hq1 (hmem n)
+  have := fun n : ℕ => finiteDimensional_LS hq0 hq1 (hmem n)
   have hrank : ∀ n : ℕ, d < n → Module.finrank K (LinearMap.range (ψ n)) = d := by
     intro n hn
     have hpos : 0 < degQ K q (n • D - pointDivisor K q α) := by
@@ -1530,15 +1530,15 @@ theorem Valuation_le_one_of_isIntegral {F : Type*} [Field F] [Algebra K F]
     (hf : IsIntegral R f) : v f ≤ 1 := by
   obtain ⟨p, hmon, heval⟩ := hf
   by_contra hgt
-  push_neg at hgt
+  push Not at hgt
   set n := p.natDegree with hndef
   have hn : 0 < n := by
     by_contra h0
-    push_neg at h0
+    push Not at h0
     have : p = 1 := (Polynomial.Monic.natDegree_eq_zero hmon).mp (by omega)
     rw [this, Polynomial.eval₂_one] at heval
     exact one_ne_zero heval
-  rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finset_sum] at heval
+  rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum] at heval
   have hsum : v (∑ i ∈ Finset.range n,
       Polynomial.eval₂ (algebraMap R F) f (Polynomial.C (p.coeff i) * Polynomial.X ^ i)) ≤
         v f ^ (n - 1) := by
@@ -1587,7 +1587,7 @@ theorem exists_center_v (v : Valuation (FqSub K q) Γ₀) {D : Omega K → ℤ}
     linarith
   have hstep1 : ∃ β ∈ Z, ∀ f ∈ AD q D, 0 < anVal K β (f : MeroRing K) → v f < 1 := by
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     choose! fs hfsA hfsβ hfsv using hcon
     set N : ℕ := ∑ β ∈ Z, (divisorOf K (g : MeroRing K) β).toNat with hN
     set Fp : FqSub K q := ∏ β ∈ Z, fs β ^ N with hFp
@@ -1685,7 +1685,7 @@ theorem classify_mvaluation (v : Valuation (FqSub K q) Γ₀)
       anVal K 1 (y : MeroRing K) ≠ 0 := by
     by_cases h : v P ≤ 1
     · exact ⟨P, hP0, h, by rw [hP1]; exact WithTop.coe_ne_zero.mpr (by norm_num)⟩
-    · push_neg at h
+    · push Not at h
       refine ⟨P⁻¹, inv_ne_zero hP0, by rw [map_inv₀]; exact (inv_lt_one₀ (lt_trans zero_lt_one h)).mpr h |>.le, ?_⟩
       have hP' : (P : MeroRing K) ≠ 0 := fun h' => hP0 (Subtype.ext h')
       rw [show ((P⁻¹ : FqSub K q) : MeroRing K) = (P : MeroRing K)⁻¹ from rfl,
@@ -1701,7 +1701,7 @@ theorem classify_mvaluation (v : Valuation (FqSub K q) Γ₀)
     | mem x hx => rw [Set.mem_singleton_iff.mp hx]; exact hyv
     | algebraMap c =>
       by_cases hc : c = 0
-      · rw [hc, map_zero, v.map_zero]; exact zero_le'
+      · rw [hc, map_zero, v.map_zero]; exact zero_le
       · rw [hv c hc]
     | add x z _ _ hx hz => exact v.map_add_le hx hz
     | mul x z _ _ hx hz => rw [v.map_mul]; exact mul_le_one' hx hz
@@ -1725,7 +1725,7 @@ theorem classify_mvaluation (v : Valuation (FqSub K q) Γ₀)
     have hhA := LS_le_AD n hh
     refine ⟨h, hhA, le_antisymm (hAv h hhA) ?_, hhβ, hhz⟩
     by_contra hlt
-    push_neg at hlt
+    push Not at hlt
     have := (hβ h hhA).mpr hlt
     rw [hhβ] at this
     exact lt_irrefl _ this
@@ -1740,7 +1740,7 @@ theorem classify_mvaluation (v : Valuation (FqSub K q) Γ₀)
     exact h2
   refine ⟨β, hβ0, fun z => ⟨fun hz => ?_, fun hz => ?_⟩⟩
   · by_contra hneg
-    push_neg at hneg
+    push Not at hneg
     have hz0 : z ≠ 0 := by
       rintro rfl
       rw [show ((0 : FqSub K q) : MeroRing K) = 0 from rfl, anVal_zero K β hβ0] at hneg
@@ -1767,7 +1767,7 @@ include hq0 hq1 in
 theorem primeDivisor_classify (P : PrimeDivisor K (FqSub K q)) :
     ∃ β : Omega K, β ≠ 0 ∧ ∀ x : FqSub K q, x ∈ P.ring ↔ 0 ≤ anVal K β (x : MeroRing K) := by
   classical
-  haveI := P.isDVR
+  have := P.isDVR
   set A := P.ring
   have hne : A ≠ ⊤ := by
     intro htop
@@ -1779,7 +1779,7 @@ theorem primeDivisor_classify (P : PrimeDivisor K (FqSub K q)) :
     show (a : FqSub K q) * (a : FqSub K q)⁻¹ = 1
     exact mul_inv_cancel₀ (fun h => ha (Subtype.ext h))
   obtain ⟨x, hx⟩ : ∃ x : FqSub K q, x ∉ A := by
-    by_contra h; push_neg at h; exact hne (eq_top_iff.mpr fun x _ => h x)
+    by_contra h; push Not at h; exact hne (eq_top_iff.mpr fun x _ => h x)
   have hx0 : x ≠ 0 := by rintro rfl; exact hx A.zero_mem
   have hv : ∀ c : K, c ≠ 0 → A.valuation (algebraMap K (FqSub K q) c) = 1 := by
     intro c hc

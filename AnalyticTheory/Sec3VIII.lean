@@ -110,7 +110,7 @@ theorem hasse_wp_trivial (hq1 : ‖q‖ < 1) :
   refine ⟨fun hc2 => ?_, fun hc2 => ?_⟩
   · by_cases hc3 : ringChar K = 3
     · have : hasseOfData (1 : K) 0 0 (coeffB K q) (coeffC K q) = 1 := by
-        rw [hasseOfData, if_neg hc2, if_pos hc3]; simp [wB2]
+        rw [hasseOfData, ite_eq_right hc2, ite_eq_left hc3]; simp [wB2]
       rw [this]; exact ⟨1, one_ne_zero, by ring⟩
     · have h2 : (2 : K) ≠ 0 := by
         exact_mod_cast natCast_ne_zero_of_char (K := K) Nat.prime_two hc2
@@ -135,7 +135,7 @@ theorem hasse_wp_trivial (hq1 : ‖q‖ < 1) :
       rw [mul_one] at ha hb
       have hhas : hasseOfData (1 : K) 0 0 (coeffB K q) (coeffC K q) =
           -(wC4 (1 : K) 0 0 (coeffB K q)) / wC6 (1 : K) 0 0 (coeffB K q) (coeffC K q) := by
-        rw [hasseOfData, if_neg hc2, if_neg hc3]
+        rw [hasseOfData, ite_eq_right hc2, ite_eq_right hc3]
       have hc4 : wC4 (1 : K) 0 0 (coeffB K q) = a ^ 2 := by
         rw [← ha]; unfold wC4 wB2 wB4 coeffB; ring
       have hc6 : wC6 (1 : K) 0 0 (coeffB K q) (coeffC K q) = -(b ^ 2) := by
@@ -146,7 +146,7 @@ theorem hasse_wp_trivial (hq1 : ‖q‖ < 1) :
       have : b ≠ 0 := hb0
       field_simp
   · have : hasseOfData (1 : K) 0 0 (coeffB K q) (coeffC K q) = 0 := by
-      rw [hasseOfData, if_pos hc2]; simp
+      rw [hasseOfData, ite_eq_left hc2]; simp
     rw [this]; exact ⟨0, by simp⟩
 
 end datum
@@ -307,7 +307,7 @@ theorem invariants_of_equiv (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {F : Type u}
   obtain ⟨t1, t2⟩ := hasse_wp_trivial (K := K) hq1
   refine ⟨by rw [absInv_eq_of_data K F hE hom hF d, hjd], fun hc => (h1 hc).trans_one (t1 hc),
     fun hc => ?_⟩
-  haveI : CharP K 2 := ringChar.of_eq hc
+  have : CharP K 2 := ringChar.of_eq hc
   exact (h2 hc).trans_zero (t2 hc)
 
 /-- Book, §3, Theorem VIII: the Hasse invariant of `F_K(q)` is trivial: `γ ≡ 1 mod K^{×2}`
@@ -340,7 +340,7 @@ theorem thmVIIIa_characterization (F : Type u) [Field F] [Algebra K F]
       rw [← hjq]; exact ⟨this.2.1, this.2.2.1⟩
     refine absolute_hasse_determine K F (FqSub K q) hE (fq_is_elliptic K q hq0 hq1) hF hp hj12
       (by rw [hj', hjq]) ⟨fun hc => (hγ.1 hc).of_ones (hγ1 hc), fun hc => ?_⟩
-    haveI : CharP K 2 := ringChar.of_eq hc
+    have : CharP K 2 := ringChar.of_eq hc
     exact (hγ.2 hc).of_zeros (hγ2 hc)
   · rintro ⟨q, hq0, hq1, ⟨e⟩⟩
     obtain ⟨h1, h2, h3⟩ := invariants_of_equiv hq0 hq1 hE hF e.symm

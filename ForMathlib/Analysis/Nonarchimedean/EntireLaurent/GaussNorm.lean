@@ -44,7 +44,7 @@ theorem exists_gnorm_attained {r : ℝ} (hr : 0 < r) {f : holSubring K L} (hf : 
     ∃ N, wt K r (holCoeff K f) N = gnorm K r f ∧ 0 < gnorm K r f ∧
       IsLeftMax K r (holCoeff K f) N := by
   have h0 : ∃ n, holCoeff K f n ≠ 0 := by
-    by_contra h; push_neg at h
+    by_contra h; push Not at h
     apply hf
     apply holCoeff_injective K
     rw [holCoeff_zero]; funext n; exact h n

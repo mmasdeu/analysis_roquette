@@ -19,7 +19,7 @@ variable {G : Type*} [Group G] [Finite G]
 /-- A character of a finite group with values in the circle has cyclic image. -/
 theorem exists_zpow_generator_circle (χ : G →* Circle) :
     ∃ σ : G, ∀ g : G, ∃ a : ℤ, χ g = χ σ ^ a := by
-  haveI : Finite χ.range := Finite.of_surjective χ.rangeRestrict χ.rangeRestrict_surjective
+  have : Finite χ.range := Finite.of_surjective χ.rangeRestrict χ.rangeRestrict_surjective
   have hcyc : IsCyclic χ.range := by
     refine isCyclic_of_injective_ringHom (Circle.coeHom.comp χ.range.subtype) ?_
     intro a b h
@@ -50,7 +50,7 @@ theorem exists_apply_eq_circle_exp (χ : G →* Circle) :
   set ψ := χ σ₀ with hψ
   set n := orderOf ψ with hn
   have hnpos : 0 < n := (MonoidHom.isOfFinOrder χ (isOfFinOrder_of_finite σ₀)).orderOf_pos
-  haveI : NeZero n := ⟨hnpos.ne'⟩
+  have : NeZero n := ⟨hnpos.ne'⟩
   set ω := Circle.exp (2 * Real.pi / n) with hω
   have hω_ord : orderOf ω = n := Circle.orderOf_exp_two_pi_div n hnpos.ne'
   have hpow : ((ψ : ℂ)) ^ n = 1 := by
