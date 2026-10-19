@@ -462,7 +462,8 @@ _upd('def:Fq-qbar-Xm', text=r'The image field of $\mu_m:\bar f(X)\mapsto\bar f(X
 _upd('def:elliptic-subfield', text=r'A subfield $E$ of an extension field $F\,|\,K$ containing $K$ is an elliptic subfield if it is an elliptic function field over $K$; $E$ has period $\bar q$ if it is $K$-isomorphic to $F_K(\bar q)$.',
      lean=['subfieldAlgebra', 'IsEllipticSubfield', 'HasPeriod'], uses=['def:elliptic'])
 _upd('thm:XVII', text=r'For $m>0$ with $\bar q^d=q^m$: $[F_K(q):F_K(\bar q|X^m)]=dm$; the degree of inseparability is the $p$-part $p^r$ of $m$ with maximal separable subextension $F_K(q^{p^r}|X^{p^r})$; the automorphisms are the translations $\tau_u$, $u\in U$, with group $U/q$; Galois iff $p\nmid m$, $\mu_m\subset K$ and $\bar q$ is an $m$-th power.',
-     lean=['Usub', 'thmXVII_inseparability'],
+     lean=['Usub', 'thmXVII_inseparability', 'isRelSeparable_upper', 'isRelPurelyInseparable_upper',
+       'isRelSeparable_FqSub_bar', 'mem_FqbarXm_of_mem_Sm'],
      uses=['lem:XVII', 'def:rel-degree', 'thm:XVII-i', 'thm:XVII-iii', 'thm:XVII-iv'])
 add('theorem', 'thm:XVII-iv', 'Theorem XVII (iv)',
     ['thmXVII_galois', 'card_quot_mul_index', 'psiHom', 'range_psiHom_eq_top_iff'],
