@@ -140,7 +140,12 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   `IsCharInvariant` (defined through `E_ζ`).
   Unproved bridges, clearly marked `sorry`: `Ezeta_isElliptic` (genus of a Galois descent),
   `Ezeta_isJacobian`, `jacobian_descent` (Appendix A2) and `thmX_minimal_splitting` (Theorem X).
-* Not started (statements only): §§5–6; Appendix A2 in general.
+* §6 (`Isogeny.lean`, `IsogenyXVII.lean`): the substitution `μ_m : f(X) ↦ f(Xᵐ)` on `M_K`
+  (built from `EntireLaurent.holExpand`), formulas (72), (73), and **Theorem XVII** completely:
+  (i) `[F_K(q) : F_K(q̄|Xᵐ)] = dm`, (ii) inseparability degree `p^r` with maximal separable
+  subextension `F_K(q^{p^r}|X^{p^r})`, (iii) the automorphisms are the translations `τ_u`, `u ∈ U`,
+  with group `U/q`, (iv) the Galois criterion.
+* Not started (statements only): §5; §6 from Theorem XVIII on; Appendix A2 in general.
 
 ## Buzzard's identity (MathOverflow 469021)
 
