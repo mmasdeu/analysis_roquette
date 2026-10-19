@@ -243,15 +243,6 @@ def Usub (qbar : K) (hqb : qbar ≠ 0) (m : ℕ) : Subgroup Kˣ where
   inv_mem' := fun {a} ⟨k, hk⟩ => ⟨-k, by
     rw [Units.val_inv_eq_inv_val, inv_pow, hk, zpow_neg]⟩
 
-/-- Book, §6, Theorem XVII (iv): `F_K(q)` is Galois over `F_K(q̄|Xᵐ)` iff `p ∤ m`, `K` contains the
-`m`-th roots of unity, and `q̄` is an `m`-th power in `K`. Blueprint: `thm:XVII`. -/
-theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
-    (hqd : qbar ^ d = q ^ m) :
-    IsRelGalois (FqbarXm K qbar m) (FqSub K q) ↔
-      (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar) := by
-  sorry
-
 /-- Book, §6, Theorem XVIII: every elliptic subfield `E` of `F_K(q)` is `F_K(q̄|Xᵐ)` for a unique
 period `q̄` (commensurable with `q`) and a unique `m > 0` (the largest integer such that every
 function of `E` is a function of `Xᵐ`). Blueprint: `thm:XVIII`. -/

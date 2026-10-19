@@ -843,4 +843,265 @@ theorem thmXVII_automorphisms (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 
       (QuotientGroup.quotientKerEquivOfSurjective _
         (translationHom_surjective hq0 hq1 hqb0 hqb1 hm hqd))).symm⟩⟩
 
+/-! ### Theorem XVII (iv): counting `U/q` -/
+
+section counting
+
+variable {q qbar : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1)
+  {m d : ℕ} (hm : 0 < m) (hd : 0 < d) (hqd : qbar ^ d = q ^ m)
+
+include hqb0 hqb1 in
+theorem zpow_qbar_injective {a b : ℤ} (h : qbar ^ a = qbar ^ b) : a = b := by
+  have := congrArg norm h
+  rw [norm_zpow, norm_zpow] at this
+  exact zpow_right_injective₀ hqb0 hqb1.ne this
+
+/-- The exponent `ψ(u)` with `uᵐ = q̄^{ψ(u)}`. -/
+noncomputable def psiExp (u : Usub K qbar (norm_pos_iff.mp hqb0) m) : ℤ := Classical.choose u.2
+
+theorem psiExp_spec (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
+    ((u : Kˣ) : K) ^ m = qbar ^ psiExp hqb0 u := Classical.choose_spec u.2
+
+include hqb1 in
+theorem psiExp_eq {u : Usub K qbar (norm_pos_iff.mp hqb0) m} {k : ℤ}
+    (h : ((u : Kˣ) : K) ^ m = qbar ^ k) : psiExp hqb0 u = k :=
+  zpow_qbar_injective hqb0 hqb1 ((psiExp_spec hqb0 u).symm.trans h)
+
+/-- `ψ : U → ℤ`, `uᵐ = q̄^{ψ(u)}`. -/
+noncomputable def psiHom : Usub K qbar (norm_pos_iff.mp hqb0) m →* Multiplicative ℤ where
+  toFun u := Multiplicative.ofAdd (psiExp hqb0 u)
+  map_one' := by
+    rw [psiExp_eq hqb0 hqb1 (k := 0) (by simp)]; rfl
+  map_mul' u v := by
+    rw [psiExp_eq hqb0 hqb1 (k := psiExp hqb0 u + psiExp hqb0 v) (by
+      rw [Subgroup.coe_mul, Units.val_mul, mul_pow, psiExp_spec, psiExp_spec,
+        zpow_add₀ (norm_pos_iff.mp hqb0)])]
+    rfl
+
+theorem mem_ker_psiHom (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
+    u ∈ (psiHom hqb0 hqb1 (m := m)).ker ↔ ((u : Kˣ) : K) ^ m = 1 := by
+  rw [MonoidHom.mem_ker]
+  constructor
+  · intro h
+    have h' : psiExp hqb0 u = 0 := congrArg Multiplicative.toAdd h
+    rw [psiExp_spec hqb0 u, h', zpow_zero]
+  · intro h
+    show Multiplicative.ofAdd (psiExp hqb0 u) = Multiplicative.ofAdd 0
+    rw [psiExp_eq hqb0 hqb1 (k := 0) (by rw [h, zpow_zero])]
+
+include hqb1 in
+theorem card_ker_psiHom :
+    Nat.card (psiHom hqb0 hqb1 (m := m)).ker = Nat.card (rootsOfUnity m K) := by
+  refine Nat.card_congr
+    { toFun := fun u => ⟨(u : Usub K qbar (norm_pos_iff.mp hqb0) m), ?_⟩
+      invFun := fun w => ⟨⟨w, ⟨0, ?_⟩⟩, ?_⟩
+      left_inv := fun u => rfl
+      right_inv := fun w => rfl }
+  · rw [mem_rootsOfUnity]; apply Units.ext
+    rw [Units.val_pow_eq_pow_val, (mem_ker_psiHom hqb0 hqb1 _).mp u.2, Units.val_one]
+  · rw [zpow_zero]
+    have := (mem_rootsOfUnity m (w : Kˣ)).mp w.2
+    rw [← Units.val_pow_eq_pow_val, this, Units.val_one]
+  · rw [mem_ker_psiHom]
+    have := (mem_rootsOfUnity m (w : Kˣ)).mp w.2
+    rw [← Units.val_pow_eq_pow_val, this, Units.val_one]
+
+/-- The subgroup `⟨q⟩ ⊆ U`. -/
+noncomputable abbrev qSub : Subgroup (Usub K qbar (norm_pos_iff.mp hqb0) m) :=
+  (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
+    (Usub K qbar (norm_pos_iff.mp hqb0) m)
+
+include hq1 hm hqd in
+theorem qSub_inf_ker : qSub hq0 hqb0 (m := m) ⊓ (psiHom hqb0 hqb1 (m := m)).ker = ⊥ := by
+  rw [eq_bot_iff]
+  rintro ⟨u, hu⟩ hx
+  obtain ⟨h1, h2⟩ := Subgroup.mem_inf.mp hx
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_zpowers_iff] at h1
+  obtain ⟨k, hk⟩ := h1
+  have hk' : Units.mk0 q (norm_pos_iff.mp hq0) ^ k = u := hk
+  have h2' := (mem_ker_psiHom hqb0 hqb1 _).mp h2
+  simp only at h2'
+  rw [← hk', Units.val_zpow_eq_zpow_val, Units.val_mk0, ← zpow_natCast, ← zpow_mul] at h2'
+  have hk0 : k * m = 0 := by
+    have := congrArg norm h2'
+    rw [norm_zpow, norm_one] at this
+    exact zpow_right_injective₀ hq0 hq1.ne (by simp only; rw [this, zpow_zero])
+  have : k = 0 := by
+    rcases mul_eq_zero.mp hk0 with h | h
+    · exact h
+    · exact absurd h (by exact_mod_cast hm.ne')
+  rw [Subgroup.mem_bot]
+  apply Subtype.ext
+  show u = 1
+  rw [← hk', this, zpow_zero]
+
+include hqd in
+theorem qU_mem_Usub : Units.mk0 q (norm_pos_iff.mp hq0) ∈ Usub K qbar (norm_pos_iff.mp hqb0) m :=
+  ⟨d, by rw [Units.val_mk0, ← hqd, zpow_natCast]⟩
+
+include hqd in
+theorem map_qSub : (qSub hq0 hqb0 (m := m)).map (psiHom hqb0 hqb1 (m := m)) =
+    Subgroup.zpowers (Multiplicative.ofAdd (d : ℤ)) := by
+  have hmem := qU_mem_Usub hq0 hqb0 hqd
+  have hgen : qSub hq0 hqb0 (m := m) =
+      Subgroup.zpowers (⟨Units.mk0 q (norm_pos_iff.mp hq0), hmem⟩ :
+        Usub K qbar (norm_pos_iff.mp hqb0) m) := by
+    ext ⟨u, hu⟩
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_zpowers_iff, Subgroup.mem_zpowers_iff]
+    constructor
+    · rintro ⟨k, hk⟩; exact ⟨k, Subtype.ext hk⟩
+    · rintro ⟨k, hk⟩; exact ⟨k, congrArg Subtype.val hk⟩
+  rw [hgen, MonoidHom.map_zpowers]
+  congr 1
+  show Multiplicative.ofAdd (psiExp hqb0 _) = _
+  rw [psiExp_eq hqb0 hqb1 (k := d) (by rw [Units.val_mk0, ← hqd, zpow_natCast])]
+
+theorem index_zpowers_ofAdd (n : ℕ) :
+    (Subgroup.zpowers (Multiplicative.ofAdd (n : ℤ))).index = n := by
+  have : Subgroup.zpowers (Multiplicative.ofAdd (n : ℤ)) =
+      AddSubgroup.toSubgroup (AddSubgroup.zmultiples (n : ℤ)) := by
+    ext x
+    show x ∈ Subgroup.zpowers _ ↔ Multiplicative.toAdd x ∈ AddSubgroup.zmultiples (n : ℤ)
+    rw [Subgroup.mem_zpowers_iff, AddSubgroup.mem_zmultiples_iff]
+    constructor
+    · rintro ⟨k, rfl⟩; exact ⟨k, by simp⟩
+    · rintro ⟨k, hk⟩; exact ⟨k, by rw [← ofAdd_zsmul, hk]; rfl⟩
+  rw [this, AddSubgroup.index_toSubgroup, Int.index_zmultiples, Int.natAbs_natCast]
+
+include hq1 hm hqd in
+/-- `|U/⟨q⟩| · [ℤ : ψ(U)] = |μ_m(K)| · d`. -/
+theorem card_quot_mul_index :
+    Nat.card (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸ qSub hq0 hqb0 (m := m)) *
+      (psiHom hqb0 hqb1 (m := m)).range.index = Nat.card (rootsOfUnity m K) * d := by
+  set ψ := psiHom hqb0 hqb1 (m := m)
+  set H := qSub hq0 hqb0 (m := m)
+  rw [← Subgroup.index_eq_card]
+  have h1 := Subgroup.relIndex_mul_index (le_sup_left : H ≤ H ⊔ ψ.ker)
+  have h2 : H.relIndex (H ⊔ ψ.ker) = Nat.card ψ.ker := by
+    rw [Subgroup.relIndex_sup_left]
+    rw [Subgroup.relIndex, show H.subgroupOf ψ.ker = ⊥ from by
+      rw [eq_bot_iff]
+      rintro ⟨u, hu⟩ hH
+      rw [Subgroup.mem_subgroupOf] at hH
+      have : u ∈ H ⊓ ψ.ker := ⟨hH, hu⟩
+      rw [qSub_inf_ker hq0 hq1 hqb0 hqb1 hm hqd, Subgroup.mem_bot] at this
+      rw [Subgroup.mem_bot]; exact Subtype.ext (by simp [this])]
+    exact Subgroup.index_bot
+  have h3 : (H ⊔ ψ.ker).index = (H.map ψ).relIndex ψ.range := by
+    rw [← Subgroup.comap_map_eq, Subgroup.index_comap]
+  have h4 := Subgroup.relIndex_mul_index (Subgroup.map_le_range ψ H)
+  rw [map_qSub hq0 hqb0 hqb1 hqd, index_zpowers_ofAdd] at h4
+  rw [map_qSub hq0 hqb0 hqb1 hqd] at h3
+  rw [← h1, h2, h3, mul_assoc, h4, card_ker_psiHom hqb0 hqb1]
+
+include hqb1 hm in
+theorem range_psiHom_eq_top_iff :
+    (psiHom hqb0 hqb1 (m := m)).range = ⊤ ↔ ∃ r : K, r ^ m = qbar := by
+  constructor
+  · intro h
+    have : Multiplicative.ofAdd (1 : ℤ) ∈ (psiHom hqb0 hqb1 (m := m)).range := by rw [h]; trivial
+    obtain ⟨u, hu⟩ := this
+    refine ⟨((u : Kˣ) : K), ?_⟩
+    rw [psiExp_spec hqb0 u, show psiExp hqb0 u = 1 from congrArg Multiplicative.toAdd hu, zpow_one]
+  · rintro ⟨r, hr⟩
+    have hr0 : r ≠ 0 := by
+      rintro rfl; rw [zero_pow hm.ne'] at hr; exact (norm_pos_iff.mp hqb0) hr.symm
+    have hmem : Units.mk0 r hr0 ∈ Usub K qbar (norm_pos_iff.mp hqb0) m :=
+      ⟨1, by rw [Units.val_mk0, hr, zpow_one]⟩
+    have h1 : psiHom hqb0 hqb1 ⟨_, hmem⟩ = Multiplicative.ofAdd (1 : ℤ) := by
+      show Multiplicative.ofAdd (psiExp hqb0 _) = _
+      rw [psiExp_eq hqb0 hqb1 (k := 1) (by rw [Units.val_mk0, hr, zpow_one])]
+    rw [eq_top_iff]
+    intro x _
+    have hx : x = (Multiplicative.ofAdd (1 : ℤ)) ^ (Multiplicative.toAdd x) := by
+      rw [← ofAdd_zsmul, smul_eq_mul, mul_one]; rfl
+    rw [hx, ← h1]
+    exact Subgroup.zpow_mem _ (MonoidHom.mem_range.mpr ⟨_, rfl⟩) _
+
+end counting
+
+/-- Ring automorphisms of `F` fixing a subfield `F₀` are the `F₀`-algebra automorphisms. -/
+noncomputable def autFixingEquiv {M : Type*} [Field M] {E F : Subfield M} (h : E ≤ F) :
+    (letI := (Subfield.inclusion h).toAlgebra; F ≃ₐ[E] F) ≃ autFixing E F :=
+  letI := (Subfield.inclusion h).toAlgebra
+  { toFun := fun φ => ⟨φ.toRingEquiv, fun x hx => by
+      have := φ.commutes ⟨x, hx⟩
+      convert this using 1⟩
+    invFun := fun ψ => AlgEquiv.ofRingEquiv (f := ψ.1) (fun c => ψ.2 _ c.2)
+    left_inv := fun φ => by ext x; rfl
+    right_inv := fun ψ => by ext x; rfl }
+
+variable (K) in
+/-- Book, §6, Theorem XVII (iv): `F_K(q)` is Galois over `F_K(q̄|Xᵐ)` iff `p ∤ m`, `K` contains the
+`m`-th roots of unity, and `q̄` is an `m`-th power in `K`. Blueprint: `thm:XVII`. -/
+theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
+    (hqd : qbar ^ d = q ^ m) :
+    IsRelGalois (FqbarXm K qbar m) (FqSub K q) ↔
+      (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar) := by
+  haveI : NeZero m := ⟨hm.ne'⟩
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hle : FqbarXm K qbar m ≤ FqSub K q :=
+    (fq_qbar_Xm_subset K q qbar hq0 hq1 hqb0 hqb1 m hmz
+      ⟨d, by rw [zpow_natCast, zpow_natCast]; exact hqd⟩).1
+  letI := (Subfield.inclusion hle).toAlgebra
+  have hdeg : Module.finrank (FqbarXm K qbar m) (FqSub K q) = d * m := by
+    rw [← relDeg_eq hle]; exact relDeg_FqbarXm hq0 hq1 hqb0 hqb1 hm hd hqd
+  haveI : FiniteDimensional (FqbarXm K qbar m) (FqSub K q) :=
+    Module.finite_of_finrank_pos (by rw [hdeg]; positivity)
+  -- the number of automorphisms is `|U/q|`
+  obtain ⟨e⟩ := (thmXVII_automorphisms K q qbar hq0 hq1 hqb0 hqb1 m d hm hd hqd).2
+  have hcard : Nat.card (FqSub K q ≃ₐ[FqbarXm K qbar m] FqSub K q) =
+      Nat.card (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸ qSub hq0 hqb0 (m := m)) :=
+    (Nat.card_congr (autFixingEquiv hle)).trans (Nat.card_congr e.toEquiv)
+  have hcount := card_quot_mul_index hq0 hq1 hqb0 hqb1 hm hqd
+  have hW : Nat.card (rootsOfUnity m K) ≤ m := by
+    rw [Nat.card_eq_fintype_card]; exact card_rootsOfUnity K m
+  have hW1 : 1 ≤ Nat.card (rootsOfUnity m K) := Nat.card_pos (α := rootsOfUnity m K)
+  have hgal : IsRelGalois (FqbarXm K qbar m) (FqSub K q) ↔
+      Nat.card (FqSub K q ≃ₐ[FqbarXm K qbar m] FqSub K q) = d * m := by
+    constructor
+    · rintro ⟨h', hG⟩
+      haveI : IsGalois (FqbarXm K qbar m) (FqSub K q) := hG
+      rw [← hdeg]
+      exact IsGalois.card_aut_eq_finrank (FqbarXm K qbar m) (FqSub K q)
+    · intro h
+      refine ⟨hle, ?_⟩
+      exact IsGalois.of_card_aut_eq_finrank (FqbarXm K qbar m) (FqSub K q) (h.trans hdeg.symm)
+  rw [hgal, hcard]
+  set N := Nat.card (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸ qSub hq0 hqb0 (m := m))
+  set i := (psiHom hqb0 hqb1 (m := m)).range.index
+  set W := Nat.card (rootsOfUnity m K)
+  have hroots : W = m ↔ ∃ ζ : K, IsPrimitiveRoot ζ m := by
+    show Nat.card (rootsOfUnity m K) = m ↔ _
+    rw [Nat.card_eq_fintype_card]
+    exact card_rootsOfUnity_eq_iff_exists_isPrimitiveRoot
+  have hi1 : i = 1 ↔ ∃ r : K, r ^ m = qbar := by
+    rw [Subgroup.index_eq_one]; exact range_psiHom_eq_top_iff hqb0 hqb1 hm
+  have hchar : (∃ ζ : K, IsPrimitiveRoot ζ m) → ¬ (ringChar K ∣ m) := by
+    rintro ⟨ζ, hζ⟩ hdvd
+    haveI := hζ.neZero'
+    exact NeZero.ne ((m : ℕ) : K) ((ringChar.spec K m).mpr hdvd)
+  constructor
+  · intro hN
+    rw [hN] at hcount
+    have hi0 : i ≠ 0 := by
+      intro h0; rw [h0, mul_zero] at hcount
+      exact absurd hcount.symm (Nat.mul_ne_zero (by omega) hd.ne')
+    have hmi : m * i = W := by
+      have : d * (m * i) = d * W := by rw [← mul_assoc, hcount, mul_comm]
+      exact Nat.eq_of_mul_eq_mul_left hd this
+    have hi : i = 1 := by
+      by_contra hne
+      have : 2 ≤ i := by omega
+      nlinarith
+    rw [hi, mul_one] at hmi
+    have hζ := hroots.mp hmi.symm
+    exact ⟨hchar hζ, hζ, hi1.mp hi⟩
+  · rintro ⟨-, hζ, hr⟩
+    have hW' := hroots.mpr hζ
+    have hi := hi1.mpr hr
+    rw [hi, mul_one, hW'] at hcount
+    rw [hcount, mul_comm]
+
 end upper

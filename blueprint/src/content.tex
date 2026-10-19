@@ -1425,13 +1425,13 @@ See the Lean proof of \texttt{corXVIb\_splitting}.
 
 \begin{theorem}[Theorem XVII]
 \label{thm:XVII}
-\lean{AnalyticTheory.Usub, AnalyticTheory.thmXVII_inseparability, AnalyticTheory.thmXVII_galois}
-\uses{lem:XVII, def:rel-degree, thm:XVII-i, thm:XVII-iii}
+\lean{AnalyticTheory.Usub, AnalyticTheory.thmXVII_inseparability}
+\uses{lem:XVII, def:rel-degree, thm:XVII-i, thm:XVII-iii, thm:XVII-iv}
 \leanok
 For $m>0$ with $\bar q^d=q^m$: $[F_K(q):F_K(\bar q|X^m)]=dm$; the degree of inseparability is the $p$-part $p^r$ of $m$ with maximal separable subextension $F_K(q^{p^r}|X^{p^r})$; the automorphisms are the translations $\tau_u$, $u\in U$, with group $U/q$; Galois iff $p\nmid m$, $\mu_m\subset K$ and $\bar q$ is an $m$-th power.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{Usub, thmXVII\_inseparability, thmXVII\_galois}.
+See the Lean proof of \texttt{Usub, thmXVII\_inseparability}.
 \end{proof}
 
 \begin{theorem}[Theorem XVIII]
@@ -1485,6 +1485,18 @@ See the Lean proof of \texttt{thmXIX\_period, thmXIX\_subfields}.
 \leanok
 $\sigma\in G$ acts on $M_L$ through the Laurent coefficients: $\sum a_nX^n\mapsto\sum\sigma(a_n)X^n$; characterized as a ring automorphism of $M_L$.
 \end{definition}
+
+\begin{theorem}[Theorem XVII (iv)]
+\label{thm:XVII-iv}
+\lean{AnalyticTheory.thmXVII_galois, AnalyticTheory.card_quot_mul_index, AnalyticTheory.psiHom, AnalyticTheory.range_psiHom_eq_top_iff}
+\uses{thm:XVII-i, thm:XVII-iii}
+\leanok
+$F_K(q)$ is Galois over $F_K(\bar q|X^m)$ iff $p\nmid m$, $K$ contains the $m$-th roots of unity and $\bar q$ is an $m$-th power in $K$. (Via $|U/q|\cdot[\mathbb Z:\psi(U)]=|\mu_m(K)|\,d$ for $\psi(u)=k$, $u^m=\bar q^k$.)
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{thmXVII\_galois, card\_quot\_mul\_index, psiHom, range\_psiHom\_eq\_top\_iff}.
+\end{proof}
 
 \begin{theorem}[Theorem XVII (iii)]
 \label{thm:XVII-iii}
