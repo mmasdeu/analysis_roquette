@@ -651,6 +651,196 @@ theorem thmXVII_inseparability (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ <
         ((ringChar K ^ (m.factorization (ringChar K)) : ℕ) : ℤ)) (FqSub K q) := by
   sorry
 
-end upper
+/-! ### Theorem XVII (iii): the automorphisms -/
 
-end AnalyticTheory
+section autos
+
+/-- The reflection commutes with `μ_m`. -/
+theorem reflectionM_substPow {m : ℤ} (hm : m ≠ 0) (f : MeroRing K) :
+    reflectionM K (substPow K m f) = substPow K m (reflectionM K f) := by
+  have key : (reflectionM K : MeroRing K →+* MeroRing K).comp (substPow K m) =
+      (substPow K m).comp (reflectionM K : MeroRing K →+* MeroRing K) := by
+    apply IsLocalization.ringHom_ext (nonZeroDivisors (holSubring K))
+    ext g
+    simp only [RingHom.comp_apply, RingEquiv.coe_toRingHom]
+    rw [substPow_alg hm, reflectionM_alg, reflectionM_alg, substPow_alg hm]
+    congr 1
+    refine Subtype.ext (funext fun α => ?_)
+    refine congrArg g.1 (Subtype.ext ?_)
+    show (α.1⁻¹) ^ m = (α.1 ^ m)⁻¹
+    rw [inv_zpow]
+  exact congrArg (fun φ : MeroRing K →+* MeroRing K => φ f) key
+
+/-- If `τ_c ℘ = ℘` for the Weierstraß function of period `Q`, then `c ∈ Q^ℤ`. -/
+theorem exists_zpow_of_translation_wp {Q : K} (hQ0 : 0 < ‖Q‖) (hQ1 : ‖Q‖ < 1) (c : Kˣ)
+    (hwp : translation K c (wpAlg hQ0 hQ1) = wpAlg hQ0 hQ1) : ∃ k : ℤ, (c : K) = Q ^ k := by
+  have hc0 : (c : K) ≠ 0 := c.ne_zero
+  have h1 := anVal_translation_shift (q := (c : K)) hc0 (one_ne_zero (α := Omega K))
+    (wpAlg hQ0 hQ1)
+  rw [mul_one, show Units.mk0 (c : K) hc0 = c from Units.ext rfl, hwp, anVal_wpAlg_one] at h1
+  have hcΩ : algebraMap K (Omega K) (c : K) ≠ 0 := (map_ne_zero _).mpr hc0
+  by_contra hno
+  push_neg at hno
+  have hnc : ¬ ConjModQ K Q 1 (algebraMap K (Omega K) (c : K)) := by
+    rw [conjModQ_one_iff (norm_pos_iff.mp hQ0)]
+    rintro ⟨k, hk⟩
+    exact hno k ((algebraMap K (Omega K)).injective (by rw [hk, map_zpow₀]))
+  have h2 := anVal_quot_nonneg hQ0 hQ1 hcΩ hnc (Gw hQ0 hQ1) 2
+  rw [← wpAlg_eq_Gw, h1] at h2
+  exact absurd h2 (by decide)
+
+variable {q qbar : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1)
+  {m d : ℕ} (hm : 0 < m) (hd : 0 < d) (hqd : qbar ^ d = q ^ m)
+
+include hqb0 hqb1 hm in
+/-- `τ_u` fixes `F_K(q̄ | Xᵐ)` iff `u ∈ U`, i.e. `uᵐ ∈ q̄^ℤ`. -/
+theorem translation_fixes_iff (u : Kˣ) :
+    (∀ x ∈ FqbarXm K qbar m, translation K u x = x) ↔
+      u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0
+  constructor
+  · intro h
+    have hfix : ∀ g ∈ FqSub K qbar, translation K (u ^ (m : ℤ)) g = g := by
+      intro g hg
+      apply substPow_injective hmz
+      rw [substPow_translation hmz]
+      exact h _ ⟨g, hg, rfl⟩
+    obtain ⟨k, hk⟩ := exists_zpow_of_translation_fix hqb0 hqb1 _ hfix
+    exact ⟨k, by rw [← hk, Units.val_zpow_eq_zpow_val, zpow_natCast]⟩
+  · rintro ⟨k, hk⟩ _ ⟨g, hg, rfl⟩
+    rw [← substPow_translation hmz]
+    congr 1
+    have hu : u ^ (m : ℤ) = Units.mk0 qbar hqb0' ^ k :=
+      Units.ext (by rw [Units.val_zpow_eq_zpow_val, Units.val_zpow_eq_zpow_val, zpow_natCast,
+        hk, Units.val_mk0])
+    rw [hu]
+    exact translation_zpow_of_periodic rfl hg k
+
+include hqb0 hqb1 hm in
+/-- A reflected translation `τ_a ε` never fixes `F_K(q̄ | Xᵐ)`. -/
+theorem not_translation_refl_fixes (a : Kˣ)
+    (h : ∀ x ∈ FqbarXm K qbar m, translation K a (reflectionM K x) = x) : False := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0
+  -- `τ_{aᵐ}` fixes `℘` of period `q̄`, hence `aᵐ ∈ q̄^ℤ`
+  have hwp := h _ ⟨wpAlg hqb0 hqb1, wpAlg_mem_Fq hqb0 hqb1, rfl⟩
+  rw [reflectionM_substPow hmz, refl_wpAlg, ← substPow_translation hmz] at hwp
+  obtain ⟨k, hk⟩ := exists_zpow_of_translation_wp hqb0 hqb1 _ (substPow_injective hmz hwp)
+  have hak : a ^ (m : ℤ) = Units.mk0 qbar hqb0' ^ k :=
+    Units.ext (by rw [hk, Units.val_zpow_eq_zpow_val, Units.val_mk0])
+  -- hence `ε` is trivial on `F_K(q̄)`
+  obtain ⟨ε, hεR, hne, -⟩ := reflAlg_eq_eps hqb0 hqb1
+  apply hne
+  rw [hεR]
+  ext g
+  have hg := h _ ⟨g, g.2, rfl⟩
+  rw [reflectionM_substPow hmz, ← substPow_translation hmz, hak] at hg
+  have hrg : reflectionM K (g : MeroRing K) ∈ FqSub K qbar := reflFq_mem qbar g
+  rw [translation_zpow_of_periodic rfl hrg k] at hg
+  exact substPow_injective hmz hg
+
+include hq0 hq1 hqb0 hqb1 hm hqd in
+theorem mem_autFixing_iff (φ : FqSub K q ≃+* FqSub K q) :
+    φ ∈ autFixing (FqbarXm K qbar m) (FqSub K q) ↔
+      ∃ u : Kˣ, u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m ∧
+        ∀ x : FqSub K q, (φ x : MeroRing K) = translation K u (x : MeroRing K) := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hle : FqbarXm K qbar m ≤ FqSub K q :=
+    (fq_qbar_Xm_subset K q qbar hq0 hq1 hqb0 hqb1 m hmz
+      ⟨d, by rw [zpow_natCast, zpow_natCast]; exact hqd⟩).1
+  constructor
+  · intro hφ
+    have hK : ∀ c : K, algebraMap K (MeroRing K) c ∈ FqbarXm K qbar m := fun c =>
+      ⟨algebraMap K (MeroRing K) c, fun a _ => translation_algebraMap K a c,
+        substPow_algebraMapK hmz c⟩
+    let Φ : FqSub K q ≃ₐ[K] FqSub K q :=
+      AlgEquiv.ofRingEquiv (f := φ) (fun c => hφ (algebraMap K (FqSub K q) c) (hK c))
+    obtain ⟨a, ha | ha⟩ := aut_structure hq0 hq1 Φ
+    · refine ⟨a, (translation_fixes_iff hqb0 hqb1 hm a).mp ?_,
+        fun x => congrArg Subtype.val (ha x)⟩
+      intro x hx
+      calc translation K a x = ((translationAlg q a ⟨x, hle hx⟩ : FqSub K q) : MeroRing K) := rfl
+        _ = (Φ ⟨x, hle hx⟩ : MeroRing K) := (congrArg Subtype.val (ha _)).symm
+        _ = x := congrArg Subtype.val (hφ ⟨x, hle hx⟩ hx)
+    · exfalso
+      refine not_translation_refl_fixes hqb0 hqb1 hm a (fun x hx => ?_)
+      calc translation K a (reflectionM K x) =
+            ((translationAlg q a (reflAlg q ⟨x, hle hx⟩) : FqSub K q) : MeroRing K) := rfl
+        _ = (Φ ⟨x, hle hx⟩ : MeroRing K) := (congrArg Subtype.val (ha _)).symm
+        _ = x := congrArg Subtype.val (hφ ⟨x, hle hx⟩ hx)
+  · rintro ⟨u, hu, hφ⟩ x hx
+    apply Subtype.ext
+    rw [hφ]
+    exact (translation_fixes_iff hqb0 hqb1 hm u).mpr hu _ hx
+
+end autos
+
+section autGroup
+
+variable {q qbar : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1)
+  {m d : ℕ} (hm : 0 < m) (hqd : qbar ^ d = q ^ m)
+
+/-- `u ↦ τ_u`, `U → Aut(F_K(q) | F_K(q̄|Xᵐ))`. -/
+noncomputable def translationHom :
+    Usub K qbar (norm_pos_iff.mp hqb0) m →* autFixing (FqbarXm K qbar m) (FqSub K q) where
+  toFun u := ⟨translationFq q u,
+    (mem_autFixing_iff hq0 hq1 hqb0 hqb1 hm hqd _).mpr ⟨u, u.2, fun _ => rfl⟩⟩
+  map_one' := Subtype.ext (RingEquiv.ext fun x => Subtype.ext (translation_one _))
+  map_mul' u v := Subtype.ext (RingEquiv.ext fun x =>
+    Subtype.ext (translation_mul (u : Kˣ) (v : Kˣ) _))
+
+theorem translationHom_coe (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
+    ((translationHom hq0 hq1 hqb0 hqb1 hm hqd u : autFixing (FqbarXm K qbar m) (FqSub K q)) :
+      FqSub K q ≃+* FqSub K q) = translationFq q u := rfl
+
+theorem translationHom_surjective : Function.Surjective (translationHom hq0 hq1 hqb0 hqb1 hm hqd) := by
+  rintro ⟨φ, hφ⟩
+  obtain ⟨u, hu, hφu⟩ := (mem_autFixing_iff hq0 hq1 hqb0 hqb1 hm hqd φ).mp hφ
+  exact ⟨⟨u, hu⟩, Subtype.ext (RingEquiv.ext fun x => Subtype.ext (hφu x).symm)⟩
+
+theorem translationHom_ker : (translationHom hq0 hq1 hqb0 hqb1 hm hqd).ker =
+    (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
+      (Usub K qbar (norm_pos_iff.mp hqb0) m) := by
+  ext ⟨u, hu⟩
+  rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf, Subgroup.mem_zpowers_iff]
+  constructor
+  · intro h
+    have h' : translationFq q u = 1 := by
+      rw [← translationHom_coe hq0 hq1 hqb0 hqb1 hm hqd ⟨u, hu⟩, h]; rfl
+    have hfix : ∀ g ∈ FqSub K q, translation K u g = g := by
+      intro g hg
+      have h2 : translationFq q u ⟨g, hg⟩ = ⟨g, hg⟩ := by
+        rw [h']; exact (rfl : (1 : FqSub K q ≃+* FqSub K q) ⟨g, hg⟩ = ⟨g, hg⟩)
+      exact congrArg Subtype.val h2
+    obtain ⟨k, hk⟩ := exists_zpow_of_translation_fix hq0 hq1 u hfix
+    exact ⟨k, Units.ext (by rw [Units.val_zpow_eq_zpow_val, Units.val_mk0, hk])⟩
+  · rintro ⟨k, hk⟩
+    refine Subtype.ext (RingEquiv.ext fun x => Subtype.ext ?_)
+    rw [translationHom_coe]
+    show translation K u x = x
+    rw [← show (Units.mk0 q (norm_pos_iff.mp hq0)) ^ k = u from hk]
+    exact translation_zpow_of_periodic rfl x.2 k
+
+end autGroup
+
+variable (K) in
+/-- Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are the
+translations `τ_u`, `u ∈ U`, and the automorphism group is `U/q`. (The book writes `u^m ≡ 1 mod^× q`;
+the proof and Corollary XIXa show that `q̄` is meant.) Blueprint: `thm:XVII`. -/
+theorem thmXVII_automorphisms (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (_hd : 0 < d)
+    (hqd : qbar ^ d = q ^ m) :
+    (∀ φ : FqSub K q ≃+* FqSub K q, φ ∈ autFixing (FqbarXm K qbar m) (FqSub K q) ↔
+      ∃ u : Kˣ, u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m ∧
+        ∀ x : FqSub K q, (φ x : MeroRing K) = translation K u (x : MeroRing K)) ∧
+    Nonempty (autFixing (FqbarXm K qbar m) (FqSub K q) ≃*
+      (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸
+        (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
+          (Usub K qbar (norm_pos_iff.mp hqb0) m))) :=
+  ⟨mem_autFixing_iff hq0 hq1 hqb0 hqb1 hm hqd,
+    ⟨((QuotientGroup.quotientMulEquivOfEq (translationHom_ker hq0 hq1 hqb0 hqb1 hm hqd)).symm.trans
+      (QuotientGroup.quotientKerEquivOfSurjective _
+        (translationHom_surjective hq0 hq1 hqb0 hqb1 hm hqd))).symm⟩⟩
+
+end upper

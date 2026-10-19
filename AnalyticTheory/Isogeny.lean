@@ -243,21 +243,6 @@ def Usub (qbar : K) (hqb : qbar ≠ 0) (m : ℕ) : Subgroup Kˣ where
   inv_mem' := fun {a} ⟨k, hk⟩ => ⟨-k, by
     rw [Units.val_inv_eq_inv_val, inv_pow, hk, zpow_neg]⟩
 
-/-- Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are the
-translations `τ_u`, `u ∈ U`, and the automorphism group is `U/q`. (The book writes `u^m ≡ 1 mod^× q`;
-the proof and Corollary XIXa show that `q̄` is meant.) Blueprint: `thm:XVII`. -/
-theorem thmXVII_automorphisms (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
-    (hqd : qbar ^ d = q ^ m) :
-    (∀ φ : FqSub K q ≃+* FqSub K q, φ ∈ autFixing (FqbarXm K qbar m) (FqSub K q) ↔
-      ∃ u : Kˣ, u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m ∧
-        ∀ x : FqSub K q, (φ x : MeroRing K) = translation K u (x : MeroRing K)) ∧
-    Nonempty (autFixing (FqbarXm K qbar m) (FqSub K q) ≃*
-      (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸
-        (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
-          (Usub K qbar (norm_pos_iff.mp hqb0) m))) := by
-  sorry
-
 /-- Book, §6, Theorem XVII (iv): `F_K(q)` is Galois over `F_K(q̄|Xᵐ)` iff `p ∤ m`, `K` contains the
 `m`-th roots of unity, and `q̄` is an `m`-th power in `K`. Blueprint: `thm:XVII`. -/
 theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)

@@ -1425,13 +1425,13 @@ See the Lean proof of \texttt{corXVIb\_splitting}.
 
 \begin{theorem}[Theorem XVII]
 \label{thm:XVII}
-\lean{AnalyticTheory.Usub, AnalyticTheory.thmXVII_inseparability, AnalyticTheory.thmXVII_automorphisms, AnalyticTheory.thmXVII_galois}
-\uses{lem:XVII, def:rel-degree, thm:XVII-i}
+\lean{AnalyticTheory.Usub, AnalyticTheory.thmXVII_inseparability, AnalyticTheory.thmXVII_galois}
+\uses{lem:XVII, def:rel-degree, thm:XVII-i, thm:XVII-iii}
 \leanok
 For $m>0$ with $\bar q^d=q^m$: $[F_K(q):F_K(\bar q|X^m)]=dm$; the degree of inseparability is the $p$-part $p^r$ of $m$ with maximal separable subextension $F_K(q^{p^r}|X^{p^r})$; the automorphisms are the translations $\tau_u$, $u\in U$, with group $U/q$; Galois iff $p\nmid m$, $\mu_m\subset K$ and $\bar q$ is an $m$-th power.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{Usub, thmXVII\_inseparability, thmXVII\_automorphisms, thmXVII\_galois}.
+See the Lean proof of \texttt{Usub, thmXVII\_inseparability, thmXVII\_galois}.
 \end{proof}
 
 \begin{theorem}[Theorem XVIII]
@@ -1485,6 +1485,18 @@ See the Lean proof of \texttt{thmXIX\_period, thmXIX\_subfields}.
 \leanok
 $\sigma\in G$ acts on $M_L$ through the Laurent coefficients: $\sum a_nX^n\mapsto\sum\sigma(a_n)X^n$; characterized as a ring automorphism of $M_L$.
 \end{definition}
+
+\begin{theorem}[Theorem XVII (iii)]
+\label{thm:XVII-iii}
+\lean{AnalyticTheory.thmXVII_automorphisms, AnalyticTheory.mem_autFixing_iff, AnalyticTheory.translation_fixes_iff, AnalyticTheory.not_translation_refl_fixes, AnalyticTheory.translationHom_ker}
+\uses{thm:XVII-i, def:rel-degree}
+\leanok
+The automorphisms of $F_K(q)$ over $F_K(\bar q|X^m)$ are the translations $\tau_u$ with $u^m\in\bar q^{\mathbb Z}$; the automorphism group is $U/q$. (The reflected translations $\tau_u\varepsilon$ never fix $F_K(\bar q|X^m)$.)
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{thmXVII\_automorphisms, mem\_autFixing\_iff, translation\_fixes\_iff, not\_translation\_refl\_fixes, translationHom\_ker}.
+\end{proof}
 
 \begin{theorem}[Theorem XVII (i)]
 \label{thm:XVII-i}
