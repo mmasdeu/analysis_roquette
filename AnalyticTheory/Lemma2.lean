@@ -258,6 +258,7 @@ theorem cocycleEquiv_of_char_eq (ζ ζ' : CocycleModQ K L q)
   exact this
 
 include hq0 hq1 in
+/-- Book, §4, Lemma 2 (i): the map `e_q : H¹(G, L^×/q) → Ĝ` is injective. -/
 theorem eQ_injective : Function.Injective (eQ K L q) := by
   intro c c' h
   induction c using Quot.ind with | _ ζ => ?_
@@ -322,6 +323,7 @@ section surj2
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 include hq0 hq1 in
+/-- Book, §4, Lemma 2: every `q`-trivial character is `e_q(ζ)` for some cocycle `ζ`. -/
 theorem exists_cocycle_of_qtrivial (χ : CharGroup K L) (hχ : IsQTrivial K L q χ) :
     ∃ ζ : CocycleModQ K L q, charOfCocycle q hq0 hq1 ζ = χ := by
   classical
@@ -521,6 +523,7 @@ section inj3
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 include hq0 hq1 in
+/-- Book, §4, Lemma 2: the character `e_q(ζ)` of every cocycle `ζ : G → L^×/q` is `q`-trivial. -/
 theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
     IsQTrivial K L q (charOfCocycle q hq0 hq1 ζ) := by
   classical
@@ -690,7 +693,7 @@ end inj3
 section final
 
 /-- Book, §4, Lemma 2: `e_q` is injective and its image is the set of `q`-trivial characters:
-`H¹(G, L^×/q) ≅ Ĝ(q)`. Blueprint: `lem:2`. -/
+`H¹(G, L^×/q) ≅ Ĝ(q)`. -/
 theorem lemma2_H1_iso (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     Function.Injective (eQ K L q) ∧
       Set.range (eQ K L q) = {χ : CharGroup K L | IsQTrivial K L q χ} := by

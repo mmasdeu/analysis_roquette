@@ -22,8 +22,7 @@ namespace AnalyticTheory
 universe u
 
 /-- Book, §A2: `E | K` splits over `L` if the constant extension `E L | L` has a prime
-divisor of degree `1`, i.e. there is a constant field extension `EL` with `HasPrimeOfDegreeOne`.
-Blueprint: `def:splits-over`. -/
+divisor of degree `1`, i.e. there is a constant field extension `EL` with `HasPrimeOfDegreeOne`. -/
 def SplitsOver (K : Type u) (E : Type u) (L : Type u) [Field K] [Field E] [Algebra K E]
     [Field L] [Algebra K L] : Prop :=
   ∃ (EL : Type u) (_ : Field EL) (_ : Algebra E EL) (_ : Algebra L EL) (_ : Algebra K EL)
@@ -31,7 +30,7 @@ def SplitsOver (K : Type u) (E : Type u) (L : Type u) [Field K] [Field E] [Algeb
     IsConstantExtension K E L EL ∧ HasPrimeOfDegreeOne L EL
 
 /-- Book, §A2: the data of a splitting field `L` of `E | K` together with a constant extension
-`EL | L` having a prime divisor of degree `1`. Blueprint: `def:splits-over`. -/
+`EL | L` having a prime divisor of degree `1`. -/
 structure SplittingData (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E] where
   L : Type u
   EL : Type u
@@ -51,7 +50,7 @@ attribute [instance] SplittingData.fL SplittingData.aL SplittingData.fEL Splitti
 
 /-- Book, §A2: the absolute invariant `j` of an arbitrary elliptic field `E | K`: the element of
 `K` whose image in `L` is `j_{EL}` for a splitting field `L` (independent of `L`, a theorem of the
-book). Blueprint: `def:absinv-general`. -/
+book). -/
 noncomputable def absInvGen (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
     (_hE : IsEllipticOver K E) : K :=
   Classical.epsilon fun j : K =>
@@ -59,8 +58,7 @@ noncomputable def absInvGen (K : Type u) (E : Type u) [Field K] [Field E] [Algeb
 
 /-- Book, §A2: the Hasse invariant `γ` of an arbitrary elliptic field `E | K` with
 `j ≠ 0, 12³`, represented by an element of `K` as in §A1: its image in `L` agrees with
-the Hasse invariant of `EL | L` modulo squares (modulo `π(L⁺)` in characteristic `2`).
-Blueprint: `def:hasse-general`. -/
+the Hasse invariant of `EL | L` modulo squares (modulo `π(L⁺)` in characteristic `2`). -/
 noncomputable def hasseGen (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
     (_hE : IsEllipticOver K E) : K :=
   Classical.epsilon fun γ : K =>
@@ -69,15 +67,14 @@ noncomputable def hasseGen (K : Type u) (E : Type u) [Field K] [Field E] [Algebr
       (ringChar K = 2 → PiEquiv (algebraMap K d.L γ) (hasseInv d.L d.EL d.deg1))
 
 /-- Book, §A2, Theorem: the absolute invariant of `E` is in `K` and agrees with the one computed
-over any splitting field. Blueprint: `thm:A2-absinv`. -/
+over any splitting field. -/
 theorem absInvGen_independent (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
     (hE : IsEllipticOver K E) (d : SplittingData K E) :
     absInv d.L d.EL d.deg1 = algebraMap K d.L (absInvGen K E hE) := by
   sorry
 
 /-- Book, §A2, (51): the Hasse invariant of `E` is a class in `K^×/K^{×2}` (resp. `K⁺/πK⁺`)
-whose image over every splitting field is the Hasse invariant over that field.
-Blueprint: `thm:A2-51`. -/
+whose image over every splitting field is the Hasse invariant over that field. -/
 theorem hasseGen_compatible (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
     (hE : IsEllipticOver K E) (d : SplittingData K E) :
     (ringChar K ≠ 2 →
@@ -86,8 +83,7 @@ theorem hasseGen_compatible (K : Type u) (E : Type u) [Field K] [Field E] [Algeb
       PiEquiv (algebraMap K d.L (hasseGen K E hE)) (hasseInv d.L d.EL d.deg1)) := by
   sorry
 
-/-- Book, §A2, (51), uniqueness: the class `γ` is determined by its image over a splitting field.
-Blueprint: `thm:A2-51`. -/
+/-- Book, §A2, (51), uniqueness: the class `γ` is determined by its image over a splitting field. -/
 theorem hasseGen_unique (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K E]
     (hE : IsEllipticOver K E) (d : SplittingData K E) (γ : K) :
     (ringChar K ≠ 2 → SquareEquiv (algebraMap K d.L γ) (hasseInv d.L d.EL d.deg1) →
@@ -97,8 +93,7 @@ theorem hasseGen_unique (K : Type u) (E : Type u) [Field K] [Field E] [Algebra K
   sorry
 
 /-- Book, §A2: the Jacobian field of `E`: the elliptic field `F | K` with a prime divisor of
-degree `1` whose absolute and Hasse invariants coincide with those of `E`. Blueprint:
-`def:jacobian-field`. -/
+degree `1` whose absolute and Hasse invariants coincide with those of `E`. -/
 def IsJacobianField (K : Type u) (E : Type u) (F : Type u) [Field K] [Field E] [Algebra K E]
     [Field F] [Algebra K F] (hE : IsEllipticOver K E) (hF : HasPrimeOfDegreeOne K F) : Prop :=
   absInvGen K E hE = absInv K F hF ∧
@@ -106,8 +101,7 @@ def IsJacobianField (K : Type u) (E : Type u) (F : Type u) [Field K] [Field E] [
     (ringChar K = 2 → PiEquiv (hasseGen K E hE) (hasseInv K F hF))
 
 /-- Book, §A2, (52): `F | K` is the Jacobian field of `E` iff `F` has a prime divisor of degree `1`
-and the constant extensions `F E₁` and `E E₁` are `E₁`-isomorphic, for every `E₁ ≅ E`.
-Blueprint: `thm:A2-52-53`. -/
+and the constant extensions `F E₁` and `E E₁` are `E₁`-isomorphic, for every `E₁ ≅ E`. -/
 theorem jacobian_characterization_52 (K : Type u) (E F : Type u) [Field K] [Field E]
     [Algebra K E] [Field F] [Algebra K F] (hE : IsEllipticOver K E)
     (hF : HasPrimeOfDegreeOne K F) :
@@ -122,7 +116,7 @@ theorem jacobian_characterization_52 (K : Type u) (E F : Type u) [Field K] [Fiel
   sorry
 
 /-- Book, §A2, (53): for any splitting field `L` of `E`, the constant extensions `FL` and `EL` are
-`L`-isomorphic when `F` is the Jacobian field of `E`. Blueprint: `thm:A2-52-53`. -/
+`L`-isomorphic when `F` is the Jacobian field of `E`. -/
 theorem jacobian_constant_extensions (K : Type u) (E F : Type u) [Field K] [Field E]
     [Algebra K E] [Field F] [Algebra K F] (hE : IsEllipticOver K E)
     (hF : HasPrimeOfDegreeOne K F) (hJ : IsJacobianField K E F hE hF)
@@ -143,19 +137,18 @@ variable (K E F L FL : Type u) [Field K] [Field E] [Field F] [Field L] [Field FL
   [Algebra K FL] [IsScalarTower K E FL] [IsScalarTower K F FL] [IsScalarTower K L FL]
 
 /-- Book, §A2: `ρ` is the extension of `σ ∈ Gal(L | K)` to an automorphism of `FL` over the
-subfield `F`: it induces `σ` on `L` and is the identity on `F`. Blueprint: `def:char-cocycle`. -/
+subfield `F`: it induces `σ` on `L` and is the identity on `F`. -/
 def IsGalExt (F : Type u) [Field F] [Algebra F FL] (σ : L ≃ₐ[K] L) (ρ : FL ≃+* FL) : Prop :=
   (∀ x : L, ρ (algebraMap L FL x) = algebraMap L FL (σ x)) ∧
     ∀ f : F, ρ (algebraMap F FL f) = algebraMap F FL f
 
 /-- Book, §A2: the extension `σ_F` of `σ` to `FL | F` (unique when `FL` is the constant
-extension). Blueprint: `def:char-cocycle`. -/
+extension). -/
 noncomputable def galExt (F : Type u) [Field F] [Algebra F FL] (σ : L ≃ₐ[K] L) : FL ≃+* FL :=
   haveI : Nonempty (FL ≃+* FL) := ⟨RingEquiv.refl _⟩
   Classical.epsilon (IsGalExt K L FL F σ)
 
-/-- Book, §A2: the group `A = Aut(FL | L)` of automorphisms of `FL` fixing `L`.
-Blueprint: `def:char-cocycle`. -/
+/-- Book, §A2: the group `A = Aut(FL | L)` of automorphisms of `FL` fixing `L`. -/
 def autL : Subgroup (FL ≃+* FL) where
   carrier := {ρ | ∀ x : L, ρ (algebraMap L FL x) = algebraMap L FL x}
   mul_mem' := fun {a b} ha hb x => by simp [ha x, hb x]
@@ -166,43 +159,40 @@ def autL : Subgroup (FL ≃+* FL) where
     exact (ha x).symm
 
 /-- Book, §A2, (55): the characteristic cocycle `ζ_E(σ) = σ_E σ_F⁻¹` of `E` (with respect to `F`
-and `L`, under the identification `EL = FL` of (54)). Blueprint: `def:char-cocycle`. -/
+and `L`, under the identification `EL = FL` of (54)). -/
 noncomputable def charCocycle (σ : L ≃ₐ[K] L) : FL ≃+* FL :=
   galExt K L FL E σ * (galExt K L FL F σ)⁻¹
 
 /-- Book, §A2, (60): a `L`-automorphism `τ` of `FL` has *translation type* if there is a divisor
-class `c` of degree `0` with `τ(𝔭) ∼ 𝔭 + c` for every prime divisor `𝔭` of degree `1`.
-Blueprint: `def:translation-group`. -/
+class `c` of degree `0` with `τ(𝔭) ∼ 𝔭 + c` for every prime divisor `𝔭` of degree `1`. -/
 def IsTranslationAut (τ : FL ≃ₐ[L] FL) : Prop :=
   ∃ c : FFClassGroupDegZero L FL, ∀ P : PrimeDivisor L FL, P.degree = 1 →
     ∃ D : FFDivisor.degZero L FL, (QuotientAddGroup.mk D : FFClassGroupDegZero L FL) = c ∧
       (D : FFDivisor L FL) = FFDivisor.act τ (Finsupp.single P 1) - Finsupp.single P 1
 
-/-- Book, §A2: the group `T ⊂ A` of translation automorphisms of `FL | L`.
-Blueprint: `def:translation-group`. -/
+/-- Book, §A2: the group `T ⊂ A` of translation automorphisms of `FL | L`. -/
 def translationGroup : Subgroup (FL ≃+* FL) :=
   Subgroup.closure {ρ | ∃ τ : FL ≃ₐ[L] FL, τ.toRingEquiv = ρ ∧ IsTranslationAut L FL τ}
 
 /-- A 1-cocycle `G → N` (`N ⊂ Aut(FL)` a subgroup stable under conjugation by `G`), for the action
-`α^σ = σ α σ⁻¹`, `σ = σ_F`. Blueprint: `def:H1-GT`. -/
+`α^σ = σ α σ⁻¹`, `σ = σ_F`. -/
 def IsCocycleAut (N : Subgroup (FL ≃+* FL)) (ζ : (L ≃ₐ[K] L) → (FL ≃+* FL)) : Prop :=
   (∀ σ, ζ σ ∈ N) ∧ ∀ σ τ : L ≃ₐ[K] L,
     ζ (σ * τ) = ζ σ * (galExt K L FL F σ * ζ τ * (galExt K L FL F σ)⁻¹)
 
-/-- The relation `ζ' σ = α ζ σ α^{-σ}` (book, (56)). Blueprint: `def:H1-GT`. -/
+/-- The relation `ζ' σ = α ζ σ α^{-σ}` (book, (56)). -/
 def Cohomologous (N : Subgroup (FL ≃+* FL)) (ζ ζ' : (L ≃ₐ[K] L) → (FL ≃+* FL)) : Prop :=
   ∃ α ∈ N, ∀ σ, ζ' σ = α * ζ σ * (galExt K L FL F σ * α * (galExt K L FL F σ)⁻¹)⁻¹
 
-/-- The relation `ζ' ∼ ζ⁻¹` (`ζ'` cohomologous to the inverse of `ζ`). Blueprint: `def:H1-GT`. -/
+/-- The relation `ζ' ∼ ζ⁻¹` (`ζ'` cohomologous to the inverse of `ζ`). -/
 def CohomologousInv (N : Subgroup (FL ≃+* FL)) (ζ ζ' : (L ≃ₐ[K] L) → (FL ≃+* FL)) : Prop :=
   Cohomologous K F L FL N (fun σ => (ζ σ)⁻¹) ζ'
 
-/-- The cohomology set `H¹(G, N)`. Blueprint: `def:H1-GT`. -/
+/-- The cohomology set `H¹(G, N)`. -/
 def H1Aut (N : Subgroup (FL ≃+* FL)) : Type u :=
   Quot fun ζ ζ' : {ζ // IsCocycleAut K F L FL N ζ} => Cohomologous K F L FL N ζ.1 ζ'.1
 
-/-- Book, §A2: the field `E_ζ` of fixed elements in `FL` of the automorphisms `ζ(σ) σ`.
-Blueprint: `def:char-cocycle`. -/
+/-- Book, §A2: the field `E_ζ` of fixed elements in `FL` of the automorphisms `ζ(σ) σ`. -/
 def cocycleField (ζ : (L ≃ₐ[K] L) → (FL ≃+* FL)) : Subfield FL where
   carrier := {x | ∀ σ, (ζ σ * galExt K L FL F σ) x = x}
   mul_mem' := fun {a b} ha hb σ => by rw [map_mul, ha σ, hb σ]
@@ -212,21 +202,20 @@ def cocycleField (ζ : (L ≃ₐ[K] L) → (FL ≃+* FL)) : Subfield FL where
   neg_mem' := fun {a} ha σ => by rw [map_neg, ha σ]
   inv_mem' := fun {a} ha σ => by rw [map_inv₀, ha σ]
 
-/-- `E` is `K`-isomorphic to the fixed field `E_ζ`, compatibly with the constants.
-Blueprint: `def:char-cocycle`. -/
+/-- `E` is `K`-isomorphic to the fixed field `E_ζ`, compatibly with the constants. -/
 def IsoToCocycleField (E' : Type u) [Field E'] [Algebra K E']
     (ζ : (L ≃ₐ[K] L) → (FL ≃+* FL)) : Prop :=
   ∃ φ : E' ≃+* cocycleField K F L FL ζ, ∀ c : K,
     ((φ (algebraMap K E' c) : cocycleField K F L FL ζ) : FL) = algebraMap K FL c
 
-/-- Book, §A2, (55): `ζ_E` is a 1-cocycle `G → A`, `A = Aut(FL | L)`. Blueprint: `def:char-cocycle`. -/
+/-- Book, §A2, (55): `ζ_E` is a 1-cocycle `G → A`, `A = Aut(FL | L)`. -/
 theorem charCocycle_isCocycle (hE : IsConstantExtension K E L FL)
     (hF : IsConstantExtension K F L FL) :
     IsCocycleAut K F L FL (autL L FL) (charCocycle K E F L FL) := by
   sorry
 
 /-- Book, §A2, (54)–(55) and the Proposition: `E` has Jacobian field `F` iff its characteristic
-cocycle takes values in the translation group `T`. Blueprint: `thm:A2-cocycle-translation`. -/
+cocycle takes values in the translation group `T`. -/
 theorem jacobian_iff_cocycle_translation (hE : IsEllipticOver K E)
     (hFd : HasPrimeOfDegreeOne K F) (hEL : IsConstantExtension K E L FL)
     (hFL : IsConstantExtension K F L FL) (hsplit : SplitsOver K E L) [IsGalois K L] :
@@ -235,7 +224,7 @@ theorem jacobian_iff_cocycle_translation (hE : IsEllipticOver K E)
   sorry
 
 /-- Book, §A2, (54): the characteristic cocycle determines `E`, as the field of fixed elements of
-the automorphisms `ζ_E(σ) σ`. Blueprint: `def:char-cocycle`. -/
+the automorphisms `ζ_E(σ) σ`. -/
 theorem fixed_field_of_cocycle (hEL : IsConstantExtension K E L FL)
     (hFL : IsConstantExtension K F L FL) :
     Set.range (algebraMap E FL) = (cocycleField K F L FL (charCocycle K E F L FL) : Set FL) := by
@@ -245,7 +234,7 @@ theorem fixed_field_of_cocycle (hEL : IsConstantExtension K E L FL)
 and `L | K` Galois, the elliptic fields `E | K` split by `L` with invariants `j, γ` of `F`
 correspond `1 − 1` to the pairs `ζ, −ζ` of mutually inverse elements of `H¹(G, T)`:
 (i) each such `E` is `K`-isomorphic to some `E_ζ`, `ζ ∈ Z¹(G, T)`; (ii) each `E_ζ` is such an
-`E`; (iii) `E_ζ ≅ E_ζ'` iff `ζ' ∼ ζ` or `ζ' ∼ ζ⁻¹`. Blueprint: `prop:A2-classification`. -/
+`E`; (iii) `E_ζ ≅ E_ζ'` iff `ζ' ∼ ζ` or `ζ' ∼ ζ⁻¹`. -/
 theorem a2_classification [IsGalois K L] (hFd : HasPrimeOfDegreeOne K F)
     (hFL : IsConstantExtension K F L FL)
     (hj : absInv K F hFd ≠ 0 ∧ absInv K F hFd ≠ 12 ^ 3) :
@@ -267,7 +256,7 @@ theorem a2_classification [IsGalois K L] (hFd : HasPrimeOfDegreeOne K F)
 
 /-- Book, §A2, Lemma A for arbitrary elliptic fields: the characteristic cocycle is compatible with
 enlarging the Galois splitting field (inflation): for `L ⊂ L'` the cocycle `ζ'` over `L'`
-restricts on `FL` to the cocycle `ζ` over `L`. Blueprint: `prop:A2-classification`. -/
+restricts on `FL` to the cocycle `ζ` over `L`. -/
 theorem cohomological_invariant_independent
     (L' FL' : Type u) [Field L'] [Field FL'] [Algebra K L'] [Algebra L L'] [IsScalarTower K L L']
     [Algebra E FL'] [Algebra F FL'] [Algebra L' FL'] [Algebra K FL'] [Algebra FL FL'] [Algebra L FL']

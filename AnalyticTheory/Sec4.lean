@@ -26,8 +26,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 
 /-- Book, §4: `E | K` has *character invariant* `χ` (with respect to `L`): `E` is `K`-isomorphic
-to `E_ζ` for a cocycle `ζ` with `e_q ζ = χ`. By Theorem IX, `χ` is determined up to `χ ↦ χ⁻¹`.
-Blueprint: `def:char-invariant`. -/
+to `E_ζ` for a cocycle `ζ` with `e_q ζ = χ`. By Theorem IX, `χ` is determined up to `χ ↦ χ⁻¹`. -/
 def IsCharInvariant (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (E : Type u) [Field E] [Algebra K E]
     (χ : CharGroup K L) : Prop :=
   ∃ ζ : CocycleModQ K L q, charOfCocycle q hq0 hq1 ζ = χ ∧ Nonempty (E ≃ₐ[K] Ezeta q ζ)
@@ -41,7 +40,7 @@ theorem isCharInvariant_Ezeta (ζ : CocycleModQ K L q) :
 
 /-- Book, §4, Theorem IX (classification): two fields with character invariants `χ`, `χ'` are
 `K`-isomorphic iff `χ' = χ^{±1}`. In particular the character invariant is determined up to
-inversion. Blueprint: `thm:IX`. -/
+inversion. -/
 theorem thmIX_classification (E E' : Type u) [Field E] [Field E'] [Algebra K E] [Algebra K E']
     (χ χ' : CharGroup K L) (h : IsCharInvariant q hq0 hq1 E χ)
     (h' : IsCharInvariant q hq0 hq1 E' χ') :
@@ -145,19 +144,19 @@ variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 of the twisted Galois action on `F_L(q)` is an elliptic function field over `K` (genus `1`
 because `E_ζ L = F_L(q)` has genus `1` and the genus is preserved by the separable constant field
 extension `L | K`; conservative for the same reason), and `F_K(q)` is its Jacobian field.
-Not yet proved. Blueprint: `thm:XII`. -/
+Not yet proved. -/
 theorem Ezeta_isElliptic (ζ : CocycleModQ K L q) : IsEllipticOver K (Ezeta q ζ) := by
   sorry
 
 /-- **Bridge B1'**: `F_K(q)` is the Jacobian field of `E_ζ` (same absolute and Hasse invariants,
-since `E_ζ L = F_L(q)`). Not yet proved. Blueprint: `thm:IX`. -/
+since `E_ζ L = F_L(q)`). Not yet proved. -/
 theorem Ezeta_isJacobian (hp : HasPrimeOfDegreeOne K (FqSub K q)) (ζ : CocycleModQ K L q) :
     IsJacobianField K (Ezeta q ζ) (FqSub K q) (Ezeta_isElliptic q ζ) hp := by
   sorry
 
 /-- **Bridge B2** (Appendix A2: characteristic cocycle, Jacobian fields): an elliptic field of
 period `q` (Jacobian field `F_K(q)`) split by the finite Galois extension `L | K` is a field `E_ζ`.
-Not yet proved. Blueprint: `thm:IX`. -/
+Not yet proved. -/
 theorem jacobian_descent (hp : HasPrimeOfDegreeOne K (FqSub K q)) (E : Type u) [Field E]
     [Algebra K E] (hE : IsEllipticOver K E) (hJ : IsJacobianField K E (FqSub K q) hE hp)
     (hs : SplitsOver K E L) : ∃ χ : CharGroup K L, IsCharInvariant q hq0 hq1 E χ := by
@@ -165,8 +164,7 @@ theorem jacobian_descent (hp : HasPrimeOfDegreeOne K (FqSub K q)) (E : Type u) [
 
 /-- Book, §4, Theorem IX: the elliptic function fields `E | K` of period `q` split by `L`
 correspond `1–1` (up to `K`-isomorphism) to the pairs `{χ, χ⁻¹}` of `q`-trivial characters.
-(`thmIX_classification`, `isCharInvariant_unique`, `thmIX_exists` and the two bridges.)
-Blueprint: `thm:IX`. -/
+(`thmIX_classification`, `isCharInvariant_unique`, `thmIX_exists` and the two bridges.) -/
 theorem thmIX_realise (hp : HasPrimeOfDegreeOne K (FqSub K q)) (χ : CharGroup K L)
     (hχ : IsQTrivial K L q χ) :
     ∃ (E : Type u) (_ : Field E) (_ : Algebra K E) (hE : IsEllipticOver K E)
@@ -186,8 +184,7 @@ theorem thmIX_every (hp : HasPrimeOfDegreeOne K (FqSub K q)) (E : Type u) [Field
 
 /-- **Bridge B3** (Book, §4, Theorem X; constant field extensions): if `E` has character
 invariant `χ` then the cyclic field `K_χ` is the unique minimal algebraic splitting field of `E`:
-it splits `E` and lies in every Galois splitting field `M ⊂ L`. Not yet proved.
-Blueprint: `thm:X`. -/
+it splits `E` and lies in every Galois splitting field `M ⊂ L`. Not yet proved. -/
 theorem thmX_minimal_splitting (E : Type u) [Field E] [Algebra K E] (hE : IsEllipticOver K E)
     (χ : CharGroup K L) (hχ : IsCharInvariant q hq0 hq1 E χ) :
     SplitsOver K E (Kchi K L χ) ∧
@@ -374,7 +371,7 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
 /-- Book, §4, Theorem XI (model form): for a semi-periodic triple `𝐐 = (L, σ, Q)` with `G = ⟨σ⟩`,
 the field `F_K(𝐐)` is the model field `E_ζ` of a cocycle `ζ` whose character value at `σ` is
 `exp(2π i / [L:K])`; it is therefore an elliptic function field over `K` (Theorem IX bridge) split by
-`L`, with character invariant of order `[L:K]`. Blueprint: `thm:XI`. -/
+`L`, with character invariant of order `[L:K]`. -/
 theorem thmXI_model (T : SemiPeriodicTriple K L q) :
     ∃ ζ : CocycleModQ K L q, (∀ f, f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ) ∧
       charOfCocycle q hq0 hq1 ζ T.gen = Circle.exp (2 * Real.pi / Module.finrank K L) ∧

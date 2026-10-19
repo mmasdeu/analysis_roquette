@@ -123,6 +123,8 @@ theorem exists_infprod_sum {g : ℕ → holSubring K L}
   simp only [hpart]
   exact (tendsto_const_nhds.add hs).congr' (by filter_upwards with J; rfl)
 
+/-- Infinite products: if the Gauss norms `‖g_j‖_ρ` tend to `0` for every radius `ρ > 0`, then `∏
+(1 + g_j)` converges pointwise to a holomorphic function. -/
 theorem exists_infprod {g : ℕ → holSubring K L}
     (hg : ∀ ρ : ℝ, 0 < ρ → Tendsto (fun j => gnorm K ρ (g j)) atTop (𝓝 0)) :
     ∃ P : holSubring K L, ∀ x : Punct L,

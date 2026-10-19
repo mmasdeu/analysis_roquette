@@ -211,6 +211,8 @@ theorem PoleOrd.transfer {F' : Type u} [Field F'] [Algebra K F'] {𝔭 : PrimeDi
     {m : ℤ} (h : PoleOrd 𝔭 f m) (σ : F ≃ₐ[K] F') : PoleOrd (𝔭.transfer σ) (σ f) m :=
   ⟨(mem_Ln_transfer σ 𝔭 m f).mpr h.1, fun h' => h.2 ((mem_Ln_transfer σ 𝔭 (m - 1) f).mp h')⟩
 
+/-- Lemma A in terms of a Weierstraß datum `(x, y)` at `𝔭`: the non-trivial automorphism fixing `𝔭`
+is `x ↦ x`, `y ↦ −y − ux − v`. -/
 theorem lemmaA_data (hE : IsEllipticOver K F) (d : WeierstrassData K F) (hc4 : d.curve.c₄ ≠ 0)
     (hc6 : d.curve.c₆ ≠ 0) :
     ∃ ε : F ≃ₐ[K] F, ε ≠ AlgEquiv.refl ∧ d.𝔭.transfer ε = d.𝔭 ∧
@@ -316,9 +318,7 @@ section lemmaAfinal
 
 variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 
-/-- Book, §A1, Lemma A: if `j ≠ 0, 12³` there is only one non-trivial `K`-automorphism `ε` of `F`
-which fixes the prime divisor `𝔭` of degree `1` attached to a Weierstraß datum.
-Blueprint: `lem:A`. -/
+/-- If `j ≠ 0, 12³` then the Weierstraß curve of a datum has `c₄ ≠ 0` and `c₆ ≠ 0`. -/
 theorem curve_c_ne_zero (d : WeierstrassData K F)
     (hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3) :
     d.curve.c₄ ≠ 0 ∧ d.curve.c₆ ≠ 0 := by
@@ -334,6 +334,8 @@ theorem curve_c_ne_zero (d : WeierstrassData K F)
     rw [h0] at hrel
     linear_combination -hrel
 
+/-- Book, Appendix §A1, Lemma A: if `j ≠ 0, 12³`, there is exactly one non-trivial automorphism `ε`
+of `F | K` fixing a given prime divisor `𝔭` of degree `1`. -/
 theorem lemmaA (hE : IsEllipticOver K F) (d : WeierstrassData K F)
     (hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3) :
     ∃ ε : F ≃ₐ[K] F, ε ≠ AlgEquiv.refl ∧ d.𝔭.transfer ε = d.𝔭 ∧

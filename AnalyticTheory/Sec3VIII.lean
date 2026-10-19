@@ -288,6 +288,7 @@ section theorems
 
 variable {q : K}
 
+/-- Book, §3: `F_K(q)` has a prime divisor of degree `1` (for instance `𝔭₁`). -/
 theorem fq_hasPrime (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) : HasPrimeOfDegreeOne K (FqSub K q) :=
   ⟨primeAt hq0 hq1 (one_ne_zero (α := Omega K)), by
     rw [primeAt_degree hq0 hq1, minpoly.one]
@@ -312,7 +313,7 @@ theorem invariants_of_equiv (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {F : Type u}
 /-- Book, §3, Theorem VIII: the Hasse invariant of `F_K(q)` is trivial: `γ ≡ 1 mod K^{×2}`
 if `char K ≠ 2`, and `γ ≡ 0 mod π(K⁺)` if `char K = 2`. Here `F_K(q)` has a prime divisor of
 degree `1` (`fq_hasPrime`). Modulo the independence of the invariants of the choice of Weierstraß
-datum (`A1Invariance.lean`). Blueprint: `thm:VIII`. -/
+datum (`A1Invariance.lean`). -/
 theorem thmVIII_hasse (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (hp : HasPrimeOfDegreeOne K (FqSub K q)) :
     (ringChar K ≠ 2 → SquareEquiv (hasseInv K (FqSub K q) hp) 1) ∧
@@ -321,7 +322,7 @@ theorem thmVIII_hasse (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 /-- Book, §3, Theorem VIIIa: an elliptic function field `F | K` with a prime divisor of degree
 `1` is `K`-isomorphic to some `F_K(q)`, `0 < |q| < 1`, if and only if `|j| > 1` and the Hasse
-invariant is trivial. Blueprint: `thm:VIIIa`. -/
+invariant is trivial. -/
 theorem thmVIIIa_characterization (F : Type u) [Field F] [Algebra K F]
     (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F) :
     (1 < ‖absInv K F hF‖ ∧
@@ -345,7 +346,7 @@ theorem thmVIIIa_characterization (F : Type u) [Field F] [Algebra K F]
     obtain ⟨h1, h2, h3⟩ := invariants_of_equiv hq0 hq1 hE hF e.symm
     exact ⟨by rw [h1]; exact (jInvQ_facts hq0 hq1).2.2.2, h2, h3⟩
 
-/-- Book, §3, after Theorem VIIIa: the period `q` of `F` is unique. Blueprint: `thm:VIIIa`. -/
+/-- Book, §3, after Theorem VIIIa: the period `q` of `F` is unique. -/
 theorem thmVIIIa_period_unique {q q' : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hq0' : 0 < ‖q'‖)
     (hq1' : ‖q'‖ < 1) (e : FqSub K q ≃ₐ[K] FqSub K q') : q = q' := by
   have h1 := (invariants_of_equiv hq0 hq1 (fq_is_elliptic K q' hq0' hq1') (fq_hasPrime hq0' hq1') e).1

@@ -21,6 +21,7 @@ progress is traced by the Lean blueprint in `blueprint/`.
 | `AnalyticTheory/FunctionField.lean` | prime divisors, divisors, Riemann–Roch spaces, genus |
 | `AnalyticTheory/Remarks.lean` | §2, additional remarks 1–2 |
 | `ForMathlib/` | general results not in Mathlib, independent of `AnalyticTheory` (see `ForMathlib/README.md`), including the non-archimedean function theory of entire Laurent series (`ForMathlib/Analysis/Nonarchimedean/EntireLaurent/`), on which §2 is built |
+| `Book.lean`, `Book/` | the Verso companion book (book text with the Lean statements; see below) |
 | `blueprint/src/content.tex` | the blueprint (generated, see below) |
 | `blueprint/tools/` | generator and consistency checker for the blueprint |
 
@@ -32,6 +33,22 @@ leanblueprint pdf                # builds blueprint/print/print.pdf
 ```
 
 `leanblueprint` requires the repository to be a git repository.
+
+### The companion book
+
+`Book.lean` and `Book/*.lean` form a [Verso](https://github.com/leanprover/verso) book in the
+spirit of the Lean companion to *Analysis I*: the text of Roquette's monograph, chapter by chapter,
+with the Lean declarations of each definition and result shown next to it (`{docstring …}` blocks
+and checked Lean examples). Only completely formalized parts appear (results whose proofs and
+dependencies are free of `sorry`); §5, Theorems IX (general form), X, XVIII, XIX, their corollaries
+and Appendix §A2 are left out.
+
+```
+./build-book.sh                                     # lake build roquette-book + render
+python3 -m http.server 8000 --directory _out/html-multi
+```
+
+The first build of the executable compiles Mathlib to native code (about 30 minutes).
 
 The blueprint is generated from `blueprint/tools/items.py`:
 

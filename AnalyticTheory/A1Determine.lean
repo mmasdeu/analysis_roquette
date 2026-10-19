@@ -64,8 +64,7 @@ theorem exists_data_of_absInv_ne_zero (hF : HasPrimeOfDegreeOne K F) (h : absInv
   rw [dif_neg hne]
 
 /-- Book, §A1, uniqueness: two fields with a prime divisor of degree 1 and equal absolute
-invariants and equivalent Hasse invariants are `K`-isomorphic (for `j ≠ 0, 12³`).
-Blueprint: `thm:A-uniqueness`. -/
+invariants and equivalent Hasse invariants are `K`-isomorphic (for `j ≠ 0, 12³`). -/
 theorem absolute_hasse_determine (hE : IsEllipticOver K F) (hE' : IsEllipticOver K F')
     (hF : HasPrimeOfDegreeOne K F) (hF' : HasPrimeOfDegreeOne K F')
     (hj0 : absInv K F hF ≠ 0 ∧ absInv K F hF ≠ 12 ^ 3) (hj : absInv K F hF = absInv K F' hF')

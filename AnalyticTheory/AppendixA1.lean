@@ -22,36 +22,31 @@ namespace AnalyticTheory
 universe u
 
 /-- Book, §A1: `u ∈ K` and `v ∈ K` with `a` and `b` in the same class modulo squares,
-i.e. `a = t² b` for some `t ∈ K^×`. Blueprint: `def:square-equiv`. -/
+i.e. `a = t² b` for some `t ∈ K^×`. -/
 def SquareEquiv {K : Type u} [Field K] (a b : K) : Prop :=
   ∃ t : K, t ≠ 0 ∧ a = t ^ 2 * b
 
-/-- Book, §A1, char 2: `a` and `b` agree modulo `π(K⁺)`, `π(z) = z² + z`.
-Blueprint: `def:pi-equiv`. -/
+/-- Book, §A1, char 2: `a` and `b` agree modulo `π(K⁺)`, `π(z) = z² + z`. -/
 def PiEquiv {K : Type u} [Field K] (a b : K) : Prop :=
   ∃ z : K, a = z ^ 2 + z + b
 
-/-- Book, §A1, equation (A1.3): `y² = 4x³ + b₁x² + b₂x + b₃` over `F`.
-Blueprint: `def:normal-form-A3`. -/
+/-- Book, §A1, equation (A1.3): `y² = 4x³ + b₁x² + b₂x + b₃` over `F`. -/
 def IsNormalFormA3 {K : Type u} {F : Type u} [Field K] [Field F] [Algebra K F]
     (x y : F) (b₁ b₂ b₃ : K) : Prop :=
   y ^ 2 = 4 * x ^ 3 + algebraMap K F b₁ * x ^ 2 + algebraMap K F b₂ * x + algebraMap K F b₃
 
-/-- Book, §A1, equation (A1.6): Weierstraß normal form `y² = 4x³ − g₂x − g₃`.
-Blueprint: `def:weierstrass-normal-form`. -/
+/-- Book, §A1, equation (A1.6): Weierstraß normal form `y² = 4x³ − g₂x − g₃`. -/
 def IsWeierstrassNormal {K : Type u} {F : Type u} [Field K] [Field F] [Algebra K F]
     (x y : F) (g₂ g₃ : K) : Prop :=
   y ^ 2 = 4 * x ^ 3 - algebraMap K F g₂ * x - algebraMap K F g₃
 
-/-- Book, §A1, equation (A1.1)/(A1.26) (with `a₀ = 1`): `y² + (ux + v)y = x³ + a₁x² + a₂x + a₃`.
-Blueprint: `def:normal-form-A1`. -/
+/-- Book, §A1, equation (A1.1)/(A1.26) (with `a₀ = 1`): `y² + (ux + v)y = x³ + a₁x² + a₂x + a₃`. -/
 def IsNormalFormA1 {K : Type u} {F : Type u} [Field K] [Field F] [Algebra K F]
     (x y : F) (u v a₁ a₂ a₃ : K) : Prop :=
   y ^ 2 + (algebraMap K F u * x + algebraMap K F v) * y =
     x ^ 3 + algebraMap K F a₁ * x ^ 2 + algebraMap K F a₂ * x + algebraMap K F a₃
 
-/-- Book, §A1, equation (A1.32) (characteristic 2): `y² + xy = x³ + A′x² + C′`.
-Blueprint: `def:normal-form-A32`. -/
+/-- Book, §A1, equation (A1.32) (characteristic 2): `y² + xy = x³ + A′x² + C′`. -/
 def IsNormalFormA32 {K : Type u} {F : Type u} [Field K] [Field F] [Algebra K F]
     (x y : F) (A' C' : K) : Prop :=
   y ^ 2 + x * y = x ^ 3 + algebraMap K F A' * x ^ 2 + algebraMap K F C'
@@ -66,7 +61,7 @@ section Invariants
 
 variable {K : Type u} [Field K]
 
-/-- `b₂ = u² + 4a₁` (this is the book's `b₁` of (A1.4)). Blueprint: `def:weierstrass-invariants`. -/
+/-- `b₂ = u² + 4a₁` (this is the book's `b₁` of (A1.4)). -/
 def wB2 (u a₁ : K) : K := u ^ 2 + 4 * a₁
 /-- `b₄ = 2a₂ + uv`. -/
 def wB4 (u v a₂ : K) : K := 2 * a₂ + u * v
@@ -84,14 +79,13 @@ def wDisc (u v a₁ a₂ a₃ : K) : K :=
   -(wB2 u a₁) ^ 2 * wB8 u v a₁ a₂ a₃ - 8 * wB4 u v a₂ ^ 3 - 27 * wB6 v a₃ ^ 2 +
     9 * wB2 u a₁ * wB4 u v a₂ * wB6 v a₃
 
-/-- The absolute invariant `j = c₄³/Δ` of a Weierstraß equation. Blueprint:
-`def:weierstrass-invariants`. -/
+/-- The absolute invariant `j = c₄³/Δ` of a Weierstraß equation. -/
 def jOfData (u v a₁ a₂ a₃ : K) : K := wC4 u v a₁ a₂ ^ 3 / wDisc u v a₁ a₂ a₃
 
 /-- The Hasse invariant (as a representative in `K`) of a Weierstraß equation, following
 (A1.13) (characteristic `≠ 2, 3`: `−c₄/c₆`, equivalent to `−½ g₂/g₃` modulo squares),
 (A1.25) (characteristic `3`: `b₂`) and (A1.36) (characteristic `2`: `a₁/u² + v/u³`, the class
-of `A′` modulo `π(K⁺)`). Blueprint: `def:weierstrass-invariants`. -/
+of `A′` modulo `π(K⁺)`). -/
 noncomputable def hasseOfData (u v a₁ a₂ a₃ : K) : K :=
   if ringChar K = 2 then a₁ / u ^ 2 + v / u ^ 3
   else if ringChar K = 3 then wB2 u a₁
@@ -101,8 +95,7 @@ end Invariants
 
 /-- Book, §A1: the data of generators `x, y` of `F | K` with a Weierstraß equation (A1.26) of
 non-zero discriminant, where `x` and `y` have the pole divisors `2𝔭` and `3𝔭` for a prime divisor
-`𝔭` of degree `1` (`x ∈ L(2𝔭) ∖ L(𝔭)`, `y ∈ L(3𝔭) ∖ L(2𝔭)`).
-Blueprint: `def:weierstrass-data`. -/
+`𝔭` of degree `1` (`x ∈ L(2𝔭) ∖ L(𝔭)`, `y ∈ L(3𝔭) ∖ L(2𝔭)`). -/
 structure WeierstrassData (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] where
   𝔭 : PrimeDivisor K F
   deg_one : 𝔭.degree = 1
@@ -122,7 +115,7 @@ structure WeierstrassData (K : Type u) (F : Type u) [Field K] [Field F] [Algebra
 open Classical in
 /-- Book, §A1: the absolute invariant `j` of an elliptic function field `F | K` with a prime
 divisor of degree `1`: computed from any Weierstraß equation of `F`. (Independence of the choice
-is a theorem of the book.) Blueprint: `def:absolute-invariant`. -/
+is a theorem of the book.) -/
 noncomputable def absInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
     (_hF : HasPrimeOfDegreeOne K F) : K :=
   if h : Nonempty (WeierstrassData K F) then
@@ -132,8 +125,7 @@ noncomputable def absInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra 
 
 open Classical in
 /-- Book, §A1: the Hasse invariant `γ` of `F | K` (with `j ≠ 0, 12³`), represented by an element of
-`K` (see the module documentation), computed from any Weierstraß equation.
-Blueprint: `def:hasse-invariant`. -/
+`K` (see the module documentation), computed from any Weierstraß equation. -/
 noncomputable def hasseInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
     (_hF : HasPrimeOfDegreeOne K F) : K :=
   if h : Nonempty (WeierstrassData K F) then
@@ -142,7 +134,7 @@ noncomputable def hasseInv (K : Type u) (F : Type u) [Field K] [Field F] [Algebr
   else 0
 
 /-- Book, §A1, (A1.8): in Weierstraß normal form with `g₂, g₃` and `char K ≠ 2, 3`,
-the absolute invariant is `j = 12³ g₂³ / (g₂³ − 27 g₃²)`. Blueprint: `prop:absinv-weierstrass`. -/
+the absolute invariant is `j = 12³ g₂³ / (g₂³ − 27 g₃²)`. -/
 theorem absInv_weierstrass (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
     (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F) (x y : F) (g₂ g₃ : K)
     (hgen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤)
@@ -152,7 +144,7 @@ theorem absInv_weierstrass (K : Type u) (F : Type u) [Field K] [Field F] [Algebr
   sorry
 
 /-- Book, §A1, (A1.13): for `char K ≠ 2, 3` and `j ≠ 0, 12³` the Hasse invariant is
-`−½ g₂/g₃` modulo squares. Blueprint: `prop:hasse-weierstrass`. -/
+`−½ g₂/g₃` modulo squares. -/
 theorem hasseInv_weierstrass (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
     (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F) (x y : F) (g₂ g₃ : K)
     (hgen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤)
@@ -162,8 +154,7 @@ theorem hasseInv_weierstrass (K : Type u) (F : Type u) [Field K] [Field F] [Alge
   sorry
 
 /-- Book, §A1, Remark 1: if `F | K` is generated by `x, y` with `y² + xy = x³ + Bx + C`, then
-`j = (1 − 48B)³/Δ` with `Δ = B² − C − 64B³ + 72BC − 432C²`, in any characteristic.
-Blueprint: `rem:A-1`. -/
+`j = (1 − 48B)³/Δ` with `Δ = B² − C − 64B³ + 72BC − 432C²`, in any characteristic. -/
 theorem remark_A1_absinv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
     (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F) (x y : F) (B C : K)
     (hgen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤)
@@ -174,16 +165,14 @@ theorem remark_A1_absinv (K : Type u) (F : Type u) [Field K] [Field F] [Algebra 
 
 /-- Book, §A1, Remark 2: if `K` is separably algebraically closed, the Hasse invariant of any
 elliptic function field with a prime divisor of degree `1` is trivial, so the absolute
-invariant determines `F | K` up to `K`-isomorphism (for `j ≠ 0, 12³`).
-Blueprint: `rem:A-2`. -/
+invariant determines `F | K` up to `K`-isomorphism (for `j ≠ 0, 12³`). -/
 theorem remark_A2_sep_closed (K : Type u) [Field K] (hK : IsSepClosed K)
     (F : Type u) [Field F] [Algebra K F] (hE : IsEllipticOver K F)
     (hF : HasPrimeOfDegreeOne K F) :
     SquareEquiv (hasseInv K F hF) 1 := by
   sorry
 
-/-- Book, §A1, Remark 3 (i): constant field extensions have the same absolute invariant.
-Blueprint: `rem:A-3`. -/
+/-- Book, §A1, Remark 3 (i): constant field extensions have the same absolute invariant. -/
 theorem remark_A3_absinv (K : Type u) (F : Type u) (L : Type u) [Field K] [Field F]
     [Algebra K F] [Field L] [Algebra K L] (FL : Type u) [Field FL] [Algebra F FL]
     [Algebra L FL] [Algebra K FL] [IsScalarTower K F FL] [IsScalarTower K L FL]
@@ -193,7 +182,7 @@ theorem remark_A3_absinv (K : Type u) (F : Type u) (L : Type u) [Field K] [Field
   sorry
 
 /-- Book, §A1, Remark 3 (ii): the Hasse invariant of `FL | L` is the image of that of `F | K`
-under `K^×/K^{×2} → L^×/L^{×2}` (resp. `K⁺/πK⁺ → L⁺/πL⁺`). Blueprint: `rem:A-3`. -/
+under `K^×/K^{×2} → L^×/L^{×2}` (resp. `K⁺/πK⁺ → L⁺/πL⁺`). -/
 theorem remark_A3_hasse (K : Type u) (F : Type u) (L : Type u) [Field K] [Field F]
     [Algebra K F] [Field L] [Algebra K L] (FL : Type u) [Field FL] [Algebra F FL]
     [Algebra L FL] [Algebra K FL] [IsScalarTower K F FL] [IsScalarTower K L FL]
@@ -203,8 +192,7 @@ theorem remark_A3_hasse (K : Type u) (F : Type u) (L : Type u) [Field K] [Field 
   sorry
 
 /-- Book, §A1, existence: for `j ≠ 0, 12³` and `γ ≠ 0` there is an elliptic function field
-`F | K` with a prime divisor of degree `1`, absolute invariant `j` and Hasse invariant `γ`.
-Blueprint: `thm:A-existence`. -/
+`F | K` with a prime divisor of degree `1`, absolute invariant `j` and Hasse invariant `γ`. -/
 theorem absolute_hasse_exists (K : Type u) [Field K] (j γ : K)
     (hj : j ≠ 0 ∧ j ≠ 12 ^ 3) (hγ : γ ≠ 0) :
     ∃ (F : Type u) (_ : Field F) (_ : Algebra K F) (_ : IsEllipticOver K F)

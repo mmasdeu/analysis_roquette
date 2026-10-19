@@ -492,7 +492,7 @@ theorem GP_eq : GP hq0 hq1 = (holD (Th hq0 hq1)) ^ 2 - Th hq0 hq1 * holD (holD (
   exact sub_eq_zero.mp hZ0
 
 include hq0 hq1 in
-/-- Book, §3, (16): `℘ = −Dζ − 2 s₁`. Blueprint: `def:wp`. -/
+/-- Book, §3, (16): `℘ = −Dζ − 2 s₁`. -/
 theorem wp_eq_neg_D_zeta : wpM K q = -Dop K (zetaM K q) - 2 * algebraMap K (MeroRing K) (sK K 1 q) := by
   have hT := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
   have hζ : zetaM K q = algebraMap (holSubring K) (MeroRing K) (holD (Th hq0 hq1)) /

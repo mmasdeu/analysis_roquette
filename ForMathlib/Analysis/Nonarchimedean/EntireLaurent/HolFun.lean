@@ -28,7 +28,7 @@ variable (L) in
 /-- Book, §2: the holomorphic functions over `K`, `H_K`: functions on `Ω^×` that are given
 by convergent Laurent series with coefficients in `K` (the value at `0` is irrelevant, so
 we work with functions on `Ω^×`; closure under products is the Cauchy product of convergent
-Laurent series, proved in `Holomorphic.lean`). Blueprint: `def:H-K`. -/
+Laurent series, proved in `Holomorphic.lean`). -/
 def holSubring : Subring (Punct L → L) where
   carrier := {f | ∃ g : L → L, IsHolomorphicOver K g ∧ (fun α : Punct L => g α.1) = f}
   mul_mem' := fun {f f'} ⟨g, hg, hgf⟩ ⟨g', hg', hgf'⟩ =>
@@ -77,7 +77,7 @@ noncomputable def holReflectHom : holSubring K L ≃+* holSubring K L where
   map_add' f g := rfl
 
 omit [Algebra.IsIntegral K L] in
-/-- Book, §2: `H_K` is an integral domain. Blueprint: `lem:H-K-domain`. -/
+/-- Book, §2: `H_K` is an integral domain. -/
 theorem holSubring_isDomain : IsDomain (holSubring K L) := by
   haveI : Nontrivial (holSubring K L) := ⟨⟨1, 0, fun h => by
     have := congrFun (congrArg Subtype.val h) ⟨1, one_ne_zero⟩
@@ -124,8 +124,7 @@ noncomputable def constHom : K →+* holSubring K L where
   map_zero' := Subtype.ext (funext fun _ => map_zero _)
   map_add' c d := Subtype.ext (funext fun _ => map_add _ _ _)
 
-/-- The `K`-algebra structure on `H_K` given by the constant functions.
-Blueprint: `def:const-algebra`. -/
+/-- The `K`-algebra structure on `H_K` given by the constant functions. -/
 noncomputable instance holAlgebra : Algebra K (holSubring K L) := RingHom.toAlgebra (constHom K L)
 
 end EntireLaurent

@@ -36,14 +36,12 @@ variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
   [Algebra.IsIntegral K L] [IsAlgClosed L]
 
 /-- Book, §2, equation (∗): a formal Laurent series `∑ aₙ Xⁿ` with coefficients in `K`
-is *convergent* if `|aₙ| rⁿ → 0` (as `n → ±∞`) for every real `r > 0`.
-Blueprint: `def:convergent-laurent`. -/
+is *convergent* if `|aₙ| rⁿ → 0` (as `n → ±∞`) for every real `r > 0`. -/
 def IsConvergentLaurent (a : ℤ → K) : Prop :=
   ∀ r : ℝ, 0 < r → Tendsto (fun n : ℤ => ‖a n‖ * r ^ n) cofinite (𝓝 0)
 
 /-- Book, §2: `f : Ω^× → Ω` is *holomorphic over `K`* if it is given by a convergent
-Laurent series with coefficients in `K` at every `α ≠ 0`.
-Blueprint: `def:holomorphic`. -/
+Laurent series with coefficients in `K` at every `α ≠ 0`. -/
 def IsHolomorphicOver (f : L → L) : Prop :=
   ∃ a : ℤ → K, IsConvergentLaurent K a ∧
     ∀ α : L, α ≠ 0 →

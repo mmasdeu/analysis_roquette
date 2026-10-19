@@ -127,6 +127,7 @@ theorem holCoeff_injective : Function.Injective (holCoeff K (L := L)) := fun f g
   rw [← holOfSeq_holCoeff K f, ← holOfSeq_holCoeff K g]
   congr 1
 
+/-- The Laurent coefficients of a product are the convolution of the coefficients. -/
 theorem holCoeff_mul (f g : holSubring K L) :
     holCoeff K (f * g) = convCoeff K (holCoeff K f) (holCoeff K g) :=
   holCoeff_eq K (convCoeff_convergent K (holCoeff_convergent K f) (holCoeff_convergent K g))

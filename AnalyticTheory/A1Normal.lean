@@ -472,7 +472,7 @@ section samePrime3
 variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 
 /-- Invariance of `j` and of the Hasse class for two data at the same prime divisor
-(A1.12), (A1.24), (A1.35). Blueprint: `lem:A1-same-prime`. -/
+(A1.12), (A1.24), (A1.35). -/
 theorem same_prime_invariants (hE : IsEllipticOver K F) (d d' : WeierstrassData K F)
     (h𝔭 : d'.𝔭 = d.𝔭) :
     jOfData d'.u d'.v d'.a₁ d'.a₂ d'.a₃ = jOfData d.u d.v d.a₁ d.a₂ d.a₃ ∧

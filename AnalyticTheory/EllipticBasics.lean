@@ -553,6 +553,8 @@ theorem finrank_Ln_one (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) :
   have : Function.Injective (Algebra.linearMap K F) := (algebraMap K F).injective
   rw [LinearMap.finrank_range_of_inj this]; simp
 
+/-- Riemann–Roch for an elliptic function field: `dim L(n𝔭) = n` for a prime divisor `𝔭` of degree
+`1` and `n ≥ 1`. -/
 theorem finrank_Ln_nat (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) (n : ℕ) (hn : 1 ≤ n) :
     Module.finrank K (Ln 𝔭 n) = n := by
   -- upper bound by induction from `n = 1`

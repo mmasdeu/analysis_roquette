@@ -67,6 +67,7 @@ theorem translation_Xm (u : Kˣ) (n : ℤ) :
     rw [Units.val_inv_eq_inv_val, inv_zpow']
   rw [this]
 
+/-- `f ∈ F_K(q)` iff `τ_q f = f`, i.e. `f(q⁻¹X) = f(X)` (book, §2, (1)). -/
 theorem mem_Fq_iff {q : K} (hq0 : q ≠ 0) (f : MeroRing K) :
     f ∈ Fq K q ↔ translation K (Units.mk0 q hq0) f = f := by
   constructor
@@ -524,7 +525,7 @@ end systems
 variable (K)
 
 /-- Book, §2: the degree and Jacobi image do not depend on the choice of the system of
-representatives (formula (12)). Blueprint: `prop:deg-q-formula`. -/
+representatives (formula (12)). -/
 theorem degQ_eq_of_system (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m : Omega K → ℤ)
     (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K))
     (hR : ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
@@ -554,8 +555,7 @@ theorem degQ_eq_of_system (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m : O
 
 /-- Book, §2, Proposition 1 (Abel–Jacobi theorem, analytic form). A `q`-periodic divisor
 `m` is the divisor of a `q`-periodic function iff `deg_q(m) = 0` and `Φ_q(m) ≡ 1 mod^× q`;
-in that case the function is unique up to a factor in `K^×`.
-Blueprint: `prop:abel-jacobi-1`. -/
+in that case the function is unique up to a factor in `K^×`. -/
 theorem abel_jacobi_one (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (m : Omega K → ℤ) (hm : m ∈ DivisorsPeriodic K q) :
     (∃ f : MeroRing K, f ∈ Fq K q ∧ f ≠ 0 ∧ divisorOf K f = m) ↔
@@ -568,8 +568,7 @@ theorem abel_jacobi_one (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 /-- Book, §2, corollary to Proposition 1: for every `α ∈ Ω^×` there is a `q`-periodic
 function with `w_α(f) = 1`; and if `β` is not `K`-conjugate to `α mod^× q`, then `f` can be chosen
-with moreover `w_β(f) = 0` (the choice of `f` depends on `β`).
-Blueprint: `cor:periodic-with-prescribed-zero`. -/
+with moreover `w_β(f) = 0` (the choice of `f` depends on `β`). -/
 theorem exists_periodic_function_with_valuation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (α : Omega K) (hα : α ≠ 0) :
     (∃ f : MeroRing K, f ∈ Fq K q ∧ anVal K α f = 1) ∧
@@ -581,8 +580,7 @@ theorem exists_periodic_function_with_valuation (q : K) (hq0 : 0 < ‖q‖) (hq1
   · obtain ⟨f, hf, h1, h2⟩ := cor_construct hq0 hq1 hα hβ
     exact ⟨f, hf, h1, h2 hαβ⟩
 
-/-- Book, §2: the set `L_K(q | 𝔪)` of `q`-periodic functions `f` with `(f) ≥ −𝔪` (including `0`).
-Blueprint: `prop:abel-jacobi-2`. -/
+/-- Book, §2: the set `L_K(q | 𝔪)` of `q`-periodic functions `f` with `(f) ≥ −𝔪` (including `0`). -/
 def LSet (q : K) (m : Omega K → ℤ) : Set (MeroRing K) :=
   {f | f ∈ Fq K q ∧ ∀ α : Omega K, α ≠ 0 → ((-(m α) : ℤ) : WithTop ℤ) ≤ anVal K α f}
 
@@ -669,8 +667,7 @@ end rr
 
 /-- Book, §2, Proposition 2 (Riemann–Roch theorem) together with the remarks preceding it: for a
 `q`-periodic divisor `𝔪`, `L_K(q|𝔪) = 0` if `deg_q 𝔪 < 0`; if `deg_q 𝔪 = 0` it is `0` unless
-`Φ_q(𝔪) ≡ 1`, in which case it has dimension `1`; and `dim L_K(q|𝔪) = deg_q(𝔪)` if `deg_q 𝔪 > 0`.
-Blueprint: `prop:abel-jacobi-2`. -/
+`Φ_q(𝔪) ≡ 1`, in which case it has dimension `1`; and `dim L_K(q|𝔪) = deg_q(𝔪)` if `deg_q 𝔪 > 0`. -/
 theorem riemann_roch_analytic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (m : Omega K → ℤ) (hm : m ∈ DivisorsPeriodic K q) :
     (degQ K q m < 0 → LSet K q m = {0}) ∧
@@ -728,8 +725,7 @@ theorem riemann_roch_analytic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     exact Int.toNat_of_nonneg this
 
 /-- Book, §2, formula (12): `deg_q(m) = ∑ [K(α):K] m_α`, the sum over a system `R` of
-representatives of the `K`-conjugacy classes mod `^× q` in the annulus `|q| < |α| ≤ 1`.
-Blueprint: `prop:deg-q-formula`. -/
+representatives of the `K`-conjugacy classes mod `^× q` in the annulus `|q| < |α| ≤ 1`. -/
 theorem degQ_formula (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (R : Set (Omega K))
     (hR : ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
       ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧ ConjModQ K q α β)

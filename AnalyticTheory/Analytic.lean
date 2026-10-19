@@ -24,7 +24,7 @@ universe u
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
 /-- Book, §2: the valuation of `K` has a unique extension to `Ω`: any absolute value on `Ω`
-extending the one of `K` equals the spectral norm. Blueprint: `lem:ext-unique`. -/
+extending the one of `K` equals the spectral norm. -/
 theorem omegaNorm_unique_extension (f : Omega K → ℝ) (hf : IsAbsoluteValue f)
     (hext : ∀ a : K, f (algebraMap K (Omega K) a) = ‖a‖) :
     f = omegaNorm K := by
@@ -38,11 +38,10 @@ abbrev OmegaX : Type u := EntireLaurent.Punct (Omega K)
 
 /-- Book, §2: the holomorphic functions over `K`, `H_K`: functions on `Ω^×` that are given
 by convergent Laurent series with coefficients in `K` (`EntireLaurent.holSubring`). It is an
-integral domain (`EntireLaurent.holSubring_isDomain`). Blueprint: `def:H-K`. -/
+integral domain (`EntireLaurent.holSubring_isDomain`). -/
 noncomputable abbrev holSubring : Subring (OmegaX K → Omega K) := EntireLaurent.holSubring K (Omega K)
 
-/-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`.
-Blueprint: `def:M-K`. -/
+/-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`. -/
 def MeroRing : Type u := FractionRing (holSubring K)
 
 noncomputable instance : Field (MeroRing K) := inferInstanceAs (Field (FractionRing (holSubring K)))
@@ -51,8 +50,7 @@ noncomputable instance : Algebra (holSubring K) (MeroRing K) :=
 instance : IsFractionRing (holSubring K) (MeroRing K) :=
   inferInstanceAs (IsFractionRing (holSubring K) (FractionRing (holSubring K)))
 
-/-- Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`.
-Blueprint: `def:reflection`. -/
+/-- Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`. -/
 noncomputable def reflectionM : MeroRing K ≃+* MeroRing K :=
   IsFractionRing.ringEquivOfRingEquiv (holReflectHom K (Omega K))
 
@@ -64,8 +62,7 @@ instance : IsScalarTower K (holSubring K) (MeroRing K) :=
   IsScalarTower.of_algebraMap_eq (fun _ => rfl)
 
 /-- Book, §2: the order of vanishing at `α ∈ Ω^×` of a holomorphic function: the integer `n`
-for which `f(x)/(x − α)ⁿ` has a non-zero limit as `x → α`; `+∞` for `f = 0`.
-Blueprint: `def:analytic-valuation`. -/
+for which `f(x)/(x − α)ⁿ` has a non-zero limit as `x → α`; `+∞` for `f = 0`. -/
 noncomputable def anOrdHol (α : Omega K) (f : holSubring K) : WithTop ℤ :=
   open Classical in
   if f = 0 then ⊤ else
@@ -76,7 +73,7 @@ noncomputable def anOrdHol (α : Omega K) (f : holSubring K) : WithTop ℤ :=
 /-- The *point order* at `α ∈ Ω^×`: `ord_α g − ord_α h` for a representation of `f ∈ M_K` as a quotient
 of holomorphic functions (`ord_α` the order of vanishing at the point `α`); `+∞` for `f = 0`.
 The analytic valuation `w_α` of the book is the point order divided by `e_α`
-(the degree of inseparability, `anVal`). Blueprint: `def:analytic-valuation`. -/
+(the degree of inseparability, `anVal`). -/
 noncomputable def anPt (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
   open Classical in
   let p : holSubring K × holSubring K := Classical.epsilon fun p : holSubring K × holSubring K =>
@@ -91,8 +88,7 @@ noncomputable def eIdx (α : Omega K) : ℕ :=
 /-- Book, §2: the analytic valuation `w_α` belonging to `α ∈ Ω^×`: the exponent of the minimal
 polynomial `φ_α` in the factorisation `f = φ_α^m g`, `g(α) ≠ 0` (extended to `M_K`); it is the
 point order `anPt` divided by `e_α` (`e_α ∣ anPt α f`, see `eIdx_dvd_anPt`). `w_α(0) = +∞`.
-That this is an additive valuation of `M_K` is `anVal_isValuation`.
-Blueprint: `def:analytic-valuation`. -/
+That this is an additive valuation of `M_K` is `anVal_isValuation`. -/
 noncomputable def anVal (α : Omega K) (f : MeroRing K) : WithTop ℤ :=
   (anPt K α f).map (fun n => n / (eIdx K α : ℤ))
 
@@ -101,8 +97,7 @@ noncomputable def scalePt (c : Kˣ) (α : OmegaX K) : OmegaX K :=
   ⟨algebraMap K (Omega K) (c : K) * α.1,
     mul_ne_zero ((map_ne_zero _).mpr c.ne_zero) α.2⟩
 
-/-- Book, §2: rescaling `f(X) ↦ f(cX)` as a ring endomorphism of `H_K`, for `c ∈ K^×`.
-Blueprint: `def:holscale`. -/
+/-- Book, §2: rescaling `f(X) ↦ f(cX)` as a ring endomorphism of `H_K`, for `c ∈ K^×`. -/
 noncomputable def holScaleHom (c : Kˣ) : holSubring K →+* holSubring K where
   toFun f := ⟨fun α => f.1 (scalePt K c α), by
     obtain ⟨g, hg, hgf⟩ := f.2
@@ -114,8 +109,7 @@ noncomputable def holScaleHom (c : Kˣ) : holSubring K →+* holSubring K where
   map_zero' := Subtype.ext rfl
   map_add' f g := Subtype.ext rfl
 
-/-- Book, §2: `H_K` is stable under the rescaling `X ↦ cX`, which is an automorphism.
-Blueprint: `def:holscale`. -/
+/-- Book, §2: `H_K` is stable under the rescaling `X ↦ cX`, which is an automorphism. -/
 noncomputable def holScale (c : Kˣ) : holSubring K ≃+* holSubring K where
   toFun := holScaleHom K c
   invFun := holScaleHom K c⁻¹
@@ -134,18 +128,16 @@ noncomputable def holScale (c : Kˣ) : holSubring K ≃+* holSubring K where
       rw [← mul_assoc, ← map_mul, Units.inv_mul, map_one, one_mul])
     rw [h])
 
-/-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`.
-Blueprint: `def:M-K`. -/
+/-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`. -/
 noncomputable def meroScale (a : Kˣ) : MeroRing K ≃+* MeroRing K :=
   IsFractionRing.ringEquivOfRingEquiv (holScale K a)
 
-/-- Book, §2: the translation automorphism `τ_a : f(X) ↦ f(a⁻¹X)` of `M_K`, for `a ∈ K^×`.
-Blueprint: `def:translation`. -/
+/-- Book, §2: the translation automorphism `τ_a : f(X) ↦ f(a⁻¹X)` of `M_K`, for `a ∈ K^×`. -/
 noncomputable def translation (a : Kˣ) : MeroRing K ≃+* MeroRing K :=
   meroScale K a⁻¹
 
 /-- Book, §2 (first observation): the `q`-periodic meromorphic functions form a subfield
-`F_K(q)` of `M_K`: those `f` with `τ_q f = f`. Blueprint: `def:Fq`. -/
+`F_K(q)` of `M_K`: those `f` with `τ_q f = f`. -/
 noncomputable def FqSub (q : K) : Subfield (MeroRing K) where
   carrier := {f | ∀ a : Kˣ, (a : K) = q → translation K a f = f}
   mul_mem' := fun {f g} hf hg a ha => by
@@ -162,7 +154,7 @@ noncomputable def FqSub (q : K) : Subfield (MeroRing K) where
 /-- The underlying set of `F_K(q)`. -/
 def Fq (q : K) : Set (MeroRing K) := (FqSub K q : Set (MeroRing K))
 
-/-- Translation fixes the constants `K ⊂ M_K`. Blueprint: `def:translation`. -/
+/-- Translation fixes the constants `K ⊂ M_K`. -/
 theorem translation_algebraMap (a : Kˣ) (c : K) :
     translation K a (algebraMap K (MeroRing K) c) = algebraMap K (MeroRing K) c := by
   have h1 : algebraMap K (MeroRing K) c =
@@ -172,7 +164,7 @@ theorem translation_algebraMap (a : Kˣ) (c : K) :
   unfold translation meroScale
   rw [h1, IsFractionRing.ringEquivOfRingEquiv_algebraMap, h2]
 
-/-- The constants `K → F_K(q)`. Blueprint: `def:Fq-algebra`. -/
+/-- The constants `K → F_K(q)`. -/
 noncomputable def FqHom (q : K) : K →+* FqSub K q where
   toFun c := ⟨algebraMap K (MeroRing K) c, fun a _ => translation_algebraMap K a c⟩
   map_one' := Subtype.ext (map_one _)
@@ -180,14 +172,13 @@ noncomputable def FqHom (q : K) : K →+* FqSub K q where
   map_zero' := Subtype.ext (map_zero _)
   map_add' c d := Subtype.ext (map_add _ _ _)
 
-/-- The `K`-algebra structure on `F_K(q)`. Blueprint: `def:Fq-algebra`. -/
+/-- The `K`-algebra structure on `F_K(q)`. -/
 noncomputable instance FqAlgebra (q : K) : Algebra K (FqSub K q) :=
   RingHom.toAlgebra (FqHom K q)
 
 /-- Book, §2: a *divisor* is a collection `m = {m_α}` of integers over `Ω^×` with
 (i) finiteness in every annulus `0 < r ≤ |α| ≤ r'`, and (ii) rationality: `m_α = m_β`
-when `α`, `β` are conjugate over `K`. As the points of `Ω^×` only matter, we normalize `m_0 = 0`.
-Blueprint: `def:divisor`. -/
+when `α`, `β` are conjugate over `K`. As the points of `Ω^×` only matter, we normalize `m_0 = 0`. -/
 noncomputable def Divisors : AddSubgroup (Omega K → ℤ) where
   carrier := {m | m 0 = 0 ∧ (∀ r r' : ℝ, 0 < r → r ≤ r' →
       {α : Omega K | r ≤ omegaNorm K α ∧ omegaNorm K α ≤ r' ∧ m α ≠ 0}.Finite) ∧
@@ -204,13 +195,12 @@ noncomputable def Divisors : AddSubgroup (Omega K → ℤ) where
     fun α β h => by simp [hm.2.2 α β h]⟩
 
 /-- Book, §2: the divisor of a meromorphic function (`(f)` in the book): `m_α = w_α(f)` for
-`α ∈ Ω^×` (and `0` at the irrelevant point `α = 0`). Blueprint: `def:divisor-of`. -/
+`α ∈ Ω^×` (and `0` at the irrelevant point `α = 0`). -/
 noncomputable def divisorOf (f : MeroRing K) : Omega K → ℤ :=
   open Classical in
   fun α => if α = 0 then 0 else WithTop.untopD 0 (anVal K α f)
 
-/-- Book, §2: `q`-periodic divisors `D_K(q)`, i.e. divisors with `m_{qα} = m_α`.
-Blueprint: `def:Dq`. -/
+/-- Book, §2: `q`-periodic divisors `D_K(q)`, i.e. divisors with `m_{qα} = m_α`. -/
 noncomputable def DivisorsPeriodic (q : K) : AddSubgroup (Omega K → ℤ) where
   carrier := {m | m ∈ Divisors K ∧
     ∀ α : Omega K, m (algebraMap K (Omega K) q * α) = m α}
@@ -219,19 +209,17 @@ noncomputable def DivisorsPeriodic (q : K) : AddSubgroup (Omega K → ℤ) where
     fun α => by simp [hm.2 α, hn.2 α]⟩
   neg_mem' := fun {m} hm => ⟨(Divisors K).neg_mem hm.1, fun α => by simp [hm.2 α]⟩
 
-/-- Book, §2: `a ≡ b mod^× q` for `a, b ∈ Ω^×` means `b = a q^k` for some `k ∈ ℤ`.
-Blueprint: `def:mod-times`. -/
+/-- Book, §2: `a ≡ b mod^× q` for `a, b ∈ Ω^×` means `b = a q^k` for some `k ∈ ℤ`. -/
 def ModTimes (q : K) (a b : Omega K) : Prop :=
   ∃ k : ℤ, b = a * (algebraMap K (Omega K) q) ^ k
 
 /-- Book, §2: `α, β ∈ Ω^×` are *K-conjugate mod^× q* if some conjugate of `β` equals
-`q^k α` for some `k`. Blueprint: `def:conj-mod-q`. -/
+`q^k α` for some `k`. -/
 def ConjModQ (q : K) (α β : Omega K) : Prop :=
   ∃ γ : Omega K, minpoly K γ = minpoly K β ∧ ModTimes K q α γ
 
 /-- Book, §2: a system of representatives (chosen once and for all) of the `K`-conjugacy classes
-mod `^× q` of elements of the annulus `|q| < |α| ≤ 1` (each class meets the annulus).
-Blueprint: `def:deg-q`. -/
+mod `^× q` of elements of the annulus `|q| < |α| ≤ 1` (each class meets the annulus). -/
 noncomputable def repSystem (q : K) : Set (Omega K) :=
   Classical.epsilon fun R : Set (Omega K) => ∀ α : Omega K, ‖q‖ < omegaNorm K α →
     omegaNorm K α ≤ 1 → ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧
@@ -242,13 +230,13 @@ noncomputable def repAnnulus (q : K) : Set (Omega K) :=
   {α ∈ repSystem K q | ‖q‖ < omegaNorm K α ∧ omegaNorm K α ≤ 1}
 
 /-- Book, §2: the degree `deg_q(m) = ∑ [K(α):K] m_α` of a `q`-periodic divisor, formula (12),
-the sum over a system of representatives. Blueprint: `def:deg-q`. -/
+the sum over a system of representatives. -/
 noncomputable def degQ (q : K) (m : Omega K → ℤ) : ℤ :=
   ∑ᶠ α ∈ repAnnulus K q,
     (Module.finrank K (IntermediateField.adjoin K ({α} : Set (Omega K))) : ℤ) * m α
 
 /-- Book, §2: the Jacobi image `Φ_q(m) = ∏' N_{K(α)|K}(α)^{m_α} mod^× q ∈ K^×/q` of a
-`q`-periodic divisor, formula (12). Blueprint: `def:Phi-q`. -/
+`q`-periodic divisor, formula (12). -/
 noncomputable def PhiQ (q : K) (hq : q ≠ 0) (m : Omega K → ℤ) :
     Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq) :=
   open Classical in
@@ -256,7 +244,7 @@ noncomputable def PhiQ (q : K) (hq : q ≠ 0) (m : Omega K → ℤ) :
     (Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)) ^ (m α)
   if h : x ≠ 0 then QuotientGroup.mk (Units.mk0 x h) else 1
 
-/-- Book, §2: `deg_q` is additive on `D_K(q)`. Blueprint: `def:deg-q`. -/
+/-- Book, §2: `deg_q` is additive on `D_K(q)`. -/
 theorem degQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K → ℤ)
     (hm : m ∈ DivisorsPeriodic K q) (hn : n ∈ DivisorsPeriodic K q) :
     degQ K q (m + n) = degQ K q m + degQ K q n := by
@@ -271,8 +259,7 @@ theorem degQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
   simp only [Pi.add_apply, mul_add]
   exact finsum_mem_add_distrib' (hfin m hm) (hfin n hn)
 
-/-- Book, §2: `Φ_q` is a homomorphism `D_K(q) → K^×/q` ("obviously", loc. cit.).
-Blueprint: `def:Phi-q`. -/
+/-- Book, §2: `Φ_q` is a homomorphism `D_K(q) → K^×/q` ("obviously", loc. cit.). -/
 theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K → ℤ)
     (hm : m ∈ DivisorsPeriodic K q) (hn : n ∈ DivisorsPeriodic K q) :
     PhiQ K q (norm_pos_iff.mp hq0) (m + n) =
@@ -323,13 +310,12 @@ theorem PhiQ_add (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (m n : Omega K 
   exact Units.ext rfl
 
 /-- Book, §2: the fundamental theta function
-`Θ(X) = ∏_{n≥0}(1 − qⁿX⁻¹) ∏_{n<0}(1 − q^{-n}X)`, as a function on `Ω^×`.
-Blueprint: `def:theta`. -/
+`Θ(X) = ∏_{n≥0}(1 − qⁿX⁻¹) ∏_{n<0}(1 − q^{-n}X)`, as a function on `Ω^×`. -/
 noncomputable def theta (q : K) (α : Omega K) : Omega K :=
   (∏' n : ℕ, (1 - (algebraMap K (Omega K) q) ^ n * α⁻¹)) *
     ∏' n : ℕ, (1 - (algebraMap K (Omega K) q) ^ (n + 1) * α)
 
-/-- Book, §2: `Θ_α(X) = Θ(α⁻¹X)`. Blueprint: `def:theta-alpha`. -/
+/-- Book, §2: `Θ_α(X) = Θ(α⁻¹X)`. -/
 noncomputable def thetaAlpha (q : K) (α β : Omega K) : Omega K :=
   theta K q (α⁻¹ * β)
 
@@ -359,8 +345,7 @@ theorem multipliable_geom_omega (q : K) (hq1 : ‖q‖ < 1) (α γ : Omega K)
     refine (hg.mul_right (‖q‖ ^ m * ‖γ‖)).congr (fun n => ?_)
     rw [norm_mul, norm_pow, norm_algebraMap_omega, pow_add]; ring
 
-/-- Book, §2, (7): `Θ(q⁻¹X) = −X Θ(X)` for `0 < |q| < 1` (`X ≠ 0`).
-Blueprint: `prop:theta-functional-eq`. -/
+/-- Book, §2, (7): `Θ(q⁻¹X) = −X Θ(X)` for `0 < |q| < 1` (`X ≠ 0`). -/
 theorem theta_functional_equation (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (α : Omega K)
     (hα : α ≠ 0) :
     theta K q ((algebraMap K (Omega K) q)⁻¹ * α) = -α * theta K q α := by

@@ -25,13 +25,12 @@ variable (L : Type u) [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L]
 
 /-- Book, §2, Remark 1: the ramification index `e(α)` of `ψ α` over `α`: the quotient of the degree
-of inseparability of `α` over `K` by that of `ψ α` over `L` (`ψ : Ω_K ≅ Ω_L`).
-Blueprint: `rem:S2-ext-const`. -/
+of inseparability of `α` over `K` by that of `ψ α` over `L` (`ψ : Ω_K ≅ Ω_L`). -/
 noncomputable def ramIndex (ψ : Omega K ≃ₐ[K] Omega L) (α : Omega K) : ℕ :=
   Field.finInsepDegree K (IntermediateField.adjoin K ({α} : Set (Omega K))) /
     Field.finInsepDegree L (IntermediateField.adjoin L ({ψ α} : Set (Omega L)))
 
-/-- The map `K^×/q → L^×/q` induced by `K ⊂ L`. Blueprint: `rem:S2-ext-const`. -/
+/-- The map `K^×/q → L^×/q` induced by `K ⊂ L`. -/
 noncomputable def quotIncl (q : K) (hq : q ≠ 0) (hqL : algebraMap K L q ≠ 0) :
     Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq) →* Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL) :=
   QuotientGroup.map _ _ (Units.map (algebraMap K L : K →* L)) (by
@@ -40,8 +39,7 @@ noncomputable def quotIncl (q : K) (hq : q ≠ 0) (hqL : algebraMap K L q ≠ 0)
     ext
     simp)
 
-/-- The embedding `M_K ⊂ M_L` given by regarding the coefficients as elements of `L`.
-Blueprint: `rem:S2-galois`. -/
+/-- The embedding `M_K ⊂ M_L` given by regarding the coefficients as elements of `L`. -/
 def IsCoeffInclusion (ι : MeroRing K →+* MeroRing L) : Prop :=
   ∀ (g : holSubring K) (a : ℤ → K), IsConvergentLaurent K a →
     (∀ α : OmegaX K, HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (g.1 α)) →

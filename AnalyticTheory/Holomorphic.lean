@@ -19,12 +19,10 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-/-- `Ω`: an algebraic closure of `K` (book, §2, first paragraph), with the spectral norm.
-Blueprint: `def:omega`. -/
+/-- `Ω`: an algebraic closure of `K` (book, §2, first paragraph), with the spectral norm. -/
 abbrev Omega : Type u := EntireLaurent.Ω K
 
-/-- The absolute value of `K` extended to `Ω` (the spectral norm).
-Blueprint: `def:omega-norm`. -/
+/-- The absolute value of `K` extended to `Ω` (the spectral norm). -/
 noncomputable abbrev omegaNorm (α : Omega K) : ℝ := spectralNorm K (Omega K) α
 
 export EntireLaurent (

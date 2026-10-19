@@ -176,7 +176,7 @@ end VII
 
 /-- Book, §3, Theorem VII: `j(q) = 1/q + R(q)` with `R` a universal power series with integral
 coefficients; `|j(q)| = 1/|q| > 1`; and every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one
-`q` with `0 < |q| < 1`. Blueprint: `thm:VII`. -/
+`q` with `0 < |q| < 1`. -/
 theorem thmVII_absinv (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     (∃ R : ℕ → ℤ, jInvQ K q = q⁻¹ + ∑' n : ℕ, (R n : K) * q ^ n) ∧
       ‖jInvQ K q‖ = ‖q‖⁻¹ ∧ 1 < ‖jInvQ K q‖ := by
@@ -189,6 +189,8 @@ theorem thmVII_absinv (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
   · rw [hj]; change 1 < ‖q⁻¹ + ∑' n : ℕ, ((coeff n R : ℤ) : K) * q ^ n‖
     rw [hn]; exact (one_lt_inv₀ hq0).mpr hq1
 
+/-- Book, §3, Theorem VII (last part): every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one `q`
+with `0 < |q| < 1`. -/
 theorem thmVII_bijective :
     ∀ j : K, 1 < ‖j‖ → ∃! q : K, 0 < ‖q‖ ∧ ‖q‖ < 1 ∧ jInvQ K q = j := by
   obtain ⟨R, hR⟩ := exists_R K

@@ -80,6 +80,10 @@ noncomputable def thetaFun (α : Omega K) : holSubring K :=
   if h : α ≠ 0 then Classical.choose (theta_spec hq0 hq1 h) else 1
 
 open scoped Classical in
+/-- The theta function of the `K`-conjugacy class of `α` mod `^× q`: a non-zero holomorphic
+function over `K` with simple zeros exactly at the `K`-conjugates of `α` mod `^× q`, satisfying the
+functional equation with multiplicator `φ_α(0)` and degree `[K(α):K]`, and given by a convergent
+product of polynomials. -/
 theorem thetaFun_spec {α : Omega K} (hα : α ≠ 0) :
     thetaFun hq0 hq1 α ≠ 0 ∧
       holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ (thetaFun hq0 hq1 α) =
@@ -140,6 +144,7 @@ theorem thetaDiv_ne_zero : thetaDiv hq0 hq1 hm ≠ 0 := by
 
 
 open scoped Classical in
+/-- Book, §2, (10): the divisor of `Θ_𝔪` is `𝔪`. -/
 theorem anVal_thetaDiv {ξ : Omega K} (hξ : ξ ≠ 0) :
     anVal K ξ (thetaDiv hq0 hq1 hm) = (m ξ : WithTop ℤ) := by
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
@@ -239,6 +244,8 @@ noncomputable def dTheta : ℤ :=
 noncomputable def aTheta : K :=
   ∏ α ∈ thetaS hq0 hq1 hm, ((minpoly K α).coeff 0) ^ (m α)
 
+/-- Book, §2, (11): the functional equation `Θ_𝔪(q⁻¹X) = a⁻¹ X^d Θ_𝔪(X)` of the theta function of a
+periodic divisor. -/
 theorem translation_thetaDiv :
     translation K (Units.mk0 q (norm_pos_iff.mp hq0)) (thetaDiv hq0 hq1 hm) =
       algebraMap K (MeroRing K) (aTheta hq0 hq1 hm)⁻¹ * Xm (dTheta hq0 hq1 hm) *
@@ -284,6 +291,7 @@ theorem prod_neg_one_zpow {ι : Type*} (S : Finset ι) (f : ι → ℤ) :
   | insert a S ha ih =>
     rw [Finset.prod_insert ha, Finset.sum_insert ha, ih, zpow_add₀ (by norm_num)]
 
+/-- Book, §2, (11): the degree of the theta function `Θ_𝔪` is `deg_q(𝔪)`. -/
 theorem degQ_eq_dTheta : degQ K q m = dTheta hq0 hq1 hm := by
   classical
   unfold degQ dTheta
@@ -306,6 +314,8 @@ theorem aTheta_ne_zero : aTheta hq0 hq1 hm ≠ 0 := by
   exact minpoly.coeff_zero_ne_zero (Algebra.IsIntegral.isIntegral α)
     (ne_zero_of_mem_thetaS hq0 hq1 hm hα)
 
+/-- Book, §2, (11): the multiplicator of `Θ_𝔪` represents `Φ_q(𝔪)` (up to the sign `(−1)^d` coming
+from the factor `(−X)^d`). -/
 theorem PhiQ_eq_mk (hq : q ≠ 0) :
     ∃ h : (-1 : K) ^ dTheta hq0 hq1 hm * aTheta hq0 hq1 hm ≠ 0,
       PhiQ K q hq m = QuotientGroup.mk (Units.mk0 _ h) := by

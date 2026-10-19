@@ -330,6 +330,7 @@ theorem adjoin_top_of_subfield_eq {F : Type*} [Field F] {S T : Subfield F} (h : 
     IntermediateField.adjoin T ({a} : Set F) = ⊤ := h ▸ hS
 
 include hq0 in
+/-- `F_L(q)` is generated over the descended field `E_ζ` by a primitive element of `L | K`. -/
 theorem Ezeta_adjoin (ζ : CocycleModQ K L q) {α : L}
     (hα : IntermediateField.adjoin K ({α} : Set L) = ⊤) :
     IntermediateField.adjoin (Ezeta q ζ) ({FqHom L (algebraMap K L q) α} :

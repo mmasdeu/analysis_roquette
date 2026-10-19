@@ -21,20 +21,18 @@ universe u
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
 
-/-- A chosen family of Laurent coefficients of a holomorphic function on `Ω^×`.
-Blueprint: `def:D-operator`. -/
+/-- A chosen family of Laurent coefficients of a holomorphic function on `Ω^×`. -/
 noncomputable def laurentCoeff (f : OmegaX K → Omega K) : ℤ → K :=
   Classical.epsilon fun a : ℤ → K => IsConvergentLaurent K a ∧
     ∀ α : OmegaX K, HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * α.1 ^ n) (f α)
 
-/-- The derivation `D = X d/dX` on functions given by Laurent series: `∑ aₙXⁿ ↦ ∑ n aₙXⁿ`.
-Blueprint: `def:D-operator`. -/
+/-- The derivation `D = X d/dX` on functions given by Laurent series: `∑ aₙXⁿ ↦ ∑ n aₙXⁿ`. -/
 noncomputable def DholFun (f : OmegaX K → Omega K) : OmegaX K → Omega K :=
   fun α => ∑' n : ℤ, (n : Omega K) * algebraMap K (Omega K) (laurentCoeff K f n) * α.1 ^ n
 
 /-- The derivation `D = X d/dX` on `M_K`: `D(g/h) = (Dg · h − g · Dh)/h²` for
 holomorphic `g, h` (with `D` acting on Laurent coefficients). That `D` is a well-defined
-derivation of `M_K` is `Dop_derivation`. Blueprint: `def:D-operator`. -/
+derivation of `M_K` is `Dop_derivation`. -/
 noncomputable def Dop (f : MeroRing K) : MeroRing K :=
   Classical.epsilon fun r : MeroRing K => ∃ g h Dg Dh : holSubring K, h ≠ 0 ∧
     f = algebraMap (holSubring K) (MeroRing K) g / algebraMap (holSubring K) (MeroRing K) h ∧
@@ -44,54 +42,52 @@ noncomputable def Dop (f : MeroRing K) : MeroRing K :=
         (algebraMap (holSubring K) (MeroRing K) h) ^ 2
 
 /-- `f ∈ M_K` takes the values `F(α)` on `Ω^×` (wherever a denominator of a representation
-`f = g/h` does not vanish). Blueprint: `def:wp`. -/
+`f = g/h` does not vanish). -/
 def EvalsTo (f : MeroRing K) (F : OmegaX K → Omega K) : Prop :=
   ∃ g h : holSubring K, h ≠ 0 ∧
     f = algebraMap (holSubring K) (MeroRing K) g / algebraMap (holSubring K) (MeroRing K) h ∧
     ∀ α : OmegaX K, h.1 α ≠ 0 → F α = g.1 α / h.1 α
 
-/-- The meromorphic function `Θ(X)` (book, §2, (6)) viewed in `M_K` (it is holomorphic on `Ω^×`).
-Blueprint: `def:theta-M`. -/
+/-- The meromorphic function `Θ(X)` (book, §2, (6)) viewed in `M_K` (it is holomorphic on `Ω^×`). -/
 noncomputable def thetaM (q : K) : MeroRing K :=
   algebraMap (holSubring K) (MeroRing K)
     (Classical.epsilon fun t : holSubring K => ∀ α : OmegaX K, t.1 α = theta K q α.1)
 
-/-- `ζ = D log Θ`. Blueprint: `def:zeta`. -/
+/-- `ζ = D log Θ`. -/
 noncomputable def zetaM (q : K) : MeroRing K := Dop K (thetaM K q) / thetaM K q
 
-/-- The sums `s_k = ∑_{m>0} m^k q^m/(1 − q^m) = ∑_n (∑_{d|n} d^k) qⁿ` (book, (35)).
-Blueprint: `def:s-k`. -/
+/-- The sums `s_k = ∑_{m>0} m^k q^m/(1 − q^m) = ∑_n (∑_{d|n} d^k) qⁿ` (book, (35)). -/
 noncomputable def sK (k : ℕ) (q : K) : K :=
   ∑' n : ℕ, ((∑ d ∈ n.divisors, (d : ℤ) ^ k : ℤ) : K) * q ^ n
 
 /-- Book, §3, (30) (new definition): `℘(X) = ∑_{n∈ℤ} qⁿX/(1 − qⁿX)² − 2 s₁`, the element of `M_K`
-with these values on `Ω^×`. Blueprint: `def:wp`. -/
+with these values on `Ω^×`. -/
 noncomputable def wpM (q : K) : MeroRing K :=
   Classical.epsilon fun f : MeroRing K => EvalsTo K f fun α =>
     (∑' n : ℤ, (algebraMap K (Omega K) q) ^ n * α.1 / (1 - (algebraMap K (Omega K) q) ^ n * α.1) ^ 2)
       - 2 * algebraMap K (Omega K) (sK K 1 q)
 
 /-- Book, §3, (18) and (new definition): `℘′(X) = ∑_{n∈ℤ} q²ⁿX²/(1 − qⁿX)³ + s₁`, i.e.
-`½(D℘ − ℘)` formally in every characteristic. Blueprint: `def:wp-prime`. -/
+`½(D℘ − ℘)` formally in every characteristic. -/
 noncomputable def wpPrimeM (q : K) : MeroRing K :=
   Classical.epsilon fun f : MeroRing K => EvalsTo K f fun α =>
     (∑' n : ℤ, (algebraMap K (Omega K) q) ^ (2 * n) * α.1 ^ 2 /
         (1 - (algebraMap K (Omega K) q) ^ n * α.1) ^ 3)
       + algebraMap K (Omega K) (sK K 1 q)
 
-/-- The coefficient `B = −5 s₃` (book, (37)). Blueprint: `def:coeffB`. -/
+/-- The coefficient `B = −5 s₃` (book, (37)). -/
 noncomputable def coeffB (q : K) : K := -5 * sK K 3 q
 
 /-- The coefficient `C = −(5 s₃ + 7 s₅)/12` (book, (38)), written as the universal power
-series with integral coefficients `c_n = −(5σ₃(n) + 7σ₅(n))/12`. Blueprint: `def:coeffC`. -/
+series with integral coefficients `c_n = −(5σ₃(n) + 7σ₅(n))/12`. -/
 noncomputable def coeffC (q : K) : K :=
   ∑' n : ℕ, ((-(5 * (∑ d ∈ n.divisors, (d : ℤ) ^ 3) + 7 * (∑ d ∈ n.divisors, (d : ℤ) ^ 5)) / 12 :
     ℤ) : K) * q ^ n
 
-/-- Book, §3, (42): `Δ = B² − C − 64B³ + 72BC − 432C²`. Blueprint: `def:Delta-q`. -/
+/-- Book, §3, (42): `Δ = B² − C − 64B³ + 72BC − 432C²`. -/
 def deltaPoly (B C : K) : K := B ^ 2 - C - 64 * B ^ 3 + 72 * B * C - 432 * C ^ 2
 
-/-- Book, §3, (42): the absolute invariant `j(q) = (1 − 48B)³/Δ`. Blueprint: `def:jq`. -/
+/-- Book, §3, (42): the absolute invariant `j(q) = (1 − 48B)³/Δ`. -/
 noncomputable def jInvQ (q : K) : K :=
   (1 - 48 * coeffB K q) ^ 3 / deltaPoly K (coeffB K q) (coeffC K q)
 
@@ -137,8 +133,7 @@ theorem lem1_diff (R : ℕ → K) (hR : ∀ n, ‖R n‖ ≤ 1) {u u' : K} (hu :
     _ = ‖u - u'‖ := by ring
 
 /-- Book, §3, Lemma 1: for `R = ∑ cᵢ Xⁱ` with `|cᵢ| ≤ 1`, the map `u ↦ 1/u + R(u)` is a
-bijection from `0 < |u| < 1` onto `|v| > 1`, and `|1/u + R(u)| = 1/|u|`.
-Blueprint: `lem:1`. -/
+bijection from `0 < |u| < 1` onto `|v| > 1`, and `|1/u + R(u)| = 1/|u|`. -/
 theorem lemma1_inversion (R : ℕ → K) (hR : ∀ n, ‖R n‖ ≤ 1) :
     Set.BijOn (fun u : K => u⁻¹ + ∑' n : ℕ, R n * u ^ n)
       {u : K | 0 < ‖u‖ ∧ ‖u‖ < 1} {v : K | 1 < ‖v‖} ∧

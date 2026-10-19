@@ -604,7 +604,7 @@ theorem degQ_PhiQ_divExt {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Om
 end degPhi
 
 /-- Book, §2, Remark 1: there is a natural embedding `D_K ⊂ D_L`, `m'_{ψ α} = e(α) m_α`, which maps
-`D_K(q)` into `D_L(q)` and preserves `deg_q` and `Φ_q`. Blueprint: `rem:S2-ext-const`. -/
+`D_K(q)` into `D_L(q)` and preserves `deg_q` and `Φ_q`. -/
 theorem remark_ext_const_divisors (ψ : Omega K ≃ₐ[K] Omega L) :
     ∃ ι : Divisors K →+ Divisors L, Function.Injective ι ∧
       (∀ (m : Divisors K) (α : Omega K), α ≠ 0 →
@@ -677,7 +677,7 @@ theorem eIdx_le_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃ₐ[K] O
     _ ≤ _ := Nat.mul_le_mul_left _ (Nat.one_le_iff_ne_zero.mpr this)
 
 /-- Book, §2, Remark 1: if `L | K` is separable then `e(α) = 1` for all `α`
-(`F_L(q)` is unramified over `F_K(q)`). Blueprint: `rem:S2-ext-const`. -/
+(`F_L(q)` is unramified over `F_K(q)`). -/
 theorem ramIndex_eq_one_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃ₐ[K] Omega L)
     (α : Omega K) : ramIndex K L ψ α = 1 := by
   classical
@@ -920,7 +920,7 @@ theorem hol_descend {g : holSubring L} (hg : ∀ σ : L ≃ₐ[K] L, holGal σ g
 end descent
 
 /-- Book, §2, Remark 2: for `f ∈ M_L` and `σ ∈ G`, `(σ f)(σ α) = σ(f(α))`, where `σ` acts on the
-coefficients of `f` and `σ'` is any extension of `σ` to `Ω_L`. Blueprint: `rem:S2-galois`. -/
+coefficients of `f` and `σ'` is any extension of `σ` to `Ω_L`. -/
 theorem remark_galois_action_eval (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L)
     (hρ : IsGalAct K L σ ρ) (σ' : Omega L ≃+* Omega L) (hσ' : IsExtension K L σ σ')
     (g g' : holSubring L)
@@ -929,7 +929,7 @@ theorem remark_galois_action_eval (σ : GalGroup K L) (ρ : MeroRing L ≃+* Mer
     g'.1 ⟨σ' α.1, (map_ne_zero σ').mpr α.2⟩ = σ' (g.1 α) :=
   galAct_holRel hρ hσ' hg α.1 α.2
 
-/-- Book, §2, Remark 2: `G` acts on `M_L` with fixed field `M_K`. Blueprint: `rem:S2-galois`. -/
+/-- Book, §2, Remark 2: `G` acts on `M_L` with fixed field `M_K`. -/
 theorem remark_galois_fixed_field :
     ∃ ι : MeroRing K →+* MeroRing L, IsCoeffInclusion K L ι ∧
       ∀ f : MeroRing L, (∀ (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L),
@@ -975,7 +975,7 @@ theorem remark_galois_fixed_field :
     rw [map_div₀, map_div₀, meroExt_alg, meroExt_alg, galAct_fix_holExt hρ, galAct_fix_holExt hρ]
 
 /-- Book, §2, Remark 2: the divisor of `σ f` is the `σ`-transform of the divisor of `f`:
-`(σ f)(σ α) = (f)(α)`. Blueprint: `rem:S2-galois`. -/
+`(σ f)(σ α) = (f)(α)`. -/
 theorem remark_galois_action_divisors (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L)
     (hρ : IsGalAct K L σ ρ) (σ' : Omega L ≃+* Omega L) (hσ' : IsExtension K L σ σ')
     (f : MeroRing L) (hf : f ≠ 0) (α : Omega L) (hα : α ≠ 0) :
@@ -984,8 +984,7 @@ theorem remark_galois_action_divisors (σ : GalGroup K L) (ρ : MeroRing L ≃+*
   unfold divisorOf
   rw [if_neg hσα, if_neg hα, anVal_galAct hρ hσ' hα]
 
-/-- Book, §2, Remark 2: the group of `G`-fixed elements of `D_L` is `D_K` (embedded as in Remark 1).
-Blueprint: `rem:S2-galois`. -/
+/-- Book, §2, Remark 2: the group of `G`-fixed elements of `D_L` is `D_K` (embedded as in Remark 1). -/
 theorem remark_galois_fixed_divisors (ψ : Omega K ≃ₐ[K] Omega L) (ι : Divisors K →+ Divisors L)
     (hι : ∀ (m : Divisors K) (α : Omega K), α ≠ 0 →
       ((ι m : Divisors L) : Omega L → ℤ) (ψ α) = (ramIndex K L ψ α : ℤ) * (m : Omega K → ℤ) α) :
@@ -1078,7 +1077,7 @@ theorem meroGal_Xm (σ : L ≃ₐ[K] L) (n : ℤ) : meroGal σ (Xm (K := L) n) =
 end galTransl
 
 /-- Book, §2, Remark 2: `deg_q(σ 𝔪) = deg_q(𝔪)` and `Φ_q(σ 𝔪) ≡ σ Φ_q(𝔪) mod^× q`, where
-`(σ 𝔪)(σ' α) = 𝔪(α)`; i.e. `deg_q` and `Φ_q` are `G`-equivariant. Blueprint: `rem:S2-galois`. -/
+`(σ 𝔪)(σ' α) = 𝔪(α)`; i.e. `deg_q` and `Φ_q` are `G`-equivariant. -/
 theorem remark_galois_equivariance (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqL : algebraMap K L q ≠ 0)
     (σ : GalGroup K L) (σ' : Omega L ≃+* Omega L) (hσ' : IsExtension K L σ σ')
     (m : Omega L → ℤ) (hm : m ∈ DivisorsPeriodic L (algebraMap K L q)) :

@@ -154,8 +154,7 @@ theorem serD_eq_serPsi : serD = serPsi := by
     evalZ_serPsi hq1 (norm_pos_iff.mp hq0),
     delta_product_core hq0 hq1 (by simpa using hπ0.ne') hne rfl, sub_self]
 
-/-- Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic.
-Blueprint: `rem:delta-product`. -/
+/-- Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic. -/
 theorem remark3_delta_product (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     deltaPoly K (coeffB K q) (coeffC K q) =
       q * ∏' n : ℕ, (1 - q ^ (n + 1)) ^ 24 := by

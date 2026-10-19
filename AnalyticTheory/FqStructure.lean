@@ -19,7 +19,7 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
-/-- Book, §2, item I: `F_K(q)` is a function field over `K`. Blueprint: `thm:fq-function-field`. -/
+/-- Book, §2, item I: `F_K(q)` is a function field over `K`. -/
 theorem fq_is_function_field (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     IsFunctionFieldOver K (FqSub K q) := by
   classical
@@ -101,7 +101,7 @@ theorem fq_is_function_field (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
   exact ⟨fun y => hle (IntermediateField.mem_top (x := y))⟩
 
 /-- Book, §2, item II (first part): `w_α = w_β` on `F_K(q)` iff `α` and `β` are
-`K`-conjugate mod `^× q`. Blueprint: `thm:fq-valuations`. -/
+`K`-conjugate mod `^× q`. -/
 theorem fq_valuation_eq_iff (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (α β : Omega K) (hα : α ≠ 0) (hβ : β ≠ 0) :
     (∀ f ∈ Fq K q, anVal K α f = anVal K β f) ↔ ConjModQ K q α β := by
@@ -117,14 +117,14 @@ theorem fq_valuation_eq_iff (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     exact anVal_conjModQ hq0' hf hα h
 
 /-- Book, §2, item II (value group): the value group of `w_α` on `F_K(q)` is `ℤ`, in
-the sense that some `f ∈ F_K(q)` has `w_α(f) = 1`. Blueprint: `thm:fq-valuations`. -/
+the sense that some `f ∈ F_K(q)` has `w_α(f) = 1`. -/
 theorem fq_valuation_surjective (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (α : Omega K) (hα : α ≠ 0) :
     ∃ f ∈ Fq K q, anVal K α f = 1 :=
   (exists_periodic_function_with_valuation K q hq0 hq1 α hα).1
 
 /-- Book, §2, item I–II: every (nontrivial) valuation of `F_K(q)` over `K` is equivalent to some
-`w_α`, i.e. has the same valuation ring. Blueprint: `thm:fq-valuations`. -/
+`w_α`, i.e. has the same valuation ring. -/
 theorem fq_valuations_classified (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (v : AddValuation (FqSub K q) (WithTop ℤ))
     (hv : ∀ c : K, c ≠ 0 → v (algebraMap K (FqSub K q) c) = 0)
@@ -134,8 +134,7 @@ theorem fq_valuations_classified (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   classify_valuation hq0 hq1 v hv hnt
 
 /-- Book, §2, item III: the valuation ring `{x ∈ F_K(q) | w_α(x) ≥ 0}` of `w_α` is the ring of a
-prime divisor of `F_K(q) | K` whose degree (the degree of its residue field over `K`) is `[K(α):K]`.
-Blueprint: `thm:fq-residue`. -/
+prime divisor of `F_K(q) | K` whose degree (the degree of its residue field over `K`) is `[K(α):K]`. -/
 theorem fq_residue_degree (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (α : Omega K) (hα : α ≠ 0) :
     ∃ P : PrimeDivisor K (FqSub K q),
       (∀ x : FqSub K q, x ∈ P.ring ↔ 0 ≤ anVal K α (x : MeroRing K)) ∧
@@ -144,7 +143,7 @@ theorem fq_residue_degree (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (α : 
   rw [primeAt_degree hq0 hq1 hα, IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral α)]
 
 /-- Book, §2, item IV: `F_K(q)` is an elliptic function field over `K` (with the
-constant field extensions `F_K(q) L = F_L(q)`). Blueprint: `thm:fq-elliptic`. -/
+constant field extensions `F_K(q) L = F_L(q)`). -/
 theorem fq_is_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     IsEllipticOver K (FqSub K q) := by
   refine ⟨fq_is_function_field K q hq0 hq1, fq_genus hq0 hq1, ?_⟩
@@ -165,7 +164,7 @@ theorem fq_is_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     fq_genus hq0 hq1]
 
 /-- Book, §2, item V (Abel–Jacobi isomorphism): the Jacobi map induces a group isomorphism
-`C⁰_K(q) ≅ K^×/q`. Blueprint: `thm:abel-jacobi-iso`. -/
+`C⁰_K(q) ≅ K^×/q`. -/
 theorem abel_jacobi_iso (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     ∃ e : Multiplicative (classGroupDegZero K q) ≃*
         (Kˣ ⧸ Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))),
@@ -230,7 +229,7 @@ theorem abel_jacobi_iso (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
 
 /-- Book, §2, Corollary Va: for `a ∈ K^×` there is a unique class `c_a ∈ C⁰_K(q)` with
 `Φ_q(c_a) = a mod^× q`; the translation `τ_a` acts on prime divisors of degree `1` by
-`p ↦ p + c_a`. Blueprint: `cor:translation-Va`. -/
+`p ↦ p + c_a`. -/
 theorem translation_class_unique (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (a : Kˣ) :
     ∃! c : Multiplicative (classGroupDegZero K q),
       ∃ m : divisorsDegZero K q,
@@ -247,8 +246,7 @@ theorem translation_class_unique (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     rw [he m, hm, hc]
 
 /-- Book, §2, Corollary Vb: the analytic translation `τ_a` and the algebraic translation
-attached to any class `c` with `Φ_q(c) = a` coincide on `F_K(q)`.
-Blueprint: `cor:translation-Vb`. -/
+attached to any class `c` with `Φ_q(c) = a` coincide on `F_K(q)`. -/
 theorem translation_analytic_eq_algebraic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (a : K) (ha : a ≠ 0) (c : classGroupDegZero K q)
     (hc : ∀ m : divisorsDegZero K q,

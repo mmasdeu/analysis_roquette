@@ -122,7 +122,7 @@ theorem Dop_const (c : K) : Dop K (algebraMap K (MeroRing K) c) = 0 := by
   rw [holD_const, map_zero]
 
 include hq0 hq1 in
-/-- Book, §3, (18): `2℘′ = D℘ − ℘`. Blueprint: `def:wp-prime`. -/
+/-- Book, §3, (18): `2℘′ = D℘ − ℘`. -/
 theorem wpPrime_spec : 2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
   rw [wpM_eq hq0 hq1, wpPrimeM_eq hq0 hq1]
   have hT := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
@@ -176,8 +176,7 @@ theorem twelve_coeffC (hq1 : ‖q‖ < 1) : 12 * coeffC K q = -5 * sK K 3 q - 7 
 
 
 /-- Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with
-`g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
-Blueprint: `rem:normal-form-3`. -/
+`g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)). -/
 theorem thmVI_weierstrass_form (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (hchar2 : ringChar K ≠ 2) (hchar3 : ringChar K ≠ 3) :
     (Dop K (wpM K q)) ^ 2 =

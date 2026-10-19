@@ -26,8 +26,7 @@ theorem exists_transfer_at (hom : DegOneHomogeneous K F) (d d₀ : WeierstrassDa
   obtain ⟨σ, hσ⟩ := hom d.𝔭 d₀.𝔭 d.deg_one d₀.deg_one
   exact ⟨d.transfer σ, hσ, rfl, rfl, rfl, rfl, rfl⟩
 
-/-- Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv`.
-Blueprint: `lem:A1-independence`. -/
+/-- Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv`. -/
 theorem absInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K F)
     (hF : HasPrimeOfDegreeOne K F) (d : WeierstrassData K F) :
     absInv K F hF = jOfData d.u d.v d.a₁ d.a₂ d.a₃ := by
@@ -41,8 +40,7 @@ theorem absInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K F
   exact this.symm ▸ rfl
 
 /-- Book, §A1: the Hasse invariant computed from any Weierstraß datum is equivalent to
-`hasseInv` (modulo squares, resp. modulo `π(K⁺)` in characteristic `2`).
-Blueprint: `lem:A1-independence`. -/
+`hasseInv` (modulo squares, resp. modulo `π(K⁺)` in characteristic `2`). -/
 theorem hasseInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K F)
     (hF : HasPrimeOfDegreeOne K F) (d : WeierstrassData K F) :
     (ringChar K ≠ 2 →

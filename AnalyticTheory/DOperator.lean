@@ -160,7 +160,7 @@ theorem Dop_div (f : MeroRing K) : ∃ g h : holSubring K, h ≠ 0 ∧
   obtain ⟨g, h, hh, rfl⟩ := IsFractionRing.div_surjective (A := holSubring K) f
   exact ⟨g, h, nonZeroDivisors.ne_zero hh, rfl, Dop_eq g h (nonZeroDivisors.ne_zero hh)⟩
 
-/-- `D` is a derivation of `M_K`. Blueprint: `def:D-operator`. -/
+/-- `D` is a derivation of `M_K`. -/
 theorem Dop_derivation : ∀ f g : MeroRing K, Dop K (f + g) = Dop K f + Dop K g ∧
     Dop K (f * g) = f * Dop K g + g * Dop K f := by
   intro f f'

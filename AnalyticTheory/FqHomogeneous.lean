@@ -77,6 +77,8 @@ theorem fq_translation_transitive (P P' : PrimeDivisor K (FqSub K q)) (hP : P.de
   field_simp
 
 include hq0 hq1 in
+/-- The prime divisors of degree `1` of `F_K(q)` are permuted transitively by its `K`-automorphisms
+(the translations `τ_a`, `a ∈ K^×`). -/
 theorem fq_homogeneous : DegOneHomogeneous K (FqSub K q) := by
   intro P P' hP hP'
   obtain ⟨a, ha⟩ := fq_translation_transitive hq0 hq1 P P' hP hP'

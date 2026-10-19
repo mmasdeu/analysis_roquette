@@ -128,6 +128,8 @@ theorem anVal_ne_top {α : Omega K} (hα : α ≠ 0) {f : MeroRing K} (hf : f �
   obtain ⟨k, hk⟩ := anPt_eq_e_mul K hα hf
   rw [anVal_of_anPt K hα hk]; exact WithTop.coe_ne_top
 
+/-- Book, §2: `w_α` is an additive valuation of `M_K`: `w_α(0) = ∞`, `w_α(1) = 0`, `w_α(fg) =
+w_α(f) + w_α(g)` and `w_α(f + g) ≥ min(w_α(f), w_α(g))`. -/
 theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
     anVal K α 0 = ⊤ ∧ anVal K α 1 = 0 ∧
       (∀ f g : MeroRing K, anVal K α (f * g) = anVal K α f + anVal K α g) ∧
@@ -177,6 +179,8 @@ theorem eIdx_aut (σ : Omega K ≃ₐ[K] Omega K) {α : Omega K} (hα : α ≠ 0
   rw [minpoly.algEquiv_eq, anOrdHol_aut K σ hα, anOrdHol_minpoly K hα] at h1
   exact_mod_cast h1.symm
 
+/-- Book, §2: `w_{σα} = w_α` for every `K`-automorphism `σ` of `Ω`; conjugate points give the same
+analytic valuation. -/
 theorem anVal_aut (σ : Omega K ≃ₐ[K] Omega K) {α : Omega K} (hα : α ≠ 0) (f : MeroRing K) :
     anVal K (σ α) f = anVal K α f := by
   unfold anVal

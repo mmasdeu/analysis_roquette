@@ -87,6 +87,8 @@ theorem sqrtNewtonSeq_inv (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) (i : �
         have e : ‖s‖ ^ 2 ^ (i + 1) = (‖s‖ ^ 2 ^ i) ^ 2 := by rw [pow_succ, pow_mul]
         rw [e]; ring
 
+/-- If `2 ≠ 0` and `|s| < 1`, then `1 + 4s` is a square (Newton's iteration `u ↦ u + (v/u − u)/2`
+from `u₀ = 1` converges). -/
 theorem exists_sq_eq_one_add_four_mul (h2 : (2 : K) ≠ 0) {s : K} (hs : ‖s‖ < 1) :
     ∃ r : K, r ^ 2 = 1 + 4 * s := by
   have h2n : 0 < ‖(2 : K)‖ := norm_pos_iff.mpr h2

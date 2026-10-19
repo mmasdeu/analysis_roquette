@@ -358,8 +358,7 @@ private theorem wt_aux3 (A B : WithTop ℤ) (c : ℤ) (h : A ≤ B) :
       exact_mod_cast this
 
 /-- Book, §2: `w_α` is an additive valuation of `M_K` with `w_α(0) = +∞`:
-`w_α(fg) = w_α(f) + w_α(g)`, `w_α(f + g) ≥ min`, `w_α(1) = 0`.
-Blueprint: `def:analytic-valuation`. -/
+`w_α(fg) = w_α(f) + w_α(g)`, `w_α(f + g) ≥ min`, `w_α(1) = 0`. -/
 theorem anPt_isValuation (α : Omega K) (hα : α ≠ 0) :
     anPt K α 0 = ⊤ ∧ anPt K α 1 = 0 ∧
       (∀ f g : MeroRing K, anPt K α (f * g) = anPt K α f + anPt K α g) ∧

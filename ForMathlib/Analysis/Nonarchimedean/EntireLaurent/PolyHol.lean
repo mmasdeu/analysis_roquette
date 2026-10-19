@@ -338,6 +338,8 @@ theorem tendsto_wt_combo {a : ℤ → K} (ha : IsConvergentLaurent K a) {r ρ : 
   refine this.congr (fun k => ?_)
   ring
 
+/-- Division with remainder by the minimal polynomial `φ_α`: `f = φ_α g + S` with `g` holomorphic
+and `S` a polynomial of degree `< deg φ_α`. -/
 theorem hol_phi_division {α : L} (hα : α ≠ 0) (f : holSubring K L) :
     ∃ (g : holSubring K L) (S : K[X]), S.degree < (minpoly K α).degree ∧
       f = polyHol K L (minpoly K α) * g + polyHol K L S := by

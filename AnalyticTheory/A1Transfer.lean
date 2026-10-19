@@ -63,7 +63,7 @@ noncomputable def WeierstrassData.transfer (σ : F ≃ₐ[K] F') (d : Weierstras
 end transfer
 
 /-- Prime divisors of degree one of `F | K` are permuted transitively by `K`-automorphisms
-(book, footnote of §A1). Blueprint: `lem:Fq-homogeneous`. -/
+(book, footnote of §A1). -/
 def DegOneHomogeneous (K F : Type u) [Field K] [Field F] [Algebra K F] : Prop :=
   ∀ P P' : PrimeDivisor K F, P.degree = 1 → P'.degree = 1 →
     ∃ σ : F ≃ₐ[K] F, P.transfer σ = P'
