@@ -58,3 +58,4 @@ import AnalyticTheory.Lemma2b
 import AnalyticTheory.FqDescent
 import AnalyticTheory.Sec4
 import AnalyticTheory.buzzard
+import AnalyticTheory.IsogenyXVII

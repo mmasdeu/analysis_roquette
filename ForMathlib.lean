@@ -3,6 +3,7 @@ import ForMathlib.Algebra.Polynomial.LaurentRoots
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Division
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Dominance
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Expand
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.FrechetLaurent
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Gauss
 import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm

@@ -1,6 +1,8 @@
 import AnalyticTheory.Structure
 import AnalyticTheory.AppendixA2
 import AnalyticTheory.SemiPeriodic
+import AnalyticTheory.FqDescent
+import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Expand
 
 /-!
 # Elliptic subfields and isogenies (book, §6)
@@ -100,10 +102,88 @@ Blueprint: `def:Fq-qbar-Xm`. -/
 noncomputable def FqbarXm (qbar : K) (m : ℤ) : Subfield (MeroRing K) :=
   (FqSub K qbar).map (substPow K m)
 
+/-! #### The substitution `X ↦ Xᵐ` on `H_K` and `M_K` -/
+
+section subst
+
+variable {K}
+
+/-- `μ_m : g(X) ↦ g(Xᵐ)` on `H_K` (`m ≠ 0`), `EntireLaurent.holExpand`. -/
+noncomputable abbrev holSubst (m : ℤ) (hm : m ≠ 0) : holSubring K →+* holSubring K :=
+  EntireLaurent.holExpand K (Omega K) m hm
+
+theorem holSubst_apply {m : ℤ} (hm : m ≠ 0) (g : holSubring K) (α : OmegaX K) :
+    (holSubst m hm g).1 α = g.1 ⟨α.1 ^ m, zpow_ne_zero m α.2⟩ := rfl
+
+theorem alg_holSubst_injective {m : ℤ} (hm : m ≠ 0) :
+    Function.Injective ((algebraMap (holSubring K) (MeroRing K)).comp (holSubst (K := K) m hm)) :=
+  (IsFractionRing.injective (holSubring K) (MeroRing K)).comp
+    (EntireLaurent.holExpand_injective K hm)
+
+/-- `μ_m` on `M_K`: the extension of `holSubst` to the field of fractions. -/
+noncomputable def meroSubst (m : ℤ) (hm : m ≠ 0) : MeroRing K →+* MeroRing K :=
+  IsFractionRing.lift (A := holSubring K) (alg_holSubst_injective hm)
+
+theorem meroSubst_alg {m : ℤ} (hm : m ≠ 0) (g : holSubring K) :
+    meroSubst m hm (algebraMap (holSubring K) (MeroRing K) g) =
+      algebraMap (holSubring K) (MeroRing K) (holSubst m hm g) :=
+  IsFractionRing.lift_algebraMap _ _
+
+theorem isSubstPow_meroSubst {m : ℤ} (hm : m ≠ 0) : IsSubstPow K m (meroSubst m hm) :=
+  fun g => ⟨holSubst m hm g, meroSubst_alg hm g, fun _ => rfl⟩
+
+/-- For `m ≠ 0`, `substPow K m` is the substitution `μ_m` (it is uniquely characterised by its
+action on `H_K`). -/
+theorem substPow_eq {m : ℤ} (hm : m ≠ 0) : substPow K m = meroSubst m hm := by
+  have hspec : IsSubstPow K m (substPow K m) :=
+    Classical.epsilon_spec (p := IsSubstPow K m) ⟨_, isSubstPow_meroSubst hm⟩
+  apply IsLocalization.ringHom_ext (nonZeroDivisors (holSubring K))
+  ext g
+  obtain ⟨g', h1, h2⟩ := hspec g
+  simp only [RingHom.comp_apply]
+  rw [h1, meroSubst_alg]
+  congr 1
+  exact Subtype.ext (funext fun α => h2 α)
+
+theorem substPow_alg {m : ℤ} (hm : m ≠ 0) (g : holSubring K) :
+    substPow K m (algebraMap (holSubring K) (MeroRing K) g) =
+      algebraMap (holSubring K) (MeroRing K) (holSubst m hm g) := by
+  rw [substPow_eq hm, meroSubst_alg]
+
+theorem substPow_injective {m : ℤ} (hm : m ≠ 0) : Function.Injective (substPow K m) :=
+  (substPow K m).injective
+
+/-- `μ_m ∘ τ_{aᵐ} = τ_a ∘ μ_m`. -/
+theorem substPow_translation {m : ℤ} (hm : m ≠ 0) (a : Kˣ) (f : MeroRing K) :
+    substPow K m (translation K (a ^ m) f) = translation K a (substPow K m f) := by
+  have key : (substPow K m).comp (translation K (a ^ m) : MeroRing K →+* MeroRing K) =
+      (translation K a : MeroRing K →+* MeroRing K).comp (substPow K m) := by
+    apply IsLocalization.ringHom_ext (nonZeroDivisors (holSubring K))
+    ext g
+    simp only [RingHom.comp_apply, RingEquiv.coe_toRingHom]
+    rw [translation_alg, substPow_alg hm, substPow_alg hm, translation_alg]
+    congr 1
+    refine Subtype.ext (funext fun α => ?_)
+    refine congrArg g.1 (Subtype.ext ?_)
+    simp only [scalePt]
+    rw [mul_zpow, ← map_zpow₀]
+    congr 2
+    rw [Units.val_inv_eq_inv_val, Units.val_inv_eq_inv_val, Units.val_zpow_eq_zpow_val, inv_zpow]
+  exact congrArg (fun φ : MeroRing K →+* MeroRing K => φ f) key
+
+end subst
+
 /-- Book, §6, (73): `μ_{-m} = μ_m ε` with `ε` the reflection. Blueprint: `def:Fq-qbar-Xm`. -/
 theorem substPow_neg (m : ℤ) (hm : m ≠ 0) :
     substPow K (-m) = (substPow K m).comp (reflectionM K : MeroRing K →+* MeroRing K) := by
-  sorry
+  apply IsLocalization.ringHom_ext (nonZeroDivisors (holSubring K))
+  ext g
+  simp only [RingHom.comp_apply, RingEquiv.coe_toRingHom]
+  rw [substPow_alg (neg_ne_zero.mpr hm), reflectionM_alg, substPow_alg hm]
+  congr 1
+  refine Subtype.ext (funext fun α => ?_)
+  refine congrArg g.1 (Subtype.ext ?_)
+  exact zpow_neg _ _
 
 /-- The constants `K ⊂ E` for a subfield `E` of an extension field `F | K`: the `K`-algebra structure
 on `E`. Blueprint: `def:elliptic-subfield`. -/
@@ -129,7 +209,30 @@ Blueprint: `lem:XVII`. -/
 theorem fq_qbar_Xm_subset (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m : ℤ) (hm : m ≠ 0) (hdvd : OrderDvd K q qbar m) :
     FqbarXm K qbar m ≤ FqSub K q ∧ FqbarXm K qbar (-m) = FqbarXm K qbar m := by
-  sorry
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0
+  obtain ⟨d, hd⟩ := hdvd
+  refine ⟨?_, ?_⟩
+  · rintro _ ⟨f, hf, rfl⟩ a ha
+    rw [← substPow_translation hm]
+    congr 1
+    have hb : (Units.mk0 qbar hqb0' : K) = qbar := rfl
+    have hab : a ^ m = Units.mk0 qbar hqb0' ^ d :=
+      Units.ext (by rw [Units.val_zpow_eq_zpow_val, Units.val_zpow_eq_zpow_val, ha, hb, hd])
+    rw [hab]
+    exact translation_zpow_of_periodic hb hf d
+  · unfold FqbarXm
+    rw [substPow_neg K m hm]
+    ext x
+    simp only [Subfield.mem_map, RingHom.comp_apply, RingEquiv.coe_toRingHom]
+    constructor
+    · rintro ⟨f, hf, rfl⟩
+      exact ⟨_, reflFq_mem qbar ⟨f, hf⟩, rfl⟩
+    · rintro ⟨f, hf, rfl⟩
+      refine ⟨_, reflFq_mem qbar ⟨f, hf⟩, ?_⟩
+      show substPow K m (reflectionM K (reflectionM K f)) = _
+      congr 1
+      exact reflectionM_involutive f
 
 /-- The subgroup `U ⊂ K^×` of elements `u` with `u^m ≡ 1 mod^× q̄`. Blueprint: `thm:XVII`. -/
 def Usub (qbar : K) (hqb : qbar ≠ 0) (m : ℕ) : Subgroup Kˣ where
@@ -139,23 +242,6 @@ def Usub (qbar : K) (hqb : qbar ≠ 0) (m : ℕ) : Subgroup Kˣ where
   one_mem' := ⟨0, by simp⟩
   inv_mem' := fun {a} ⟨k, hk⟩ => ⟨-k, by
     rw [Units.val_inv_eq_inv_val, inv_pow, hk, zpow_neg]⟩
-
-/-- Book, §6, Theorem XVII (i)–(ii): for `m > 0` a multiple of the order of `q mod^× q̄` (so that
-`q̄^d = q^m` with `d > 0`), `[F_K(q) : F_K(q̄|Xᵐ)] = dm`, and the degree of inseparability is the
-largest power `p^r` of the characteristic dividing `m`, with maximal separable subextension
-`F_K(q^{p^r} | X^{p^r})`. Blueprint: `thm:XVII`. -/
-theorem thmXVII_degree (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
-    (hqd : qbar ^ d = q ^ m) :
-    relDeg (FqbarXm K qbar m) (FqSub K q) = d * m ∧
-    relInsepDeg (FqbarXm K qbar m) (FqSub K q) = ringChar K ^ (m.factorization (ringChar K)) ∧
-    IsRelSeparable (FqbarXm K qbar m)
-      (FqbarXm K (q ^ (ringChar K ^ (m.factorization (ringChar K))))
-        ((ringChar K ^ (m.factorization (ringChar K)) : ℕ) : ℤ)) ∧
-    IsRelPurelyInseparable
-      (FqbarXm K (q ^ (ringChar K ^ (m.factorization (ringChar K))))
-        ((ringChar K ^ (m.factorization (ringChar K)) : ℕ) : ℤ)) (FqSub K q) := by
-  sorry
 
 /-- Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are the
 translations `τ_u`, `u ∈ U`, and the automorphism group is `U/q`. (The book writes `u^m ≡ 1 mod^× q`;
