@@ -247,7 +247,9 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
     ∃ ζ : CocycleModQ K L q, (∀ f : FqSub L (algebraMap K L q),
       f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ) ∧
       charOfCocycle q hq0 hq1 ζ T.gen = Circle.exp (2 * Real.pi / Module.finrank K L) ∧
-      ∃ k : ℤ, ((ζ.1 T.gen : Lˣ) : L) = T.Q * (algebraMap K L q) ^ k := by
+      (∃ k : ℤ, ((ζ.1 T.gen : Lˣ) : L) = T.Q * (algebraMap K L q) ^ k) ∧
+      ∀ j : ℕ, j < Module.finrank K L →
+        ((ζ.1 (T.gen ^ j) : Lˣ) : L) = ∏ l ∈ Finset.range j, (T.gen ^ l) T.Q := by
   classical
   set σ := T.gen with hσ
   set n := Module.finrank K L with hnn
@@ -330,7 +332,22 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
   obtain ⟨k0, hk0⟩ := hζσ
   have hcast0 : (((ζU σ : Lˣ)) : L) = (Q' : L) * (algebraMap K L q) ^ k0 := by
     rw [hk0]; simp [hqU, qUnit]
-  refine ⟨⟨ζU, hcoc⟩, ?_, ?_, ⟨k0, hcast0⟩⟩
+  have hi_pow : ∀ j : ℕ, j < n → i (σ ^ j) = j := by
+    intro j hj
+    have h1 : σ ^ (i (σ ^ j)) = σ ^ j := (hgi (σ ^ j)).symm
+    have h2 : i (σ ^ j) ≡ j [MOD n] := by rw [← hn]; exact pow_eq_pow_iff_modEq.mp h1
+    have h3 : i (σ ^ j) < n := by
+      have := Int.emod_lt_of_pos (a (σ ^ j)) (by exact_mod_cast hnpos : (0 : ℤ) < n)
+      have := hi (σ ^ j); omega
+    exact Nat.ModEq.eq_of_lt_of_lt h2 h3 hj
+  have hpow : ∀ j : ℕ, j < n →
+      ((ζU (σ ^ j) : Lˣ) : L) = ∏ l ∈ Finset.range j, (σ ^ l) T.Q := by
+    intro j hj
+    show ((Qp σ Q' (i (σ ^ j)) : Lˣ) : L) = _
+    rw [hi_pow j hj, Qp, Units.coe_prod]
+    refine Finset.prod_congr rfl fun l _ => ?_
+    simp [AlgEquiv.smul_units_def, hQ']
+  refine ⟨⟨ζU, hcoc⟩, ?_, ?_, ⟨⟨k0, hcast0⟩, hpow⟩⟩
   · intro f
     have hkey : rhoZ q ⟨ζU, hcoc⟩ σ f = f ↔
         translation L Q' (meroGal σ (f : MeroRing L)) = (f : MeroRing L) := by
@@ -383,7 +400,7 @@ theorem thmXI_model (T : SemiPeriodicTriple K L q) :
     ∃ ζ : CocycleModQ K L q, (∀ f, f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ) ∧
       charOfCocycle q hq0 hq1 ζ T.gen = Circle.exp (2 * Real.pi / Module.finrank K L) ∧
       IsEllipticOver K (Ezeta q ζ) ∧ SplitsOver K (Ezeta q ζ) L := by
-  obtain ⟨ζ, h1, h2, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  obtain ⟨ζ, h1, h2, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
   exact ⟨ζ, h1, h2, Ezeta_isElliptic q hq0 hq1 ζ, Ezeta_splitsOver q hq0 hq1 ζ⟩
 
 /-- Book, §5, Theorem XII: `F_K(𝐐)` is an elliptic function field over `K` whose constant field
@@ -393,7 +410,7 @@ theorem thmXII_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     IsEllipticOver K (FKQ K L q T) ∧
       Subfield.closure (Set.range (FKQ K L q T).subtype ∪
         Set.range (algebraMap L (FqSub L (algebraMap K L q)))) = ⊤ := by
-  obtain ⟨ζ, h1, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  obtain ⟨ζ, h1, -, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
   have hEq : FKQ K L q T = Ezeta q ζ := Subfield.ext h1
   constructor
   · let σ : Ezeta q ζ ≃ₐ[K] FKQ K L q T :=

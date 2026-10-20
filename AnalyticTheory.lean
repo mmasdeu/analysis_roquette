@@ -91,3 +91,6 @@ import AnalyticTheory.GenusDescent
 import AnalyticTheory.EzetaElliptic
 import AnalyticTheory.ConstExtAbstract
 import AnalyticTheory.ConstExtDescent
+import AnalyticTheory.GaloisPrimes
+import AnalyticTheory.ZpowAux
+import AnalyticTheory.Sec5

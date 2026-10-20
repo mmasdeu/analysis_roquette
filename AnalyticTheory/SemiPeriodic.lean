@@ -223,25 +223,7 @@ def IsSemiConj {q : K} (T : SemiPeriodicTriple K L q) (α β : Omega L) : Prop :
   ∃ σ' : Omega L ≃+* Omega L, IsExtension K L T.gen σ' ∧ ∃ (γ : Omega L) (m : ℤ),
     minpoly L γ = minpoly L β ∧ γ = ((semiPerm K L T σ') ^ m) α
 
-/-- Book, §5, Theorem XIII: the prime divisors `𝔮` of `F_K(𝐐)` correspond `1 − 1` to the classes of
-`L`-conjugate `α ∈ Ω^×` mod^× `Qσ`; the valuation ring of `𝔮_α` is the one induced by `w_{α,L}`;
-the degree of `𝔮_α` is `n [L(α):L]`, hence divisible by `n`. -/
-theorem thmXIII_prime_degrees (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    (∀ α : Omega L, α ≠ 0 → ∃ P : PrimeDivisor K (FKQ K L q T),
-      (∀ x : FKQ K L q T, x ∈ P.ring ↔
-        0 ≤ anVal L α ((x : FqSub L (algebraMap K L q)) : MeroRing L)) ∧
-      P.degree = Module.finrank K L *
-        Module.finrank L (IntermediateField.adjoin L ({α} : Set (Omega L)))) ∧
-    (∀ P : PrimeDivisor K (FKQ K L q T), ∃ α : Omega L, α ≠ 0 ∧
-      ∀ x : FKQ K L q T, x ∈ P.ring ↔
-        0 ≤ anVal L α ((x : FqSub L (algebraMap K L q)) : MeroRing L)) ∧
-    (∀ α β : Omega L, α ≠ 0 → β ≠ 0 →
-      ((∀ x : FKQ K L q T,
-        0 ≤ anVal L α ((x : FqSub L (algebraMap K L q)) : MeroRing L) ↔
-          0 ≤ anVal L β ((x : FqSub L (algebraMap K L q)) : MeroRing L)) ↔
-        IsSemiConj K L T α β)) := by
-  sorry
+/-! Theorem XIII (`thmXIII_prime_degrees`) is proved in `Sec5.lean`. -/
 
 /-- Book, §5: the group `D_K(𝐐)` of `𝐐`-semi-periodic divisors, `τ_Q σ 𝔪 = 𝔪`. -/
 def SemiPeriodicDivisors (q : K) (T : SemiPeriodicTriple K L q) : AddSubgroup (Omega L → ℤ) where
