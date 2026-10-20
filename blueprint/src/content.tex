@@ -1462,22 +1462,24 @@ See the Lean proof of \texttt{eq\_FqbarXm\_of\_separable}.
 \begin{theorem}[Theorem XVIII]
 \label{thm:XVIII}
 \lean{AnalyticTheory.thmXVIII_subfields}
-\uses{thm:XVII, def:elliptic-subfield, thm:XVIII-sep}
+\uses{thm:XVII, def:elliptic-subfield, thm:XVIII-sep, lem:XVIII-insep, lem:XVIII-unique}
 \leanok
-Every elliptic subfield $E$ of $F_K(q)$ equals $F_K(\bar q|X^m)$ for a unique period $\bar q$ (commensurable with $q$) and $m>0$ the largest integer such that $E\subset\mu_m(M_K)$.
+Every elliptic subfield $E$ of $F_K(q)$ equals $F_K(\bar q|X^m)$ for a unique period $\bar q$ with $0<|\bar q|<1$ (commensurable with $q$) and $m>0$ the largest integer such that $E\subset\mu_m(M_K)$.
 \end{theorem}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{thmXVIII\_subfields}.
 \end{proof}
 
 \begin{corollary}[Corollary XVIIIa (isogenies)]
 \label{cor:XVIIIa}
 \lean{AnalyticTheory.corXVIIIa_isogeny, AnalyticTheory.corXVIIIa_isogenies_form}
-\uses{thm:XVIII, def:isogeny}
+\uses{thm:XVIII, def:isogeny, cor:XVIIIa-subst}
 \leanok
 $E$ admits an isogeny to $F_K(q)$ iff $E\cong F_K(\bar q)$ with $\bar q$ commensurable with $q$; the isogenies $F_K(\bar q)\to F_K(q)$ are the $\mu_m\tau$ with $\tau$ a translation, of degree $dm$.
 \end{corollary}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{corXVIIIa\_isogeny, corXVIIIa\_isogenies\_form}.
 \end{proof}
 
@@ -1741,6 +1743,42 @@ $M_K\cap F_L(\bar q\mid X^m)=F_K(\bar q\mid X^m)$, and if $E_L=F_L(\bar q\mid X^
 \begin{proof}
 \leanok
 See the Lean proof of \texttt{mem\_FqbarXm\_of\_meroExt, gal\_fixed\_of\_imageSub\_eq}.
+\end{proof}
+
+\begin{lemma}[Finiteness over subfields]
+\label{lem:ff-finite}
+\lean{AnalyticTheory.finiteDimensional_of_transcendental, AnalyticTheory.IsEllipticOver.of_algEquiv}
+\uses{def:function-field, def:elliptic}
+\leanok
+A function field is finite over every intermediate field containing a transcendental element; ellipticity is invariant under $K$-isomorphisms.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{finiteDimensional\_of\_transcendental, of\_algEquiv}.
+\end{proof}
+
+\begin{lemma}[The inseparable part]
+\label{lem:XVIII-insep}
+\lean{AnalyticTheory.isSeparable_wpPrime, AnalyticTheory.relDeg_frobSub_le, AnalyticTheory.frobSub_le_FqbarXm, AnalyticTheory.eq_FqbarXm_of_elliptic}
+\uses{thm:XVIII-sep, lem:ff-finite, thm:VI}
+\leanok
+In characteristic $p$, $[F_K(q):K\,F_K(q)^{p^r}]\le p^r$ and $K\,F_K(q)^{p^r}=F_K(q^{p^r}\mid X^{p^r})$ is the maximal separable subextension over an elliptic subfield with inseparability degree $p^r$; hence every elliptic subfield is some $F_K(\bar q\mid X^m)$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{isSeparable\_wpPrime, relDeg\_frobSub\_le, frobSub\_le\_FqbarXm, eq\_FqbarXm\_of\_elliptic}.
+\end{proof}
+
+\begin{lemma}[Uniqueness of $\bar q$ and $m$]
+\label{lem:XVIII-unique}
+\lean{AnalyticTheory.FqbarXm_inj, AnalyticTheory.exists_transport}
+\uses{thm:XVII, thm:VIIIa}
+\leanok
+$F_K(a\mid X^m)=F_K(b\mid X^n)$ implies $a=b$ and $m=n$; an elliptic subfield of $F_K(Q\mid X^n)$ is $\mu_n$ of an elliptic subfield of $F_K(Q)$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{FqbarXm\_inj, exists\_transport}.
 \end{proof}
 
 \begin{definition}[Isogeny]

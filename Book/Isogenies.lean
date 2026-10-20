@@ -13,12 +13,13 @@ open AnalyticTheory EntireLaurent
 We are going to determine the elliptic subfields of the fields of periodic functions. First, we
 shall exhibit a series of elliptic subfields of $`F_K(q)` and establish their relevant properties.
 
-_Scope of this chapter._ The companion contains the construction of these subfields and
-Theorem XVII, which determines the extension $`F_K(q)\,|\,F_K(\bar q\,|\,X^m)` completely. The
-subsequent results of §6 are not formalized and are not reproduced: Theorem XVIII (every elliptic
-subfield is of this form), the isogenies of Corollaries XVIIIa, b, and the results on
-semi-periodic fields. Their proofs use the general algebraic theory of elliptic function fields
-over $`\Omega` (a separable extension of elliptic fields is Galois with a group of translations).
+_Scope of this chapter._ The companion contains the construction of these subfields,
+Theorem XVII, which determines the extension $`F_K(q)\,|\,F_K(\bar q\,|\,X^m)` completely,
+Theorem XVIII (every elliptic subfield is of this form) and Corollary XVIIIa. The book's appeal to
+the general algebraic theory of elliptic function fields over $`\Omega` is replaced by a
+formalized theory of finite extensions of function fields and of constant field extensions
+inside $`F_L(q)` (see the section on Theorem XVIII). Corollary XVIIIb and the results on
+semi-periodic fields are not reproduced.
 
 The Lean code on this page refers to the following context.
 -/
@@ -562,3 +563,61 @@ since $`|q^m| > 1`; so only $`m > 0` occurs, and $`\mu_{-m}` is $`\mu_m` compose
 #stmt exists_substitution_isogeny
 
 #stmt substitution_isogeny_degree
+
+/-!
+## Theorem XVIII
+
+*Theorem XVIII.* _Every elliptic subfield $`E` of $`F_K(q\,|\,X)` is of the form
+$`E=F_K(\bar q\,|\,X^m)` where $`\bar q` is commensurable with $`q` and $`m>0` is a multiple of
+the order of $`q\bmod^\times\bar q`. Here, $`\bar q` is uniquely determined as the period of $`E`
+while $`m` is determined as the largest integer such that every function in $`E` can be written as
+a function in $`X^m`._
+
+The formal statement normalizes the period by $`0<|\bar q|<1`, as in the book (note that
+$`F_K(\bar q^{-1})=F_K(\bar q)`).
+-/
+
+#stmt thmXVIII_subfields
+
+/-!
+_The proof._ The book uses that $`F_\Omega(q)` is Galois over $`E\Omega` with a group of
+translations. The formalization proceeds instead as follows.
+
+For a rational point $`a\in K^\times` let $`\pi(a)=\mathfrak p_a\cap E`. By the Abel–Jacobi
+theorem in $`F_K(q)` and the norm formula, $`\pi(ab)+\pi(1)\sim\pi(a)+\pi(b)`; since in a field of
+genus one $`[Q_1]-[Q_2]` with $`\deg Q_2=1` is principal only if $`Q_1=Q_2`, the set
+$`V=\pi^{-1}(\pi(1))` is a subgroup of $`K^\times`, its cosets are the rational fibres of $`\pi`,
+and the translations $`\tau_v` ($`v\in V`) fix $`E`. If the prime divisors over some $`\pi(a)` are
+rational and unramified, they are counted by the fundamental identity, $`V/q` is finite, $`V` is
+the group $`U` of Theorem XVII for a suitable $`\bar q` and $`m`, and $`E=F_K(\bar q\,|\,X^m)`:
+-/
+
+#stmt eq_FqbarXm_of_split
+
+/-!
+In general one chooses $`a` such that $`\pi(a)` is unramified with separable residue fields (the
+different of $`F_K(q)\,|\,E` is supported on finitely many primes), and passes to a finite Galois
+extension $`L\subset\Omega` containing the points over $`\pi(a)`. The constant field extension
+$`E_L\subset F_L(q)` is rigid at the rational points of $`K` (the coordinates of a function of
+$`E_L` with respect to a basis of $`L\,|\,K` are Galois sums and lie in a Riemann–Roch space of
+$`E`), so the split case applies over $`L`; the resulting period is Galois invariant and descends:
+-/
+
+#stmt isRigidAt_constExt
+
+#stmt eq_FqbarXm_of_separable
+
+/-!
+The inseparable part is reduced to the separable case through
+$`K\cdot F_K(q)^{p^r}=F_K(q^{p^r}\,|\,X^{p^r})`, which holds since $`F_K(q)=K(\wp,\wp')` with
+$`\wp'` separable over every subfield containing $`\wp`.
+
+*Corollary XVIIIa.* _If $`E\,|\,K` is any elliptic function field then there exists an isogeny from
+$`E` to $`F_K(q)` if and only if $`E` is $`K`-isomorphic to $`F_K(\bar q)` with $`\bar q` being
+commensurable to $`q`. Every isogeny from $`F_K(\bar q)` to $`F_K(q)` is of the form
+$`\mu_m\tau` where $`\tau` is a translation of $`F_K(\bar q)`._
+-/
+
+#stmt corXVIIIa_isogeny
+
+#stmt corXVIIIa_isogenies_form

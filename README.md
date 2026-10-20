@@ -79,7 +79,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Blueprint nodes: 208 (80 definitions, 128 lemmas/propositions/theorems/corollaries/remarks; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
+* Blueprint nodes: 211 (80 definitions, 131 lemmas/propositions/theorems/corollaries/remarks; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
 * **No placeholder objects remain**: there is no `opaque` constant, no `sorry`-bodied definition,
   instance or structure field, and no statement recorded as `True`. Every `sorry` is the proof of
   a theorem (all statements compile; `lake build` reports them as warnings).
@@ -181,8 +181,15 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   constant field extension `E_L ⊆ F_L(q)` with its rigidity, splitting and descent
   (`ConstSubfield`, `ConstGalois`, `ConstRigid`, `ConstSplit`, `ConstDescent.lean`),
   assembled in `EllipticSeparable.lean`.
-* Not started (statements only): §5; the inseparable reduction and the uniqueness statements of
-  Theorem XVIII; Corollaries XVIIIa (second part), XVIIIb; Appendix A2 in general.
+* §6, **Theorem XVIII completely** (`thmXVIII_subfields`, `EllipticXVIII.lean`): the inseparable
+  reduction (`FqInsep.lean`: `K·F^{p^r} = F_K(q^{p^r}|X^{p^r})`), finiteness of `F_K(q)` over an
+  elliptic subfield (`FFFinite.lean`), uniqueness of the period and maximality of `m`. Correction:
+  the uniqueness of the period is stated for periods `0 < |q'| < 1` (the book's normalization; the
+  unrestricted statement was false since `F_K(q'⁻¹) = F_K(q')`).
+* §6, **Corollary XVIIIa completely** (`CorXVIIIa.lean`): isogenies onto `F_K(q)` and their form
+  `μ_m τ_u`.
+* Not started (statements only): §5; Corollary XVIIIb (no complex multiplication); Appendix A2 in
+  general.
 
 ## Buzzard's identity (MathOverflow 469021)
 
