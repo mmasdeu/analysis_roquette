@@ -67,3 +67,4 @@ import AnalyticTheory.EllipticSubfield
 import AnalyticTheory.PeriodGroup
 import AnalyticTheory.EllipticSplit
 import AnalyticTheory.FqResidue
+import AnalyticTheory.FFUnramified
