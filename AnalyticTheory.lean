@@ -87,3 +87,6 @@ import AnalyticTheory.FFFundamental
 import AnalyticTheory.GaloisDescent
 import AnalyticTheory.PrimeBaseChange
 import AnalyticTheory.ConormDescent
+import AnalyticTheory.GenusDescent
+import AnalyticTheory.EzetaElliptic
+import AnalyticTheory.ConstExtDescent
