@@ -291,10 +291,7 @@ def HasComplexMultiplication : Prop :=
 
 end CM
 
-/-- Book, §6, Corollary XVIIIb: `F_K(q)` does not have complex multiplication. -/
-theorem corXVIIIb_no_cm (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
-    ¬ HasComplexMultiplication K (FqSub K q) := by
-  sorry
+-- Corollary XVIIIb (`corXVIIIb_no_cm`) is in `CorXVIIIb.lean`.
 
 /-- Book, §6, Proposition (absolute integrality): for an arbitrary field `K` (not necessarily
 local) and an elliptic function field `F | K`, complex multiplication forces the absolute

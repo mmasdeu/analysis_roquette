@@ -504,6 +504,26 @@ variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 include hq0 hq1
 
+/-- Every endomorphism `μ` of `F_K(q)` acts on divisors of degree `0` as multiplication by some
+`m` modulo principal divisors. -/
+theorem exists_pullback_eq_zsmul (μ : FqSub K q →ₐ[K] FqSub K q) :
+    ∃ m : ℤ, ∀ D : FFDivisor K (FqSub K q), D.deg = 0 →
+      (isogenyPullback K (FqSub K q) μ D).deg = 0 ∧
+      -(isogenyPullback K (FqSub K q) μ D) + m • D ∈ FFDivisor.principal K (FqSub K q) := by
+  obtain ⟨m, u, hm, -, hμ⟩ := corXVIIIa_isogenies_form hq0 hq1 hq0 hq1 μ
+  refine ⟨m, fun D hD0 => ⟨by rw [deg_isogenyPullback hq0 hq1 μ hm u hμ]; exact hD0, ?_⟩⟩
+  set E : FFDivisor K (FqSub K q) := -(isogenyPullback K (FqSub K q) μ D) + m • D
+  have hEdeg : E.deg = 0 := by
+    show FFDivisor.degHom E = 0
+    rw [map_add, map_neg, map_zsmul]
+    show -(isogenyPullback K (FqSub K q) μ D).deg + m • FFDivisor.deg D = 0
+    rw [deg_isogenyPullback hq0 hq1 μ hm u hμ, hD0]; simp
+  have hEpsi : psiDiv hq0 hq1 E = 0 := by
+    rw [map_add, map_neg, map_zsmul, psiDiv_isogenyPullback hq0 hq1 μ hm u hμ]
+    exact aux_principal (G := QuotQ q (norm_pos_iff.mp hq0)) m _ _ _ hD0
+  obtain ⟨g, hg0, hg⟩ := exists_fun_of_psiDiv hq0 hq1 E hEdeg hEpsi
+  exact AddSubgroup.subset_closure ⟨g, hg0, hg⟩
+
 /-- The multiplicator of an endomorphism `μ_m τ_u` of `F_K(q)` is multiplication by `m`. -/
 theorem isMultiplicator_eq_intCast (μ : FqSub K q →ₐ[K] FqSub K q)
     (f : FFClassGroupDegZero K (FqSub K q) →+ FFClassGroupDegZero K (FqSub K q))
