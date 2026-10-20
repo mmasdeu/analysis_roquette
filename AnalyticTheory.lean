@@ -89,4 +89,5 @@ import AnalyticTheory.PrimeBaseChange
 import AnalyticTheory.ConormDescent
 import AnalyticTheory.GenusDescent
 import AnalyticTheory.EzetaElliptic
+import AnalyticTheory.ConstExtAbstract
 import AnalyticTheory.ConstExtDescent

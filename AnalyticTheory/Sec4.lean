@@ -1,4 +1,5 @@
 import AnalyticTheory.FqDescent
+import AnalyticTheory.ConstExtDescent
 
 /-!
 # §4: Theorems IX, X, XI (pragmatic form)
@@ -141,18 +142,21 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
+include hq0 hq1 in
 /-- **Bridge B1** (genus of a Galois descent, Appendix A2 / Introduction): the fixed field `E_ζ`
 of the twisted Galois action on `F_L(q)` is an elliptic function field over `K` (genus `1`
 because `E_ζ L = F_L(q)` has genus `1` and the genus is preserved by the separable constant field
 extension `L | K`; conservative for the same reason), and `F_K(q)` is its Jacobian field.
-Not yet proved. -/
-theorem Ezeta_isElliptic (ζ : CocycleModQ K L q) : IsEllipticOver K (Ezeta q ζ) := by
-  sorry
+Proved using the descent of Riemann–Roch spaces (`Ezeta_genus`) and the identification of
+`E_ζ L'` with a descended field `E_{ζ''}` of `F_M(q)` (`Ezeta_conservative`). -/
+theorem Ezeta_isElliptic (ζ : CocycleModQ K L q) : IsEllipticOver K (Ezeta q ζ) :=
+  ⟨Ezeta_isFunctionField q hq0 hq1 ζ, Ezeta_genus q hq0 hq1 ζ, Ezeta_conservative q hq0 hq1 ζ⟩
 
+include hq0 hq1 in
 /-- **Bridge B1'**: `F_K(q)` is the Jacobian field of `E_ζ` (same absolute and Hasse invariants,
 since `E_ζ L = F_L(q)`). Not yet proved. -/
 theorem Ezeta_isJacobian (hp : HasPrimeOfDegreeOne K (FqSub K q)) (ζ : CocycleModQ K L q) :
-    IsJacobianField K (Ezeta q ζ) (FqSub K q) (Ezeta_isElliptic q ζ) hp := by
+    IsJacobianField K (Ezeta q ζ) (FqSub K q) (Ezeta_isElliptic q hq0 hq1 ζ) hp := by
   sorry
 
 /-- **Bridge B2** (Appendix A2: characteristic cocycle, Jacobian fields): an elliptic field of
@@ -172,8 +176,8 @@ theorem thmIX_realise (hp : HasPrimeOfDegreeOne K (FqSub K q)) (χ : CharGroup K
       (_ : SplitsOver K E L), IsJacobianField K E (FqSub K q) hE hp ∧
         IsCharInvariant q hq0 hq1 E χ := by
   obtain ⟨ζ, hζ⟩ := thmIX_exists q hq0 hq1 χ hχ
-  exact ⟨Ezeta q ζ, inferInstance, inferInstance, Ezeta_isElliptic q ζ,
-    Ezeta_splitsOver q hq0 hq1 ζ, Ezeta_isJacobian q hp ζ, hζ⟩
+  exact ⟨Ezeta q ζ, inferInstance, inferInstance, Ezeta_isElliptic q hq0 hq1 ζ,
+    Ezeta_splitsOver q hq0 hq1 ζ, Ezeta_isJacobian q hq0 hq1 hp ζ, hζ⟩
 
 /-- Every elliptic field of period `q` split by `L` has a `q`-trivial character invariant. -/
 theorem thmIX_every (hp : HasPrimeOfDegreeOne K (FqSub K q)) (E : Type u) [Field E]
@@ -377,7 +381,7 @@ theorem thmXI_model (T : SemiPeriodicTriple K L q) :
       charOfCocycle q hq0 hq1 ζ T.gen = Circle.exp (2 * Real.pi / Module.finrank K L) ∧
       IsEllipticOver K (Ezeta q ζ) ∧ SplitsOver K (Ezeta q ζ) L := by
   obtain ⟨ζ, h1, h2⟩ := exists_cocycle_of_triple q hq0 hq1 T
-  exact ⟨ζ, h1, h2, Ezeta_isElliptic q ζ, Ezeta_splitsOver q hq0 hq1 ζ⟩
+  exact ⟨ζ, h1, h2, Ezeta_isElliptic q hq0 hq1 ζ, Ezeta_splitsOver q hq0 hq1 ζ⟩
 
 end xi
 
