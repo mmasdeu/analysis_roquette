@@ -73,3 +73,4 @@ import AnalyticTheory.ConstSubfield
 import AnalyticTheory.ConstGalois
 import AnalyticTheory.ConstRigid
 import AnalyticTheory.ConstSplit
+import AnalyticTheory.ConstDescent
