@@ -159,15 +159,13 @@ theorem fqExt_algebraMap_mem_constExtSub (e : E) :
   exact (IntermediateField.adjoin E _).algebraMap_mem e
 
 /-- The `L`-algebra structure of `E_L`. -/
-@[instance_reducible] noncomputable def constAlgebraL : Algebra L (constExtSub L hq E) :=
+noncomputable instance constAlgebraL : Algebra L (constExtSub L hq E) :=
   ((algebraMap L (FqSub L (algebraMap K L q))).codRestrict _
     (algebraMap_mem_constExtSub hq)).toAlgebra
 
 omit [FiniteDimensional K L] [Algebra K E] [IsScalarTower K E (FqSub K q)] in
-theorem constAlgebraL_tower :
-    letI := constAlgebraL (L := L) hq (E := E)
+instance constAlgebraL_tower :
     IsScalarTower L (constExtSub L hq E) (FqSub L (algebraMap K L q)) :=
-  letI := constAlgebraL (L := L) hq (E := E)
   IsScalarTower.of_algebraMap_eq fun _ => rfl
 
 variable [FiniteDimensional E (FqSub K q)]
@@ -212,14 +210,14 @@ theorem span_constExtSub_eq_top :
   exact this
 
 omit [Fintype ι] b in
-theorem finiteDimensional_constExtSub :
+instance finiteDimensional_constExtSub :
     FiniteDimensional (constExtSub L hq E) (FqSub L (algebraMap K L q)) := by
   refine Module.Finite.of_fg_top ?_
   rw [← span_constExtSub_eq_top hq]
   exact Submodule.fg_span (Set.finite_range _)
 
 omit [Fintype ι] b in
-theorem isSeparable_constExtSub [Algebra.IsSeparable E (FqSub K q)] :
+instance isSeparable_constExtSub [Algebra.IsSeparable E (FqSub K q)] :
     Algebra.IsSeparable (constExtSub L hq E) (FqSub L (algebraMap K L q)) := by
   classical
   set EL := constExtSub L hq E

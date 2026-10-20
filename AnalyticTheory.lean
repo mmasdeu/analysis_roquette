@@ -71,3 +71,4 @@ import AnalyticTheory.FFUnramified
 import AnalyticTheory.EllipticGood
 import AnalyticTheory.ConstSubfield
 import AnalyticTheory.ConstGalois
+import AnalyticTheory.ConstRigid
