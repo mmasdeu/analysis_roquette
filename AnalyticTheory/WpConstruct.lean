@@ -100,6 +100,7 @@ theorem anVal_Th {ξ : Omega K} (hξ : ξ ≠ 0) :
 noncomputable def ptQ (n : ℤ) : Omega K := algebraMap K (Omega K) (q ^ (-n))
 
 omit hq0 hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem ptQ_ne_zero (hq0' : q ≠ 0) (n : ℤ) : ptQ (q := q) n ≠ 0 :=
   (_root_.map_ne_zero _).mpr (zpow_ne_zero _ hq0')
 
@@ -148,7 +149,7 @@ theorem gnorm_linF {ρ : ℝ} (hρ : 0 < ρ) (n : ℤ) :
     · rw [ite_eq_left h0]
       obtain ⟨k, rfl⟩ : ∃ k : ℕ, m = k := ⟨m.toNat, by omega⟩
       simp only [Int.toNat_natCast, Polynomial.coeff_sub, Polynomial.coeff_X, Polynomial.coeff_C]
-      rcases k with _ | _ | k <;> simp <;> split_ifs <;> first | rfl | omega
+      rcases k with _ | _ | k <;> simp ; split_ifs <;> first | rfl | omega
     · rw [ite_eq_right h0]; simp [show m ≠ 1 by omega, show m ≠ 0 by omega]
   refine le_antisymm ((gnorm_le_iff hρ _).mpr (fun m => ?_)) (max_le ?_ ?_)
   · simp only [wt, hc]
@@ -189,6 +190,7 @@ theorem gnorm_Rq {ρ : ℝ} (hρ : 0 < ρ) (n : ℤ) :
   rw [h]; field_simp
 
 include hq0 hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- The general term bound: `|q|^{-n} ρ^k (G/M)^p ≤ C |q|^{|n|}` for `k < p`. -/
 theorem term_bound {ρ : ℝ} (hρ : 0 < ρ) (k p : ℕ) (hp : 2 ≤ p) (G : ℝ) (hG : 0 ≤ G) :
     ∃ C : ℝ, ∀ n : ℤ, ‖q‖ ^ (-n) * ρ ^ k * (G / max ρ (‖q‖ ^ (-n))) ^ p ≤ C * ‖q‖ ^ n.natAbs := by
@@ -520,14 +522,14 @@ theorem GP_one : (GP hq0 hq1).1 oneX = (Rq hq0 hq1 0).1 oneX ^ 2 := by
   have h2 := hasSum_single (f := fun n => (tP hq0 hq1 n).1 oneX) 0 (fun n hn => by
     simp only [tP, mul_apply_hol, pow_apply_hol, Rq_one hq0 hq1 hn]; ring)
   rw [h.unique h2]
-  simp [tP, mul_apply_hol, algebraMap_apply_hol, monoHol_apply, pow_apply_hol, oneX]
+  simp [tP, mul_apply_hol, monoHol_apply, pow_apply_hol, oneX]
 
 theorem GP'_one : (GP' hq0 hq1).1 oneX = -(Rq hq0 hq1 0).1 oneX ^ 3 := by
   have h := GP'_hasSum hq0 hq1 oneX
   have h2 := hasSum_single (f := fun n => (tP' hq0 hq1 n).1 oneX) 0 (fun n hn => by
     simp only [tP', mul_apply_hol, pow_apply_hol, Rq_one hq0 hq1 hn]; ring)
   rw [h.unique h2]
-  simp [tP', mul_apply_hol, algebraMap_apply_hol, monoHol_apply, pow_apply_hol, oneX]
+  simp [tP', monoHol_apply, oneX]
 
 theorem anVal_GP_one : anVal K 1 (algebraMap (holSubring K) (MeroRing K) (GP hq0 hq1)) = 0 := by
   have hne : (GP hq0 hq1).1 oneX ≠ 0 := by

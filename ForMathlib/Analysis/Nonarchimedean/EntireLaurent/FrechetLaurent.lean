@@ -142,7 +142,7 @@ theorem NullFamily.sum_convergent {c : ι → ℤ → K} (hn : NullFamily K c)
   have h2 : ‖hn.sum n‖ * r ^ n ≤ ε / 2 := by
     calc _ ≤ ε / 2 / r ^ n * r ^ n := mul_le_mul_of_nonneg_right h1 hp.le
       _ = ε / 2 := by field_simp
-  simp only [Set.mem_ofPred_eq, Real.dist_eq, sub_zero, not_not]
+  simp only [Real.dist_eq, sub_zero]
   rw [abs_of_nonneg (mul_nonneg (norm_nonneg _) hp.le)]
   linarith
 
@@ -165,7 +165,7 @@ theorem hol_hasSum_family {f : ι → holSubring K L} (hn : NullFamily K (fun i 
   have ht : Tendsto u cofinite (𝓝 0) := by
     rw [tendsto_zero_iff_norm_tendsto_zero]
     refine (hn.tendsto_prod hc hr).congr (fun p => ?_)
-    simp [hu, norm_algebraMap_omega]
+    simp [hu]
   obtain ⟨s, -, hs⟩ := omega_hasSum_mem K S hmem ht
   have h1 : HasSum (fun i => (f i).1 α) s := hs.prod_fiberwise (fun i => holCoeff_hasSum K (f i) α)
   have h2 : HasSum (fun n : ℤ => algebraMap K L (hn.sum n) * α.1 ^ n) s := by

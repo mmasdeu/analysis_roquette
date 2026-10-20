@@ -1,7 +1,10 @@
 import AnalyticTheory
+import Book.Stmt
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
+
+open AnalyticTheory EntireLaurent
 
 /-!
 # §6. Elliptic subfields and isogenies
@@ -20,7 +23,6 @@ over $`\Omega` (a separable extension of elliptic fields is Galois with a group 
 The Lean code on this page refers to the following context.
 -/
 
-open AnalyticTheory
 universe u
 variable (K : Type u) [NontriviallyNormedField K]
   [IsUltrametricDist K] [CompleteSpace K]
@@ -39,7 +41,7 @@ This condition means that $`\bar q` has finite order $`\bmod^\times q`.
 > Book, §6, (71): `q̄ ∈ K` (`0 < |q̄| < 1`) is *commensurable* with `q` if `q̄^d = q^m` for some nonzero integers `d, m`.
 -/
 
-#print AnalyticTheory.Commensurable
+#stmt Commensurable
 
 /-!
 
@@ -58,14 +60,14 @@ $`f = \sum_{0 \le i < m} X^{-i} g_i(X^m)`.
 > The substitution `f(X) ↦ f(Xᵐ)` (`m ≠ 0`) as a ring endomorphism of `holSubring K L`.
 -/
 
-#print EntireLaurent.holExpand
+#stmt holExpand
 
 /-!
 
 > `H_L = ⊕ bᵢ H_K`.
 -/
 
-#check @EntireLaurent.hol_decomp
+#stmt EntireLaurent.hol_decomp
 
 /-!
 
@@ -75,28 +77,28 @@ as the substitution on $`H_K`.
 > Book, §6: `μ` is the substitution `X ↦ Xᵐ` on `M_K`: it maps the holomorphic function `g` to the holomorphic function `g(Xᵐ)`.
 -/
 
-#print AnalyticTheory.IsSubstPow
+#stmt IsSubstPow
 
 /-!
 
 > Book, §6: the substitution `μ_m : f(X) ↦ f(Xᵐ)` as an endomorphism of `M_K`.
 -/
 
-#print AnalyticTheory.substPow
+#stmt substPow
 
 /-!
 
 > `μ_m` on `M_K`: the extension of `holSubst` to the field of fractions.
 -/
 
-#print AnalyticTheory.meroSubst
+#stmt meroSubst
 
 /-!
 
 > For `m ≠ 0`, `substPow K m` is the substitution `μ_m` (it is uniquely characterised by its action on `H_K`).
 -/
 
-#check @AnalyticTheory.substPow_eq
+#stmt substPow_eq
 
 /-!
 
@@ -105,7 +107,7 @@ The substitution intertwines the translations: $`\mu_m \circ \tau_{a^m} = \tau_a
 > `μ_m ∘ τ_{aᵐ} = τ_a ∘ μ_m`.
 -/
 
-#check @AnalyticTheory.substPow_translation
+#stmt substPow_translation
 
 /-!
 
@@ -119,7 +121,7 @@ $`X \mapsto q^{-1}X`. That is, $`\bar f(X^m) \in F_K(q)`.
 > Book, §6: `m` is divisible by the order of `q mod^× q̄`, i.e. `q^m` is a power of `q̄`.
 -/
 
-#print AnalyticTheory.OrderDvd
+#stmt OrderDvd
 
 /-!
 
@@ -143,21 +145,21 @@ $`F_K(\bar q\,|\,X^m)` we may assume $`m > 0`.
 > Book, §6, (72): the image field `F_K(q̄ | Xᵐ)` of `μ_m : F_K(q̄) → M_K`.
 -/
 
-#print AnalyticTheory.FqbarXm
+#stmt FqbarXm
 
 /-!
 
 > Book, §6, (73): `μ_{-m} = μ_m ε` with `ε` the reflection.
 -/
 
-#check @AnalyticTheory.substPow_neg
+#stmt substPow_neg
 
 /-!
 
 > Book, §6, (72)–(73): `F_K(q̄ | Xᵐ) ⊆ F_K(q)` whenever `q̄` is commensurable with `q` and `m ≠ 0` is divisible by the order of `q mod^× q̄`; moreover `F_K(q̄|X⁻ᵐ) = F_K(q̄|Xᵐ)`.
 -/
 
-#check @AnalyticTheory.fq_qbar_Xm_subset
+#stmt fq_qbar_Xm_subset
 
 /-!
 
@@ -168,42 +170,42 @@ pair of subfields $`E \le F` of a field $`M`.
 > The degree `[F : E]` of subfields `E ≤ F` of `M` (and `0` if `E ≰ F`).
 -/
 
-#print AnalyticTheory.relDeg
+#stmt relDeg
 
 /-!
 
 > The degree of inseparability of `F | E`.
 -/
 
-#print AnalyticTheory.relInsepDeg
+#stmt relInsepDeg
 
 /-!
 
 > `F | E` is a separable extension.
 -/
 
-#print AnalyticTheory.IsRelSeparable
+#stmt IsRelSeparable
 
 /-!
 
 > `F | E` is purely inseparable.
 -/
 
-#print AnalyticTheory.IsRelPurelyInseparable
+#stmt IsRelPurelyInseparable
 
 /-!
 
 > `F | E` is a Galois extension.
 -/
 
-#print AnalyticTheory.IsRelGalois
+#stmt IsRelGalois
 
 /-!
 
 > The group of automorphisms of `F` fixing `E` pointwise.
 -/
 
-#print AnalyticTheory.autFixing
+#stmt autFixing
 
 /-!
 
@@ -232,35 +234,35 @@ show that $`\bmod^\times \bar q` is meant.)
 > Book, §6, Theorem XVII (i): for `m > 0` a multiple of the order of `q mod^× q̄` (so that `q̄^d = q^m` with `d > 0`), `[F_K(q) : F_K(q̄|Xᵐ)] = dm`.
 -/
 
-#check @AnalyticTheory.thmXVII_degree
+#stmt thmXVII_degree
 
 /-!
 
 > Book, §6, Theorem XVII (ii): the degree of inseparability of `F_K(q) | F_K(q̄|Xᵐ)` is the largest power `p^r` of the characteristic dividing `m`, with maximal separable subextension `F_K(q^{p^r} | X^{p^r})`.
 -/
 
-#check @AnalyticTheory.thmXVII_inseparability
+#stmt thmXVII_inseparability
 
 /-!
 
 > The subgroup `U ⊂ K^×` of elements `u` with `u^m ≡ 1 mod^× q̄`.
 -/
 
-#print AnalyticTheory.Usub
+#stmt Usub
 
 /-!
 
 > Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are the translations `τ_u`, `u ∈ U`, and the automorphism group is `U/q`. (The book writes `u^m ≡ 1 mod^× q`; the proof and Corollary XIXa show that `q̄` is meant.)
 -/
 
-#check @AnalyticTheory.thmXVII_automorphisms
+#stmt thmXVII_automorphisms
 
 /-!
 
 > Book, §6, Theorem XVII (iv): `F_K(q)` is Galois over `F_K(q̄|Xᵐ)` iff `p ∤ m`, `K` contains the `m`-th roots of unity, and `q̄` is an `m`-th power in `K`.
 -/
 
-#check @AnalyticTheory.thmXVII_galois
+#stmt thmXVII_galois
 
 /-!
 
@@ -299,21 +301,21 @@ $$`\text{the extension (75) is cyclic of degree } d. \qquad (76)`
 > `τ_{q̄}` as an automorphism of `F_K(Q)`.
 -/
 
-#print AnalyticTheory.tauBar
+#stmt tauBar
 
 /-!
 
 > Book, §6, (76): `τ_{q̄}` has order `d` as an automorphism of `F_K(Q)` when `q̄ᵈ = Q`.
 -/
 
-#check @AnalyticTheory.orderOf_tauBar
+#stmt orderOf_tauBar
 
 /-!
 
 > `[F_K(Q) : F_K(q̄)] = d` for `q̄ᵈ = Q`: the extension is cyclic, generated by `τ_{q̄}`.
 -/
 
-#check @AnalyticTheory.relDeg_FqSub_bar
+#stmt relDeg_FqSub_bar
 
 /-!
 
@@ -331,14 +333,14 @@ $`u_i(q\,|\,X) \in F_K(q\,|\,X)`.
 > `uᵢ = X⁻ⁱ μ_m(Θ(q^{-i}Xᵐ)/Θ(Xᵐ))`, `Θ` of period `qᵐ` (book, (77)).
 -/
 
-#print AnalyticTheory.uq
+#stmt uq
 
 /-!
 
 > Book, §6, (77): the functions `uᵢ` are `q`-periodic.
 -/
 
-#check @AnalyticTheory.uq_mem
+#stmt uq_mem
 
 /-!
 
@@ -350,28 +352,28 @@ $`M_K(X^m)`.
 > `μ_m(M_K)`, the meromorphic functions of `Xᵐ`.
 -/
 
-#print AnalyticTheory.Sm
+#stmt Sm
 
 /-!
 
 > The basis `1, X⁻¹, …, X^{-(m-1)}` of `M_K` over `μ_m(M_K)`.
 -/
 
-#print AnalyticTheory.basisTX
+#stmt basisTX
 
 /-!
 
 > `[M_K : μ_m(M_K)] = m`.
 -/
 
-#check @AnalyticTheory.finrank_Sm
+#stmt finrank_Sm
 
 /-!
 
 > Book, §6, (77): the functions `u₀, …, u_{m−1}` are linearly independent over `μ_m(M_K)`.
 -/
 
-#check @AnalyticTheory.uq_linearIndependent
+#stmt uq_linearIndependent
 
 /-!
 
@@ -388,21 +390,21 @@ $$`M_K(X^m) \cap F_K(q\,|\,X) = F_K(q^m\,|\,X^m). \qquad (78)`
 > `[F_K(q) : F_K(qᵐ | Xᵐ)] = m` (book, (77)–(78)).
 -/
 
-#check @AnalyticTheory.relDeg_upper
+#stmt relDeg_upper
 
 /-!
 
 > Formula (78): `μ_n(M_K) ∩ F_K(q) ⊆ F_K(qⁿ | Xⁿ)`.
 -/
 
-#check @AnalyticTheory.mem_FqbarXm_of_mem_Sm
+#stmt mem_FqbarXm_of_mem_Sm
 
 /-!
 
 > **Theorem XVII (i)**: for `q̄ᵈ = qᵐ` (`d, m > 0`), `[F_K(q) : F_K(q̄ | Xᵐ)] = d m`.
 -/
 
-#check @AnalyticTheory.relDeg_FqbarXm
+#stmt relDeg_FqbarXm
 
 /-!
 
@@ -423,21 +425,21 @@ $`F_K(\bar q\,|\,X^m) \subset F_K(q^m\,|\,X^m)`, this is separable in view of (7
 > `F_K(q)` is separable over `F_K(qⁿ | Xⁿ)` when `n ≠ 0` in `K`.
 -/
 
-#check @AnalyticTheory.isRelSeparable_upper
+#stmt isRelSeparable_upper
 
 /-!
 
 > In characteristic `p`, `F_K(q)` is purely inseparable over `F_K(q^{pᵛ} | X^{pᵛ})`.
 -/
 
-#check @AnalyticTheory.isRelPurelyInseparable_upper
+#stmt isRelPurelyInseparable_upper
 
 /-!
 
 > `F_K(Q) | F_K(q̄)` is Galois, hence separable.
 -/
 
-#check @AnalyticTheory.isRelSeparable_FqSub_bar
+#stmt isRelSeparable_FqSub_bar
 
 /-!
 
@@ -462,28 +464,28 @@ translation never does.
 > `Aut(F_L(q) | L) = T ∪ T ε`.
 -/
 
-#check @AnalyticTheory.aut_structure
+#stmt aut_structure
 
 /-!
 
 > `τ_u` fixes `F_K(q̄ | Xᵐ)` iff `u ∈ U`, i.e. `uᵐ ∈ q̄^ℤ`.
 -/
 
-#check @AnalyticTheory.translation_fixes_iff
+#stmt translation_fixes_iff
 
 /-!
 
 > A reflected translation `τ_a ε` never fixes `F_K(q̄ | Xᵐ)`.
 -/
 
-#check @AnalyticTheory.not_translation_refl_fixes
+#stmt not_translation_refl_fixes
 
 /-!
 
 > Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are exactly the translations `τ_u` with `u ∈ U`.
 -/
 
-#check @AnalyticTheory.mem_autFixing_iff
+#stmt mem_autFixing_iff
 
 /-!
 
@@ -493,14 +495,14 @@ automorphism group, with kernel the subgroup generated by $`q`.
 > `u ↦ τ_u`, `U → Aut(F_K(q) | F_K(q̄|Xᵐ))`.
 -/
 
-#print AnalyticTheory.translationHom
+#stmt translationHom
 
 /-!
 
 > The kernel of `u ↦ τ_u` on `U` is the subgroup generated by `q`.
 -/
 
-#check @AnalyticTheory.translationHom_ker
+#stmt translationHom_ker
 
 /-!
 
@@ -520,18 +522,18 @@ $`K`; this gives $`|U/q| \cdot [\mathbb{Z} : \psi(U)] = |\mu_m(K)| \cdot d`.
 > `ψ : U → ℤ`, `uᵐ = q̄^{ψ(u)}`.
 -/
 
-#print AnalyticTheory.psiHom
+#stmt psiHom
 
 /-!
 
 > `|U/⟨q⟩| · [ℤ : ψ(U)] = |μ_m(K)| · d`.
 -/
 
-#check @AnalyticTheory.card_quot_mul_index
+#stmt card_quot_mul_index
 
 /-!
 
 > `ψ(U) = ℤ` iff `q̄` is an `m`-th power in `K`.
 -/
 
-#check @AnalyticTheory.range_psiHom_eq_top_iff
+#stmt range_psiHom_eq_top_iff

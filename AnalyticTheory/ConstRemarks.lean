@@ -295,6 +295,7 @@ theorem holRel_holExt (g : holSubring K) : HolRel (ψ : Omega K ≃+* Omega L) g
   simp only [Function.comp, AddMonoidHom.coe_ofClass, map_mul, map_zpow₀, AlgEquiv.commutes]
   rw [IsScalarTower.algebraMap_apply K L (Omega L)]
 
+omit [FiniteDimensional K L] in
 theorem holExt_monoHol (n : ℤ) : holExt (L := L) (monoHol K (Omega K) n) = monoHol L (Omega L) n := by
   apply holCoeff_injective L
   rw [holCoeff_holExt]
@@ -330,6 +331,7 @@ theorem eIdx_dvd {α : Omega K} (hα : α ≠ 0) : eIdx L (ψ α) ∣ eIdx K α 
   have hdvd : (eIdx L (ψ α) : ℤ) ∣ (eIdx K α : ℤ) := ⟨k', this⟩
   exact_mod_cast hdvd
 
+omit [FiniteDimensional K L] in
 /-- `e(α) = e_{α,K} / e_{ψα,L}`. -/
 theorem ramIndex_eq_eIdx {α : Omega K} (hα : α ≠ 0) :
     ramIndex K L ψ α = eIdx K α / eIdx L (ψ α) := by
@@ -379,14 +381,17 @@ noncomputable def divExtFun (m : Omega K → ℤ) : Omega L → ℤ :=
   open Classical in
   fun β => if β = 0 then 0 else (ramIndex K L ψ (ψ.symm β) : ℤ) * m (ψ.symm β)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] in
 theorem divExtFun_apply (m : Omega K → ℤ) {α : Omega K} (hα : α ≠ 0) :
     divExtFun ψ m (ψ α) = (ramIndex K L ψ α : ℤ) * m α := by
   unfold divExtFun
   rw [ite_eq_right ((map_ne_zero ψ).mpr hα), AlgEquiv.symm_apply_apply]
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] in
 theorem divExtFun_zero_pt (m : Omega K → ℤ) : divExtFun ψ m 0 = 0 := by
   simp [divExtFun]
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] in
 theorem divExtFun_add (m n : Omega K → ℤ) :
     divExtFun ψ (m + n) = divExtFun ψ m + divExtFun ψ n := by
   funext β; unfold divExtFun; by_cases h : β = 0 <;> simp [h, mul_add]
@@ -609,7 +614,7 @@ theorem remark_ext_const_divisors (ψ : Omega K ≃ₐ[K] Omega L) :
     ∃ ι : Divisors K →+ Divisors L, Function.Injective ι ∧
       (∀ (m : Divisors K) (α : Omega K), α ≠ 0 →
         ((ι m : Divisors L) : Omega L → ℤ) (ψ α) = (ramIndex K L ψ α : ℤ) * (m : Omega K → ℤ) α) ∧
-      ∀ (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqL : algebraMap K L q ≠ 0) (m : Divisors K),
+      ∀ (q : K) (hq0 : 0 < ‖q‖) (_hq1 : ‖q‖ < 1) (hqL : algebraMap K L q ≠ 0) (m : Divisors K),
         (m : Omega K → ℤ) ∈ DivisorsPeriodic K q →
         ((ι m : Divisors L) : Omega L → ℤ) ∈ DivisorsPeriodic L (algebraMap K L q) ∧
         degQ L (algebraMap K L q) ((ι m : Divisors L) : Omega L → ℤ) = degQ K q m ∧
@@ -633,6 +638,7 @@ theorem remark_ext_const_divisors (ψ : Omega K ≃ₐ[K] Omega L) :
     rw [divExtFun_apply ψ _ hα, divExtFun_apply ψ _ hα] at this
     exact mul_left_cancel₀ (by exact_mod_cast (ramIndex_pos ψ hα).ne') this
 
+omit [FiniteDimensional K L] in
 theorem eIdx_le_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃ₐ[K] Omega L) {α : Omega K}
     (hα : α ≠ 0) : eIdx K α ≤ eIdx L (ψ α) := by
   classical
@@ -701,6 +707,7 @@ section galAction
 
 variable {K L}
 
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem normL_eq_spectral (x : L) : ‖x‖ = spectralNorm K L x := by
   have : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
   let f : AbsoluteValue L ℝ :=
@@ -815,6 +822,7 @@ section galDiv
 
 variable {K L}
 
+omit [IsGalois K L] in
 theorem galAct_holRel {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (hρ : IsGalAct K L σ ρ)
     {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ') {g g' : holSubring L}
     (hg : ρ (algebraMap (holSubring L) (MeroRing L) g) = algebraMap (holSubring L) (MeroRing L) g') :
@@ -832,6 +840,7 @@ theorem galAct_holRel {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (h
   simp only [Function.comp, AddMonoidHom.coe_ofClass, map_mul, map_zpow₀]
   rw [hσ']
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem minpoly_ext {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ')
     (α : Omega L) : minpoly L (σ' α) = (minpoly L α).map (σ : L →+* L) := by
   have hint : IsIntegral L α := Algebra.IsIntegral.isIntegral α
@@ -887,6 +896,7 @@ section descent
 
 variable {K L}
 
+omit [FiniteDimensional K L] [IsGalois K L] in
 theorem galAct_fix_holExt {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (hρ : IsGalAct K L σ ρ)
     (x : holSubring K) :
     ρ (algebraMap (holSubring L) (MeroRing L) (holExt x)) =
@@ -979,7 +989,7 @@ theorem remark_galois_fixed_field :
 `(σ f)(σ α) = (f)(α)`. -/
 theorem remark_galois_action_divisors (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L)
     (hρ : IsGalAct K L σ ρ) (σ' : Omega L ≃+* Omega L) (hσ' : IsExtension K L σ σ')
-    (f : MeroRing L) (hf : f ≠ 0) (α : Omega L) (hα : α ≠ 0) :
+    (f : MeroRing L) (_hf : f ≠ 0) (α : Omega L) (hα : α ≠ 0) :
     divisorOf L (ρ f) (σ' α) = divisorOf L f α := by
   have hσα : σ' α ≠ 0 := (map_ne_zero σ').mpr hα
   unfold divisorOf

@@ -22,6 +22,7 @@ variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
   [NormedAlgebra K L]
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 theorem isConvergentLaurent_map {a : ℤ → K} (ha : IsConvergentLaurent K a) :
     IsConvergentLaurent L (fun n => algebraMap K L (a n)) := by
   intro r hr
@@ -36,6 +37,7 @@ theorem holCoeff_holExtFun (g : holSubring K) :
     holCoeff L (holExtFun (L := L) g) = fun n => algebraMap K L (holCoeff K g n) :=
   holCoeff_holOfSeq L (L := Omega L) _ _
 
+omit [CompleteSpace L] in
 theorem convCoeff_map {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsConvergentLaurent K b) :
     (fun n => algebraMap K L (convCoeff K a b n)) =
       convCoeff L (fun n => algebraMap K L (a n)) (fun n => algebraMap K L (b n)) := by
@@ -122,6 +124,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable {ι : Type*} [Fintype ι] (b : Module.Basis ι K L)
 
 include b in
+omit [CompleteSpace L] [Fintype ι] in
 theorem exists_coord_bound' (i : ι) : ∃ C : ℝ, 0 ≤ C ∧ ∀ x : L, ‖b.repr x i‖ ≤ C * ‖x‖ := by
   let f : L →ₗ[K] K := b.coord i
   let F := LinearMap.toContinuousLinearMap f
@@ -151,6 +154,7 @@ theorem holCoeff_holComp (g : holSubring L) (i : ι) :
     holCoeff K (holComp b g i) = fun n => b.repr (holCoeff L g n) i :=
   holCoeff_holOfSeq K (L := Omega K) _ _
 
+omit [FiniteDimensional K L] in
 theorem holCoeff_combo (g : ι → holSubring K) (n : ℤ) :
     holCoeff L (∑ i, algebraMap L (holSubring L) (b i) * holExt (g i)) n =
       ∑ i, holCoeff K (g i) n • b i := by
@@ -223,6 +227,7 @@ theorem mcombo_eq_zero {e : ι → MeroRing K} (h : mcombo b e = 0) (i : ι) : e
   rw [hxi, map_zero] at this
   exact (mul_eq_zero.mp this.symm).resolve_left (alg_hol_ne_zero hy0)
 
+omit [FiniteDimensional K L] in
 theorem mcombo_add (e e' : ι → MeroRing K) :
     mcombo b (e + e') = mcombo b e + mcombo b e' := by
   simp only [mcombo, Pi.add_apply, map_add, mul_add, Finset.sum_add_distrib]
@@ -431,7 +436,7 @@ theorem PrimeDivisor.ext_ring {F : Type u} [Field F] [Algebra k F] {P P' : Prime
 /-- `σ` restricted to a valuation ring and its image. -/
 def ringTransfer (σ : E ≃ₐ[k] E') (A : ValuationSubring E) :
     A ≃+* (A.comap (σ.symm : E' →+* E)) where
-  toFun y := ⟨σ y.1, by rw [ValuationSubring.mem_comap]; simpa using y.2⟩
+  toFun y := ⟨σ y.1, by rw [ValuationSubring.mem_comap]; simp⟩
   invFun x := ⟨σ.symm x.1, ValuationSubring.mem_comap.mp x.2⟩
   left_inv y := Subtype.ext (by simp)
   right_inv x := Subtype.ext (by simp)

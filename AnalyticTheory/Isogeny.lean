@@ -146,7 +146,7 @@ theorem substPow_alg {m : ℤ} (hm : m ≠ 0) (g : holSubring K) :
       algebraMap (holSubring K) (MeroRing K) (holSubst m hm g) := by
   rw [substPow_eq hm, meroSubst_alg]
 
-theorem substPow_injective {m : ℤ} (hm : m ≠ 0) : Function.Injective (substPow K m) :=
+theorem substPow_injective {m : ℤ} (_hm : m ≠ 0) : Function.Injective (substPow K m) :=
   (substPow K m).injective
 
 /-- `μ_m ∘ τ_{aᵐ} = τ_a ∘ μ_m`. -/
@@ -183,7 +183,7 @@ theorem substPow_neg (m : ℤ) (hm : m ≠ 0) :
 
 /-- The constants `K ⊂ E` for a subfield `E` of an extension field `F | K`: the `K`-algebra structure
 on `E`. -/
-def subfieldAlgebra {F : Type u} [Field F] [Algebra K F] (E : Subfield F)
+@[instance_reducible] def subfieldAlgebra {F : Type u} [Field F] [Algebra K F] (E : Subfield F)
     (h : ∀ c : K, algebraMap K F c ∈ E) : Algebra K E :=
   (RingHom.codRestrict (algebraMap K F) E h).toAlgebra
 
@@ -200,8 +200,8 @@ def HasPeriod {F : Type u} [Field F] [Algebra K F] (E : Subfield F) (qbar : K) :
 
 /-- Book, §6, (72)–(73): `F_K(q̄ | Xᵐ) ⊆ F_K(q)` whenever `q̄` is commensurable with `q` and
 `m ≠ 0` is divisible by the order of `q mod^× q̄`; moreover `F_K(q̄|X⁻ᵐ) = F_K(q̄|Xᵐ)`. -/
-theorem fq_qbar_Xm_subset (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m : ℤ) (hm : m ≠ 0) (hdvd : OrderDvd K q qbar m) :
+theorem fq_qbar_Xm_subset (q qbar : K) (hq0 : 0 < ‖q‖) (_hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (_hqb1 : ‖qbar‖ < 1) (m : ℤ) (hm : m ≠ 0) (hdvd : OrderDvd K q qbar m) :
     FqbarXm K qbar m ≤ FqSub K q ∧ FqbarXm K qbar (-m) = FqbarXm K qbar m := by
   have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
   have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0

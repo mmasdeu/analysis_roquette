@@ -46,7 +46,7 @@ theorem hasOrd_exists {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f
     funext x
     have h1 := hsum x.1 x.2
     have h2 : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x.1 ^ n) (0 : Omega K) := by
-      simpa [hcon] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : Omega K)) 0)
+      simp [hcon]
     have : g x.1 = 0 := h1.unique h2
     rw [← congrFun hgf x]; simpa using this
   obtain ⟨k, c, hc, -, ht⟩ := exists_order K ha hsum hα h0
@@ -69,7 +69,7 @@ theorem hasOrd_data {α : Omega K} (hα : α ≠ 0) {f : holSubring K} (hf : f �
     funext x
     have h1 := hsum x.1 x.2
     have h2 : HasSum (fun n : ℤ => algebraMap K (Omega K) (a n) * x.1 ^ n) (0 : Omega K) := by
-      simpa [hcon] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : Omega K)) 0)
+      simp [hcon]
     have : g x.1 = 0 := h1.unique h2
     rw [← congrFun hgf x]; simpa using this
   obtain ⟨k, c, hc, hk, ht⟩ := exists_order K ha hsum hα h0

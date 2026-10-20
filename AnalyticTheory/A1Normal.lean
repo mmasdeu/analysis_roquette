@@ -418,6 +418,7 @@ section invariance
 
 variable {K : Type u} [Field K]
 
+omit [Field K] in
 /-- The curve with parameters `(u, v, a₁, a₂, a₃)` has them as coefficients. -/
 theorem dataCurve_eq (W : WeierstrassCurve K) : dataCurve W.a₁ W.a₃ W.a₂ W.a₄ W.a₆ = W := rfl
 

@@ -30,10 +30,10 @@ theorem pDiv_eq_divisorOf (n : ℕ) :
   funext α
   by_cases hα : α = 0
   · simp [pDiv, divisorOf, hα]
-  · simp only [pDiv, divisorOf, ite_eq_right hα, ne_eq, not_false_eq_true, true_and]
+  · simp only [pDiv, divisorOf, ite_eq_right hα, ne_eq]
     rw [anVal_pow_of hα (v := if ConjModQ K q 1 α then 1 else 0) (by
       rw [anVal_Th hq0 hq1 hα]; split_ifs <;> rfl)]
-    by_cases h : ConjModQ K q 1 α <;> simp [h, hα] <;> rfl
+    by_cases h : ConjModQ K q 1 α <;> simp [h, hα] ; rfl
 
 theorem conjModQ_one_shift {α : Omega K} (hq0' : q ≠ 0) :
     ConjModQ K q 1 (algebraMap K (Omega K) q * α) ↔ ConjModQ K q 1 α := by
@@ -372,7 +372,7 @@ noncomputable def spanMono (n : ℕ) : Submodule K (MeroRing K) :=
   Submodule.span K {f | ∃ i j : ℕ, j ≤ 1 ∧ 2 * i + 3 * j ≤ n ∧ f = mono hq0 hq1 i j}
 
 theorem spanMono_mono {n m : ℕ} (h : n ≤ m) : spanMono hq0 hq1 n ≤ spanMono hq0 hq1 m :=
-  Submodule.span_mono (fun f ⟨i, j, hj, hij, hf⟩ => ⟨i, j, hj, le_trans hij h, hf⟩)
+  Submodule.span_mono (fun _f ⟨i, j, hj, hij, hf⟩ => ⟨i, j, hj, le_trans hij h, hf⟩)
 
 theorem mono_mem_spanMono {i j : ℕ} (hj : j ≤ 1) : mono hq0 hq1 i j ∈ spanMono hq0 hq1 (2 * i + 3 * j) :=
   Submodule.subset_span ⟨i, j, hj, le_rfl, rfl⟩
@@ -445,6 +445,7 @@ theorem divisorOf_periodic {f : MeroRing K} (hf : f ∈ Fq K q) :
 /-- The pole divisor `max(-m, 0)`. -/
 def polePart (m : Omega K → ℤ) : Omega K → ℤ := fun α => max (-(m α)) 0
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem polePart_mem {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q) :
     polePart m ∈ DivisorsPeriodic K q := by
   refine ⟨⟨by simp [polePart, hm.1.1], fun r r' hr hrr' => (hm.1.2.1 r r' hr hrr').subset

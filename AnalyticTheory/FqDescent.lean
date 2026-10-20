@@ -161,6 +161,7 @@ theorem rhoZ_coe (ζ : CocycleModQ K L q) (σ : L ≃ₐ[K] L) (f : FqSub L (alg
     ((rhoZ q ζ σ f : FqSub L (algebraMap K L q)) : MeroRing L) =
       translation L (ζ.1 σ) (meroGal σ (f : MeroRing L)) := rfl
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem cocycle_unit (ζ : CocycleModQ K L q) (σ τ : L ≃ₐ[K] L) :
     ∃ k : ℤ, ζ.1 (σ * τ) = ζ.1 σ * Units.map (σ : L →* L) (ζ.1 τ) * (qUnit q hq0) ^ k := by
   obtain ⟨k, hk⟩ := ζ.2 σ τ
@@ -216,7 +217,7 @@ noncomputable def rhoHom (ζ : CocycleModQ K L q) :
   map_mul' σ τ := RingEquiv.ext (rhoZ_mul q hq0 ζ σ τ)
 
 /-- The twisted action of `G` on `F_L(q)`. -/
-noncomputable def twistAction (ζ : CocycleModQ K L q) :
+@[instance_reducible] noncomputable def twistAction (ζ : CocycleModQ K L q) :
     MulSemiringAction (L ≃ₐ[K] L) (FqSub L (algebraMap K L q)) :=
   MulSemiringAction.compHom _ (rhoHom q hq0 ζ)
 
@@ -240,6 +241,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 theorem FqHom_injective : Function.Injective (FqHom L (algebraMap K L q)) := by
   intro a b h
   have := congrArg (fun f : FqSub L (algebraMap K L q) => (f : MeroRing L)) h
@@ -402,7 +404,7 @@ theorem holCoeff_holReflect (g : holSubring L) (n : ℤ) :
     have h2 := (Equiv.neg ℤ).hasSum_iff.mpr h1
     convert h2 using 1
     funext n
-    simp [Function.comp, zpow_neg, inv_zpow]
+    simp [Function.comp, zpow_neg]
     rfl
 
 end reflect
@@ -479,10 +481,10 @@ theorem reflectionM_involutive (f : MeroRing L) : reflectionM L (reflectionM L f
 noncomputable def reflFq (q' : L) : FqSub L q' ≃+* FqSub L q' where
   toFun f := ⟨reflectionM L (f : MeroRing L), reflFq_mem q' f⟩
   invFun f := ⟨reflectionM L (f : MeroRing L), reflFq_mem q' f⟩
-  left_inv f := Subtype.ext (reflectionM_involutive _)
-  right_inv f := Subtype.ext (reflectionM_involutive _)
-  map_mul' f g := Subtype.ext (map_mul _ _ _)
-  map_add' f g := Subtype.ext (map_add _ _ _)
+  left_inv _f := Subtype.ext (reflectionM_involutive _)
+  right_inv _f := Subtype.ext (reflectionM_involutive _)
+  map_mul' _f _g := Subtype.ext (map_mul _ _ _)
+  map_add' _f _g := Subtype.ext (map_add _ _ _)
 
 theorem reflFq_coe (q' : L) (f : FqSub L q') :
     ((reflFq q' f : FqSub L q') : MeroRing L) = reflectionM L (f : MeroRing L) := rfl
@@ -689,6 +691,7 @@ def cocycleInv (ζ : CocycleModQ K L q) : CocycleModQ K L q :=
     refine ⟨-k, ?_⟩
     simp only [Units.val_inv_eq_inv_val, hk, mul_inv, map_inv₀, zpow_neg]⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem cocycleInv_apply (ζ : CocycleModQ K L q) (σ : L ≃ₐ[K] L) :
     (cocycleInv q ζ).1 σ = (ζ.1 σ)⁻¹ := rfl
 
@@ -768,6 +771,7 @@ theorem refl_rho (ζ : CocycleModQ K L q) (σ : L ≃ₐ[K] L) (f : FqSub L (alg
   rw [reflectionM_translation, reflectionM_meroGal]
 
 include hq0 in
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem unit_compat_of_equiv (ζ ζ' : CocycleModQ K L q) (h : CocycleEquiv K L q ζ ζ') :
     ∃ b : Lˣ, ∀ σ : L ≃ₐ[K] L, ∃ k : ℤ,
       ζ'.1 σ * Units.map (σ : L →* L) b = b * ζ.1 σ * (qUnit q hq0) ^ k := by
@@ -801,9 +805,11 @@ theorem Ezeta_iso_of_equiv_inv (ζ ζ' : CocycleModQ K L q)
       rw [refl_rho, trans_rho q hq0 _ ζ' b hb]
       rfl)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem norm_alg_pos (hq0 : 0 < ‖q‖) : 0 < ‖algebraMap K L q‖ := by
   rw [norm_algebraMap']; exact hq0
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem norm_alg_lt (hq1 : ‖q‖ < 1) : ‖algebraMap K L q‖ < 1 := by
   rw [norm_algebraMap']; exact hq1
 
@@ -843,7 +849,7 @@ theorem cocycleEquiv_of_trans_rho (hq1 : ‖q‖ < 1) (ζ ζ' : CocycleModQ K L 
   have hy0 : ((ζ'.1 σ : Lˣ) : L) ≠ 0 := (ζ'.1 σ).ne_zero
   simp only [hx, hy, Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_ofClass,
     mul_inv] at hk
-  simp only [Units.val_inv_eq_inv_val, map_inv₀, zpow_neg, inv_inv]
+  simp only [Units.val_inv_eq_inv_val, map_inv₀, zpow_neg]
   have hk' : (a : L) * (ζ.1 σ : L) = (algebraMap K L q) ^ k * ((ζ'.1 σ : L) * σ (a : L)) := by
     rw [← hk]; field_simp
   field_simp

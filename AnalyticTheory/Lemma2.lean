@@ -25,6 +25,7 @@ variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 
 variable {K L}
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem expq_mul (q : K) {a b : L} (ha : a ≠ 0) (hb : b ≠ 0) :
     expq K L q (a * b) = expq K L q a * expq K L q b := by
   unfold expq
@@ -41,6 +42,7 @@ theorem expq_inv (q : K) {a : L} (ha : a ≠ 0) : expq K L q a⁻¹ = (expq K L 
   rw [h1] at h
   exact eq_inv_of_mul_eq_one_left h.symm
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem expq_q_zpow (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (k : ℤ) :
     expq K L q ((algebraMap K L q) ^ k) = 1 := by
   unfold expq
@@ -160,7 +162,7 @@ theorem exact_cocycle {F M : Type*} [Field F] [Field M] [Algebra F M] [FiniteDim
     have hE : θ (σ * τ) = σ • θ τ * θ σ * Q ^ (k - m (σ * τ) + m σ + m τ) := by
       rw [hσθ, hθ (σ * τ), hθ σ, hk]
       simp only [zpow_add, zpow_sub, zpow_neg]
-      simp only [mul_assoc, mul_comm, mul_left_comm, mul_inv_cancel_left, inv_mul_cancel_left, mul_one, one_mul, inv_inv, mul_inv_rev]
+      simp only [mul_assoc, mul_comm, mul_left_comm, mul_inv_cancel_left]
     have hv0 : v (σ • θ τ) = 0 := by
       rw [AlgEquiv.smul_units_def, hvσ]; exact hvθ τ
     have h1 := hvθ (σ * τ)
@@ -186,6 +188,7 @@ variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 /-- The additive valuation `log ‖x‖ / log ‖q‖` on `Lˣ`. -/
 noncomputable def vq (q : K) (x : Lˣ) : ℝ := Real.log ‖(x : L)‖ / Real.log ‖q‖
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem vq_mul (x y : Lˣ) : vq q (x * y) = vq q x + vq q y := by
   unfold vq
   rw [Units.val_mul, norm_mul, Real.log_mul (norm_ne_zero_iff.mpr x.ne_zero)
@@ -197,6 +200,7 @@ theorem vq_gal (σ : L ≃ₐ[K] L) (x : Lˣ) : vq q (Units.map (σ : L →* L) 
   rw [gal_norm]
 
 include hq0 hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem vq_alg : vq q (Units.mk0 (algebraMap K L q) ((map_ne_zero_iff _
     (algebraMap K L).injective).mpr (norm_pos_iff.mp hq0))) = 1 := by
   unfold vq
@@ -225,8 +229,8 @@ theorem cocycleEquiv_of_char_eq (ζ ζ' : CocycleModQ K L q)
     dsimp only
     rw [e1, e2]
     simp only [zpow_sub, map_mul, map_inv, mul_inv_rev]
-    simp only [mul_assoc, mul_comm, mul_left_comm, mul_inv_cancel_left, inv_mul_cancel_left,
-      mul_one, one_mul, inv_inv]
+    simp only [mul_assoc, mul_comm, mul_left_comm,
+      mul_one]
   have hint : ∀ σ : L ≃ₐ[K] L, ∃ m : ℤ, vq q (ζ'.1 σ * (ζ.1 σ)⁻¹) = m := by
     intro σ
     have h1 := congrArg (fun χ : CharGroup K L => (χ σ : Circle)) h
@@ -509,6 +513,7 @@ section vqz
 
 variable (q : K)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem vq_one : vq q (1 : Lˣ) = 0 := by unfold vq; simp
 
 theorem vq_inv' (x : Lˣ) : vq q x⁻¹ = - vq q x := by
@@ -547,8 +552,8 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
     have e1 : ζ.1 (g * g') = ζ.1 g * g • ζ.1 g' * qU ^ k := Units.ext (by simpa [hqU] using hk)
     simp only [ζ']
     rw [e1, smul_mul', smul_div', mul_smul]
-    simp only [div_eq_mul_inv, mul_inv_rev, smul_inv, mul_assoc, mul_comm, mul_left_comm,
-      mul_inv_cancel_left, inv_mul_cancel_left, inv_inv, mul_one, one_mul]
+    simp only [div_eq_mul_inv, mul_assoc, mul_comm, mul_left_comm,
+      mul_inv_cancel_left]
   have hcoc'' : IsCocycleModQ K L q (fun g => (ζ' g : Lˣ)) := by
     intro g g'
     obtain ⟨k, hk⟩ := hcoc' g g'
@@ -598,9 +603,9 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
       rw [hkh, hkh', smul_zpow', hqσ] at e
       have e2 : h • ζ' g = (ζ' g * qU ^ kh' * qU ^ k2) * (qU ^ kh * qU ^ k1)⁻¹ := by
         rw [eq_mul_inv_iff_mul_eq, ← e]
-        simp only [mul_assoc, mul_comm, mul_left_comm]
+        simp only [mul_assoc, mul_comm]
       rw [e2]
-      simp only [zpow_add, zpow_sub, zpow_neg, mul_inv_rev, mul_assoc, mul_comm, mul_left_comm]
+      simp only [zpow_add, zpow_sub, mul_inv_rev, mul_assoc, mul_comm]
     have hv : vq q (h • ζ' g) = vq q (ζ' g) := by
       rw [AlgEquiv.smul_units_def]; exact vq_gal q h _
     rw [hJ, vq_mul, vq_zpow q qU hvqU] at hv
@@ -634,7 +639,7 @@ theorem qtrivial_of_cocycle (ζ : CocycleModQ K L q) :
         rw [add_comm, Qp_add]; simp [Qp]; rfl
       have hu' : ζ' σ = u := rfl
       rw [pow_succ', hk, hu', hc, hQ1, smul_mul', smul_zpow', hqσ, zpow_add]
-      simp only [mul_assoc, mul_comm, mul_left_comm]
+      simp only [mul_assoc]
   have hσn : σ ^ n ∈ MonoidHom.ker χ := by
     rw [MonoidHom.mem_ker, map_pow, ← hord, pow_orderOf_eq_one]
   obtain ⟨c, hc⟩ := hind n

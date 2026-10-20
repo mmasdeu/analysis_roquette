@@ -18,11 +18,12 @@ universe u
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem eIdx_pos {α : Omega K} : 0 < eIdx K α := by
   have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
   unfold eIdx
   rw [Polynomial.rootMultiplicity_pos ((minpoly.monic hint).map _).ne_zero]
-  simpa [Polynomial.IsRoot, Polynomial.eval_map_algebraMap] using minpoly.aeval K α
+  simp [Polynomial.IsRoot, Polynomial.eval_map_algebraMap]
 
 theorem hasOrd_minpoly {α : Omega K} (hα : α ≠ 0) :
     HasOrd K α (polyHol K (Omega K) (minpoly K α)) (eIdx K α : ℤ) := by
@@ -113,7 +114,7 @@ theorem anPt_eq_e_mul {α : Omega K} (hα : α ≠ 0) {f : MeroRing K} (hf : f �
   rw [← this]
   norm_cast
 
-theorem anVal_of_anPt {α : Omega K} (hα : α ≠ 0) {f : MeroRing K} {k : ℤ}
+theorem anVal_of_anPt {α : Omega K} (_hα : α ≠ 0) {f : MeroRing K} {k : ℤ}
     (h : anPt K α f = (((eIdx K α : ℤ) * k : ℤ) : WithTop ℤ)) : anVal K α f = (k : WithTop ℤ) := by
   unfold anVal
   rw [h, WithTop.map_coe]

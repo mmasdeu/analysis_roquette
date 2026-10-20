@@ -185,7 +185,7 @@ theorem reflSeq_convergent {a : ℤ → K} (ha : IsConvergentLaurent K a) :
   simp [reflSeq, zpow_neg]
 
 omit [IsUltrametricDist K] [CompleteSpace K] in
-theorem wt_refl {r : ℝ} (hr : 0 < r) (a : ℤ → K) (n : ℤ) :
+theorem wt_refl {r : ℝ} (_hr : 0 < r) (a : ℤ → K) (n : ℤ) :
     wt K r (reflSeq K a) n = wt K r⁻¹ a (-n) := by
   simp [wt, reflSeq, zpow_neg]
 
@@ -204,7 +204,7 @@ theorem isRightMax_iff_refl {r : ℝ} (hr : 0 < r) (a : ℤ → K) (N : ℤ) :
   have hr' : 0 < r⁻¹ := inv_pos.mpr hr
   have e : ∀ n, wt K r⁻¹ (reflSeq K a) n = wt K r a (-n) := by
     intro n
-    simp only [wt, reflSeq, inv_zpow', zpow_neg, inv_inv]
+    simp only [wt, reflSeq, inv_zpow', zpow_neg]
   unfold IsRightMax IsLeftMax
   simp only [e, neg_neg]
   constructor
@@ -307,14 +307,14 @@ theorem exists_rightMax {a : ℤ → K} (ha : IsConvergentLaurent K a) {r : ℝ}
   obtain ⟨N, hN, hp⟩ := exists_leftMax K (reflSeq_convergent K ha) hr' ⟨-n0, by simpa [reflSeq] using hn0⟩
   refine ⟨-N, (isRightMax_iff_refl K hr a (-N)).mpr (by rwa [neg_neg]), ?_⟩
   have e : wt K r⁻¹ (reflSeq K a) N = wt K r a (-N) := by
-    simp only [wt, reflSeq, inv_zpow', zpow_neg, inv_inv]
+    simp only [wt, reflSeq, inv_zpow', zpow_neg]
   rwa [e] at hp
 
 /-- The Kronecker sequence. -/
 def deltaSeq : ℤ → K := fun n => if n = 0 then 1 else 0
 
 omit [IsUltrametricDist K] [CompleteSpace K] in
-theorem deltaSeq_wt {r : ℝ} (hr : 0 < r) (n : ℤ) :
+theorem deltaSeq_wt {r : ℝ} (_hr : 0 < r) (n : ℤ) :
     wt K r (deltaSeq K) n = if n = 0 then 1 else 0 := by
   by_cases h : n = 0 <;> simp [wt, deltaSeq, h]
 

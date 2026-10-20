@@ -231,6 +231,7 @@ theorem finite_quad {A s : ℝ} (hA : 0 < A) (hs0 : 0 < s) (hs1 : s < 1) {ε : �
 noncomputable def seqOf (q κ : K) (d : ℤ) (c : ℕ → K) (n : ℤ) : K :=
   c (n % d).toNat * κ ^ (n / d) * q ^ ((n % d) * (n / d) + d * triZ (n / d))
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem seqOf_rec {q κ : K} (hq0 : q ≠ 0) (hκ : κ ≠ 0) {d : ℤ} (hd : 0 < d) (c : ℕ → K) (n : ℤ) :
     q ^ (-n) * seqOf q κ d c n = κ * seqOf q κ d c (n - d) := by
   have hdn : d ≠ 0 := hd.ne'
@@ -255,6 +256,7 @@ theorem seqOf_rec {q κ : K} (hq0 : q ≠ 0) (hκ : κ ≠ 0) {d : ℤ} (hd : 0 
     _ = _ := by rw [hq]; ring
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem seqOf_convergent {q κ : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hκ : κ ≠ 0) {d : ℤ}
     (hd : 0 < d) (c : ℕ → K) : IsConvergentLaurent K (seqOf q κ d c) := by
   intro r hr

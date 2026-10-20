@@ -716,7 +716,7 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
       intro n
       rw [hsplit n]
       refine le_trans (ultra_sub _ _) (max_le_max ?_ (hDV n))
-      simp only [Pi.smul_apply, eSeq]
+      simp only [eSeq]
       split_ifs <;> simp [hcn]
     have hM1 : ‖Qc‖ ≤ max 1 (‖Qc‖ * ε) := c0le Qc _ (le_trans zero_le_one (le_max_left _ _)) hle1
     by_contra hgt
@@ -727,7 +727,7 @@ theorem weierstrass_prep (H : ℤ → F) (hHd : Dec H) (s : ℕ) (ε : ℝ) (hε
   have hclose : ∀ n, ‖Qc n - if n = 0 then (H s)⁻¹ else 0‖ ≤ ε := by
     intro n
     have h1 : Qc n - (if n = 0 then (H s)⁻¹ else 0) = -divD hP V n := by
-      rw [hsplit n]; simp only [eSeq, hes]; split_ifs <;> simp [hhs]
+      rw [hsplit n]; simp only [eSeq]; split_ifs <;> simp [hhs]
     rw [h1, norm_neg]
     calc ‖divD hP V n‖ ≤ ‖Qc‖ * ε := hDV n
       _ ≤ 1 * ε := mul_le_mul_of_nonneg_right hM hε0

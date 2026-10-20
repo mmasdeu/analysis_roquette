@@ -368,6 +368,7 @@ theorem degQ_pointDivisor {β : Omega K} (hβ : β ≠ 0) :
     · rintro ⟨rfl, hne⟩
       exact ⟨hβ', hne⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem natDegree_minpoly_pos (β : Omega K) : 0 < (minpoly K β).natDegree :=
   minpoly.natDegree_pos (Algebra.IsIntegral.isIntegral β)
 
@@ -377,6 +378,7 @@ section pointLS
 
 variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem pointDivisor_nonneg (β x : Omega K) : 0 ≤ pointDivisor K q β x := by
   unfold pointDivisor; split_ifs <;> omega
 
@@ -497,7 +499,7 @@ theorem exists_inverse_mod {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K 
     have hle : LinearMap.ker φ ≤ V'.comap V.subtype := by
       intro u hu
       simp only [LinearMap.mem_ker, φ, LinearMap.comp_apply, Submodule.mkQ_apply,
-        Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.subtype_apply] at hu
+        Submodule.Quotient.mk_eq_zero] at hu
       show (u : FqSub K q) ∈ V'
       intro α hα
       have hguα := hu α hα
@@ -527,7 +529,7 @@ theorem exists_inverse_mod {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K 
       Submodule.finrank_le _
     omega
   have h1W : (1 : FqSub K q) ∈ W := one_mem_LS (fun α => by
-    simp only [hm'def, Pi.smul_apply, smul_eq_mul]; exact mul_nonneg (by positivity) (hD0 α))
+    simp only [hm'def, Pi.smul_apply]; exact mul_nonneg (by positivity) (hD0 α))
   obtain ⟨u, hu⟩ : W''.mkQ ⟨1, h1W⟩ ∈ LinearMap.range φ := by rw [hrange]; trivial
   refine ⟨n, u, u.2, ?_⟩
   simp only [φ, LinearMap.comp_apply, Submodule.mkQ_apply] at hu
@@ -633,7 +635,7 @@ theorem exists_LS_of_AD {D : Omega K → ℤ} (hD0 : ∀ α, 0 ≤ D α) {f : Fq
 include hq0 hq1 in
 /-- Denominators: for `f` without pole at `β ∉ supp D` there is `h ∈ A_D` with `w_β(h) = 0` and
 `hf ∈ A_D`. -/
-theorem exists_denominator {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K q) (hD0 : ∀ α, 0 ≤ D α)
+theorem exists_denominator {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K q) (_hD0 : ∀ α, 0 ≤ D α)
     (hdeg : 0 < degQ K q D) {β : Omega K} (hβ : β ≠ 0) (hDβ : D β = 0) {f : FqSub K q}
     (hfβ : 0 ≤ anVal K β (f : MeroRing K)) :
     ∃ n : ℕ, ∃ h ∈ LS q (n • D), anVal K β (h : MeroRing K) = 0 ∧ h * f ∈ AD q D := by
@@ -732,7 +734,7 @@ theorem LS_succ_le {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
         have := hD0 α; rw [hDdef] at hDα this ⊢; unfold polePart at hDα this ⊢; omega
       change _ ≤ anVal K α ((y : MeroRing K) * h) at hgα
       rw [(anVal_isValuation K α hα).2.2.1, hyα] at hgα
-      simp only [Pi.smul_apply, smul_eq_mul] at hgα
+      simp only [Pi.smul_apply] at hgα
       by_cases htop : anVal K α (h : MeroRing K) = ⊤
       · rw [htop]; exact le_top
       · obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp htop
@@ -846,6 +848,7 @@ theorem withTop_neg_neg {x : WithTop ℤ} (h : 0 < x) (hx : x ≠ ⊤) : -x < 0 
   have : 0 < a := by exact_mod_cast h
   rw [← WithTop.LinearOrderedAddCommGroup.coe_neg]; exact_mod_cast (by omega : -a < (0 : ℤ))
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- Valuations are nonnegative on integral elements over a subring where they are nonnegative. -/
 theorem AddValuation_nonneg_of_isIntegral {F : Type*} [Field F] [Algebra K F]
     (v : AddValuation F (WithTop ℤ)) (R : Subalgebra K F) (hR : ∀ r ∈ R, 0 ≤ v r) {f : F}
@@ -940,7 +943,7 @@ theorem AddValuation_prod {F : Type*} [Field F] (v : AddValuation F (WithTop ℤ
 include hq0 hq1 in
 /-- Nonzero denominators for arbitrary elements. -/
 theorem exists_denominator_ne {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K q)
-    (hD0 : ∀ α, 0 ≤ D α) (hdeg : 0 < degQ K q D) (x : FqSub K q) :
+    (_hD0 : ∀ α, 0 ≤ D α) (hdeg : 0 < degQ K q D) (x : FqSub K q) :
     ∃ h ∈ AD q D, h ≠ 0 ∧ h * x ∈ AD q D := by
   classical
   by_cases hx0 : x = 0
@@ -988,7 +991,7 @@ include hq0 hq1 in
 with `w_β(f) > 0 ⇒ v(f) > 0` and `v(f) > 0 ⇒ w_β(f) > 0` for `f ∈ A_D`. -/
 theorem exists_center (v : AddValuation (FqSub K q) (WithTop ℤ)) {D : Omega K → ℤ}
     (hD : D ∈ DivisorsPeriodic K q) (hD0 : ∀ α, 0 ≤ D α) (hdeg : 0 < degQ K q D)
-    (hAv : ∀ f ∈ AD q D, 0 ≤ v f) (hv1 : ∀ c : K, c ≠ 0 → v (algebraMap K (FqSub K q) c) = 0)
+    (hAv : ∀ f ∈ AD q D, 0 ≤ v f) (_hv1 : ∀ c : K, c ≠ 0 → v (algebraMap K (FqSub K q) c) = 0)
     {g : FqSub K q} (hgA : g ∈ AD q D) (hg0 : g ≠ 0) (hgv : 0 < v g) :
     ∃ β : Omega K, β ≠ 0 ∧ D β = 0 ∧
       ∀ f ∈ AD q D, (0 < anVal K β (f : MeroRing K) ↔ 0 < v f) := by

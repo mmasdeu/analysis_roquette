@@ -1,7 +1,10 @@
 import AnalyticTheory
+import Book.Stmt
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
+
+open AnalyticTheory EntireLaurent
 
 /-!
 # §4. Elliptic function fields having a periodic Jacobian field
@@ -33,7 +36,6 @@ The Lean code on this page refers to the following context: $`L` is a finite Gal
 $`K`, with the absolute value extending that of $`K`.
 -/
 
-open AnalyticTheory
 universe u
 variable {K : Type u} [NontriviallyNormedField K]
   [IsUltrametricDist K] [CompleteSpace K]
@@ -61,56 +63,56 @@ $`E_\zeta` of fixed elements satisfies our requirements.
 > The Galois group `G` of `L | K`.
 -/
 
-#print AnalyticTheory.GalGroup
+#stmt GalGroup
 
 /-!
 
 > Book, §4: a 1-cocycle `G → L^×/q`, represented by a map `ζ : G → L^×` satisfying the cocycle relation modulo `q`.
 -/
 
-#print AnalyticTheory.IsCocycleModQ
+#stmt IsCocycleModQ
 
 /-!
 
 > The subtype of cocycles `G → L^×/q`.
 -/
 
-#print AnalyticTheory.CocycleModQ
+#stmt CocycleModQ
 
 /-!
 
 > Two cocycles are cohomologous if they differ by a coboundary `σ a / a` mod `q`.
 -/
 
-#print AnalyticTheory.CocycleEquiv
+#stmt CocycleEquiv
 
 /-!
 
 > The cohomology group `H¹(G, L^×/q)` of the Galois module `L^×/q`: cocycles modulo coboundaries.
 -/
 
-#print AnalyticTheory.H1Lq
+#stmt H1Lq
 
 /-!
 
 > The twisted action `ρ_σ = τ_{ζ(σ)} ∘ σ` on `F_L(q)`.
 -/
 
-#print AnalyticTheory.rhoZ
+#stmt rhoZ
 
 /-!
 
 > The twisted action of `G` on `F_L(q)`.
 -/
 
-#print AnalyticTheory.twistAction
+#stmt twistAction
 
 /-!
 
 > The field `E_ζ = F_K(ζ)`: the fixed field of the twisted action (book §4, 𝐐-semi-periodic functions for cyclic `G`).
 -/
 
-#print AnalyticTheory.Ezeta
+#stmt Ezeta
 
 /-!
 
@@ -121,21 +123,21 @@ of degree $`1`, $`L` splits $`E_\zeta`.
 > `F_L(q)` is generated over the descended field `E_ζ` by a primitive element of `L | K`.
 -/
 
-#check @AnalyticTheory.Ezeta_adjoin
+#stmt Ezeta_adjoin
 
 /-!
 
 > Book, §A2: `E | K` splits over `L` if the constant extension `E L | L` has a prime divisor of degree `1`, i.e. there is a constant field extension `EL` with `HasPrimeOfDegreeOne`.
 -/
 
-#print AnalyticTheory.SplitsOver
+#stmt SplitsOver
 
 /-!
 
 > `L` splits `E_ζ`: the constant extension `E_ζ L = F_L(q)` has a prime divisor of degree one (Artin's theorem for the Galois descent of `F_L(q)`).
 -/
 
-#check @AnalyticTheory.Ezeta_splitsOver
+#stmt Ezeta_splitsOver
 
 /-!
 
@@ -157,28 +159,28 @@ $`G`.
 > Book, §4, (50): `e_q(a) = exp(2πi log|a| / log|q|)`.
 -/
 
-#print AnalyticTheory.expq
+#stmt expq
 
 /-!
 
 > Book, §4: characters `χ : G → W` of `G` (values in the unit circle).
 -/
 
-#print AnalyticTheory.CharGroup
+#stmt CharGroup
 
 /-!
 
 > The character `σ ↦ e_q(ζ(σ))` of a cocycle.
 -/
 
-#print AnalyticTheory.charOfCocycle
+#stmt charOfCocycle
 
 /-!
 
 > Book, §4, (51): the map `e_q : H¹(G, L^×/q) → Ĝ`, `ζ ↦ (σ ↦ e_q(ζ(σ)))`.
 -/
 
-#print AnalyticTheory.eQ
+#stmt eQ
 
 /-!
 
@@ -190,7 +192,7 @@ $`K_\chi\,|\,K` is cyclic of degree equal to the order of $`\chi`.
 > Book, §4: `K_χ`, the field of fixed elements of the kernel of `χ`.
 -/
 
-#print AnalyticTheory.Kchi
+#stmt Kchi
 
 /-!
 
@@ -201,7 +203,7 @@ be denoted by $`\widehat{G}(q)`.
 > Book, §4, Definition: `χ` is *`q`-trivial* if `q` is the norm of some `Q ∈ K_χ`.
 -/
 
-#print AnalyticTheory.IsQTrivial
+#stmt IsQTrivial
 
 /-!
 
@@ -220,7 +222,7 @@ $`\widehat{G}(q)` is a subgroup of $`\widehat{G}`._
 > Book, §4, Lemma 2: `e_q` is injective and its image is the set of `q`-trivial characters: `H¹(G, L^×/q) ≅ Ĝ(q)`.
 -/
 
-#check @AnalyticTheory.lemma2_H1_iso
+#stmt lemma2_H1_iso
 
 /-!
 
@@ -253,21 +255,21 @@ $`\sigma^i \mapsto Q\cdot\sigma Q\cdots\sigma^{i-1}Q`.
 > Book, §4, Lemma 2 (i): the map `e_q : H¹(G, L^×/q) → Ĝ` is injective.
 -/
 
-#check @AnalyticTheory.eQ_injective
+#stmt eQ_injective
 
 /-!
 
 > Book, §4, Lemma 2: every `q`-trivial character is `e_q(ζ)` for some cocycle `ζ`.
 -/
 
-#check @AnalyticTheory.exists_cocycle_of_qtrivial
+#stmt exists_cocycle_of_qtrivial
 
 /-!
 
 > Book, §4, Lemma 2: the character `e_q(ζ)` of every cocycle `ζ : G → L^×/q` is `q`-trivial.
 -/
 
-#check @AnalyticTheory.qtrivial_of_cocycle
+#stmt qtrivial_of_cocycle
 
 /-!
 
@@ -283,7 +285,7 @@ $`\chi \mapsto \chi^{-1}`.
 > Book, §4: `E | K` has *character invariant* `χ` (with respect to `L`): `E` is `K`-isomorphic to `E_ζ` for a cocycle `ζ` with `e_q ζ = χ`. By Theorem IX, `χ` is determined up to `χ ↦ χ⁻¹`.
 -/
 
-#print AnalyticTheory.IsCharInvariant
+#stmt IsCharInvariant
 
 /-!
 
@@ -295,35 +297,35 @@ of mutually inverse $`q`-trivial characters of $`G`._
 > Book, §4, Theorem IX (classification, model form): the fields `E_ζ` and `E_ζ'` are `K`-isomorphic iff `χ_ζ' = χ_ζ^{±1}`.
 -/
 
-#check @AnalyticTheory.Ezeta_iso_iff
+#stmt Ezeta_iso_iff
 
 /-!
 
 > Book, §4, Theorem IX (classification): two fields with character invariants `χ`, `χ'` are `K`-isomorphic iff `χ' = χ^{±1}`. In particular the character invariant is determined up to inversion.
 -/
 
-#check @AnalyticTheory.thmIX_classification
+#stmt thmIX_classification
 
 /-!
 
 > The character invariant is unique up to inversion.
 -/
 
-#check @AnalyticTheory.isCharInvariant_unique
+#stmt isCharInvariant_unique
 
 /-!
 
 > Every `q`-trivial character is the character invariant of some `E_ζ` (Lemma 2).
 -/
 
-#check @AnalyticTheory.thmIX_exists
+#stmt thmIX_exists
 
 /-!
 
 > Conversely the character invariant of any `E_ζ` is `q`-trivial.
 -/
 
-#check @AnalyticTheory.qtrivial_of_isCharInvariant
+#stmt qtrivial_of_isCharInvariant
 
 /-!
 
@@ -350,7 +352,7 @@ with a given triple $`\mathbf{Q} = (L, \sigma, Q)` where
 > Book, §4: the semi-periodic data `𝐐 = (L, σ, Q)`: a generator `σ` of the cyclic group `G` and `Q ∈ L` with `N(Q) = q`.
 -/
 
-#print AnalyticTheory.SemiPeriodicTriple
+#stmt SemiPeriodicTriple
 
 /-!
 
@@ -384,14 +386,14 @@ it satisfies the functional equation (59). These functions form a subfield $`F_K
 > Book, §4, (59): the automorphism `τ_Q σ` of `M_L` (translation by `Q` after `σ`).
 -/
 
-#print AnalyticTheory.tauQSigma
+#stmt tauQSigma
 
 /-!
 
 > Book, §4, the field `F_K(𝐐)` of `𝐐`-semi-periodic functions: the fixed field of `τ_Q σ` in `F_L(q)`.
 -/
 
-#print AnalyticTheory.FKQ
+#stmt FKQ
 
 /-!
 
@@ -402,4 +404,4 @@ theory of §A2.
 > The cocycle attached to a triple `(L, σ, Q)`: `ζ(σ^i) = Q · σQ ⋯ σ^{i-1}Q`.
 -/
 
-#check @AnalyticTheory.exists_cocycle_of_triple
+#stmt exists_cocycle_of_triple

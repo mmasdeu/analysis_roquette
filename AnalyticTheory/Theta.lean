@@ -47,13 +47,16 @@ variable {K}
 /-- `ψ_k`: the polynomial with roots `qᵏ β` (`β` the roots of `φ`). -/
 noncomputable def psi (q : K) (φ : Polynomial K) (k : ℤ) : Polynomial K := φ.scaleRoots (q ^ k)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psi_coeff (q : K) (φ : Polynomial K) (k : ℤ) (i : ℕ) :
     (psi q φ k).coeff i = φ.coeff i * (q ^ k) ^ (φ.natDegree - i) :=
   Polynomial.coeff_scaleRoots _ _ _
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psi_monic (q : K) {φ : Polynomial K} (hφ : φ.Monic) (k : ℤ) : (psi q φ k).Monic :=
   (Polynomial.monic_scaleRoots_iff _).mpr hφ
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psi_natDegree (q : K) (φ : Polynomial K) (k : ℤ) : (psi q φ k).natDegree = φ.natDegree :=
   Polynomial.natDegree_scaleRoots _ _
 

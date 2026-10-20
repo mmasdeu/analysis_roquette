@@ -151,6 +151,7 @@ theorem thK_triple (hq : ‖q‖ < 1) (hq0 : q ≠ 0) {r : K} (hr0 : r ≠ 0) (h
   linear_combination (-2 * (E * (A * B) + 1)) * hE
 
 
+omit [CompleteSpace K] in
 theorem one_add_pow_ne_zero (hq : ‖q‖ < 1) (n : ℕ) : 1 + q ^ (n + 1) ≠ 0 := by
   intro h
   have h1 : q ^ (n + 1) = -1 := by linear_combination h

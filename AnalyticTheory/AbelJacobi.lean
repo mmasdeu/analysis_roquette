@@ -263,6 +263,7 @@ theorem anVal_thM_zpow {y : Omega K} (hy : y ≠ 0) (z : ℤ) {ξ : Omega K} (h�
   split_ifs <;> simp
 
 omit hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem minpoly_alg (x : K) : minpoly K (algebraMap K (Omega K) x) = X - C x :=
   minpoly.eq_X_sub_C (Omega K) x
 
@@ -440,10 +441,11 @@ theorem normGen_conj {q : K} (hq0 : q ≠ 0) {β γ : Omega K} (h : ConjModQ K q
     hk', ← psi_eq_minpoly hq0, psi_natDegree, psi_coeff, Nat.sub_zero]
   ring
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem annPart_support_finite {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
     (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K)) :
     {α | α ∈ annPart q R ∧ m α ≠ 0}.Finite :=
-  (hm.1.2.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ⟨hα.2.1.le, hα.2.2, hs⟩)
+  (hm.1.2.1 ‖q‖ 1 hq0 hq1.le).subset (fun _α ⟨hα, hs⟩ => ⟨hα.2.1.le, hα.2.2, hs⟩)
 
 theorem annPart_prod_eq {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
     (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K)) :
@@ -459,6 +461,7 @@ theorem annPart_prod_eq {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Ome
     exact ⟨⟨hα, fun h0 => hne (by simp [h0])⟩, hne⟩
   · rintro ⟨⟨hα, -⟩, hne⟩; exact ⟨hα, hne⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem annPart_ne_zero {q : K} (hq0 : 0 < ‖q‖) {R : Set (Omega K)} {α : Omega K}
     (h : α ∈ annPart q R) : α ≠ 0 := by
   rintro rfl

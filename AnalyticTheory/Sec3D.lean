@@ -143,6 +143,7 @@ theorem wpPrime_spec : 2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
   linear_combination hid
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem natCast_ne_zero_of_char {p : ℕ} (hp : p.Prime) (h : ringChar K ≠ p) : ((p : ℕ) : K) ≠ 0 := by
   intro h0
   have := (Nat.dvd_prime hp).mp (ringChar.dvd h0)
@@ -199,11 +200,11 @@ theorem thmVI_weierstrass_form (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   have hD : Dop K P = 2 * P' + P := by linear_combination -hspec
   have e1 : algebraMap K (MeroRing K) (1 / 12 + 20 * sK K 3 q) =
       1 / 12 + 20 * algebraMap K (MeroRing K) (sK K 3 q) := by
-    simp [map_add, map_mul, map_div₀, map_ofNat]
+    simp [map_add, map_mul, map_ofNat]
   have e2 : algebraMap K (MeroRing K) (-(1 / 216) + (7 / 3) * sK K 5 q) =
       -(1 / 216) + (7 / 3) * algebraMap K (MeroRing K) (sK K 5 q) := by
     simp [map_add, map_mul, map_div₀, map_ofNat]
-  have e3 : algebraMap K (MeroRing K) (1 / 12 : K) = 1 / 12 := by simp [map_div₀, map_ofNat]
+  have e3 : algebraMap K (MeroRing K) (1 / 12 : K) = 1 / 12 := by simp [map_ofNat]
   have hB : algebraMap K (MeroRing K) (coeffB K q) = -5 * algebraMap K (MeroRing K) (sK K 3 q) := by
     unfold coeffB; rw [map_mul, map_neg, map_ofNat]
   have hC' : algebraMap K (MeroRing K) (coeffC K q) =

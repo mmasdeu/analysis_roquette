@@ -239,7 +239,7 @@ theorem binom1_apply (c : K) (k : ℤ) (x : OmegaX K) :
   rw [sub_apply_hol, one_apply_hol, mul_apply_hol, algebraMap_apply_hol, monoHol_apply]
 
 theorem lda_binom1 (c : K) (k : ℤ) (x : OmegaX K)
-    (h : 1 - algebraMap K (Omega K) c * x.1 ^ k ≠ 0) :
+    (_h : 1 - algebraMap K (Omega K) c * x.1 ^ k ≠ 0) :
     lda (binom1 c k) x = -((k : Omega K) * (algebraMap K (Omega K) c * x.1 ^ k)) /
       (1 - algebraMap K (Omega K) c * x.1 ^ k) := by
   unfold lda
@@ -308,7 +308,7 @@ theorem half_prod {g : ℕ → holSubring K}
   refine ⟨hL, ?_⟩
   have h2 := (hD2.div hPN hP).sub (hL.pow 2)
   refine h2.congr (fun N => ?_)
-  simp only [Pi.div_apply, Pi.sub_apply, Pi.pow_apply]
+  simp only [Pi.div_apply]
   rw [(hfin N).2, mul_div_cancel_left₀ _ (hne N)]; ring
 
 end halfprod

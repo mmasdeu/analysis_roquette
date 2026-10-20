@@ -46,7 +46,7 @@ theorem relDeg_mul {E E' F : Subfield M} (h1 : E ≤ E') (h2 : E' ≤ F) :
 noncomputable def subfieldMapEquiv {M' : Type*} [Field M'] (μ : M →+* M') (E : Subfield M) :
     E ≃+* E.map μ :=
   RingEquiv.ofBijective (μ.restrict E (E.map μ) (fun x hx => ⟨x, hx, rfl⟩))
-    ⟨fun x y h => Subtype.ext (μ.injective (congrArg Subtype.val h)),
+    ⟨fun _x _y h => Subtype.ext (μ.injective (congrArg Subtype.val h)),
       fun ⟨_, x, hx, rfl⟩ => ⟨⟨x, hx⟩, rfl⟩⟩
 
 /-- Relative degrees are invariant under injective ring homomorphisms. -/
@@ -475,7 +475,7 @@ theorem translation_ThM :
   simp only [Polynomial.coeff_sub, Polynomial.coeff_X_zero, Polynomial.coeff_C_zero,
     zero_sub] at h
   rw [translation_alg, h]
-  simp only [Nat.cast_one, map_mul, ← tX_inv_eq, ← algebraMapK_eq, inv_neg, inv_one, map_neg,
+  simp only [Nat.cast_one, map_mul, ← tX_inv_eq, inv_neg, inv_one, map_neg,
     map_one]
   ring
 
@@ -509,9 +509,11 @@ end theta
 
 section basisU
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem norm_pow_pos {q : K} (hq0 : 0 < ‖q‖) (m : ℕ) : 0 < ‖q ^ m‖ := by
   rw [norm_pow]; exact pow_pos hq0 m
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem norm_pow_lt_one {q : K} (hq1 : ‖q‖ < 1) {m : ℕ} (hm : 0 < m) : ‖q ^ m‖ < 1 := by
   rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hq1 hm.ne'
 
@@ -816,8 +818,8 @@ noncomputable def translationHom :
     Usub K qbar (norm_pos_iff.mp hqb0) m →* autFixing (FqbarXm K qbar m) (FqSub K q) where
   toFun u := ⟨translationFq q u,
     (mem_autFixing_iff hq0 hq1 hqb0 hqb1 hm hqd _).mpr ⟨u, u.2, fun _ => rfl⟩⟩
-  map_one' := Subtype.ext (RingEquiv.ext fun x => Subtype.ext (translation_one _))
-  map_mul' u v := Subtype.ext (RingEquiv.ext fun x =>
+  map_one' := Subtype.ext (RingEquiv.ext fun _x => Subtype.ext (translation_one _))
+  map_mul' u v := Subtype.ext (RingEquiv.ext fun _x =>
     Subtype.ext (translation_mul (u : Kˣ) (v : Kˣ) _))
 
 theorem translationHom_coe (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
@@ -882,6 +884,7 @@ variable {q qbar : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qba
   {m d : ℕ} (hm : 0 < m) (hd : 0 < d) (hqd : qbar ^ d = q ^ m)
 
 include hqb0 hqb1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem zpow_qbar_injective {a b : ℤ} (h : qbar ^ a = qbar ^ b) : a = b := by
   have := congrArg norm h
   rw [norm_zpow, norm_zpow] at this
@@ -890,6 +893,7 @@ theorem zpow_qbar_injective {a b : ℤ} (h : qbar ^ a = qbar ^ b) : a = b := by
 /-- The exponent `ψ(u)` with `uᵐ = q̄^{ψ(u)}`. -/
 noncomputable def psiExp (u : Usub K qbar (norm_pos_iff.mp hqb0) m) : ℤ := Classical.choose u.2
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psiExp_spec (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
     ((u : Kˣ) : K) ^ m = qbar ^ psiExp hqb0 u := Classical.choose_spec u.2
 
@@ -967,6 +971,7 @@ theorem qSub_inf_ker : qSub hq0 hqb0 (m := m) ⊓ (psiHom hqb0 hqb1 (m := m)).ke
   rw [← hk', this, zpow_zero]
 
 include hqd in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem qU_mem_Usub : Units.mk0 q (norm_pos_iff.mp hq0) ∈ Usub K qbar (norm_pos_iff.mp hqb0) m :=
   ⟨d, by rw [Units.val_mk0, ← hqd, zpow_natCast]⟩
 

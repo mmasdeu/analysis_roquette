@@ -118,6 +118,7 @@ def semiFixed (q : L) (S : Set (GalGroup K L × Lˣ)) : Subfield (FqSub L q) whe
 noncomputable def kConstFq (q : K) : K →+* FqSub L (algebraMap K L q) :=
   (FqHom L (algebraMap K L q)).comp (algebraMap K L)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 /-- The constants `K` lie in `semiFixed`. -/
 theorem kConstFq_mem (q : K) (S : Set (GalGroup K L × Lˣ)) (c : K) :
     kConstFq K L q c ∈ semiFixed K L (algebraMap K L q) S := by
@@ -132,9 +133,9 @@ noncomputable instance semiFixedAlgebra (q : K) (S : Set (GalGroup K L × Lˣ)) 
   RingHom.toAlgebra
     { toFun := fun c => ⟨kConstFq K L q c, kConstFq_mem K L q S c⟩
       map_one' := Subtype.ext (map_one _)
-      map_mul' := fun c d => Subtype.ext (map_mul _ _ _)
+      map_mul' := fun _c _d => Subtype.ext (map_mul _ _ _)
       map_zero' := Subtype.ext (map_zero _)
-      map_add' := fun c d => Subtype.ext (map_add _ _ _) }
+      map_add' := fun _c _d => Subtype.ext (map_add _ _ _) }
 
 /-! #### Cocycles with values in `L^×/q` and the map `e_q` -/
 

@@ -31,9 +31,9 @@ namespace PrimeDivisor
 def toRing (P : PrimeDivisor K F) : K →+* P.ring where
   toFun c := ⟨algebraMap K F c, P.contains c⟩
   map_one' := Subtype.ext (map_one _)
-  map_mul' c d := Subtype.ext (map_mul _ _ _)
+  map_mul' _c _d := Subtype.ext (map_mul _ _ _)
   map_zero' := Subtype.ext (map_zero _)
-  map_add' c d := Subtype.ext (map_add _ _ _)
+  map_add' _c _d := Subtype.ext (map_add _ _ _)
 
 /-- The degree of a prime divisor: the degree of its residue field over `K`. -/
 noncomputable def degree (P : PrimeDivisor K F) : ℕ :=
@@ -107,7 +107,7 @@ noncomputable def PrimeDivisor.map (φ : F ≃ₐ[K] F) (P : PrimeDivisor K F) :
     have := P.isDVR
     let e : P.ring ≃+* (P.ring.comap (φ.symm : F →+* F)) :=
       { toFun := fun y => ⟨φ y.1, by
-          rw [ValuationSubring.mem_comap]; simpa using y.2⟩
+          rw [ValuationSubring.mem_comap]; simp⟩
         invFun := fun x => ⟨φ.symm x.1, ValuationSubring.mem_comap.mp x.2⟩
         left_inv := fun y => Subtype.ext (by simp)
         right_inv := fun x => Subtype.ext (by simp)

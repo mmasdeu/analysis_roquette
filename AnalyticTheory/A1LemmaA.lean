@@ -114,7 +114,7 @@ section stab3
 
 variable {K : Type u} [Field K]
 
-theorem stab_u_sq (W : WeierstrassCurve K) (hΔ : W.Δ ≠ 0) (hc4 : W.c₄ ≠ 0) (hc6 : W.c₆ ≠ 0)
+theorem stab_u_sq (W : WeierstrassCurve K) (_hΔ : W.Δ ≠ 0) (hc4 : W.c₄ ≠ 0) (hc6 : W.c₆ ≠ 0)
     (C : VariableChange K) (h : C • W = W) : (C.u : K) ^ 2 = 1 := by
   have hū : ((C.u⁻¹ : Kˣ) : K) = (C.u : K)⁻¹ := by simp
   have hu0 : (C.u : K) ≠ 0 := C.u.ne_zero

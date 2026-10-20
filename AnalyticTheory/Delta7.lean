@@ -77,7 +77,7 @@ theorem evalZ_prodN (N : ℕ) : evalZ q (prodN N) = ∏ n ∈ Finset.range N, (1
   rw [map_pow, map_sub, map_one, map_pow, key, evalZ_X]
 
 include hq in
-theorem evalZ_serPsi (hq0 : q ≠ 0) : evalZ q serPsi = q * Pc q ^ 24 := by
+theorem evalZ_serPsi (_hq0 : q ≠ 0) : evalZ q serPsi = q * Pc q ^ 24 := by
   have key : ∀ f : PowerSeries ℤ, evalZHom hq f = evalZ q f := fun _ => rfl
   have h1 : evalZ q serPsi = q * evalZ q prodInf := by
     unfold serPsi

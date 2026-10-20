@@ -73,16 +73,18 @@ theorem sK_norm_lt (hq1 : ‖q‖ < 1) (k : ℕ) : ‖sK K k q‖ < 1 := by
     exact coeff_zero_sigmaS k)
   exact lt_of_le_of_lt this (by simpa using hq1)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem wDisc_wp (B C : K) : wDisc (1 : K) 0 0 B C = deltaPoly K B C := by
   unfold wDisc wB2 wB4 wB6 wB8 deltaPoly; ring
 
-theorem jOfData_wp (hq1 : ‖q‖ < 1) :
+theorem jOfData_wp (_hq1 : ‖q‖ < 1) :
     jOfData (1 : K) 0 0 (coeffB K q) (coeffC K q) = jInvQ K q := by
   rw [jOfData, jInvQ, wDisc_wp]
   unfold wC4 wB2 wB4
   congr 1
   ring
 
+omit [CompleteSpace K] in
 theorem natCast_norm_le (n : ℕ) : ‖(n : K)‖ ≤ 1 := IsUltrametricDist.norm_natCast_le_one K n
 
 theorem norm_four_mul_lt {s : K} (hs : ‖s‖ < 1) : ‖(4 : K) * s‖ < 1 := by
@@ -252,7 +254,7 @@ noncomputable def wpData : WeierstrassData K (FqSub K q) where
     unfold IsNormalFormA1
     apply Subtype.ext
     push_cast [hc]
-    simp only [map_one, map_zero, zero_mul, add_zero, one_mul, zero_add] at *
+    simp only [zero_mul, add_zero, one_mul] at *
     linear_combination hr
   gen := by
     rw [eq_top_iff]

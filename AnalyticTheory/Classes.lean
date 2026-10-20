@@ -15,6 +15,7 @@ universe u
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_refl (q : K) (α : Omega K) : ConjModQ K q α α :=
   ⟨α, rfl, 0, by simp⟩
 
@@ -86,12 +87,13 @@ theorem exists_shift_annulus {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {α
     rwa [mul_inv_cancel₀ ht.ne'] at h3
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_of_shift (q : K) (α : Omega K) (k : ℤ) :
     ConjModQ K q α (α * algebraMap K (Omega K) q ^ k) :=
   ⟨_, rfl, k, rfl⟩
 
 /-- The chosen system of representatives has the defining property. -/
-theorem repSystem_spec {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
+theorem repSystem_spec {q : K} (hq0 : 0 < ‖q‖) (_hq1 : ‖q‖ < 1) :
     ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
       ∃! β, β ∈ repSystem K q ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧
         ConjModQ K q α β := by

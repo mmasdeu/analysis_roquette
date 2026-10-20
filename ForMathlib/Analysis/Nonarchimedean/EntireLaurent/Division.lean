@@ -54,7 +54,7 @@ theorem unique_max_of_no_zero {U : holSubring K L} (hU : U ≠ 0) {ρ : ℝ} (h�
 
 
 omit [IsUltrametricDist K] [CompleteSpace K] in
-theorem wt_exp (r : ℝ) (a : ℤ → K) (j : ℤ) (t : ℝ) :
+theorem wt_exp (_r : ℝ) (a : ℤ → K) (j : ℤ) (t : ℝ) :
     wt K (Real.exp t) a j = ‖a j‖ * Real.exp t ^ j := rfl
 
 /-- Without zeros in a closed annulus, the dominant Laurent coefficient is the same on the whole
@@ -188,7 +188,7 @@ theorem gnorm_lt_one_of_forall {ρ : ℝ} (hρ : 0 < ρ) {f : holSubring K L}
   obtain ⟨N, hN, -, -⟩ := exists_gnorm_attained hρ hf
   rw [← hN]; exact h N
 
-theorem local_inverse {U : holSubring K L} (hU : U ≠ 0) {r r' : ℝ} (hr : 0 < r) (hrr' : r ≤ r')
+theorem local_inverse {U : holSubring K L} (_hU : U ≠ 0) {r r' : ℝ} (hr : 0 < r) (hrr' : r ≤ r')
     {N : ℤ} (hN : ∀ ρ : ℝ, (ρ = r ∨ ρ = r') → ∀ n, n ≠ N →
       wt K ρ (holCoeff K U) n < wt K ρ (holCoeff K U) N) :
     ∃ (W E : holSubring K L) (θ : ℝ), θ < 1 ∧ W * U = 1 - E ∧
@@ -243,7 +243,7 @@ theorem local_inverse {U : holSubring K L} (hU : U ≠ 0) {r r' : ℝ} (hr : 0 <
 
 
 omit [IsAlgClosed L] in
-theorem pow_dvd_iff_le {α : L} (hα : α ≠ 0) {f : holSubring K L} (hf : f ≠ 0) {m : ℕ}
+theorem pow_dvd_iff_le {α : L} (_hα : α ≠ 0) {f : holSubring K L} (_hf : f ≠ 0) {m : ℕ}
     (hm : polyHol K L (minpoly K α) ^ m ∣ f ∧ ¬ polyHol K L (minpoly K α) ^ (m + 1) ∣ f) (k : ℕ) :
     polyHol K L (minpoly K α) ^ k ∣ f ↔ k ≤ m := by
   constructor

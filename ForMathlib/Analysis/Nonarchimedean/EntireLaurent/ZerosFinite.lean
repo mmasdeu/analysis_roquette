@@ -33,7 +33,7 @@ theorem hol_rep {p : holSubring K L} (hp : p ≠ 0) :
   funext x
   have h1 := hsum x.1 x.2
   have h2 : HasSum (fun n : ℤ => algebraMap K L (a n) * x.1 ^ n) (0 : L) := by
-    simpa [hcon] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : L)) 0)
+    simp [hcon]
   have : g x.1 = 0 := h1.unique h2
   rw [← congrFun hgf x]; simpa using this
 

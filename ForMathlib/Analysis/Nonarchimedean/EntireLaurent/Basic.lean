@@ -59,7 +59,7 @@ theorem isHolomorphicOver_const (c : K) :
   · intro r hr
     have hev : ∀ᶠ n : ℤ in cofinite, n ≠ 0 := by
       refine Filter.eventually_cofinite.mpr ?_
-      simpa using Set.finite_singleton (0 : ℤ)
+      simp
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [hev] with n hn
     simp [hn]
@@ -212,7 +212,7 @@ theorem eventually_small_outside {A : ℤ → ℝ} (hA : Tendsto A cofinite (�
 
 /-- Key estimate for the tail of a convolution: products `A k · B (n-k)` are uniformly small
 once `|n|` is large. -/
-theorem conv_tail_bound {A B : ℤ → ℝ} (hA0 : ∀ k, 0 ≤ A k) (hB0 : ∀ l, 0 ≤ B l)
+theorem conv_tail_bound {A B : ℤ → ℝ} (_hA0 : ∀ k, 0 ≤ A k) (hB0 : ∀ l, 0 ≤ B l)
     (hA : Tendsto A cofinite (𝓝 0)) (hB : Tendsto B cofinite (𝓝 0)) {ε : ℝ} (hε : 0 < ε) :
     ∃ M : ℕ, ∀ n k : ℤ, ((2 * M : ℕ) : ℤ) < n ∨ n < -((2 * M : ℕ) : ℤ) →
       A k * B (n - k) ≤ ε := by

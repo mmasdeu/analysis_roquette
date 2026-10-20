@@ -168,9 +168,9 @@ theorem translation_algebraMap (a : Kˣ) (c : K) :
 noncomputable def FqHom (q : K) : K →+* FqSub K q where
   toFun c := ⟨algebraMap K (MeroRing K) c, fun a _ => translation_algebraMap K a c⟩
   map_one' := Subtype.ext (map_one _)
-  map_mul' c d := Subtype.ext (map_mul _ _ _)
+  map_mul' _c _d := Subtype.ext (map_mul _ _ _)
   map_zero' := Subtype.ext (map_zero _)
-  map_add' c d := Subtype.ext (map_add _ _ _)
+  map_add' _c _d := Subtype.ext (map_add _ _ _)
 
 /-- The `K`-algebra structure on `F_K(q)`. -/
 noncomputable instance FqAlgebra (q : K) : Algebra K (FqSub K q) :=

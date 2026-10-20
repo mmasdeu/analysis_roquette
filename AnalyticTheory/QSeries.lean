@@ -26,6 +26,7 @@ variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 noncomputable def Qn (q : K) (m : ℕ) : K := q ^ m / (1 - q ^ m)
 
 include hq1 in
+omit [CompleteSpace K] in
 theorem norm_Qn_le (m : ℕ) : ‖Qn q m‖ ≤ ‖q‖ ^ m := by
   rcases Nat.eq_zero_or_pos m with rfl | hm
   · simp [Qn]
@@ -35,6 +36,7 @@ theorem norm_Qn_le (m : ℕ) : ‖Qn q m‖ ≤ ‖q‖ ^ m := by
       simp [norm_neg, norm_pow, h1.le, h1.ne']
   rw [Qn, norm_div, h2, div_one, norm_pow]
 
+omit [CompleteSpace K] in
 theorem norm_nat_le_one (n : ℕ) : ‖(n : K)‖ ≤ 1 := IsUltrametricDist.norm_natCast_le_one K n
 
 /-- The terms of `℘`. -/
@@ -44,6 +46,7 @@ noncomputable def tW (q : K) (n : ℤ) (y : K) : K := q ^ n * y / (1 - q ^ n * y
 noncomputable def tPp (q : K) (n : ℤ) (y : K) : K := q ^ (2 * n) * y ^ 2 / (1 - q ^ n * y) ^ 3
 
 include hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem hasSum_Qn_geom (m : ℕ) (c : K) (hmc : 0 < m ∨ c = 0) :
     HasSum (fun n : ℕ => c * (q ^ m) ^ (n + 1)) (c * Qn q m) := by
   rcases hmc with hm | hc
@@ -92,6 +95,7 @@ theorem hasSum_tW_pos {y : K} (hy : ‖y‖ = 1) :
   simp only [e2] at h2
   rw [h2.tsum_eq]; exact h1
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem tW_neg {y : K} (hy : y ≠ 0) (hq0' : q ≠ 0) (n : ℕ) :
     tW q (-((n : ℤ) + 1)) y = tW q ((n : ℤ) + 1) y⁻¹ := by
   unfold tW
@@ -157,6 +161,7 @@ theorem summable_coeff_Qn (c : ℕ → K) (hc : ∀ j, ‖c j‖ ≤ 1) {y : K} 
         mul_le_mul (hc j) (norm_Qn_le hq1 j) (norm_nonneg _) zero_le_one
     _ = _ := one_mul _
 
+omit [CompleteSpace K] in
 theorem hasSum_choose2 {u : K} (hu : ‖u‖ < 1) :
     HasSum (fun j : ℕ => ((j.choose 2 : ℕ) : K) * u ^ j) (u ^ 2 / (1 - u) ^ 3) := by
   have h := (hasSum_choose_mul_geometric_of_norm_lt_one 2 hu).mul_left (u ^ 2)
@@ -166,6 +171,7 @@ theorem hasSum_choose2 {u : K} (hu : ‖u‖ < 1) :
   simp [Finset.sum_range_succ] at h2
   simpa [div_eq_mul_inv] using h2
 
+omit [CompleteSpace K] in
 theorem hasSum_choose2' {u : K} (hu : ‖u‖ < 1) :
     HasSum (fun j : ℕ => (((j + 1).choose 2 : ℕ) : K) * u ^ j) (u / (1 - u) ^ 3) := by
   have h := (hasSum_choose_mul_geometric_of_norm_lt_one 2 hu).mul_left u
@@ -175,6 +181,7 @@ theorem hasSum_choose2' {u : K} (hu : ‖u‖ < 1) :
   simpa [div_eq_mul_inv] using h2
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem tPp_neg {y : K} (hy : y ≠ 0) (hq0' : q ≠ 0) (n : ℕ) :
     tPp q (-((n : ℤ) + 1)) y =
       -(q ^ (n + 1) * y⁻¹ / (1 - q ^ (n + 1) * y⁻¹) ^ 3) := by
@@ -197,10 +204,12 @@ theorem tPp_neg {y : K} (hy : y ≠ 0) (hq0' : q ≠ 0) (n : ℕ) :
     field_simp
     ring
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem tW_nat (n : ℕ) (y : K) : tW q ((n : ℤ) + 1) y =
     q ^ (n + 1) * y / (1 - q ^ (n + 1) * y) ^ 2 := by
   rw [tW, show ((n : ℤ) + 1) = ((n + 1 : ℕ) : ℤ) by push_cast; ring, zpow_natCast]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem tPp_nat (n : ℕ) (y : K) : tPp q ((n : ℤ) + 1) y =
     (q ^ (n + 1) * y) ^ 2 / (1 - q ^ (n + 1) * y) ^ 3 := by
   rw [tPp, show ((n : ℤ) + 1) = ((n + 1 : ℕ) : ℤ) by push_cast; ring, zpow_natCast,
@@ -446,6 +455,7 @@ theorem binomZ_one (n : ℤ) : binomZ n 1 = n := by
     rw [this, Int.toNat_of_nonneg (by omega)]; ring
 
 omit hq0 hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem Qn_zero (q : K) : Qn q 0 = 0 := by simp [Qn]
 
 omit hq0 in
@@ -486,6 +496,7 @@ theorem rhoC_zero : rhoC q 0 = 2 * sK K 1 q := by
   simp only [binomZ_zero, Int.cast_one, pow_one]; ring
 
 omit hq0 hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem rhoC_one : rhoC q 1 = 0 := by
   rw [rhoC, ← tsum_zero]
   refine tsum_congr (fun m => ?_)

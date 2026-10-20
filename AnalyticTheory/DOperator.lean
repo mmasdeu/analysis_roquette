@@ -16,6 +16,7 @@ universe u
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
+omit [CompleteSpace K] in
 theorem isConvergentLaurent_Dseq {a : ℤ → K} (ha : IsConvergentLaurent K a) :
     IsConvergentLaurent K (fun n : ℤ => (n : K) * a n) := by
   intro r hr

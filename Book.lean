@@ -1,7 +1,10 @@
 import AnalyticTheory
+import Book.Stmt
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
+
+open AnalyticTheory EntireLaurent
 
 /-!
 # Analytic Theory of Elliptic Functions over Local Fields

@@ -102,7 +102,7 @@ theorem holSubring_isDomain : IsDomain (holSubring K L) := by
       apply Subtype.ext
       funext α
       have hz : HasSum (fun n : ℤ => algebraMap K L (a n) * α.1 ^ n) (0 : L) := by
-        simpa [hno] using (hasSum_zero : HasSum (fun _ : ℤ => (0 : L)) 0)
+        simp [hno]
       simpa using (hsum α).unique hz
     obtain ⟨a, ha, ha0, hfa⟩ := key f hf
     obtain ⟨b, hb, hb0, hgb⟩ := key g hg
@@ -120,9 +120,9 @@ noncomputable def constHom : K →+* holSubring K L where
   toFun c := ⟨fun _ => algebraMap K L c, fun _ => algebraMap K L c,
     isHolomorphicOver_const K (L := L) c, rfl⟩
   map_one' := Subtype.ext (funext fun _ => map_one _)
-  map_mul' c d := Subtype.ext (funext fun _ => map_mul _ _ _)
+  map_mul' _c _d := Subtype.ext (funext fun _ => map_mul _ _ _)
   map_zero' := Subtype.ext (funext fun _ => map_zero _)
-  map_add' c d := Subtype.ext (funext fun _ => map_add _ _ _)
+  map_add' _c _d := Subtype.ext (funext fun _ => map_add _ _ _)
 
 /-- The `K`-algebra structure on `H_K` given by the constant functions. -/
 noncomputable instance holAlgebra : Algebra K (holSubring K L) := RingHom.toAlgebra (constHom K L)

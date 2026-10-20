@@ -26,16 +26,18 @@ def expandSeq (m : ℤ) (a : ℤ → K) : ℤ → K := fun n => if m ∣ n then 
 
 variable {K}
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem expandSeq_mul {m : ℤ} (hm : m ≠ 0) (a : ℤ → K) (k : ℤ) :
     expandSeq K m a (m * k) = a k := by
   simp [expandSeq, Int.mul_ediv_cancel_left _ hm]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem expandSeq_of_not_dvd {m n : ℤ} (a : ℤ → K) (h : ¬ m ∣ n) : expandSeq K m a n = 0 := by
   simp [expandSeq, h]
 
 /-- A function on `ℤ` which vanishes off the range of an injective map `e`, and tends to `0` along
 `e`, tends to `0` along the cofinite filter. -/
-theorem tendsto_cofinite_of_injective {f : ℤ → ℝ} {e : ℤ → ℤ} (he : Function.Injective e)
+theorem tendsto_cofinite_of_injective {f : ℤ → ℝ} {e : ℤ → ℤ} (_he : Function.Injective e)
     (h0 : ∀ n, n ∉ Set.range e → f n = 0) (h : Tendsto (f ∘ e) cofinite (𝓝 0)) :
     Tendsto f cofinite (𝓝 0) := by
   intro s hs
@@ -63,6 +65,7 @@ theorem expandSeq_convergent {m : ℤ} (hm : m ≠ 0) {a : ℤ → K} (ha : IsCo
 variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
   [Algebra.IsIntegral K L] [IsAlgClosed L]
 
+omit [IsUltrametricDist L] [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem hasSum_expandSeq {m : ℤ} (hm : m ≠ 0) {a : ℤ → K} {x : L} {S : L}
     (h : HasSum (fun k : ℤ => algebraMap K L (a k) * (x ^ m) ^ k) S) :
     HasSum (fun n : ℤ => algebraMap K L (expandSeq K m a n) * x ^ n) S := by
@@ -112,6 +115,7 @@ theorem holExpand_injective {m : ℤ} (hm : m ≠ 0) :
 /-- The coefficients `k ↦ a_{mk−i}` of the `i`-th component `gᵢ`. -/
 def residueSeq (m i : ℕ) (a : ℤ → K) : ℤ → K := fun k => a (m * k - i)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem residueSeq_convergent {m : ℕ} (hm : 0 < m) (i : ℕ) {a : ℤ → K}
     (ha : IsConvergentLaurent K a) : IsConvergentLaurent K (residueSeq K m i a) := by
   intro r hr

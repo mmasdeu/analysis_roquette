@@ -85,6 +85,7 @@ macro "bds" : tactic => `(tactic| repeat' (first | assumption | exact BdS.const 
 variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 include hq0 hq1 in
+omit [CompleteSpace K] in
 /-- A polynomial of degree `< N` which is `O(hᴺ)` along `h = q^{j+1}` vanishes. -/
 theorem coeff_vanish (N : ℕ) (c : ℕ → K) (M : ℝ)
     (hB : ∀ j : ℕ, ‖∑ k ∈ Finset.range N, c k * (q ^ (j + 1)) ^ k‖ ≤ M * ‖q ^ (j + 1)‖ ^ N) :
@@ -400,7 +401,7 @@ theorem twelve_mul_gC (m : ℕ) : 12 * gC m = -(5 * (m : ℤ) ^ 3 + 7 * (m : ℤ
 
 theorem idB (m' : ℕ) : -2 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 1 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 1 * ((1 + m').choose 1 : ℤ))) - 3 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 2 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) = -5 * ((m' + 1 : ℕ) : ℤ) ^ 3 := by
   qify
-  simp only [cast_choose_two_q, cast_choose_three_q, cast_choose_four_q, Nat.choose_one_right]
+  simp only [cast_choose_two_q, Nat.choose_one_right]
   push_cast; ring
 
 theorem idC (m' : ℕ) : -(((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 1 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 1 * ((1 + m').choose 1 : ℤ))) - 3 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 2 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) - 2 * (((m' + 1).choose 2 : ℤ) * ((m' + 1).choose 3 : ℤ) - ((m' + 1 + 1).choose 2 : ℤ) * ((-1) ^ 3 * ((3 + m').choose 3 : ℤ))) - 5 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 2 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 2 * ((2 + m').choose 2 : ℤ))) - 7 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 3 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 3 * ((3 + m').choose 3 : ℤ))) - 3 * (((m' + 1 : ℕ) : ℤ) * ((m' + 1).choose 4 : ℤ) + ((m' + 1 : ℕ) : ℤ) * ((-1) ^ 4 * ((4 + m').choose 4 : ℤ))) = gC (m' + 1) := by
@@ -440,7 +441,7 @@ theorem hasSum_piS (k : ℕ) : HasSum (piS q k) (piC q k) := by
 omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem summandB (m : ℕ) : -2 * piS q 1 m - 3 * rhoS q 2 m = -5 * ((m : K) ^ 3 * Qn q m) := by
   rcases m with _ | m'
-  · simp [piS, rhoS, Qn_zero]
+  · simp [piS, rhoS]
   · simp only [rhoS, piS, binomZ_nat, binomZ_neg_succ]
     have h := congrArg (Int.cast : ℤ → K) (idB m')
     push_cast at h ⊢

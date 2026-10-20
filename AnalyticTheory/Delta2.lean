@@ -283,6 +283,7 @@ section mainMb
 
 variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem q_zpow_ne_one (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {n : ℤ} (hn : n ≠ 0) : q ^ n ≠ 1 := by
   intro h
   have h1 := congrArg norm h

@@ -1,7 +1,8 @@
 # Literate rendering of the companion book (`lake query :literateHtml`).
 landing_page = "Book"
-hide_commands = ["import", "set_option"]
-show_output = ["#check", "#print"]
+exclude = ["Book.Stmt"]
+hide_commands = ["import", "set_option", "open"]
+show_output = ["#stmt"]
 show_imports = false
 show_docstrings = true
 

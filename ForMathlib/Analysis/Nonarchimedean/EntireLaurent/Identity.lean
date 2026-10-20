@@ -53,7 +53,7 @@ theorem exists_norm_in_open (U : Set ℝ) (hU : IsOpen U) (hU0 : U ⊆ Set.Ioi 0
 
 /-- Gap below the maximum (not necessarily attained once). -/
 theorem exists_gap_max (w : ℤ → ℝ) (hw0 : ∀ n, 0 ≤ w n) (ht : Tendsto w cofinite (𝓝 0)) (N : ℤ)
-    (hmax : ∀ n, w n ≤ w N) (hpos : 0 < w N) :
+    (_hmax : ∀ n, w n ≤ w N) (hpos : 0 < w N) :
     ∃ δ : ℝ, δ < w N ∧ 0 ≤ δ ∧ ∀ n, w n < w N → w n ≤ δ := by
   classical
   have hP : {n | ¬ w n < w N / 2}.Finite :=
@@ -208,8 +208,8 @@ omit [IsUltrametricDist K] [CompleteSpace K] [Algebra.IsIntegral K L] in
 include K in
 /-- Lemma C: a polynomial with a coefficient of maximal norm `w` takes values of norm `> δ`
 on the open unit ball, when `δ < w`. -/
-theorem exists_large_value (Q : Polynomial L) (d : ℕ) (w δ : ℝ) (hw : 0 < w) (hδ : 0 ≤ δ)
-    (hδw : δ < w) (hle : ∀ j, ‖Q.coeff j‖ ≤ w) (hd : ‖Q.coeff d‖ = w) :
+theorem exists_large_value (Q : Polynomial L) (d : ℕ) (w δ : ℝ) (hw : 0 < w) (_hδ : 0 ≤ δ)
+    (hδw : δ < w) (_hle : ∀ j, ‖Q.coeff j‖ ≤ w) (hd : ‖Q.coeff d‖ = w) :
     ∃ t : L, ‖t‖ < 1 ∧ δ < ‖Q.eval t‖ := by
   classical
   set e : ℕ → ℝ := fun j => ‖Q.coeff j‖ with he

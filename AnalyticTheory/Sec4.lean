@@ -92,6 +92,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 /-- A subfield `S` of `F_L(q)` containing `K` and such that `F_L(q) = S⟮a⟯` for a constant `a`
 is split by `L`. -/
 theorem splitsOver_of_adjoin (S : Subfield (FqSub L (algebraMap K L q))) [Algebra K S]
@@ -200,6 +201,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem gen_zpow (T : SemiPeriodicTriple K L q) (g : L ≃ₐ[K] L) : ∃ a : ℤ, T.gen ^ a = g := by
   have : g ∈ Subgroup.closure ({T.gen} : Set (L ≃ₐ[K] L)) := by rw [T.gen_generates]; trivial
   rw [Subgroup.mem_closure_singleton] at this

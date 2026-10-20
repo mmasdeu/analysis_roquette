@@ -201,7 +201,7 @@ theorem tie_structure {a : ℤ → K} (ha : IsConvergentLaurent K a) {F : L → 
     apply hδ
     rw [hwn1]
     refine lt_of_le_of_ne (le_trans (hwmax n) (le_of_eq hwn1)) (fun h => ?_)
-    have hnM : n ∈ Ms := by simp [hMs, h, hwn1]
+    have hnM : n ∈ Ms := by simp [hMs, h]
     rcases hn with h1 | h1
     · exact absurd (Finset.min'_le _ _ hnM) (not_le.mpr h1)
     · exact absurd (Finset.le_max' _ _ hnM) (not_le.mpr h1)

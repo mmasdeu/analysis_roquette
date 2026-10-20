@@ -1,7 +1,10 @@
 import AnalyticTheory
+import Book.Stmt
 
 set_option doc.verso true
 set_option doc.verso.suggestions false
+
+open AnalyticTheory EntireLaurent
 
 /-!
 # §2. Fields of periodic functions
@@ -10,7 +13,6 @@ set_option doc.verso.suggestions false
 The Lean code on this page refers to the following context.
 -/
 
-open AnalyticTheory
 universe u
 variable (K : Type u) [NontriviallyNormedField K]
   [IsUltrametricDist K] [CompleteSpace K]
@@ -27,21 +29,21 @@ not complete.
 > `Ω`: an algebraic closure of `K` (book, §2, first paragraph), with the spectral norm.
 -/
 
-#print AnalyticTheory.Omega
+#stmt Omega
 
 /-!
 
 > The absolute value of `K` extended to `Ω` (the spectral norm).
 -/
 
-#print AnalyticTheory.omegaNorm
+#stmt omegaNorm
 
 /-!
 
 > Book, §2: the valuation of `K` has a unique extension to `Ω`: any absolute value on `Ω` extending the one of `K` equals the spectral norm.
 -/
 
-#check @AnalyticTheory.omegaNorm_unique_extension
+#stmt omegaNorm_unique_extension
 
 /-!
 
@@ -60,7 +62,7 @@ the complete field $`K(\alpha)`.
 > Book, §2, equation (∗): a formal Laurent series `∑ aₙ Xⁿ` with coefficients in `K` is *convergent* if `|aₙ| rⁿ → 0` (as `n → ±∞`) for every real `r > 0`.
 -/
 
-#print EntireLaurent.IsConvergentLaurent
+#stmt IsConvergentLaurent
 
 /-!
 
@@ -73,7 +75,7 @@ $`f(X)` are assumed to be in $`K`.
 > Book, §2: `f : Ω^× → Ω` is *holomorphic over `K`* if it is given by a convergent Laurent series with coefficients in `K` at every `α ≠ 0`.
 -/
 
-#print EntireLaurent.IsHolomorphicOver
+#stmt IsHolomorphicOver
 
 /-!
 
@@ -84,14 +86,14 @@ Laurent coefficients of a holomorphic function.
 > The Laurent coefficients of an element of `H_K`.
 -/
 
-#print EntireLaurent.holCoeff
+#stmt holCoeff
 
 /-!
 
 > Uniqueness of Laurent coefficients (identity theorem).
 -/
 
-#check @EntireLaurent.laurent_unique
+#stmt laurent_unique
 
 /-!
 
@@ -101,28 +103,28 @@ constant functions. This integral domain is denoted by $`H_K`.
 > Book, §2: the holomorphic functions over `K`, `H_K`: functions on `Ω^×` that are given by convergent Laurent series with coefficients in `K` (`EntireLaurent.holSubring`). It is an integral domain (`EntireLaurent.holSubring_isDomain`).
 -/
 
-#print AnalyticTheory.holSubring
+#stmt AnalyticTheory.holSubring
 
 /-!
 
 > Closure of holomorphic functions under products.
 -/
 
-#check @EntireLaurent.isHolomorphicOver_mul
+#stmt isHolomorphicOver_mul
 
 /-!
 
 > Book, §2: `H_K` is an integral domain.
 -/
 
-#check @EntireLaurent.holSubring_isDomain
+#stmt holSubring_isDomain
 
 /-!
 
 > The `K`-algebra structure on `H_K` given by the constant functions.
 -/
 
-#print EntireLaurent.holAlgebra
+#stmt holAlgebra
 
 /-!
 
@@ -132,7 +134,7 @@ $`H_K`. This is denoted by $`M_K`.
 > Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`.
 -/
 
-#print AnalyticTheory.MeroRing
+#stmt MeroRing
 
 /-!
 
@@ -153,21 +155,21 @@ $`F_K(q)` is the subfield of the elements fixed by $`\tau_q`.
 > Book, §2: the translation automorphism `τ_a : f(X) ↦ f(a⁻¹X)` of `M_K`, for `a ∈ K^×`.
 -/
 
-#print AnalyticTheory.translation
+#stmt translation
 
 /-!
 
 > Book, §2 (first observation): the `q`-periodic meromorphic functions form a subfield `F_K(q)` of `M_K`: those `f` with `τ_q f = f`.
 -/
 
-#print AnalyticTheory.FqSub
+#stmt FqSub
 
 /-!
 
 > `f ∈ F_K(q)` iff `τ_q f = f`, i.e. `f(q⁻¹X) = f(X)` (book, §2, (1)).
 -/
 
-#check @AnalyticTheory.mem_Fq_iff
+#stmt mem_Fq_iff
 
 /-!
 
@@ -195,14 +197,14 @@ of inseparability $`e_\alpha` of $`\alpha` over $`K`.
 > Book, §2: the analytic valuation `w_α` belonging to `α ∈ Ω^×`: the exponent of the minimal polynomial `φ_α` in the factorisation `f = φ_α^m g`, `g(α) ≠ 0` (extended to `M_K`); it is the point order `anPt` divided by `e_α` (`e_α ∣ anPt α f`, see `eIdx_dvd_anPt`). `w_α(0) = +∞`. That this is an additive valuation of `M_K` is `anVal_isValuation`.
 -/
 
-#print AnalyticTheory.anVal
+#stmt anVal
 
 /-!
 
 > Book, §2: `w_α` is an additive valuation of `M_K`: `w_α(0) = ∞`, `w_α(1) = 0`, `w_α(fg) = w_α(f) + w_α(g)` and `w_α(f + g) ≥ min(w_α(f), w_α(g))`.
 -/
 
-#check @AnalyticTheory.anVal_isValuation
+#stmt anVal_isValuation
 
 /-!
 
@@ -215,7 +217,7 @@ conjugate over $`K`:
 > Book, §2: `w_{σα} = w_α` for every `K`-automorphism `σ` of `Ω`; conjugate points give the same analytic valuation.
 -/
 
-#check @AnalyticTheory.anVal_aut
+#stmt anVal_aut
 
 /-!
 
@@ -238,21 +240,21 @@ _integral_.
 > Book, §2: a *divisor* is a collection `m = {m_α}` of integers over `Ω^×` with (i) finiteness in every annulus `0 < r ≤ |α| ≤ r'`, and (ii) rationality: `m_α = m_β` when `α`, `β` are conjugate over `K`. As the points of `Ω^×` only matter, we normalize `m_0 = 0`.
 -/
 
-#print AnalyticTheory.Divisors
+#stmt Divisors
 
 /-!
 
 > Book, §2: the divisor of a meromorphic function (`(f)` in the book): `m_α = w_α(f)` for `α ∈ Ω^×` (and `0` at the irrelevant point `α = 0`).
 -/
 
-#print AnalyticTheory.divisorOf
+#stmt divisorOf
 
 /-!
 
 > The divisor of a meromorphic function is a divisor.
 -/
 
-#check @AnalyticTheory.divisorOf_mem_Divisors
+#stmt divisorOf_mem_Divisors
 
 /-!
 
@@ -266,14 +268,14 @@ namely those which are exponentials of holomorphic functions.)
 > The units of `H_K` are the functions `c Xⁿ`.
 -/
 
-#check @EntireLaurent.hol_unit
+#stmt hol_unit
 
 /-!
 
 > A meromorphic function without zeros or poles in `Ω^×` is a monomial `c Xⁿ`.
 -/
 
-#check @AnalyticTheory.mero_unit_of_anVal_zero
+#stmt mero_unit_of_anVal_zero
 
 /-!
 
@@ -285,7 +287,7 @@ denoted by $`D_K(q)`.
 > Book, §2: `q`-periodic divisors `D_K(q)`, i.e. divisors with `m_{qα} = m_α`.
 -/
 
-#print AnalyticTheory.DivisorsPeriodic
+#stmt DivisorsPeriodic
 
 /-!
 
@@ -325,14 +327,14 @@ Obviously, the map $`\Phi_q\colon D_K(q) \to K^\times/q` thus defined is a homom
 > Book, §2: `a ≡ b mod^× q` for `a, b ∈ Ω^×` means `b = a q^k` for some `k ∈ ℤ`.
 -/
 
-#print AnalyticTheory.ModTimes
+#stmt ModTimes
 
 /-!
 
 > Book, §2: `α, β ∈ Ω^×` are *K-conjugate mod^× q* if some conjugate of `β` equals `q^k α` for some `k`.
 -/
 
-#print AnalyticTheory.ConjModQ
+#stmt ConjModQ
 
 /-!
 
@@ -343,14 +345,14 @@ theta functions (3), and do not depend on the system of representatives, is then
 > Book, §2: the degree `deg_q(m) = ∑ [K(α):K] m_α` of a `q`-periodic divisor, formula (12), the sum over a system of representatives.
 -/
 
-#print AnalyticTheory.degQ
+#stmt degQ
 
 /-!
 
 > Book, §2: the Jacobi image `Φ_q(m) = ∏' N_{K(α)|K}(α)^{m_α} mod^× q ∈ K^×/q` of a `q`-periodic divisor, formula (12).
 -/
 
-#print AnalyticTheory.PhiQ
+#stmt PhiQ
 
 /-!
 
@@ -387,14 +389,14 @@ That is, the degree of $`\Theta` is $`1` and its multiplicator is $`1`.
 > Book, §2: the fundamental theta function `Θ(X) = ∏_{n≥0}(1 − qⁿX⁻¹) ∏_{n<0}(1 − q^{-n}X)`, as a function on `Ω^×`.
 -/
 
-#print AnalyticTheory.theta
+#stmt theta
 
 /-!
 
 > Book, §2, (7): `Θ(q⁻¹X) = −X Θ(X)` for `0 < |q| < 1` (`X ≠ 0`).
 -/
 
-#check @AnalyticTheory.theta_functional_equation
+#stmt theta_functional_equation
 
 /-!
 
@@ -410,7 +412,7 @@ the degree of $`\Theta_\alpha` is $`1` and its multiplicator is $`\alpha`.
 > Book, §2: `Θ_α(X) = Θ(α⁻¹X)`.
 -/
 
-#print AnalyticTheory.thetaAlpha
+#stmt thetaAlpha
 
 /-!
 
@@ -433,21 +435,21 @@ conjugates $`\alpha'` of $`\alpha`.
 > The theta function of the `K`-conjugacy class of `α` mod `^× q`: a non-zero holomorphic function over `K` with simple zeros exactly at the `K`-conjugates of `α` mod `^× q`, satisfying the functional equation with multiplicator `φ_α(0)` and degree `[K(α):K]`, and given by a convergent product of polynomials.
 -/
 
-#check @AnalyticTheory.thetaFun_spec
+#stmt thetaFun_spec
 
 /-!
 
 > The theta function `Θ_𝔪 = ∏ T_α^{m_α}`.
 -/
 
-#print AnalyticTheory.thetaDiv
+#stmt thetaDiv
 
 /-!
 
 > Book, §2, (10): the divisor of `Θ_𝔪` is `𝔪`.
 -/
 
-#check @AnalyticTheory.anVal_thetaDiv
+#stmt anVal_thetaDiv
 
 /-!
 
@@ -459,21 +461,21 @@ $$`d = \sum_{|q|<|\alpha|\le 1} e_\alpha m_\alpha = \deg_q(\mathfrak{m}), \qquad
 > Book, §2, (11): the functional equation `Θ_𝔪(q⁻¹X) = a⁻¹ X^d Θ_𝔪(X)` of the theta function of a periodic divisor.
 -/
 
-#check @AnalyticTheory.translation_thetaDiv
+#stmt translation_thetaDiv
 
 /-!
 
 > Book, §2, (11): the degree of the theta function `Θ_𝔪` is `deg_q(𝔪)`.
 -/
 
-#check @AnalyticTheory.degQ_eq_dTheta
+#stmt degQ_eq_dTheta
 
 /-!
 
 > Book, §2, (11): the multiplicator of `Θ_𝔪` represents `Φ_q(𝔪)` (up to the sign `(−1)^d` coming from the factor `(−X)^d`).
 -/
 
-#check @AnalyticTheory.PhiQ_eq_mk
+#stmt PhiQ_eq_mk
 
 /-!
 
@@ -488,7 +490,7 @@ classes; note that $`K`-conjugate elements have the same absolute value.
 > Book, §2, formula (12): `deg_q(m) = ∑ [K(α):K] m_α`, the sum over a system `R` of representatives of the `K`-conjugacy classes mod `^× q` in the annulus `|q| < |α| ≤ 1`.
 -/
 
-#check @AnalyticTheory.degQ_formula
+#stmt degQ_formula
 
 /-!
 
@@ -508,7 +510,7 @@ uniquely determined by $`\mathfrak{m}`, up to a factor in $`K^\times`._
 > Book, §2, Proposition 1 (Abel–Jacobi theorem, analytic form). A `q`-periodic divisor `m` is the divisor of a `q`-periodic function iff `deg_q(m) = 0` and `Φ_q(m) ≡ 1 mod^× q`; in that case the function is unique up to a factor in `K^×`.
 -/
 
-#check @AnalyticTheory.abel_jacobi_one
+#stmt abel_jacobi_one
 
 /-!
 
@@ -522,7 +524,7 @@ $`f` can be chosen such that $`w_\beta(f) = 0`._
 > Book, §2, corollary to Proposition 1: for every `α ∈ Ω^×` there is a `q`-periodic function with `w_α(f) = 1`; and if `β` is not `K`-conjugate to `α mod^× q`, then `f` can be chosen with moreover `w_β(f) = 0` (the choice of `f` depends on `β`).
 -/
 
-#check @AnalyticTheory.exists_periodic_function_with_valuation
+#stmt exists_periodic_function_with_valuation
 
 /-!
 
@@ -535,7 +537,7 @@ $`\Phi_q(\mathfrak{p}_\alpha) \equiv N_{K(\alpha)|K}(\alpha) \bmod^\times q`.
 > The divisor `[α]` of the point `α ∈ Ω^×`: `1` on the `K`-conjugates of `α` mod `^× q` and `0` elsewhere.
 -/
 
-#print AnalyticTheory.pointDivisor
+#stmt pointDivisor
 
 /-!
 
@@ -566,7 +568,7 @@ $`q`-periodic functions $`f` such that $`(f) \ge -\mathfrak{m}`?
 > Book, §2: the set `L_K(q | 𝔪)` of `q`-periodic functions `f` with `(f) ≥ −𝔪` (including `0`).
 -/
 
-#print AnalyticTheory.LSet
+#stmt LSet
 
 /-!
 
@@ -581,7 +583,7 @@ $`\deg_q(\mathfrak{m}) > 0` then $`\dim L_K(q\,|\,\mathfrak{m}) = \deg_q(\mathfr
 > Book, §2, Proposition 2 (Riemann–Roch theorem) together with the remarks preceding it: for a `q`-periodic divisor `𝔪`, `L_K(q|𝔪) = 0` if `deg_q 𝔪 < 0`; if `deg_q 𝔪 = 0` it is `0` unless `Φ_q(𝔪) ≡ 1`, in which case it has dimension `1`; and `dim L_K(q|𝔪) = deg_q(𝔪)` if `deg_q 𝔪 > 0`.
 -/
 
-#check @AnalyticTheory.riemann_roch_analytic
+#stmt riemann_roch_analytic
 
 /-!
 
@@ -626,14 +628,14 @@ zero divisor; 5 says that the degree of the $`q`-periodic divisor $`(f)` is zero
 > Book, §2, item II (first part): `w_α = w_β` on `F_K(q)` iff `α` and `β` are `K`-conjugate mod `^× q`.
 -/
 
-#check @AnalyticTheory.fq_valuation_eq_iff
+#stmt fq_valuation_eq_iff
 
 /-!
 
 > Book, §2, item II (value group): the value group of `w_α` on `F_K(q)` is `ℤ`, in the sense that some `f ∈ F_K(q)` has `w_α(f) = 1`.
 -/
 
-#check @AnalyticTheory.fq_valuation_surjective
+#stmt fq_valuation_surjective
 
 /-!
 
@@ -651,7 +653,7 @@ $`F_K(q)`._
 > Book, §2, item I: `F_K(q)` is a function field over `K`.
 -/
 
-#check @AnalyticTheory.fq_is_function_field
+#stmt fq_is_function_field
 
 /-!
 
@@ -664,7 +666,7 @@ valuation of $`F_K(q)` belonging to $`\mathfrak{p}`._
 > Book, §2, item I–II: every (nontrivial) valuation of `F_K(q)` over `K` is equivalent to some `w_α`, i.e. has the same valuation ring.
 -/
 
-#check @AnalyticTheory.fq_valuations_classified
+#stmt fq_valuations_classified
 
 /-!
 
@@ -682,21 +684,21 @@ degree of $`\mathfrak{p}` (in the algebraic sense) equals $`[K(\alpha):K]`._
 > Book, §2, item III: the valuation ring `{x ∈ F_K(q) | w_α(x) ≥ 0}` of `w_α` is the ring of a prime divisor of `F_K(q) | K` whose degree (the degree of its residue field over `K`) is `[K(α):K]`.
 -/
 
-#check @AnalyticTheory.fq_residue_degree
+#stmt fq_residue_degree
 
 /-!
 
 > The prime divisor of `F_K(q) | K` attached to `α`.
 -/
 
-#print AnalyticTheory.primeAt
+#stmt primeAt
 
 /-!
 
 > Book, §2, item III: the residue degree of `w_α` is `[K(α) : K]`.
 -/
 
-#check @AnalyticTheory.primeAt_degree
+#stmt primeAt_degree
 
 /-!
 
@@ -716,7 +718,7 @@ sufficiently large. From Proposition 2 we conclude therefore that $`g = 1`.
 > Book, §2, item IV (genus): `F_K(q) | K` has genus `1`.
 -/
 
-#check @AnalyticTheory.fq_genus
+#stmt fq_genus
 
 /-!
 
@@ -738,14 +740,14 @@ field $`L` of $`K`, we have $`F_L(q) = F_K(q) \cdot L`._
 > Every constant field extension of `F_K(q)` by `L` is `L`-isomorphic to `F_L(q)`.
 -/
 
-#check @AnalyticTheory.exists_algEquiv_constExt
+#stmt exists_algEquiv_constExt
 
 /-!
 
 > Book, §2, item IV: `F_K(q)` is an elliptic function field over `K` (with the constant field extensions `F_K(q) L = F_L(q)`).
 -/
 
-#check @AnalyticTheory.fq_is_elliptic
+#stmt fq_is_elliptic
 
 /-!
 
@@ -768,21 +770,21 @@ classes of degree $`0`.
 > Book, §2: the principal divisors `P_K(q)`: the group generated by the divisors `(f)` of non-zero `q`-periodic functions `f ∈ F_K(q)` (it consists of exactly these, as `divisorOf` is additive).
 -/
 
-#print AnalyticTheory.principalDivisors
+#stmt principalDivisors
 
 /-!
 
 > Book, §2: the divisors of degree `0` in `D_K(q)`: the group generated by the `q`-periodic divisors `m` with `deg_q(m) = 0` (it consists of exactly these, as `deg_q` is additive on `D_K(q)`).
 -/
 
-#print AnalyticTheory.divisorsDegZero
+#stmt divisorsDegZero
 
 /-!
 
 > Book, §2: the group `C⁰_K(q) = D⁰_K(q) / P_K(q)` of divisor classes of degree `0`.
 -/
 
-#print AnalyticTheory.classGroupDegZero
+#stmt classGroupDegZero
 
 /-!
 
@@ -798,7 +800,7 @@ $`C^0_K(q) \approx K^\times/q`._
 > Book, §2, item V (Abel–Jacobi isomorphism): the Jacobi map induces a group isomorphism `C⁰_K(q) ≅ K^×/q`.
 -/
 
-#check @AnalyticTheory.abel_jacobi_iso
+#stmt abel_jacobi_iso
 
 /-!
 
@@ -825,7 +827,7 @@ denoted by $`T_K(q)`.
 > The translation `τ_a` as an automorphism of `F_K(q)`.
 -/
 
-#print AnalyticTheory.translationFq
+#stmt translationFq
 
 /-!
 
@@ -842,7 +844,7 @@ _uniquely determined_, as an automorphism of $`F_K(q)\,|\,K`, by the property (1
 > An automorphism of `F_K(q) | K` is determined by its action on the valuations at `K`-points.
 -/
 
-#check @AnalyticTheory.ringEquiv_eq_of_anVal
+#stmt ringEquiv_eq_of_anVal
 
 /-!
 
@@ -861,7 +863,7 @@ which corresponds to $`a` under the Jacobi isomorphism $`\Phi_q\colon C^0_K(q) \
 > Book, §2, Corollary Va: for `a ∈ K^×` there is a unique class `c_a ∈ C⁰_K(q)` with `Φ_q(c_a) = a mod^× q`; the translation `τ_a` acts on prime divisors of degree `1` by `p ↦ p + c_a`.
 -/
 
-#check @AnalyticTheory.translation_class_unique
+#stmt translation_class_unique
 
 /-!
 
@@ -874,7 +876,7 @@ $`1` of $`F_K(q)`. If $`c = c_a` then Corollary Va shows that $`\tau_c = \tau_a`
 > Book, §2: the algebraic translation automorphism of `F_K(q)` attached to a divisor class `c ∈ C⁰_K(q)`: the `K`-automorphism `τ` moving the prime divisor of a point `α ∈ K^×` to that of `β ∈ K^×` whenever `c = [β] − [α]`, i.e. `w_β(τ f) = w_α(f)`.
 -/
 
-#print AnalyticTheory.translationOfClass
+#stmt translationOfClass
 
 /-!
 
@@ -885,7 +887,7 @@ $`\tau_c = \tau_a`._
 > Book, §2, Corollary Vb: the analytic translation `τ_a` and the algebraic translation attached to any class `c` with `Φ_q(c) = a` coincide on `F_K(q)`.
 -/
 
-#check @AnalyticTheory.translation_analytic_eq_algebraic
+#stmt translation_analytic_eq_algebraic
 
 /-!
 
@@ -911,14 +913,14 @@ equivalent to $`w_{\alpha,K}`; the corresponding ramification index is $`e_i(\al
 > Book, §2, Remark 1: the ramification index `e(α)` of `ψ α` over `α`: the quotient of the degree of inseparability of `α` over `K` by that of `ψ α` over `L` (`ψ : Ω_K ≅ Ω_L`).
 -/
 
-#print AnalyticTheory.ramIndex
+#stmt ramIndex
 
 /-!
 
 > The valuations of `L` restrict to `e(α)` times those of `K`.
 -/
 
-#check @AnalyticTheory.anVal_meroExt
+#stmt anVal_meroExt
 
 /-!
 
@@ -937,7 +939,7 @@ field. A similar remark applies to $`\Phi_q`.
 > Book, §2, Remark 1: there is a natural embedding `D_K ⊂ D_L`, `m'_{ψ α} = e(α) m_α`, which maps `D_K(q)` into `D_L(q)` and preserves `deg_q` and `Φ_q`.
 -/
 
-#check @AnalyticTheory.remark_ext_const_divisors
+#stmt remark_ext_const_divisors
 
 /-!
 
@@ -947,7 +949,7 @@ $`F_L(q)` is _unramified_ over $`F_K(q)`.
 > Book, §2, Remark 1: if `L | K` is separable then `e(α) = 1` for all `α` (`F_L(q)` is unramified over `F_K(q)`).
 -/
 
-#check @AnalyticTheory.ramIndex_eq_one_of_separable
+#stmt ramIndex_eq_one_of_separable
 
 /-!
 
@@ -959,14 +961,14 @@ of $`G` in $`M_L`. That is, $`G` becomes the Galois group of $`M_L\,|\,M_K`.
 > Book, §4: `ρ` is the action of `σ ∈ G` on `M_L` through the coefficients of the Laurent series: a ring automorphism of `M_L` which maps `∑ aₙ Xⁿ` to `∑ σ(aₙ) Xⁿ`.
 -/
 
-#print AnalyticTheory.IsGalAct
+#stmt IsGalAct
 
 /-!
 
 > Book, §2, Remark 2: `G` acts on `M_L` with fixed field `M_K`.
 -/
 
-#check @AnalyticTheory.remark_galois_fixed_field
+#stmt remark_galois_fixed_field
 
 /-!
 
@@ -977,7 +979,7 @@ $`\sigma` to an automorphism of $`\Omega\,|\,K`.
 > Book, §2, Remark 2: for `f ∈ M_L` and `σ ∈ G`, `(σ f)(σ α) = σ(f(α))`, where `σ` acts on the coefficients of `f` and `σ'` is any extension of `σ` to `Ω_L`.
 -/
 
-#check @AnalyticTheory.remark_galois_action_eval
+#stmt remark_galois_action_eval
 
 /-!
 
@@ -988,14 +990,14 @@ $`D_K`.
 > Book, §2, Remark 2: the divisor of `σ f` is the `σ`-transform of the divisor of `f`: `(σ f)(σ α) = (f)(α)`.
 -/
 
-#check @AnalyticTheory.remark_galois_action_divisors
+#stmt remark_galois_action_divisors
 
 /-!
 
 > Book, §2, Remark 2: the group of `G`-fixed elements of `D_L` is `D_K` (embedded as in Remark 1).
 -/
 
-#check @AnalyticTheory.remark_galois_fixed_divisors
+#stmt remark_galois_fixed_divisors
 
 /-!
 
@@ -1010,7 +1012,7 @@ $`G`-modules.
 > A function with divisor `n` and `G(q⁻¹X) = b⁻¹ X^d G(X)` determines `deg_q n` and `Φ_q(n)`.
 -/
 
-#check @AnalyticTheory.degQ_PhiQ_of_fun
+#stmt degQ_PhiQ_of_fun
 
 /-!
 
@@ -1029,14 +1031,14 @@ and the coefficients of a product are given by the convolution.
 > The element of `H_K` defined by a convergent Laurent sequence.
 -/
 
-#print EntireLaurent.holOfSeq
+#stmt holOfSeq
 
 /-!
 
 > The Laurent coefficients of a product are the convolution of the coefficients.
 -/
 
-#check @EntireLaurent.holCoeff_mul
+#stmt holCoeff_mul
 
 /-!
 
@@ -1046,14 +1048,14 @@ the only units of $`H_K` are the monomials $`cX^n`.
 > **Gauss' lemma**: the Gauss norms are multiplicative.
 -/
 
-#check @EntireLaurent.gaussNorm_mul
+#stmt gaussNorm_mul
 
 /-!
 
 > Units of the convolution algebra are monomials.
 -/
 
-#check @EntireLaurent.unit_monomial
+#stmt unit_monomial
 
 /-!
 
@@ -1065,21 +1067,21 @@ every point.
 > Taylor expansion at `α ≠ 0` of a function given by a convergent Laurent series with coefficients in `K`: `F(α + h) = ∑ bₖ hᵏ` for `|h| < |α|`, with `bₖ ∈ K(α)` and `|bₖ| |α|ᵏ` bounded.
 -/
 
-#check @EntireLaurent.taylor_expansion
+#stmt taylor_expansion
 
 /-!
 
 > Identity theorem: a convergent Laurent series over `K` vanishing on a ball `B(α, |α|)`, `α ≠ 0`, is zero.
 -/
 
-#check @EntireLaurent.laurent_eq_zero_of_vanishing
+#stmt laurent_eq_zero_of_vanishing
 
 /-!
 
 > Order of vanishing: a non-zero holomorphic function has a finite order `k` at `α ≠ 0`: `F(x)/(x − α)ᵏ` has a non-zero limit as `x → α`.
 -/
 
-#check @EntireLaurent.exists_order
+#stmt exists_order
 
 /-!
 
@@ -1091,7 +1093,7 @@ is a separate proof, by Euclidean division followed by a contraction argument.)
 > Weierstrass preparation on the unit circle (dominance form): `yˢ = Q·H + R`.
 -/
 
-#check @EntireLaurent.weierstrass_prep
+#stmt weierstrass_prep
 
 /-!
 
@@ -1102,14 +1104,14 @@ only finitely many zeros in every closed annulus.
 > Zero existence on a tie sphere.
 -/
 
-#check @EntireLaurent.tie_structure
+#stmt tie_structure
 
 /-!
 
 > A non-zero holomorphic function has only finitely many zeros in each closed annulus.
 -/
 
-#check @EntireLaurent.zeros_annulus_finite
+#stmt zeros_annulus_finite
 
 /-!
 
@@ -1121,14 +1123,14 @@ $`f = \varphi_\alpha^m g` with which the section begins.
 > Division with remainder by the minimal polynomial `φ_α`: `f = φ_α g + S` with `g` holomorphic and `S` a polynomial of degree `< deg φ_α`.
 -/
 
-#check @EntireLaurent.hol_phi_division
+#stmt hol_phi_division
 
 /-!
 
 > **Division theorem** (book, §2): if `w_α(A) ≥ w_α(B)` for all `α ∈ Ω^×` then `B ∣ A` in `H_K`.
 -/
 
-#check @AnalyticTheory.hol_dvd_of_anVal_le
+#stmt hol_dvd_of_anVal_le
 
 /-!
 
@@ -1138,4 +1140,4 @@ the Gauss norms of the $`g_j` tend to zero for every radius; this gives the thet
 > Infinite products: if the Gauss norms `‖g_j‖_ρ` tend to `0` for every radius `ρ > 0`, then `∏ (1 + g_j)` converges pointwise to a holomorphic function.
 -/
 
-#check @EntireLaurent.exists_infprod
+#stmt exists_infprod

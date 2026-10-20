@@ -43,6 +43,7 @@ theorem anVal_zpow_of {ξ : Omega K} (hξ : ξ ≠ 0) {f : MeroRing K} (hf0 : f 
     ring
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem periodic_zpow {q : K} (hq0 : q ≠ 0) {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q)
     (α : Omega K) (k : ℤ) : m (α * algebraMap K (Omega K) q ^ k) = m α := by
   have ha : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0
@@ -65,9 +66,10 @@ theorem periodic_conj {q : K} (hq0 : q ≠ 0) {m : Omega K → ℤ} (hm : m ∈ 
   obtain ⟨γ, hγ, k, hk⟩ := h
   rw [← hm.1.2.2 γ ξ hγ, hk, periodic_zpow hq0 hm]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem repAnnulus_support_finite {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
     (hm : m ∈ DivisorsPeriodic K q) : {α : Omega K | α ∈ repAnnulus K q ∧ m α ≠ 0}.Finite :=
-  (hm.1.2.1 ‖q‖ 1 hq0 hq1.le).subset (fun α ⟨hα, hs⟩ => ⟨hα.2.1.le, hα.2.2, hs⟩)
+  (hm.1.2.1 ‖q‖ 1 hq0 hq1.le).subset (fun _α ⟨hα, hs⟩ => ⟨hα.2.1.le, hα.2.2, hs⟩)
 
 
 section theta
@@ -275,6 +277,7 @@ theorem translation_thetaDiv :
   rw [e, map_inv₀]
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem norm_gen_eq {α : Omega K} (hint : IsIntegral K α) :
     Algebra.norm K (IntermediateField.AdjoinSimple.gen K α) =
       (-1) ^ (minpoly K α).natDegree * (minpoly K α).coeff 0 := by
@@ -283,6 +286,7 @@ theorem norm_gen_eq {α : Omega K} (hint : IsIntegral K α) :
     IntermediateField.minpoly_gen] at this
   exact this
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem prod_neg_one_zpow {ι : Type*} (S : Finset ι) (f : ι → ℤ) :
     ∏ i ∈ S, ((-1 : K) ^ f i) = (-1 : K) ^ (∑ i ∈ S, f i) := by
   classical

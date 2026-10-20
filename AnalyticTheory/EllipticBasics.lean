@@ -263,7 +263,7 @@ theorem Ln_mono {n m : ℤ} (h : n ≤ m) : Ln 𝔭 n ≤ Ln 𝔭 m := by
   refine rrSpace_mono fun P => ?_
   by_cases hP : 𝔭 = P
   · subst hP; simpa using h
-  · simp [Finsupp.single_apply, hP]
+  · simp [hP]
 
 theorem deg_single (h : 𝔭.degree = 1) (n : ℤ) : FFDivisor.deg (Finsupp.single 𝔭 n) = n := by
   simp [FFDivisor.deg, FFDivisor.degHom, h]
@@ -316,7 +316,7 @@ section inc
 variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 
 /-- The `K`-algebra structure on the residue field of a prime divisor (as in `degree`). -/
-noncomputable def resAlg (P : PrimeDivisor K F) : Algebra K (IsLocalRing.ResidueField P.ring) :=
+@[instance_reducible] noncomputable def resAlg (P : PrimeDivisor K F) : Algebra K (IsLocalRing.ResidueField P.ring) :=
   ((IsLocalRing.residue P.ring).comp P.toRing).toAlgebra
 
 variable (𝔭 : PrimeDivisor K F)
@@ -480,7 +480,7 @@ section dim2
 variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 variable {𝔭 : PrimeDivisor K F}
 
-theorem pow_mem_Ln {m : ℤ} (hm : 0 ≤ m) {z : F} (hz : z ∈ Ln 𝔭 m) (i : ℕ) :
+theorem pow_mem_Ln {m : ℤ} (_hm : 0 ≤ m) {z : F} (hz : z ∈ Ln 𝔭 m) (i : ℕ) :
     z ^ i ∈ Ln 𝔭 (i * m) := by
   induction i with
   | zero => simpa using one_mem_Ln (𝔭 := 𝔭) (le_refl 0)

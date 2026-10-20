@@ -20,6 +20,7 @@ section eval
 
 variable {q : K} (hq : ‖q‖ < 1)
 
+omit [CompleteSpace K] in
 theorem norm_term_le (n : ℤ) (k : ℕ) : ‖(n : K) * q ^ k‖ ≤ ‖q‖ ^ k := by
   rw [norm_mul, norm_pow]
   calc ‖(n : K)‖ * ‖q‖ ^ k ≤ 1 * ‖q‖ ^ k :=
@@ -36,10 +37,12 @@ theorem summable_norm_eval (f : PowerSeries ℤ) :
 noncomputable def evalZ (q : K) (f : PowerSeries ℤ) : K :=
   ∑' k : ℕ, ((coeff k f : ℤ) : K) * q ^ k
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- `evalZ` is the evaluation `PowerSeries.tsumEval` along `ℤ → K` (`ForMathlib`). -/
 theorem evalZ_eq_tsumEval (f : PowerSeries ℤ) :
     evalZ q f = PowerSeries.tsumEval (Int.castRingHom K) q f := rfl
 
+omit [CompleteSpace K] in
 theorem norm_intCastRingHom_le (n : ℤ) : ‖Int.castRingHom K n‖ ≤ 1 :=
   IsUltrametricDist.norm_intCast_le_one K n
 
@@ -51,10 +54,13 @@ include hq in
 theorem evalZ_add (f g : PowerSeries ℤ) : evalZ q (f + g) = evalZ q f + evalZ q g :=
   PowerSeries.tsumEval_add (Int.castRingHom K) norm_intCastRingHom_le hq f g
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem evalZ_zero : evalZ q (0 : PowerSeries ℤ) = 0 := by simp [evalZ]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem evalZ_one : evalZ q (1 : PowerSeries ℤ) = 1 := PowerSeries.tsumEval_one (Int.castRingHom K)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem evalZ_X : evalZ q (X : PowerSeries ℤ) = q := PowerSeries.tsumEval_X (Int.castRingHom K)
 
 include hq in
@@ -84,6 +90,7 @@ def serN : PowerSeries ℤ := (1 - C 48 * serB) ^ 3
 def serD : PowerSeries ℤ :=
   serB ^ 2 - serC - C 64 * serB ^ 3 + C 72 * serB * serC - C 432 * serC ^ 2
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem sK_eq (k : ℕ) : sK K k q = evalZ q (sigmaS k) := by
   unfold sK evalZ sigmaS; simp only [coeff_mk]
 
@@ -116,7 +123,8 @@ theorem exists_serU : ∃ u : PowerSeries ℤ, serD = X * u ∧ constantCoeff u 
 theorem constantCoeff_serN : constantCoeff serN = 1 := by
   simp only [serN, map_pow, map_sub, map_one, map_mul, constantCoeff_serB, mul_zero, sub_zero, one_pow]
 
-theorem evalZ_C (hq : ‖q‖ < 1) (n : ℤ) : evalZ q (C n) = n := by
+omit [IsUltrametricDist K] [CompleteSpace K] in
+theorem evalZ_C (_hq : ‖q‖ < 1) (n : ℤ) : evalZ q (C n) = n := by
   unfold evalZ
   rw [tsum_eq_single 0]
   · simp
@@ -127,6 +135,7 @@ theorem evalZ_serB (hq : ‖q‖ < 1) : evalZ q serB = coeffB K q := by
   rw [serB, evalZ_mul hq, evalZ_C hq, sK_eq]
   simp
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem evalZ_serC : evalZ q serC = coeffC K q := by
   unfold coeffC evalZ serC; simp only [coeff_mk, cCoef]
 
@@ -169,6 +178,7 @@ theorem exists_R : ∃ R : PowerSeries ℤ, ∀ q : K, ‖q‖ < 1 → q ≠ 0 �
   rw [hv]
   field_simp
 
+omit [CompleteSpace K] in
 theorem R_bound (R : PowerSeries ℤ) (n : ℕ) : ‖((coeff n R : ℤ) : K)‖ ≤ 1 :=
   IsUltrametricDist.norm_intCast_le_one K _
 

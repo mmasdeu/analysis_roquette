@@ -53,7 +53,7 @@ theorem laurentFun_hasSum {a : ℤ → K} (ha : IsConvergentLaurent K a) {α : L
 variable (L) in
 /-- The element of `H_K` defined by a convergent Laurent sequence. -/
 noncomputable def holOfSeq (a : ℤ → K) (ha : IsConvergentLaurent K a) : holSubring K L :=
-  ⟨fun α => laurentFun K a α.1, laurentFun K a, ⟨a, ha, fun α hα => laurentFun_hasSum K ha hα⟩, rfl⟩
+  ⟨fun α => laurentFun K a α.1, laurentFun K a, ⟨a, ha, fun _α hα => laurentFun_hasSum K ha hα⟩, rfl⟩
 
 omit [IsAlgClosed L] in
 theorem holOfSeq_apply (a : ℤ → K) (ha : IsConvergentLaurent K a) (α : Punct L) :
@@ -98,9 +98,11 @@ theorem hol_rep_seq (f : holSubring K L) :
 /-- The Laurent coefficients of an element of `H_K`. -/
 noncomputable def holCoeff (f : holSubring K L) : ℤ → K := Classical.choose (hol_rep_seq K f)
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem holCoeff_convergent (f : holSubring K L) : IsConvergentLaurent K (holCoeff K f) :=
   (Classical.choose_spec (hol_rep_seq K f)).1
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem holCoeff_hasSum (f : holSubring K L) (α : Punct L) :
     HasSum (fun n : ℤ => algebraMap K L (holCoeff K f n) * α.1 ^ n) (f.1 α) :=
   (Classical.choose_spec (hol_rep_seq K f)).2 α
@@ -139,7 +141,7 @@ theorem deltaSeq_convergent : IsConvergentLaurent K (deltaSeq K) := by
   intro r hr
   have hev : ∀ᶠ n : ℤ in cofinite, n ≠ 0 := by
     refine Filter.eventually_cofinite.mpr ?_
-    simpa using Set.finite_singleton (0 : ℤ)
+    simp
   refine tendsto_const_nhds.congr' ?_
   filter_upwards [hev] with n hn
   simp [deltaSeq, hn]
@@ -157,17 +159,18 @@ noncomputable def monoHol (n : ℤ) : holSubring K L :=
     intro r hr
     have hev : ∀ᶠ m : ℤ in cofinite, m ≠ n := by
       refine Filter.eventually_cofinite.mpr ?_
-      simpa using Set.finite_singleton n
+      simp
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [hev] with m hm
     simp [hm])
 
+omit [IsAlgClosed L] in
 theorem monoHol_apply (n : ℤ) (α : Punct L) : (monoHol K L n).1 α = α.1 ^ n := by
   have h := holOfSeq_hasSum K (fun m => if m = n then (1 : K) else 0) (by
     intro r hr
     have hev : ∀ᶠ m : ℤ in cofinite, m ≠ n := by
       refine Filter.eventually_cofinite.mpr ?_
-      simpa using Set.finite_singleton n
+      simp
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [hev] with m hm
     simp [hm]) α

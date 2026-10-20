@@ -18,6 +18,7 @@ section core
 variable {K L : Type*} [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (χ : (L ≃ₐ[K] L) →* Circle)
 
+omit [IsGalois K L] in
 theorem exists_generator : ∃ σ : L ≃ₐ[K] L, ∀ g : L ≃ₐ[K] L, ∃ a : ℤ, χ g = χ σ ^ a :=
   χ.exists_zpow_generator_circle
 
@@ -52,6 +53,7 @@ variable {K L : Type*} [Field K] [Field L] [Algebra K L] [FiniteDimensional K L]
 variable (χ : (L ≃ₐ[K] L) →* Circle) (σ : L ≃ₐ[K] L)
 variable (hσ : ∀ g : L ≃ₐ[K] L, ∃ a : ℤ, χ g = χ σ ^ a)
 
+omit [FiniteDimensional K L] [IsGalois K L] in
 theorem pow_ord_mem_ker : σ ^ orderOf (χ σ) ∈ MonoidHom.ker χ := by
   rw [MonoidHom.mem_ker, map_pow, pow_orderOf_eq_one]
 

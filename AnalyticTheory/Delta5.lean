@@ -118,6 +118,7 @@ end R0
 
 section assemble
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem ptK_one : ptK (1 : K) one_ne_zero = oneX :=
   Subtype.ext (by simp [ptK, oneX])
 

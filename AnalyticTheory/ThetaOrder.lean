@@ -49,6 +49,7 @@ theorem anVal_polyHol_minpoly {ξ β : Omega K} (hξ : ξ ≠ 0) (hβ : β ≠ 0
         ((minpoly.irreducible hintξ).associated_of_dvd (minpoly.irreducible hintβ) hd))
     exact anVal_hol_nonvanishing hξ (polyHol_minpoly_prime K hβ).ne_zero hne
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psi_eq_minpoly {q : K} (hq0 : q ≠ 0) {α : Omega K} (k : ℤ) :
     psi q (minpoly K α) k = minpoly K (algebraMap K (Omega K) (q ^ k) * α) := by
   have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
@@ -120,6 +121,7 @@ theorem anVal_prod_alg {ξ : Omega K} (hξ : ξ ≠ 0) {ι : Type*} (s : Finset 
       (anVal_isValuation K ξ hξ).2.2.1, ih]
 
 open scoped Classical in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem chi_cast {q : K} {α ξ : Omega K} (k : ℤ) :
     ((if minpoly K ξ = minpoly K (algebraMap K (Omega K) (q ^ k) * α) then 1 else 0 : WithTop ℤ)) =
       ((chi q α ξ k : ℤ) : WithTop ℤ) := by
@@ -153,14 +155,17 @@ theorem anVal_thG {q : K} (hq0 : q ≠ 0) {α : Omega K} (hα : α ≠ 0) {ξ : 
   exact chi_cast _
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem chi_nonneg (q : K) (α ξ : Omega K) (k : ℤ) : 0 ≤ chi q α ξ k := by
   classical
   unfold chi; split_ifs <;> simp
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem chi_eq_zero_or_one (q : K) (α ξ : Omega K) (k : ℤ) : chi q α ξ k = 0 ∨ chi q α ξ k = 1 := by
   classical
   unfold chi; split_ifs <;> simp
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_iff_chi {q : K} {α ξ : Omega K} :
     ConjModQ K q α ξ ↔ ∃ k : ℤ, chi q α ξ k = 1 := by
   classical
@@ -177,7 +182,7 @@ theorem conjModQ_iff_chi {q : K} {α ξ : Omega K} :
     refine ⟨algebraMap K (Omega K) (q ^ k) * α, h.symm, k, ?_⟩
     rw [map_zpow₀, mul_comm]
 
-theorem thF_ne_zero {q : K} (hq0 : q ≠ 0) {φ : Polynomial K} (hφ : φ.Monic) (n : ℕ) :
+theorem thF_ne_zero {q : K} (_hq0 : q ≠ 0) {φ : Polynomial K} (hφ : φ.Monic) (n : ℕ) :
     thF q φ n ≠ 0 := by
   have h1 : polyHol K (Omega K) (psi q φ n) ≠ 0 := polyHol_ne_zero_of_monic (psi_monic q hφ n)
   exact mul_ne_zero (monoHol_ne_zero _) h1

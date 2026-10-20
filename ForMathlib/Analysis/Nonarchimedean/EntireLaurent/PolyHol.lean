@@ -35,6 +35,7 @@ omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem mul_apply_hol (f g : holSubring K L) (x : Punct L) : (f * g).1 x = f.1 x * g.1 x := rfl
 omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem add_apply_hol (f g : holSubring K L) (x : Punct L) : (f + g).1 x = f.1 x + g.1 x := rfl
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem pow_apply_hol (f : holSubring K L) (n : ℕ) (x : Punct L) : (f ^ n).1 x = (f.1 x) ^ n := by
   induction n with
   | zero => rfl
@@ -42,6 +43,7 @@ theorem pow_apply_hol (f : holSubring K L) (n : ℕ) (x : Punct L) : (f ^ n).1 x
 omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem algebraMap_apply_hol (c : K) (x : Punct L) :
     (algebraMap K (holSubring K L) c).1 x = algebraMap K L c := rfl
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem sum_apply_hol {ι : Type*} (s : Finset ι) (f : ι → holSubring K L) (x : Punct L) :
     (∑ i ∈ s, f i).1 x = ∑ i ∈ s, (f i).1 x := by
   classical
@@ -108,7 +110,7 @@ theorem holCoeff_monoHol (n m : ℤ) : holCoeff K (monoHol K L n) m = if m = n t
     intro r hr
     have hev : ∀ᶠ m : ℤ in cofinite, m ≠ n := by
       refine Filter.eventually_cofinite.mpr ?_
-      simpa using Set.finite_singleton n
+      simp
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [hev] with m hm
     simp [hm])
@@ -198,7 +200,7 @@ theorem coe_eq_sum_basis {α : L} (hint : IsIntegral K α)
 
 omit [IsAlgClosed L] in
 /-- Coordinates of `αᵏ` with respect to the power basis of `K(α)`, with a norm bound. -/
-theorem exists_coord_bound {α : L} (hα : α ≠ 0) :
+theorem exists_coord_bound {α : L} (_hα : α ≠ 0) :
     ∃ (C : ℝ) (R : ℤ → K[X]), 0 ≤ C ∧ (∀ k, (R k).degree < (minpoly K α).degree) ∧
       (∀ k, Polynomial.aeval α (R k) = α ^ k) ∧ ∀ k j, ‖(R k).coeff j‖ ≤ C * ‖α‖ ^ k := by
   have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
@@ -290,7 +292,7 @@ theorem natDegree_lt_of_degree_lt {α : L} {R : K[X]} (hR : R.degree < (minpoly 
   · exact Polynomial.natDegree_lt_natDegree h0 hR
 
 
-theorem phi_quot_bound {α : L} (hα : α ≠ 0) {C : ℝ} {R : ℤ → K[X]} {G : ℤ → holSubring K L}
+theorem phi_quot_bound {α : L} (_hα : α ≠ 0) {C : ℝ} {R : ℤ → K[X]} {G : ℤ → holSubring K L}
     (hRdeg : ∀ k, (R k).degree < (minpoly K α).degree)
     (hRb : ∀ k j, ‖(R k).coeff j‖ ≤ C * ‖α‖ ^ k)
     (hG : ∀ k, monoHol K L k = polyHol K L (minpoly K α) * G k + polyHol K L (R k))
@@ -424,7 +426,7 @@ theorem hol_phi_division {α : L} (hα : α ≠ 0) (f : holSubring K L) :
 theorem polyHol_minpoly_apply {α : L} (hα : α ≠ 0) :
     (polyHol K L (minpoly K α)).1 ⟨α, hα⟩ = 0 := by
   rw [polyHol_apply]
-  simpa [Polynomial.eval_map_algebraMap] using minpoly.aeval K α
+  simp [Polynomial.eval_map_algebraMap]
 
 theorem polyHol_apply_eq_aeval (P : K[X]) {α : L} (hα : α ≠ 0) :
     (polyHol K L P).1 ⟨α, hα⟩ = Polynomial.aeval α P := by
