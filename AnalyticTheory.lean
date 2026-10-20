@@ -68,3 +68,4 @@ import AnalyticTheory.PeriodGroup
 import AnalyticTheory.EllipticSplit
 import AnalyticTheory.FqResidue
 import AnalyticTheory.FFUnramified
+import AnalyticTheory.EllipticGood

@@ -224,6 +224,45 @@ theorem evRing_eq_zero {x : (primeAt hq0 hq1 hα).ring}
 noncomputable def resEmb : IsLocalRing.ResidueField (primeAt hq0 hq1 hα).ring →+* Omega K :=
   Ideal.Quotient.lift _ (evRing hq0 hq1 hα) fun _ hx => evRing_eq_zero hq0 hq1 hα hx
 
+theorem resEmb_residue (x : (primeAt hq0 hq1 hα).ring) :
+    resEmb hq0 hq1 hα (IsLocalRing.residue _ x) = evRing hq0 hq1 hα x := rfl
+
+theorem evRing_toRing (c : K) :
+    evRing hq0 hq1 hα ((primeAt hq0 hq1 hα).toRing c) = algebraMap K (Omega K) c :=
+  meroAt_algebraMap hα c
+
+/-- `α` is the value at `α` of some function without pole at `α`. -/
+theorem exists_evRing_eq : ∃ x : (primeAt hq0 hq1 hα).ring, evRing hq0 hq1 hα x = α := by
+  set P := primeAt hq0 hq1 hα
+  let := resAlg P
+  let ρ : IsLocalRing.ResidueField P.ring →ₐ[K] Omega K :=
+    { resEmb hq0 hq1 hα with
+      commutes' := fun c => by
+        show meroAt hα (algebraMap K (MeroRing K) c) = _
+        exact meroAt_algebraMap hα c }
+  have hρ : Function.Injective ρ := (resEmb hq0 hq1 hα).injective
+  have hmem : ∀ r, ρ r ∈ IntermediateField.adjoin K {α} := by
+    intro r
+    obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective r
+    exact meroAt_mem_adjoin hα _
+  let ρ' : IsLocalRing.ResidueField P.ring →ₗ[K] IntermediateField.adjoin K {α} :=
+    LinearMap.codRestrict (IntermediateField.adjoin K {α}).toSubalgebra.toSubmodule
+      ρ.toLinearMap hmem
+  have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
+  have hdeg : Module.finrank K (IsLocalRing.ResidueField P.ring) = (minpoly K α).natDegree :=
+    primeAt_degree hq0 hq1 hα
+  have hfin : FiniteDimensional K (IsLocalRing.ResidueField P.ring) :=
+    Module.finite_of_finrank_pos (by rw [hdeg]; exact minpoly.natDegree_pos hint)
+  have : FiniteDimensional K (IntermediateField.adjoin K {α}) :=
+    IntermediateField.adjoin.finiteDimensional hint
+  have hsurj : Function.Surjective ρ' :=
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+      (by rw [hdeg, IntermediateField.adjoin.finrank hint])).mp
+      (fun a b hab => hρ (congrArg Subtype.val hab))
+  obtain ⟨r, hr⟩ := hsurj ⟨α, IntermediateField.mem_adjoin_simple_self K α⟩
+  obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective r
+  exact ⟨x, congrArg Subtype.val hr⟩
+
 /-- If the residue field of `p_α` is separable over `K`, then `α` is separable over `K`. -/
 theorem isSeparable_of_residue
     (h : letI := resAlg (primeAt hq0 hq1 hα);
