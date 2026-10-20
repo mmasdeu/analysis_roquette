@@ -115,7 +115,55 @@ theorem exists_aj_function (a b : Kˣ) : ∃ g : FqSub K q, g ≠ 0 ∧
   simp only [m₁, m₂, hD, Pi.sub_apply, Pi.add_apply, pointDivisor, eq_ptPrime_iff hq0 hq1 P]
   ring
 
+include hq0 hq1 in
+/-- A nonzero `q`-periodic function has only finitely many zeros and poles. -/
+theorem finite_ord_ne_zero {f : FqSub K q} (hf : f ≠ 0) :
+    {P : PrimeDivisor K (FqSub K q) | P.ord f ≠ 0}.Finite := by
+  classical
+  have hq0' := norm_pos_iff.mp hq0
+  have hf' : (f : MeroRing K) ≠ 0 := fun h => hf (Subtype.ext h)
+  have hA := (divisorOf_mem_Divisors K (f : MeroRing K)).2.1 ‖q‖ 1 hq0 hq1.le
+  let g : Omega K → PrimeDivisor K (FqSub K q) := fun α =>
+    if h : α = 0 then ptPrime hq0 hq1 1 else primeAt hq0 hq1 h
+  refine (hA.image g).subset fun P (hP : P.ord f ≠ 0) => ?_
+  set β := ptOf P
+  have hβ : β ≠ 0 := (ptOf_spec hq0 hq1 P).1
+  obtain ⟨k, hk1, hk2⟩ := exists_shift_annulus hq0 hq1 hβ
+  set α := β * algebraMap K (Omega K) q ^ k
+  have hα : α ≠ 0 := mul_ne_zero hβ (zpow_ne_zero k ((_root_.map_ne_zero _).mpr hq0'))
+  have hc : ConjModQ K q β α := conjModQ_of_shift q β k
+  have hgα : g α = P := by
+    simp only [g, dite_eq_right hα]
+    rw [eq_primeAt hq0 hq1 P]
+    exact (primeAt_eq_iff hq0 hq1 _ _).mpr (conjModQ_symm hq0' hc)
+  refine ⟨α, ⟨hk1.le, hk2, ?_⟩, hgα⟩
+  have h1 := anVal_ptOf_eq_ord hq0 hq1 P hf
+  rw [anVal_conjModQ hq0' f.2 hβ hc] at h1
+  simp only [divisorOf, ite_eq_right hα, h1, WithTop.untopD_coe]
+  exact hP
+
+/-- `ord_{p_{vb}}(τ_v f) = ord_{p_b}(f)`. -/
+theorem ord_ptPrime_translation (v b : Kˣ) {f : FqSub K q} (hf : f ≠ 0) :
+    (ptPrime hq0 hq1 (v * b)).ord (translationFq q v f) = (ptPrime hq0 hq1 b).ord f := by
+  have hτ : translationFq q v f ≠ 0 := (map_ne_zero_iff _ (translationFq q v).injective).mpr hf
+  rw [← WithTop.coe_inj, ord_ptPrime hq0 hq1 _ hτ, ord_ptPrime hq0 hq1 _ hf, Units.val_mul, map_mul]
+  have := anVal_translation_shift (q := (v : K)) v.ne_zero (algebraMap_omega_ne_zero b)
+    (f : MeroRing K)
+  rwa [Units.mk0_val] at this
+
 end points
+
+theorem Set.Finite.image_of_factor {α β γ : Type*} {S : Set α} {f : α → β} {g : α → γ}
+    (hf : (f '' S).Finite) (h : ∀ a ∈ S, ∀ b ∈ S, f a = f b → g a = g b) : (g '' S).Finite := by
+  classical
+  rcases S.eq_empty_or_nonempty with rfl | ⟨a₀, -⟩
+  · simp
+  refine (hf.image fun y => if hy : ∃ a ∈ S, f a = y then g hy.choose else g a₀).subset ?_
+  rintro _ ⟨a, ha, rfl⟩
+  have hy : ∃ a' ∈ S, f a' = f a := ⟨a, ha, rfl⟩
+  refine ⟨f a, ⟨a, ha, rfl⟩, ?_⟩
+  simp only [dite_eq_left hy]
+  exact h _ hy.choose_spec.1 _ ha hy.choose_spec.2
 
 section generic
 
@@ -153,6 +201,11 @@ theorem isPrincipalDiv_norm {ι : Type*} (s : Finset ι) (X : ι → PrimeDiviso
   rw [← R.sum_inertia_ite (X i) (hX i hi), Finset.mul_sum]
   refine Finset.sum_congr rfl fun P _ => ?_
   rw [pdiv]; ring
+
+theorem PrimeDivisor.ord_pos_of_mem_maximalIdeal (P : PrimeDivisor K F) (x : P.ring)
+    (hx : x ∈ IsLocalRing.maximalIdeal P.ring) (hx0 : (x : F) ≠ 0) : 0 < P.ord x :=
+  lt_of_le_of_ne (P.ord_nonneg x.2 hx0) fun h =>
+    (IsLocalRing.mem_maximalIdeal x).mp hx ((isUnit_iff_ord P x hx0).mpr h.symm)
 
 end generic
 
@@ -230,6 +283,73 @@ theorem q_mem_Vsub : Units.mk0 q (norm_pos_iff.mp hq0) ∈ Vsub hq0 hq1 E hrig :
   show ptE hq0 hq1 E _ = ptE hq0 hq1 E 1
   rw [ptE, ptE, (ptPrime_eq_iff hq0 hq1 (Units.mk0 q (norm_pos_iff.mp hq0)) 1).mpr
     ⟨-1, by simp [norm_pos_iff.mp hq0]⟩]
+
+/-- **Translation invariance**: if `π` is rigid on a set `S` of rational points meeting infinitely
+many prime divisors, then the translations `τ_v`, `v ∈ V`, fix `E`. -/
+theorem translation_fixes_of_mem {v : Kˣ} (hv : v ∈ Vsub hq0 hq1 E hrig) (S : Set Kˣ)
+    (hS : ∀ b ∈ S, IsRigidAt (ptE hq0 hq1 E b)) (hSinf : (ptPrime hq0 hq1 '' S).Infinite) (e : E) :
+    translationFq q v (algebraMap E (FqSub K q) e) = algebraMap E (FqSub K q) e := by
+  set x := algebraMap E (FqSub K q) e
+  by_contra hne
+  have hx0 : x ≠ 0 := by
+    intro h; apply hne; rw [h, map_zero]
+  set y := translationFq q v x - x
+  have hy : y ≠ 0 := sub_ne_zero.mpr hne
+  -- at every rigid point `b` where `x` has no pole, `y` vanishes at `p_{vb}`
+  have key : ∀ b ∈ S, 0 ≤ (ptPrime hq0 hq1 b).ord x → (ptPrime hq0 hq1 (v * b)).ord y ≠ 0 := by
+    intro b hb hxb
+    set Q := ptE hq0 hq1 E b
+    have hQv : ptE hq0 hq1 E (v * b) = Q := ptE_mul_of_mem hq0 hq1 hrig hv (hS b hb)
+    have he : e ∈ Q.ring := ((ptPrime hq0 hq1 b).mem_ring_iff hx0).mpr hxb
+    obtain ⟨c, hc⟩ := Q.exists_const_of_degree_one (ptE_degree hq0 hq1 b) ⟨e, he⟩
+    set e' := e - algebraMap K E c
+    have hx' : algebraMap E (FqSub K q) e' = x - algebraMap K (FqSub K q) c := by
+      rw [map_sub, ← IsScalarTower.algebraMap_apply]
+    have he'0 : e' ≠ 0 := by
+      intro h0
+      apply hne
+      have : x = algebraMap K (FqSub K q) c := by rw [← sub_eq_zero, ← hx', h0, map_zero]
+      rw [this]
+      exact Subtype.ext (translation_algebraMap K v c)
+    have hQe : 0 < Q.ord e' := Q.ord_pos_of_mem_maximalIdeal _ hc he'0
+    have hpos : ∀ P : PrimeDivisor K (FqSub K q), P.restrict (E := E) = Q →
+        0 < P.ord (x - algebraMap K (FqSub K q) c) := by
+      intro P hP
+      rw [← hx', P.ord_algebraMap he'0, hP]
+      exact mul_pos P.ramIdx_pos hQe
+    set x' := x - algebraMap K (FqSub K q) c
+    have hx'0 : x' ≠ 0 := by rw [← hx']; exact (map_ne_zero_iff _ (algebraMap E _).injective).mpr he'0
+    have hτ : translationFq q v x' = translationFq q v x - algebraMap K (FqSub K q) c := by
+      rw [map_sub]; congr 1; exact Subtype.ext (translation_algebraMap K v c)
+    have hτ0 : translationFq q v x' ≠ 0 :=
+      (map_ne_zero_iff _ (translationFq q v).injective).mpr hx'0
+    have h1 : 0 < (ptPrime hq0 hq1 (v * b)).ord (translationFq q v x') := by
+      rw [ord_ptPrime_translation hq0 hq1 v b hx'0]; exact hpos _ rfl
+    have h2 : 0 < (ptPrime hq0 hq1 (v * b)).ord (-x') := by
+      rw [PrimeDivisor.ord_neg _ hx'0]; exact hpos _ hQv
+    have hyx : y = translationFq q v x' + -x' := by rw [hτ]; simp [y, x']
+    refine ne_of_gt (lt_of_lt_of_le (lt_min h1 h2) ?_)
+    rw [hyx]
+    exact PrimeDivisor.le_ord_add _ hτ0 (neg_ne_zero.mpr hx'0) (hyx ▸ hy)
+  -- hence `ptPrime '' S` is finite
+  apply hSinf
+  set Bad := {P : PrimeDivisor K (FqSub K q) | P.ord x ≠ 0}
+  set S' := {b ∈ S | 0 ≤ (ptPrime hq0 hq1 b).ord x}
+  have hfin' : ((fun b => ptPrime hq0 hq1 (v * b)) '' S').Finite :=
+    (finite_ord_ne_zero hq0 hq1 hy).subset (by
+      rintro _ ⟨b, ⟨hb, hxb⟩, rfl⟩; exact key b hb hxb)
+  have hfin'' : (ptPrime hq0 hq1 '' S').Finite := Set.Finite.image_of_factor hfin' fun a _ b _ hab => by
+    obtain ⟨k, hk⟩ := (ptPrime_eq_iff hq0 hq1 _ _).mp hab
+    refine (ptPrime_eq_iff hq0 hq1 _ _).mpr ⟨k, ?_⟩
+    have hv0 : (v : K) ≠ 0 := v.ne_zero
+    simp only [Units.val_mul] at hk
+    field_simp at hk ⊢
+    linear_combination hk
+  refine ((finite_ord_ne_zero hq0 hq1 hx0).union hfin'').subset ?_
+  rintro _ ⟨b, hb, rfl⟩
+  by_cases hxb : 0 ≤ (ptPrime hq0 hq1 b).ord x
+  · exact Or.inr ⟨b, ⟨hb, hxb⟩, rfl⟩
+  · exact Or.inl (fun h => hxb (h ▸ le_refl _))
 
 end subfield
 
