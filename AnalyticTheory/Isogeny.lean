@@ -243,24 +243,7 @@ def Usub (qbar : K) (hqb : qbar ≠ 0) (m : ℕ) : Subgroup Kˣ where
 def IsIsogeny (E F : Type u) [Field E] [Field F] [Algebra K E] [Algebra K F] : Prop :=
   ∃ μ : E →ₐ[K] F, Function.Injective μ
 
-/-- Book, §6, Corollary XVIIIa: an elliptic field `E | K` admits an isogeny to `F_K(q)` iff `E` is
-`K`-isomorphic to `F_K(q̄)` with `q̄` commensurable with `q`. -/
-theorem corXVIIIa_isogeny (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (E : Type u) [Field E] [Algebra K E] (hE : IsEllipticOver K E) :
-    IsIsogeny K E (FqSub K q) ↔
-      ∃ qbar : K, 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ Commensurable K q qbar ∧
-        Nonempty (E ≃ₐ[K] FqSub K qbar) := by
-  sorry
-
-/-- Book, §6, Corollary XVIIIa (second part): every isogeny `F_K(q̄) → F_K(q)` is `μ_m τ` with `τ` a
-translation of `F_K(q̄)` and `m ≠ 0` divisible by the order of `q mod^× q̄`. (The existence of the
-isogenies `μ_m` and their degree are `exists_substitution_isogeny`, `substitution_isogeny_degree`.) -/
-theorem corXVIIIa_isogenies_form (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar)
-    (μ : FqSub K qbar →ₐ[K] FqSub K q) :
-    ∃ (m : ℤ) (u : Kˣ), m ≠ 0 ∧ OrderDvd K q qbar m ∧
-      ∀ x, (μ x : MeroRing K) = substPow K m (translation K u (x : MeroRing K)) := by
-  sorry
+-- Corollary XVIIIa (`corXVIIIa_isogeny`, `corXVIIIa_isogenies_form`) is in `CorXVIIIa.lean`.
 
 /-! #### Multiplicators and complex multiplication -/
 
