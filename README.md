@@ -79,7 +79,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Blueprint nodes: 211 (80 definitions, 131 lemmas/propositions/theorems/corollaries/remarks; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
+* Blueprint nodes: 213 (80 definitions, 133 lemmas/propositions/theorems/corollaries/remarks; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
 * **No placeholder objects remain**: there is no `opaque` constant, no `sorry`-bodied definition,
   instance or structure field, and no statement recorded as `True`. Every `sorry` is the proof of
   a theorem (all statements compile; `lake build` reports them as warnings).
@@ -188,8 +188,12 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   unrestricted statement was false since `F_K(q'⁻¹) = F_K(q')`).
 * §6, **Corollary XVIIIa completely** (`CorXVIIIa.lean`): isogenies onto `F_K(q)` and their form
   `μ_m τ_u`.
-* Not started (statements only): §5; Corollary XVIIIb (no complex multiplication); Appendix A2 in
-  general.
+* §6, **Corollary XVIIIb completely** (`CorXVIIIb.lean`): the pull-back of `μ_m τ_u`, `Φ_q` of point
+  divisors and the algebraic Abel–Jacobi theorem (`Multiplicators.lean`), transport of
+  multiplicators along isomorphisms (`MultTransfer.lean`), constant extensions normed by the
+  spectral norm.
+* Not started (statements only): §5; the Proposition on absolute integrality of `j` (§6);
+  Appendix A2 in general.
 
 ## Buzzard's identity (MathOverflow 469021)
 

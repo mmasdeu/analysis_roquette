@@ -253,7 +253,11 @@ add('corollary','cor:XVIIIa-subst','Corollary XVIIIa: the isogenies $\\mu_m$',['
  r'For $\bar q$ commensurable with $q$ and $m\ne0$ divisible by the order of $q\bmod^\times\bar q$, $\mu_m$ restricts to an isogeny $F_K(\bar q)\to F_K(q)$ of degree $dm$ whenever $\bar q^d=q^m$.')
 add('definition','def:complex-multiplication','Complex multiplication (placeholder)',['HasComplexMultiplication'],[],True,
  r'$M(F)\neq\mathbb Z$. Placeholder predicate.')
-add('corollary','cor:XVIIIb','Corollary XVIIIb (no CM)',['corXVIIIb_no_cm'],['def:complex-multiplication'],False,
+add('lemma','lem:XVIIIb-mult','Multiplicators of $F_K(q)$',['psiDiv_isogenyPullback','exists_fun_of_psiDiv','exists_pullback_eq_zsmul','multiplicatorRing_eq_int'],['cor:XVIIIa','prop:abel-jacobi-1'],False,
+ r'The pull-back of $\mu_m\tau_u$ sends $\mathfrak p_\beta$ to $[K(\beta):K(\gamma)]\,\mathfrak p_\gamma$, $\gamma=u^{-1}\beta^m$, so $\Phi_q(\mu^*D)=\Phi_q(D)^m u^{-\deg D}$; by Abel--Jacobi $\mu^*$ is multiplication by $m$ on $C^0_K(q)$.')
+add('lemma','lem:mult-transfer','Multiplicators under isomorphisms',['PullbackIsInt.of_algEquiv','multiplicatorRing_eq_int_of_pullbackIsInt'],['def:complex-multiplication'],False,
+ r'If every endomorphism acts on $C^0$ as an integer, the ring of multiplicators is $\mathbb Z$; this property is invariant under $K$-isomorphisms.')
+add('corollary','cor:XVIIIb','Corollary XVIIIb (no CM)',['corXVIIIb_no_cm'],['def:complex-multiplication','lem:XVIIIb-mult','lem:mult-transfer'],False,
  r'$F_K(q)$ does not have complex multiplication.')
 add('proposition','prop:abs-integral','Absolute integrality of $j$',['prop_cm_absolutely_integral'],['def:complex-multiplication','def:absolute-invariant-gen'],False,
  r'Over any field, complex multiplication forces $j$ to be absolutely integral.')

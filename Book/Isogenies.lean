@@ -18,8 +18,8 @@ Theorem XVII, which determines the extension $`F_K(q)\,|\,F_K(\bar q\,|\,X^m)` c
 Theorem XVIII (every elliptic subfield is of this form) and Corollary XVIIIa. The book's appeal to
 the general algebraic theory of elliptic function fields over $`\Omega` is replaced by a
 formalized theory of finite extensions of function fields and of constant field extensions
-inside $`F_L(q)` (see the section on Theorem XVIII). Corollary XVIIIb and the results on
-semi-periodic fields are not reproduced.
+inside $`F_L(q)` (see the section on Theorem XVIII). Corollary XVIIIb (no complex
+multiplication) is also proved; the results on semi-periodic fields are not reproduced.
 
 The Lean code on this page refers to the following context.
 -/
@@ -621,3 +621,24 @@ $`\mu_m\tau` where $`\tau` is a translation of $`F_K(\bar q)`._
 #stmt corXVIIIa_isogeny
 
 #stmt corXVIIIa_isogenies_form
+
+/-!
+## Multiplicators
+
+Every isogeny $`\mu\colon E\to F` defines by transposition a map $`\mu^*\colon D(F)\to D(E)` of the
+divisor groups and hence the _multiplicator_ $`\mu^*\colon C^0(F)\to C^0(E)`. For an endomorphism
+$`\mu=\mu_m\tau_u` of $`F_K(q)` the pull-back of the prime divisor at $`\beta` is
+$`[K(\beta):K(\gamma)]` times the prime divisor at $`\gamma=u^{-1}\beta^m`, so that
+$`\Phi_q(\mu^*D)=\Phi_q(D)^m\,u^{-\deg D}`:
+-/
+
+#stmt psiDiv_isogenyPullback
+
+/-!
+By the Abel–Jacobi theorem the multiplicator is multiplication by $`m`, the ring of multiplicators
+$`\mathbf M_K(q)` is $`\mathbb Z`, and the same holds after every finite constant field extension:
+
+*Corollary XVIIIb.* _The field $`F_K(q)` does not have complex multiplication._
+-/
+
+#stmt corXVIIIb_no_cm
