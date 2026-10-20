@@ -62,3 +62,5 @@ import AnalyticTheory.IsogenyXVII
 import AnalyticTheory.FFExtension
 import AnalyticTheory.FFDedekind
 import AnalyticTheory.FFNorm
+import AnalyticTheory.EllipticRigidity
+import AnalyticTheory.EllipticSubfield
