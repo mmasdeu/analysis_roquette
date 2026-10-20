@@ -83,3 +83,4 @@ import AnalyticTheory.CorXVIIIa
 import AnalyticTheory.Multiplicators
 import AnalyticTheory.MultTransfer
 import AnalyticTheory.CorXVIIIb
+import AnalyticTheory.FFFundamental
