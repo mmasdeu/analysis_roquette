@@ -1448,13 +1448,25 @@ See the Lean proof of \texttt{thmXVIII\_subfields}.
 
 \begin{corollary}[Corollary XVIIIa (isogenies)]
 \label{cor:XVIIIa}
-\lean{AnalyticTheory.corXVIIIa_isogeny, AnalyticTheory.corXVIIIa_isogenies}
+\lean{AnalyticTheory.corXVIIIa_isogeny, AnalyticTheory.corXVIIIa_isogenies_form}
 \uses{thm:XVIII, def:isogeny}
 \leanok
 $E$ admits an isogeny to $F_K(q)$ iff $E\cong F_K(\bar q)$ with $\bar q$ commensurable with $q$; the isogenies $F_K(\bar q)\to F_K(q)$ are the $\mu_m\tau$ with $\tau$ a translation, of degree $dm$.
 \end{corollary}
 \begin{proof}
-See the Lean proof of \texttt{corXVIIIa\_isogeny, corXVIIIa\_isogenies}.
+See the Lean proof of \texttt{corXVIIIa\_isogeny, corXVIIIa\_isogenies\_form}.
+\end{proof}
+
+\begin{corollary}[Corollary XVIIIa: the isogenies $\mu_m$]
+\label{cor:XVIIIa-subst}
+\lean{AnalyticTheory.exists_substitution_isogeny, AnalyticTheory.substitution_isogeny_degree}
+\uses{lem:XVII-subst, thm:XVII-i, def:isogeny}
+\leanok
+For $\bar q$ commensurable with $q$ and $m\ne0$ divisible by the order of $q\bmod^\times\bar q$, $\mu_m$ restricts to an isogeny $F_K(\bar q)\to F_K(q)$ of degree $dm$ whenever $\bar q^d=q^m$.
+\end{corollary}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_substitution\_isogeny, substitution\_isogeny\_degree}.
 \end{proof}
 
 \begin{corollary}[Corollary XVIIIb (no CM)]

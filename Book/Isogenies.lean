@@ -537,3 +537,28 @@ $`K`; this gives $`|U/q| \cdot [\mathbb{Z} : \psi(U)] = |\mu_m(K)| \cdot d`.
 -/
 
 #stmt range_psiHom_eq_top_iff
+
+/-!
+## Isogenies between the fields of periodic functions
+
+If $`E\,|\,K` and $`F\,|\,K` are elliptic function fields then an _isogeny_ from $`E` to $`F` is
+defined to be a $`K`-isomorphism $`\mu` from $`E` into $`F`; the field degree $`[F : \mu E]` is
+called the _degree_ of $`\mu`.
+-/
+
+#stmt IsIsogeny
+
+/-!
+*Corollary XVIIIa (the isogenies $`\mu_m`).* _Let $`\bar q` be commensurable with $`q`, and let
+$`m \ne 0` be divisible by the order of $`q \bmod^\times \bar q`. Then $`\mu_m` maps $`F_K(\bar q)`
+into $`F_K(q)` and is an isogeny $`F_K(\bar q) \to F_K(q)` of degree $`dm`, where
+$`\bar q^{\,d} = q^m`._
+
+Indeed, the image of $`\mu_m` is $`F_K(\bar q\,|\,X^m) \subset F_K(q\,|\,X)` by (72), and its degree
+is computed in Theorem XVII (i). (For $`m < 0` there is no $`d \ge 0` with $`\bar q^{\,d} = q^m`,
+since $`|q^m| > 1`; so only $`m > 0` occurs, and $`\mu_{-m}` is $`\mu_m` composed with the reflection.)
+-/
+
+#stmt exists_substitution_isogeny
+
+#stmt substitution_isogeny_degree

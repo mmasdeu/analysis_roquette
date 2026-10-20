@@ -168,7 +168,8 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   (built from `EntireLaurent.holExpand`), formulas (72), (73), and **Theorem XVII** completely:
   (i) `[F_K(q) : F_K(q̄|Xᵐ)] = dm`, (ii) inseparability degree `p^r` with maximal separable
   subextension `F_K(q^{p^r}|X^{p^r})`, (iii) the automorphisms are the translations `τ_u`, `u ∈ U`,
-  with group `U/q`, (iv) the Galois criterion.
+  with group `U/q`, (iv) the Galois criterion. Also the first half of **Corollary XVIIIa**: `μ_m` is an isogeny `F_K(q̄) → F_K(q)` of degree `dm`
+  (`exists_substitution_isogeny`, `substitution_isogeny_degree`).
 * Not started (statements only): §5; §6 from Theorem XVIII on; Appendix A2 in general.
 
 ## Buzzard's identity (MathOverflow 469021)

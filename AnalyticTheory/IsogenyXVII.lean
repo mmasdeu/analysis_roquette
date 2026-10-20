@@ -1461,4 +1461,55 @@ theorem thmXVII_inseparability (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ <
     exact ⟨0, ⟨x, by simp only [pow_zero, pow_one]; rfl⟩⟩
 
 
+section isogeny
+
+/-- Book, §6: for `m ≠ 0` divisible by the order of `q mod^× q̄`, the substitution `μ_m` restricts to
+a `K`-embedding (an isogeny) `F_K(q̄) → F_K(q)`. -/
+theorem exists_substitution_isogeny (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m : ℤ) (hm : m ≠ 0) (hdvd : OrderDvd K q qbar m) :
+    ∃ μ : FqSub K qbar →ₐ[K] FqSub K q,
+      (∀ x, (μ x : MeroRing K) = substPow K m (x : MeroRing K)) ∧ Function.Injective μ := by
+  have hle : FqbarXm K qbar m ≤ FqSub K q :=
+    (fq_qbar_Xm_subset K q qbar hq0 hq1 hqb0 hqb1 m hm hdvd).1
+  let f : FqSub K qbar →+* FqSub K q :=
+    ((substPow K m).comp (FqSub K qbar).subtype).codRestrict (FqSub K q)
+      (fun x => hle ⟨x, x.2, rfl⟩)
+  have hf : ∀ x, (f x : MeroRing K) = substPow K m (x : MeroRing K) := fun x => rfl
+  refine ⟨{ f with commutes' := fun c => ?_ }, hf, ?_⟩
+  · apply Subtype.ext
+    show substPow K m ((FqHom K qbar c : FqSub K qbar) : MeroRing K) =
+      ((FqHom K q c : FqSub K q) : MeroRing K)
+    exact substPow_algebraMapK hm c
+  · intro x y hxy
+    apply Subtype.ext
+    exact substPow_injective hm (by simpa [hf] using congrArg Subtype.val hxy)
+
+/-- Book, §6, Corollary XVIIIa (first part): the isogeny `μ_m : F_K(q̄) → F_K(q)` has degree `dm`
+if `q̄ᵈ = qᵐ`. -/
+theorem substitution_isogeny_degree (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m : ℤ) (hm : m ≠ 0) (d : ℕ)
+    (hd : qbar ^ d = q ^ m) : relDeg (FqbarXm K qbar m) (FqSub K q) = d * m.natAbs := by
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  rcases lt_or_gt_of_ne hm with hneg | hpos
+  · exfalso
+    have h1 : ‖qbar ^ d‖ ≤ 1 := by
+      rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hqb1.le
+    have h2 : 1 < ‖q ^ m‖ := by
+      rw [norm_zpow]
+      exact one_lt_zpow_of_neg₀ hq0 hq1 hneg
+    rw [hd] at h1; exact absurd h1 (not_le.mpr h2)
+  · obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hpos.le
+    have hn : 0 < n := by exact_mod_cast hpos
+    have hd0 : 0 < d := by
+      rcases Nat.eq_zero_or_pos d with rfl | h
+      · exfalso
+        have : ‖q ^ (n : ℤ)‖ = 1 := by rw [← hd]; simp
+        rw [norm_zpow] at this
+        exact absurd this (ne_of_lt (zpow_lt_one₀ hq0 hq1 hpos))
+      · exact h
+    have := thmXVII_degree K q qbar hq0 hq1 hqb0 hqb1 n d hn hd0 (by simpa using hd)
+    simpa using this
+
+end isogeny
+
 end upper

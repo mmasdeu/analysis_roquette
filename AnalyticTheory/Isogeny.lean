@@ -262,16 +262,14 @@ theorem corXVIIIa_isogeny (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
         Nonempty (E ≃ₐ[K] FqSub K qbar) := by
   sorry
 
-/-- Book, §6, Corollary XVIIIa (second part): for `q̄` commensurable with `q` and `m ≠ 0` divisible
-by the order of `q mod^× q̄` the substitution `μ_m : F_K(q̄) → F_K(q)` is an isogeny of degree `dm`
-(`q̄^d = q^m`); every isogeny `F_K(q̄) → F_K(q)` is `μ_m τ` with `τ` a translation of `F_K(q̄)`. -/
-theorem corXVIIIa_isogenies (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) :
-    (∀ m : ℤ, m ≠ 0 → OrderDvd K q qbar m → ∃ μ : FqSub K qbar →ₐ[K] FqSub K q,
-      (∀ x, (μ x : MeroRing K) = substPow K m (x : MeroRing K)) ∧
-      ∀ d : ℕ, qbar ^ d = q ^ m → relDeg (FqbarXm K qbar m) (FqSub K q) = d * m.natAbs) ∧
-    (∀ μ : FqSub K qbar →ₐ[K] FqSub K q, ∃ (m : ℤ) (u : Kˣ), m ≠ 0 ∧ OrderDvd K q qbar m ∧
-      ∀ x, (μ x : MeroRing K) = substPow K m (translation K u (x : MeroRing K))) := by
+/-- Book, §6, Corollary XVIIIa (second part): every isogeny `F_K(q̄) → F_K(q)` is `μ_m τ` with `τ` a
+translation of `F_K(q̄)` and `m ≠ 0` divisible by the order of `q mod^× q̄`. (The existence of the
+isogenies `μ_m` and their degree are `exists_substitution_isogeny`, `substitution_isogeny_degree`.) -/
+theorem corXVIIIa_isogenies_form (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar)
+    (μ : FqSub K qbar →ₐ[K] FqSub K q) :
+    ∃ (m : ℤ) (u : Kˣ), m ≠ 0 ∧ OrderDvd K q qbar m ∧
+      ∀ x, (μ x : MeroRing K) = substPow K m (translation K u (x : MeroRing K)) := by
   sorry
 
 /-! #### Multiplicators and complex multiplication -/
