@@ -84,3 +84,4 @@ import AnalyticTheory.Multiplicators
 import AnalyticTheory.MultTransfer
 import AnalyticTheory.CorXVIIIb
 import AnalyticTheory.FFFundamental
+import AnalyticTheory.GaloisDescent
