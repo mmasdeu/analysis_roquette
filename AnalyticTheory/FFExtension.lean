@@ -193,6 +193,40 @@ theorem exists_const_of_degree_one (P : PrimeDivisor K F) (h : P.degree = 1) (x 
   rw [sub_eq_zero]
   rfl
 
+/-- Conversely, if every element of the valuation ring is congruent to a constant, the prime
+divisor has degree `1`. -/
+theorem degree_eq_one_of_forall (P : PrimeDivisor K F)
+    (h : ∀ x : P.ring, ∃ c : K, x - P.toRing c ∈ IsLocalRing.maximalIdeal P.ring) : P.degree = 1 := by
+  let := resAlg P
+  show Module.finrank K (IsLocalRing.ResidueField P.ring) = 1
+  refine finrank_eq_one_iff'.mpr ⟨1, one_ne_zero, fun w => ?_⟩
+  obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective w
+  obtain ⟨c, hc⟩ := h x
+  refine ⟨c, ?_⟩
+  rw [Algebra.smul_def, mul_one]
+  show IsLocalRing.residue P.ring (P.toRing c) = _
+  rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, ← neg_sub]
+  exact neg_mem hc
+
+/-- The restriction of a prime divisor of degree `1` has degree `1`. -/
+theorem degree_restrict_eq_one (P : PrimeDivisor K F) [Algebra.IsAlgebraic E F]
+    (h : P.degree = 1) : (P.restrict (E := E)).degree = 1 := by
+  set Q := P.restrict (E := E)
+  refine Q.degree_eq_one_of_forall fun y => ?_
+  obtain ⟨c, hc⟩ := P.exists_const_of_degree_one h ⟨algebraMap E F y, y.2⟩
+  refine ⟨c, ?_⟩
+  set z := y - Q.toRing c
+  by_cases hz : (z : E) = 0
+  · rw [show z = 0 from Subtype.ext hz]; exact zero_mem _
+  have hzF : algebraMap E F (z : E) = ((⟨algebraMap E F y, y.2⟩ - P.toRing c : P.ring) : F) := by
+    show algebraMap E F ((y : E) - algebraMap K E c) = algebraMap E F y - algebraMap K F c
+    rw [map_sub, ← IsScalarTower.algebraMap_apply]
+  have hz' : algebraMap E F (z : E) ≠ 0 := (map_ne_zero_iff _ (algebraMap E F).injective).mpr hz
+  rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_iff_ord Q z hz]
+  rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_iff_ord P _ (hzF ▸ hz'), ← hzF,
+    P.ord_algebraMap hz] at hc
+  intro h0; exact hc (by rw [h0, mul_zero])
+
 
 theorem ord_one (P : PrimeDivisor K F) : P.ord (1 : F) = 0 :=
   P.ord_eq (u := 1) (n := 0) (by simp)
