@@ -207,7 +207,37 @@ add('lemma','lem:XVII','Inclusion (72) and symmetry (73)',['fq_qbar_Xm_subset'],
  r'$F_K(\bar q\mid X^m)\subseteq F_K(q\mid X)$, and $F_K(\bar q\mid X^{-m})=F_K(\bar q\mid X^m)$.')
 add('theorem','thm:XVII','Theorem XVII',['thmXVII_degree'],['lem:XVII'],True,
  r'Degrees, inseparability, automorphisms and Galois criterion of $F_K(q\mid X)$ over $F_K(\bar q\mid X^m)$. Recorded as $\mathrm{True}$.')
-add('theorem','thm:XVIII','Theorem XVIII',['thmXVIII_subfields'],['thm:XVII','def:elliptic-subfield'],False,
+add('lemma','lem:ff-restrict','Restriction of prime divisors',['PrimeDivisor.restrict','PrimeDivisor.ord_algebraMap','PrimeDivisor.degree_restrict_eq_one'],['def:function-field'],False,
+ r'For an algebraic extension $F\,|\,E$ every prime divisor $P$ of $F$ restricts to a prime divisor $P\cap E$ of $E$, with $\mathrm{ord}_P=e\cdot\mathrm{ord}_{P\cap E}$ on $E$, $e\ge1$; restrictions of degree-one primes have degree one.')
+add('lemma','lem:ff-fundamental','Dedekind bridge and fundamental identity',['PrimeDivisor.overEquiv','PrimeDivisor.card_over_eq_finrank','PrimeDivisor.exists_over'],['lem:ff-restrict'],False,
+ r'For $F\,|\,E$ finite separable and $Q$ a prime divisor of $E$, the prime divisors over $Q$ correspond to the maximal ideals of the integral closure of $\mathcal O_Q$; if all of them have degree one and are unramified there are exactly $[F:E]$.')
+add('lemma','lem:ff-norm','Norm formula',['PrimeDivisor.ord_norm','isPrincipalDiv_norm'],['lem:ff-fundamental'],False,
+ r'$\mathrm{ord}_Q N_{F|E}(g)=\sum_{P|Q} f(P|Q)\,\mathrm{ord}_P(g)$; hence push-forwards of principal divisors are principal.')
+add('lemma','lem:ff-unramified','Unramified primes',['exists_isGoodGen','PrimeDivisor.IsGoodGen.ramIdx_eq_one','PrimeDivisor.IsGoodGen.exists_poly'],['lem:ff-fundamental'],False,
+ r'At all but finitely many prime divisors $Q$ a primitive element $y$ is integral with $f^\prime(y)$ a unit; there $\mathcal O_Q[y]$ is the integral closure (conductor), every $P|Q$ is unramified (different) and residues are polynomials in $\bar y$.')
+add('lemma','lem:genus-one-rigid','Rigidity of degree-one primes',['isRigidAt_of_elliptic'],['def:elliptic'],False,
+ r'In an elliptic function field, $[Q_1]-[Q_2]$ with $\deg Q_2=1$ is principal only if $Q_1=Q_2$.')
+add('lemma','lem:XVIII-points','The point map of a subfield',['isPrincipalDiv_ptE','Vsub','translation_fixes_of_mem'],['lem:ff-norm','lem:genus-one-rigid','prop:abel-jacobi-1'],False,
+ r'For $E\subseteq F_K(q)$ and $\pi(a)=p_a\cap E$: $\pi(ab)+\pi(1)\sim\pi(a)+\pi(b)$; $V=\pi^{-1}(\pi(1))$ is a subgroup of $K^\times$ whose translations fix $E$.')
+add('lemma','lem:XVIII-period-group','Subgroups commensurable with $q$',['exists_period_of_subgroup'],[],False,
+ r'A subgroup $V\ni q$ of $K^\times$ with $V/q$ finite is $\{u\mid u^m\in\bar q^{\mathbb Z}\}$ with $\bar q$ an $m$-th power, $K\supseteq\mu_m$ and $\bar q^d=q^m$.')
+add('lemma','lem:XVIII-split','Theorem XVIII, split case',['eq_FqbarXm_of_split'],['lem:XVIII-points','lem:XVIII-period-group','lem:ff-fundamental','thm:XVII'],False,
+ r'If $\pi$ is rigid and the primes over some $\pi(a)$ are rational and unramified, then $E=F_K(\bar q\mid X^m)$.')
+add('lemma','lem:fq-residue-eval','Residue fields of $F_K(q)$',['exists_evRing_eq','isSeparable_of_residue'],['thm:fq-residue'],False,
+ r'Evaluation at $\alpha$ embeds the residue field of $p_\alpha$ onto $K(\alpha)$.')
+add('lemma','lem:XVIII-good-point','Good rational points',['exists_good_point','isSeparable_of_isGoodGen'],['lem:ff-unramified','lem:fq-residue-eval'],False,
+ r'There is $a\in K^\times$ such that every prime over $\pi(a)$ is unramified and its point is separable over $K$.')
+add('lemma','lem:const-ext-sub','Constant field extension of a subfield',['constExtSub','mem_constExtSub_iff','fqExt_mem_constExtSub_iff','isSeparable_constExtSub'],['def:constant-extension'],False,
+ r'$E_L=E(L)\subseteq F_L(q)$ consists of the $\sum b_i e_i$; $E_L\cap F_K(q)=E$ and $F_L(q)\,|\,E_L$ is finite separable.')
+add('lemma','lem:const-rigid','Rigidity of $E_L$ at rational points',['anVal_coord_ge','isRigidAt_constExt'],['lem:const-ext-sub','lem:genus-one-rigid'],False,
+ r'For $L\,|\,K$ Galois and $b\in K^\times$, $\pi_L(b)$ is rigid in $E_L$ (Galois descent of coordinates).')
+add('lemma','lem:const-split','Splitting at a good point',['constExt_split'],['lem:XVIII-good-point','lem:const-ext-sub'],False,
+ r'If $L$ contains the points over $\pi(a)$, every prime of $F_L(q)$ over $\pi_L(a)$ is $L$-rational and unramified.')
+add('lemma','lem:const-descent','Descent of $\\bar q$',['mem_FqbarXm_of_meroExt','gal_fixed_of_imageSub_eq'],['lem:const-ext-sub'],False,
+ r'$M_K\cap F_L(\bar q\mid X^m)=F_K(\bar q\mid X^m)$, and if $E_L=F_L(\bar q\mid X^m)$ then $\bar q\in K$.')
+add('theorem','thm:XVIII-sep','Theorem XVIII, separable case',['eq_FqbarXm_of_separable'],['lem:XVIII-split','lem:const-rigid','lem:const-split','lem:const-descent'],False,
+ r'If $F_K(q)$ is finite separable over an elliptic subfield $E$, then $E=F_K(\bar q\mid X^m)$ with $\bar q^d=q^m$.')
+add('theorem','thm:XVIII','Theorem XVIII',['thmXVIII_subfields'],['thm:XVII','def:elliptic-subfield','thm:XVIII-sep'],False,
  r'Every elliptic subfield of $F_K(q)$ is $F_K(\bar q\mid X^m)$ for a unique period $\bar q$ and integer $m$.')
 add('definition','def:isogeny','Isogeny',['IsIsogeny'],[],False,
  r'An isogeny is a $K$-embedding of elliptic function fields.')
@@ -485,7 +515,7 @@ add('theorem', 'thm:XVII-i', 'Theorem XVII (i)',
     ['lem:XVII', 'lem:XVII-subst', 'def:rel-degree'], False,
     r'For $m>0$ with $\bar q^d=q^m$: $[F_K(q):F_K(\bar q|X^m)]=dm$. The lower step $F_K(\bar q|X^m)\subset F_K(q^m|X^m)$ is cyclic of degree $d$ (generated by $\tau_{\bar q}$), the upper step has the basis $u_i=X^{-i}\Theta(q^m|q^{-i}X^m)/\Theta(q^m|X^m)$, $0\le i<m$.')
 _upd('thm:XVIII', text=r'Every elliptic subfield $E$ of $F_K(q)$ equals $F_K(\bar q|X^m)$ for a unique period $\bar q$ (commensurable with $q$) and $m>0$ the largest integer such that $E\subset\mu_m(M_K)$.',
-     uses=['thm:XVII', 'def:elliptic-subfield'])
+     uses=['thm:XVII', 'def:elliptic-subfield', 'thm:XVIII-sep'])
 _upd('cor:XVIIIa', text=r'$E$ admits an isogeny to $F_K(q)$ iff $E\cong F_K(\bar q)$ with $\bar q$ commensurable with $q$; the isogenies $F_K(\bar q)\to F_K(q)$ are the $\mu_m\tau$ with $\tau$ a translation, of degree $dm$.',
      lean=['corXVIIIa_isogeny', 'corXVIIIa_isogenies_form'])
 _upd('def:isogeny', text=r'An isogeny $E\to F$ is a $K$-embedding; it has a transposed divisor map $\mu^*:D(F)\to D(E)$, hence a multiplicator $C^0(F)\to C^0(E)$.',

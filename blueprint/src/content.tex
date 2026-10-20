@@ -174,7 +174,7 @@ The holomorphic functions over $K$ form a ring $H_K$, packaged as a subring of t
 
 \begin{lemma}[$H_K$ is a domain]
 \label{lem:H-K-domain}
-\lean{EntireLaurent.holSubring_isDomain, EntireLaurent.exists_good_point, EntireLaurent.sum_ne_zero_of_good, EntireLaurent.bad_radii_finite}
+\lean{EntireLaurent.holSubring_isDomain, AnalyticTheory.exists_good_point, EntireLaurent.sum_ne_zero_of_good, EntireLaurent.bad_radii_finite}
 \uses{def:H-K}
 \leanok
 $H_K$ is an integral domain.
@@ -601,6 +601,18 @@ The function $\Theta$, which is holomorphic on $\Omega^\times$, viewed as an ele
 \leanok
 The image field of $\mu_m:\bar f(X)\mapsto\bar f(X^m)$, where $\mu_m$ is the substitution endomorphism of $M_K$ (characterized by its action on holomorphic functions); $F_K(\bar q\mid X^m)=\mu_m(F_K(\bar q))$.
 \end{definition}
+
+\begin{lemma}[Residue fields of $F_K(q)$]
+\label{lem:fq-residue-eval}
+\lean{AnalyticTheory.exists_evRing_eq, AnalyticTheory.isSeparable_of_residue}
+\uses{thm:fq-residue}
+\leanok
+Evaluation at $\alpha$ embeds the residue field of $p_\alpha$ onto $K(\alpha)$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_evRing\_eq, isSeparable\_of\_residue}.
+\end{proof}
 
 \begin{definition}[$K$-algebra structure on $F_K(q)$]
 \label{def:Fq-algebra}
@@ -1435,10 +1447,22 @@ For $m>0$ with $\bar q^d=q^m$: $[F_K(q):F_K(\bar q|X^m)]=dm$; the degree of inse
 See the Lean proof of \texttt{Usub, thmXVII\_inseparability, isRelSeparable\_upper, isRelPurelyInseparable\_upper, isRelSeparable\_FqSub\_bar, mem\_FqbarXm\_of\_mem\_Sm}.
 \end{proof}
 
+\begin{theorem}[Theorem XVIII, separable case]
+\label{thm:XVIII-sep}
+\lean{AnalyticTheory.eq_FqbarXm_of_separable}
+\uses{lem:XVIII-split, lem:const-rigid, lem:const-split, lem:const-descent}
+\leanok
+If $F_K(q)$ is finite separable over an elliptic subfield $E$, then $E=F_K(\bar q\mid X^m)$ with $\bar q^d=q^m$.
+\end{theorem}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{eq\_FqbarXm\_of\_separable}.
+\end{proof}
+
 \begin{theorem}[Theorem XVIII]
 \label{thm:XVIII}
 \lean{AnalyticTheory.thmXVIII_subfields}
-\uses{thm:XVII, def:elliptic-subfield}
+\uses{thm:XVII, def:elliptic-subfield, thm:XVIII-sep}
 \leanok
 Every elliptic subfield $E$ of $F_K(q)$ equals $F_K(\bar q|X^m)$ for a unique period $\bar q$ (commensurable with $q$) and $m>0$ the largest integer such that $E\subset\mu_m(M_K)$.
 \end{theorem}
@@ -1562,6 +1586,161 @@ $F_K(\bar q\mid X^m)\subseteq F_K(q\mid X)$, and $F_K(\bar q\mid X^{-m})=F_K(\ba
 \begin{proof}
 \leanok
 See the Lean proof of \texttt{fq\_qbar\_Xm\_subset}.
+\end{proof}
+
+\begin{lemma}[Restriction of prime divisors]
+\label{lem:ff-restrict}
+\lean{AnalyticTheory.PrimeDivisor.restrict, AnalyticTheory.PrimeDivisor.ord_algebraMap, AnalyticTheory.PrimeDivisor.degree_restrict_eq_one}
+\uses{def:function-field}
+\leanok
+For an algebraic extension $F\,|\,E$ every prime divisor $P$ of $F$ restricts to a prime divisor $P\cap E$ of $E$, with $\mathrm{ord}_P=e\cdot\mathrm{ord}_{P\cap E}$ on $E$, $e\ge1$; restrictions of degree-one primes have degree one.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{restrict, ord\_algebraMap, degree\_restrict\_eq\_one}.
+\end{proof}
+
+\begin{lemma}[Dedekind bridge and fundamental identity]
+\label{lem:ff-fundamental}
+\lean{AnalyticTheory.PrimeDivisor.overEquiv, AnalyticTheory.PrimeDivisor.card_over_eq_finrank, AnalyticTheory.PrimeDivisor.exists_over}
+\uses{lem:ff-restrict}
+\leanok
+For $F\,|\,E$ finite separable and $Q$ a prime divisor of $E$, the prime divisors over $Q$ correspond to the maximal ideals of the integral closure of $\mathcal O_Q$; if all of them have degree one and are unramified there are exactly $[F:E]$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{overEquiv, card\_over\_eq\_finrank, exists\_over}.
+\end{proof}
+
+\begin{lemma}[Norm formula]
+\label{lem:ff-norm}
+\lean{AnalyticTheory.PrimeDivisor.ord_norm, AnalyticTheory.isPrincipalDiv_norm}
+\uses{lem:ff-fundamental}
+\leanok
+$\mathrm{ord}_Q N_{F|E}(g)=\sum_{P|Q} f(P|Q)\,\mathrm{ord}_P(g)$; hence push-forwards of principal divisors are principal.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{ord\_norm, isPrincipalDiv\_norm}.
+\end{proof}
+
+\begin{lemma}[Unramified primes]
+\label{lem:ff-unramified}
+\lean{AnalyticTheory.exists_isGoodGen, AnalyticTheory.PrimeDivisor.IsGoodGen.ramIdx_eq_one, AnalyticTheory.PrimeDivisor.IsGoodGen.exists_poly}
+\uses{lem:ff-fundamental}
+\leanok
+At all but finitely many prime divisors $Q$ a primitive element $y$ is integral with $f^\prime(y)$ a unit; there $\mathcal O_Q[y]$ is the integral closure (conductor), every $P|Q$ is unramified (different) and residues are polynomials in $\bar y$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_isGoodGen, ramIdx\_eq\_one, exists\_poly}.
+\end{proof}
+
+\begin{lemma}[Rigidity of degree-one primes]
+\label{lem:genus-one-rigid}
+\lean{AnalyticTheory.isRigidAt_of_elliptic}
+\uses{def:elliptic}
+\leanok
+In an elliptic function field, $[Q_1]-[Q_2]$ with $\deg Q_2=1$ is principal only if $Q_1=Q_2$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{isRigidAt\_of\_elliptic}.
+\end{proof}
+
+\begin{lemma}[The point map of a subfield]
+\label{lem:XVIII-points}
+\lean{AnalyticTheory.isPrincipalDiv_ptE, AnalyticTheory.Vsub, AnalyticTheory.translation_fixes_of_mem}
+\uses{lem:ff-norm, lem:genus-one-rigid, prop:abel-jacobi-1}
+\leanok
+For $E\subseteq F_K(q)$ and $\pi(a)=p_a\cap E$: $\pi(ab)+\pi(1)\sim\pi(a)+\pi(b)$; $V=\pi^{-1}(\pi(1))$ is a subgroup of $K^\times$ whose translations fix $E$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{isPrincipalDiv\_ptE, Vsub, translation\_fixes\_of\_mem}.
+\end{proof}
+
+\begin{lemma}[Subgroups commensurable with $q$]
+\label{lem:XVIII-period-group}
+\lean{AnalyticTheory.exists_period_of_subgroup}
+\leanok
+A subgroup $V\ni q$ of $K^\times$ with $V/q$ finite is $\{u\mid u^m\in\bar q^{\mathbb Z}\}$ with $\bar q$ an $m$-th power, $K\supseteq\mu_m$ and $\bar q^d=q^m$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_period\_of\_subgroup}.
+\end{proof}
+
+\begin{lemma}[Theorem XVIII, split case]
+\label{lem:XVIII-split}
+\lean{AnalyticTheory.eq_FqbarXm_of_split}
+\uses{lem:XVIII-points, lem:XVIII-period-group, lem:ff-fundamental, thm:XVII}
+\leanok
+If $\pi$ is rigid and the primes over some $\pi(a)$ are rational and unramified, then $E=F_K(\bar q\mid X^m)$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{eq\_FqbarXm\_of\_split}.
+\end{proof}
+
+\begin{lemma}[Good rational points]
+\label{lem:XVIII-good-point}
+\lean{AnalyticTheory.exists_good_point, AnalyticTheory.isSeparable_of_isGoodGen}
+\uses{lem:ff-unramified, lem:fq-residue-eval}
+\leanok
+There is $a\in K^\times$ such that every prime over $\pi(a)$ is unramified and its point is separable over $K$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_good\_point, isSeparable\_of\_isGoodGen}.
+\end{proof}
+
+\begin{lemma}[Constant field extension of a subfield]
+\label{lem:const-ext-sub}
+\lean{AnalyticTheory.constExtSub, AnalyticTheory.mem_constExtSub_iff, AnalyticTheory.fqExt_mem_constExtSub_iff, AnalyticTheory.isSeparable_constExtSub}
+\uses{def:constant-extension}
+\leanok
+$E_L=E(L)\subseteq F_L(q)$ consists of the $\sum b_i e_i$; $E_L\cap F_K(q)=E$ and $F_L(q)\,|\,E_L$ is finite separable.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{constExtSub, mem\_constExtSub\_iff, fqExt\_mem\_constExtSub\_iff, isSeparable\_constExtSub}.
+\end{proof}
+
+\begin{lemma}[Rigidity of $E_L$ at rational points]
+\label{lem:const-rigid}
+\lean{AnalyticTheory.anVal_coord_ge, AnalyticTheory.isRigidAt_constExt}
+\uses{lem:const-ext-sub, lem:genus-one-rigid}
+\leanok
+For $L\,|\,K$ Galois and $b\in K^\times$, $\pi_L(b)$ is rigid in $E_L$ (Galois descent of coordinates).
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{anVal\_coord\_ge, isRigidAt\_constExt}.
+\end{proof}
+
+\begin{lemma}[Splitting at a good point]
+\label{lem:const-split}
+\lean{AnalyticTheory.constExt_split}
+\uses{lem:XVIII-good-point, lem:const-ext-sub}
+\leanok
+If $L$ contains the points over $\pi(a)$, every prime of $F_L(q)$ over $\pi_L(a)$ is $L$-rational and unramified.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{constExt\_split}.
+\end{proof}
+
+\begin{lemma}[Descent of $\bar q$]
+\label{lem:const-descent}
+\lean{AnalyticTheory.mem_FqbarXm_of_meroExt, AnalyticTheory.gal_fixed_of_imageSub_eq}
+\uses{lem:const-ext-sub}
+\leanok
+$M_K\cap F_L(\bar q\mid X^m)=F_K(\bar q\mid X^m)$, and if $E_L=F_L(\bar q\mid X^m)$ then $\bar q\in K$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{mem\_FqbarXm\_of\_meroExt, gal\_fixed\_of\_imageSub\_eq}.
 \end{proof}
 
 \begin{definition}[Isogeny]

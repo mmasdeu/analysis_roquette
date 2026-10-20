@@ -79,8 +79,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Blueprint nodes: 175 (80 definitions, 95 lemmas/propositions/theorems/corollaries/remarks, of which
-  39 are completely proved; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
+* Blueprint nodes: 208 (80 definitions, 128 lemmas/propositions/theorems/corollaries/remarks; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
 * **No placeholder objects remain**: there is no `opaque` constant, no `sorry`-bodied definition,
   instance or structure field, and no statement recorded as `True`. Every `sorry` is the proof of
   a theorem (all statements compile; `lake build` reports them as warnings).
@@ -170,7 +169,20 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   subextension `F_K(q^{p^r}|X^{p^r})`, (iii) the automorphisms are the translations `τ_u`, `u ∈ U`,
   with group `U/q`, (iv) the Galois criterion. Also the first half of **Corollary XVIIIa**: `μ_m` is an isogeny `F_K(q̄) → F_K(q)` of degree `dm`
   (`exists_substitution_isogeny`, `substitution_isogeny_degree`).
-* Not started (statements only): §5; §6 from Theorem XVIII on; Appendix A2 in general.
+* §6, algebraic theory of finite extensions of function fields (replacing the book's appeal to the
+  general theory of elliptic function fields): restriction of prime divisors and ramification
+  (`FFExtension.lean`), the Dedekind bridge and fundamental identity (`FFDedekind.lean`), the norm
+  formula (`FFNorm.lean`), unramified primes via conductor and different (`FFUnramified.lean`),
+  rigidity of degree-one primes in genus one (`EllipticRigidity.lean`).
+* §6, **Theorem XVIII in the separable case** (`eq_FqbarXm_of_separable`, sorry-free): the point
+  map of `E ⊆ F_K(q)` and its rigidity group `V` (`EllipticSubfield.lean`), subgroups of `K^×`
+  commensurable with `q` (`PeriodGroup.lean`), the split case (`EllipticSplit.lean`), residue fields
+  of `F_K(q)` by evaluation (`FqResidue.lean`), good rational points (`EllipticGood.lean`), the
+  constant field extension `E_L ⊆ F_L(q)` with its rigidity, splitting and descent
+  (`ConstSubfield`, `ConstGalois`, `ConstRigid`, `ConstSplit`, `ConstDescent.lean`),
+  assembled in `EllipticSeparable.lean`.
+* Not started (statements only): §5; the inseparable reduction and the uniqueness statements of
+  Theorem XVIII; Corollaries XVIIIa (second part), XVIIIb; Appendix A2 in general.
 
 ## Buzzard's identity (MathOverflow 469021)
 
