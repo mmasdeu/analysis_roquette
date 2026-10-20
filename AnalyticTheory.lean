@@ -64,3 +64,5 @@ import AnalyticTheory.FFDedekind
 import AnalyticTheory.FFNorm
 import AnalyticTheory.EllipticRigidity
 import AnalyticTheory.EllipticSubfield
+import AnalyticTheory.PeriodGroup
+import AnalyticTheory.EllipticSplit
