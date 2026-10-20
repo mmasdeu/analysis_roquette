@@ -76,3 +76,5 @@ import AnalyticTheory.ConstSplit
 import AnalyticTheory.ConstDescent
 import AnalyticTheory.EllipticSeparable
 import AnalyticTheory.FFFinite
+import AnalyticTheory.EllipticTransfer
+import AnalyticTheory.FqInsep
