@@ -75,3 +75,4 @@ import AnalyticTheory.ConstRigid
 import AnalyticTheory.ConstSplit
 import AnalyticTheory.ConstDescent
 import AnalyticTheory.EllipticSeparable
+import AnalyticTheory.FFFinite
