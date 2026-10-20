@@ -59,3 +59,5 @@ import AnalyticTheory.FqDescent
 import AnalyticTheory.Sec4
 import AnalyticTheory.buzzard
 import AnalyticTheory.IsogenyXVII
+import AnalyticTheory.FFExtension
+import AnalyticTheory.FFDedekind

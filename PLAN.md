@@ -1,3 +1,47 @@
+# Plan: elliptic subfields of `F_K(q)` (§6, Theorem XVIII and after)
+
+The book proves Theorem XVIII by appealing to the "general algebraic theory of elliptic function
+fields": over `Ω`, `F_Ω(q)` is Galois over a separable elliptic subfield `EΩ`, with a group of
+translations.  The formalization replaces this by the following chain (all in the project).
+
+## A. Finite extensions of function fields (`FFExtension.lean`, generic)
+1. Restriction of prime divisors `P ↦ P ∩ E` along a finite (algebraic) extension `F | E`;
+   ramification index `e(P|Q)` with `ord_P = e · ord_Q` on `E`; residue degree, `deg P = f · deg Q`.
+2. Dedekind bridge (separable `F | E`): `S = integralClosure O_Q F` is a Dedekind domain; the prime
+   divisors of `F` over `Q` ↔ maximal ideals of `S`, `O_P = S_𝔪`; `e`, `f` agree with Mathlib's
+   `ramificationIdx`, `inertiaDeg`.
+3. Fundamental identity `∑_{P|Q} e f = [F : E]` (Mathlib `Ideal.sum_ramification_inertia`).
+4. Norm formula `ord_Q (N f) = ∑_{P|Q} f(P|Q) ord_P f` (Mathlib `Ideal.relNorm_eq_pow_of_isMaximal`),
+   hence pushforward of principal divisors is principal.
+5. Ramified primes divide the different (Mathlib `pow_sub_one_dvd_differentIdeal`,
+   `aeval_derivative_mem_differentIdeal`): only finitely many primes ramify.
+
+## B. Genus one
+1. For degree-one primes `P, Q` of a genus-one field: `[P] - [Q]` principal ⇒ `P = Q` (`ℓ(Q) = 1`).
+2. Constant field extensions `E·L` of a subfield `E ⊆ F_K(q)` inside `F_L(q)` (linear disjointness
+   from `F_L(q) = ⊕ bᵢ F_K(q)`), degree and separability preserved, genus one by conservativity.
+
+## C. Rigidity on rational points (`F = F_K(q)`, `E ⊆ F`, `F | E` separable)
+1. Point map `π(α) = p_α ∩ E` for `α ∈ K^×`.
+2. `π(αβ) + π(1) ~ π(α) + π(β)` (Abel–Jacobi on `F` + pushforward), hence `V = π⁻¹(π 1)` is a
+   subgroup of `K^×` and the rational fibres are `V`-cosets.
+3. `τ_v` fixes `E` for `v ∈ V` (values on the infinitely many rational points).
+4. If the primes over `π(1)` are rational and unramified: `|V/q| = [F : E]`, so `E = F^V`, and
+   `F^V = F_K(q̄|Xᵐ)` (Theorem XVII).
+
+## D. Theorem XVIII
+1. Inseparable part: `F_K(q^{p^r}|X^{p^r})` is the unique subfield over which `F_K(q)` is purely
+   inseparable of degree `p^r`.
+2. Separable part over a finite Galois `L` containing the points over `π(1)`; unramifiedness from A5
+   (infinitely many rational primes, finitely many ramified ones); descent of `q̄` to `K` by Galois
+   invariance of the period.
+3. Maximality of `m`.
+
+Afterwards: Corollary XVIIIa (second part), XVIIIb (no CM), and the §4 bridges (genus of a Galois
+descent) with the same constant-extension tools.
+
+---
+
 # Plan: the parts of Appendices A1/A2 needed for §§3–4
 
 General rule: use Mathlib whenever possible, and in particular its elliptic-curve library
