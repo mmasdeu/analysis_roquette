@@ -113,7 +113,8 @@ theorem frobSub_le (r : ℕ) : frobSub q p r ≤ FqSub K q := by
 
 include hq0 hq1 in
 /-- `[F_K(q) : K · F_K(q)^{p^r}] ≤ p^r`. -/
-theorem relDeg_frobSub_le (r : ℕ) : relDeg (frobSub q p r) (FqSub K q) ≤ p ^ r := by
+theorem relDeg_frobSub_le (r : ℕ) :
+    0 < relDeg (frobSub q p r) (FqSub K q) ∧ relDeg (frobSub q p r) (FqSub K q) ≤ p ^ r := by
   set R := frobSub q p r
   have hRF := frobSub_le (q := q) (p := p) r
   have hxF : wpM K q ∈ FqSub K q := by rw [wpM_eq hq0 hq1]; exact wpAlg_mem_Fq hq0 hq1
@@ -170,7 +171,7 @@ theorem relDeg_frobSub_le (r : ℕ) : relDeg (frobSub q p r) (FqSub K q) ≤ p ^
   have hrel : relDeg R (FqSub K q) = Module.finrank R A := by
     rw [← hMeq, relDeg_eq hRM]
     rfl
-  rw [hrel, hfin]; exact hle
+  rw [hrel, hfin]; exact ⟨minpoly.natDegree_pos hint, hle⟩
 
 include hq0 hq1 in
 /-- `K · F_K(q)^{p^r} ⊆ F_K(q^{p^r} | X^{p^r})`. -/

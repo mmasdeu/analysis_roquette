@@ -237,17 +237,7 @@ def Usub (qbar : K) (hqb : qbar ≠ 0) (m : ℕ) : Subgroup Kˣ where
   inv_mem' := fun {a} ⟨k, hk⟩ => ⟨-k, by
     rw [Units.val_inv_eq_inv_val, inv_pow, hk, zpow_neg]⟩
 
-/-- Book, §6, Theorem XVIII: every elliptic subfield `E` of `F_K(q)` is `F_K(q̄|Xᵐ)` for a unique
-period `q̄` (commensurable with `q`) and a unique `m > 0` (the largest integer such that every
-function of `E` is a function of `Xᵐ`). -/
-theorem thmXVIII_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (E : Subfield (FqSub K q)) (hE : IsEllipticSubfield K E) :
-    ∃ (qbar : K) (m : ℕ), 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ Commensurable K q qbar ∧
-      0 < m ∧ OrderDvd K q qbar m ∧
-      E.map (FqSub K q).subtype = FqbarXm K qbar m ∧
-      (∀ q' : K, HasPeriod K E q' → q' = qbar) ∧
-      IsGreatest {k : ℕ | 0 < k ∧ E.map (FqSub K q).subtype ≤ (substPow K k).fieldRange} m := by
-  sorry
+-- Theorem XVIII (`thmXVIII_subfields`) is stated and proved in `EllipticXVIII.lean`.
 
 /-- Book, §6: an *isogeny* `μ : E → F` of elliptic function fields is a `K`-embedding `E ↪ F`. -/
 def IsIsogeny (E F : Type u) [Field E] [Field F] [Algebra K E] [Algebra K F] : Prop :=

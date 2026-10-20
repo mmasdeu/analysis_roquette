@@ -78,3 +78,4 @@ import AnalyticTheory.EllipticSeparable
 import AnalyticTheory.FFFinite
 import AnalyticTheory.EllipticTransfer
 import AnalyticTheory.FqInsep
+import AnalyticTheory.EllipticXVIII
