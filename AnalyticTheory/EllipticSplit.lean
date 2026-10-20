@@ -59,7 +59,7 @@ theorem mem_imageSub {x : MeroRing K} :
   · rintro ⟨y, ⟨e, rfl⟩, rfl⟩; exact ⟨e, rfl⟩
   · rintro ⟨e, rfl⟩; exact ⟨_, ⟨e, rfl⟩, rfl⟩
 
-omit [IsScalarTower K E (FqSub K q)] [FiniteDimensional E (FqSub K q)] [Algebra.IsSeparable E (FqSub K q)] in
+omit [Algebra K E] [IsScalarTower K E (FqSub K q)] [FiniteDimensional E (FqSub K q)] [Algebra.IsSeparable E (FqSub K q)] in
 theorem relDeg_imageSub : relDeg (imageSub q E) (FqSub K q) = Module.finrank E (FqSub K q) := by
   rw [relDeg_eq imageSub_le]
   let := (Subfield.inclusion (imageSub_le (q := q) (E := E))).toAlgebra

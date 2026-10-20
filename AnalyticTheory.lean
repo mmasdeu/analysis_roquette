@@ -66,3 +66,4 @@ import AnalyticTheory.EllipticRigidity
 import AnalyticTheory.EllipticSubfield
 import AnalyticTheory.PeriodGroup
 import AnalyticTheory.EllipticSplit
+import AnalyticTheory.FqResidue
