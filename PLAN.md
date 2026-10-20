@@ -14,8 +14,26 @@ translations.  The formalization replaces this by the following chain (all in th
 
 **Corollary XVIIIb is proved** (`Multiplicators.lean`, `MultTransfer.lean`, `CorXVIIIb.lean`).
 
-Remaining sorries: §4 bridges (`Sec4.lean`), §5 (`SemiPeriodic.lean`), the absolute-integrality
-Proposition of §6 (`prop_cm_absolutely_integral`), Appendices A1/A2.
+Remaining sorries and what they need:
+
+* **Appendix A1** (`absInv_weierstrass`, `hasseInv_weierstrass`, `remark_A1_absinv`, Remarks A2/A3,
+  `absolute_hasse_exists`): `absInv`/`hasseInv` are independent of the Weierstraß datum only under
+  `DegOneHomogeneous` (proved for `F_K(q)`). Needed: homogeneity of degree-one primes of an
+  arbitrary elliptic `F | K`.
+  - H1 Riemann's inequality `ℓ(D) ≥ deg D` from `genus_spec` and `ℓ(D + 𝔭) ≤ ℓ(D) + 1`.
+  - H2 a function `f` with simple poles at `P ≠ P'`.
+  - H3 `[F : K(f)] = 2` with `F | K(f)` Galois; the non-trivial automorphism swaps `P`, `P'`.
+    Separability and the degree need the fundamental identity beyond the separable case,
+    e.g. through `Ln` dimensions.
+  - H4 the prime at infinity of generators `x, y` with a Weierstraß equation (the A1 formulas).
+* **§4** (`Ezeta_isElliptic`, `Ezeta_isJacobian`, `jacobian_descent`, `thmX_minimal_splitting`) and
+  **§5**: the genus of a Galois descent.
+  - G1 for `E_ζ` with `E_ζ L = F_L(q)`: divisors of `E_ζ` are the `Gal`-invariant divisors of
+    `F_L(q)`, and degrees are preserved (unramified constant extension).
+  - G2 `L_{E_ζ}(D) ⊗ L ≅ L_{F_L}(D_L)` (Speiser's lemma), so the genera agree; conservativity as
+    well.
+* **§6** `prop_cm_absolutely_integral`: needs `absInvGen` (A2) and completions of arbitrary `K`.
+* **Appendix A2**: cocycle theory over the above.
 
 ## A. Finite extensions of function fields (`FFExtension.lean`, generic)
 1. Restriction of prime divisors `P ↦ P ∩ E` along a finite (algebraic) extension `F | E`;
