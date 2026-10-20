@@ -81,7 +81,7 @@ theorem eq_FqbarXm_of_split (S : Set Kˣ) (hS : ∀ b ∈ S, IsRigidAt (ptE hq0 
     (hsplit : ∀ P : PrimeDivisor K (FqSub K q), P.restrict (E := E) = ptE hq0 hq1 E a →
       (∃ c : Kˣ, P = ptPrime hq0 hq1 c) ∧ P.ramIdx (E := E) = 1) :
     ∃ (qbar : K) (m d : ℕ), 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ 0 < m ∧ 0 < d ∧ qbar ^ d = q ^ m ∧
-      imageSub q E = FqbarXm K qbar m := by
+      (∃ r : K, r ^ m = qbar) ∧ imageSub q E = FqbarXm K qbar m := by
   classical
   set Q := ptE hq0 hq1 E a
   -- the primes over `π(a)`
@@ -178,7 +178,7 @@ theorem eq_FqbarXm_of_split (S : Set Kˣ) (hS : ∀ b ∈ S, IsRigidAt (ptE hq0 
   have h1 : relDeg (imageSub q E) (FqbarXm K qbar m) = 1 := by
     refine le_antisymm (Nat.le_of_mul_le_mul_right (by simpa using hn) hpos) ?_
     exact Nat.pos_of_ne_zero fun h => by rw [h, zero_mul] at hpos'; exact lt_irrefl _ hpos'
-  exact ⟨qbar, m, d, hqb0, hqb1, hm, hd, hqd, eq_of_relDeg_eq_one hsub h1⟩
+  exact ⟨qbar, m, d, hqb0, hqb1, hm, hd, hqd, hr, eq_of_relDeg_eq_one hsub h1⟩
 
 end split
 

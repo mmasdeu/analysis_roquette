@@ -82,24 +82,29 @@ theorem isSeparable_of_isGoodGen {Q : PrimeDivisor K E} (hQ : Q.degree = 1) {y :
   rw [show (IntermediateField.val (IntermediateField.adjoin K {γ})) ⟨α, hmem⟩ = α from rfl] at e
   rwa [e]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
+include hq0 hq1 in
+theorem one_add_qpow_ne_zero (n : ℕ) : 1 + q ^ (n + 1) ≠ 0 := by
+  intro h
+  have h1 : ‖q ^ (n + 1)‖ < 1 := by
+    rw [norm_pow]; exact pow_lt_one₀ hq0.le hq1 (Nat.succ_ne_zero n)
+  have : q ^ (n + 1) = -1 := by linear_combination h
+  rw [this, norm_neg, norm_one] at h1
+  exact lt_irrefl _ h1
+
 omit [Algebra K E] [Algebra E (FqSub K q)] [IsScalarTower K E (FqSub K q)]
   [FiniteDimensional E (FqSub K q)] [Algebra.IsSeparable E (FqSub K q)] in
-/-- `K^×/q` is infinite: the points `1 + q^{n+1}` are pairwise distinct mod `q`. -/
-theorem ptPrime_range_infinite : (Set.range (ptPrime hq0 hq1)).Infinite := by
-  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+/-- The points `1 + q^{n+1}` are pairwise distinct mod `q`. -/
+theorem ptPrime_one_add_injective : Function.Injective fun n : ℕ =>
+    ptPrime hq0 hq1 (Units.mk0 _ (one_add_qpow_ne_zero hq0 hq1 n)) := by
   have hn : ∀ n : ℕ, ‖q ^ (n + 1)‖ < 1 := fun n => by
     rw [norm_pow]; exact pow_lt_one₀ hq0.le hq1 (Nat.succ_ne_zero n)
   have hnorm : ∀ n : ℕ, ‖1 + q ^ (n + 1)‖ = 1 := fun n => by
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_one]; exact (hn n).ne'),
       norm_one, max_eq_left (hn n).le]
-  have hne : ∀ n : ℕ, 1 + q ^ (n + 1) ≠ 0 := fun n h => by
-    have := hnorm n; rw [h, norm_zero] at this; exact zero_ne_one this
-  let u : ℕ → Kˣ := fun n => Units.mk0 _ (hne n)
-  refine Set.infinite_of_injective_forall_mem (f := fun n => ptPrime hq0 hq1 (u n)) ?_
-    (fun n => ⟨u n, rfl⟩)
   intro m n hmn
   obtain ⟨k, hk⟩ := (ptPrime_eq_iff hq0 hq1 _ _).mp hmn
-  simp only [u, Units.val_mk0] at hk
+  simp only [Units.val_mk0] at hk
   have hk0 : k = 0 := by
     have := congrArg norm hk
     rw [norm_mul, norm_zpow, hnorm, hnorm, one_mul] at this
@@ -109,6 +114,12 @@ theorem ptPrime_range_infinite : (Set.range (ptPrime hq0 hq1)).Infinite := by
   rw [norm_pow, norm_pow] at this
   have := (pow_right_injective₀ hq0 hq1.ne) this
   omega
+
+omit [Algebra K E] [Algebra E (FqSub K q)] [IsScalarTower K E (FqSub K q)]
+  [FiniteDimensional E (FqSub K q)] [Algebra.IsSeparable E (FqSub K q)] in
+/-- `K^×/q` is infinite. -/
+theorem ptPrime_range_infinite : (Set.range (ptPrime hq0 hq1)).Infinite :=
+  Set.infinite_of_injective_forall_mem (ptPrime_one_add_injective hq0 hq1) (fun _ => ⟨_, rfl⟩)
 
 /-- The point map has finite fibres on rational points: if `π(S)` is finite then so is
 `{p_b | b ∈ S}`. -/
