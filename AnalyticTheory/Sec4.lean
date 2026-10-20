@@ -383,6 +383,46 @@ theorem thmXI_model (T : SemiPeriodicTriple K L q) :
   obtain ⟨ζ, h1, h2⟩ := exists_cocycle_of_triple q hq0 hq1 T
   exact ⟨ζ, h1, h2, Ezeta_isElliptic q hq0 hq1 ζ, Ezeta_splitsOver q hq0 hq1 ζ⟩
 
+/-- Book, §5, Theorem XII: `F_K(𝐐)` is an elliptic function field over `K` whose constant field
+extension with `L` is `F_L(q)`. -/
+theorem thmXII_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (T : SemiPeriodicTriple K L q) :
+    IsEllipticOver K (FKQ K L q T) ∧
+      Subfield.closure (Set.range (FKQ K L q T).subtype ∪
+        Set.range (algebraMap L (FqSub L (algebraMap K L q)))) = ⊤ := by
+  obtain ⟨ζ, h1, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  have hEq : FKQ K L q T = Ezeta q ζ := Subfield.ext h1
+  constructor
+  · let σ : Ezeta q ζ ≃ₐ[K] FKQ K L q T :=
+      AlgEquiv.ofRingEquiv (f := RingEquiv.subfieldCongr hEq.symm) fun c => rfl
+    exact (Ezeta_isElliptic q hq0 hq1 ζ).of_algEquiv σ
+  · obtain ⟨α, hα⟩ := Field.exists_primitive_element K L
+    have hgen := Ezeta_adjoin q hq0 ζ hα
+    have hr : Set.range (FKQ K L q T).subtype = Set.range (Ezeta q ζ).subtype := by
+      ext f
+      constructor
+      · rintro ⟨x, rfl⟩; exact ⟨⟨x.1, (h1 x.1).mp x.2⟩, rfl⟩
+      · rintro ⟨x, rfl⟩; exact ⟨⟨x.1, (h1 x.1).mpr x.2⟩, rfl⟩
+    rw [hr]
+    rw [eq_top_iff]
+    intro z _
+    have hz : z ∈ IntermediateField.adjoin (Ezeta q ζ)
+        ({FqHom L (algebraMap K L q) α} : Set (FqSub L (algebraMap K L q))) := by
+      have h' : IntermediateField.adjoin (Ezeta q ζ)
+          ({FqHom L (algebraMap K L q) α} : Set (FqSub L (algebraMap K L q))) = ⊤ := hgen
+      rw [h']; trivial
+    have hle : IntermediateField.adjoin (Ezeta q ζ)
+        ({FqHom L (algebraMap K L q) α} : Set (FqSub L (algebraMap K L q))) ≤
+        Subfield.toIntermediateField (Subfield.closure
+          (Set.range (Ezeta q ζ).subtype ∪
+            Set.range (algebraMap L (FqSub L (algebraMap K L q)))))
+          (fun x => Subfield.subset_closure (Or.inl ⟨x, rfl⟩)) := by
+      rw [IntermediateField.adjoin_le_iff]
+      intro w hw
+      rw [Set.mem_singleton_iff.mp hw]
+      exact Subfield.subset_closure (Or.inr ⟨α, rfl⟩)
+    exact hle hz
+
 end xi
 
 end AnalyticTheory

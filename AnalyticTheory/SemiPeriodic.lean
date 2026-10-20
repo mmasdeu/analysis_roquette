@@ -205,14 +205,7 @@ noncomputable instance FKQAlgebra (q : K) (T : SemiPeriodicTriple K L q) :
 
 /-! ### §5: properties of semi-periodic function fields -/
 
-/-- Book, §5, Theorem XII: `F_K(𝐐)` is an elliptic function field over `K` whose constant field
-extension with `L` is `F_L(q)`. -/
-theorem thmXII_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    IsEllipticOver K (FKQ K L q T) ∧
-      Subfield.closure (Set.range (FKQ K L q T).subtype ∪
-        Set.range (algebraMap L (FqSub L (algebraMap K L q)))) = ⊤ := by
-  sorry
+/-! Theorem XII (`thmXII_elliptic`) is proved in `Sec4.lean`, after the bridge `Ezeta_isElliptic`. -/
 
 /-- Book, §5: the extension `σ'` of `σ ∈ G` to an automorphism of `Ω_L`. -/
 def IsExtension (σ : GalGroup K L) (σ' : Omega L ≃+* Omega L) : Prop :=
