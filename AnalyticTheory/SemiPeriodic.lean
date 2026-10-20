@@ -258,21 +258,9 @@ theorem thmXIV_divisors (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
           m' ((((semiPerm K L T σ')⁻¹) ^ i) α)) := by
   sorry
 
-/-- Book, §5, Corollary XIIIa: `F_K(𝐐)` has index `n = [L:K]`: the smallest positive degree
-of a divisor is `n`. -/
-theorem corXIIIa_index (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    IsLeast {d : ℤ | 0 < d ∧ ∃ D : FFDivisor K (FKQ K L q T), D.deg = d}
-      (Module.finrank K L : ℤ) := by
-  sorry
+/-! Corollary XIIIa (`corXIIIa_index`) is proved in `Sec5.lean`. -/
 
-/-- Book, §5, Corollary XIIIb: `L` is the minimal algebraic splitting field of `F_K(𝐐)`. -/
-theorem corXIIIb_minimal (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    SplitsOver K (FKQ K L q T) L ∧
-      ∀ (L' : Type u) [Field L'] [Algebra K L'] [Algebra.IsAlgebraic K L'],
-        SplitsOver K (FKQ K L q T) L' → Nonempty (L →ₐ[K] L') := by
-  sorry
+/-! Corollary XIIIb (`corXIIIb_minimal`) is proved in `Sec5.lean`. -/
 
 /-- The norm group `N L^× ⊂ K^× ⊂ L^×`. -/
 noncomputable def normGroup : Subgroup Lˣ :=

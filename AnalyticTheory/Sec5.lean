@@ -1,6 +1,7 @@
 import AnalyticTheory.Sec4
 import AnalyticTheory.GaloisPrimes
 import AnalyticTheory.ZpowAux
+import AnalyticTheory.ResidueMaps
 
 /-!
 # §5: semi-periodic function fields
@@ -26,6 +27,7 @@ variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (ζ : CocycleModQ K L q
 
 attribute [local instance 10] fqKAlgebra
 attribute [-instance] fqSubfieldAlgebra fqSubfieldSMul
+attribute [local instance] resAlg
 
 /-- `F_L(q)` is a tower `K ⊂ L ⊂ F_L(q)`. -/
 local instance fqTowerL (q : K) : IsScalarTower K L (FqSub L (algebraMap K L q)) :=
@@ -536,6 +538,122 @@ theorem thmXIII_prime_degrees (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   exact ⟨fun α hα => thmXIII_a q hq0 hq1 T hα, fun P => thmXIII_b q hq0 hq1 T P,
     fun α β hα hβ => thmXIII_c q hq0 hq1 T hα hβ⟩
 
+
+/-- Book, §5, Corollary XIIIa: `F_K(𝐐)` has index `n = [L:K]`: the smallest positive degree
+of a divisor is `n`. -/
+theorem corXIIIa_index (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (T : SemiPeriodicTriple K L q) :
+    IsLeast {d : ℤ | 0 < d ∧ ∃ D : FFDivisor K (FKQ K L q T), D.deg = d}
+      (Module.finrank K L : ℤ) := by
+  have := FKQ_tower q T
+  have := FKQ_finiteDimensional q hq0 hq1 T
+  have := FKQ_isSeparable q hq0 hq1 T
+  constructor
+  · -- the prime divisor attached to `α = 1` has degree `n`
+    have h1 : (1 : Omega L) ≠ 0 := one_ne_zero
+    obtain ⟨P, -, hP⟩ := thmXIII_a q hq0 hq1 T h1
+    refine ⟨Nat.cast_pos.mpr Module.finrank_pos, Finsupp.single P 1, ?_⟩
+    have hdeg : (minpoly L (1 : Omega L)).natDegree = 1 := by
+      exact minpoly.natDegree_eq_one_iff.mpr ⟨1, map_one _⟩
+    rw [IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral (1 : Omega L)), hdeg,
+      mul_one] at hP
+    simp [FFDivisor.deg, FFDivisor.degHom, Finsupp.liftAddHom_apply_single, hP]
+  · rintro d ⟨hd, D, rfl⟩
+    have hdvd : ((Module.finrank K L : ℕ) : ℤ) ∣ D.deg := by
+      unfold FFDivisor.deg FFDivisor.degHom
+      rw [Finsupp.liftAddHom_apply]
+      refine Finset.dvd_sum fun P _ => ?_
+      simp only [AddMonoidHom.coe_mulRight]
+      refine Dvd.dvd.mul_left ?_ _
+      obtain ⟨α, hα, rfl⟩ := core_surj q hq0 hq1 (FKQ K L q T) P
+      rw [core_degree q hq0 hq1 (tripleCocycle q hq0 hq1 T) (FKQ K L q T) (FKQ_fix q hq0 hq1 T)
+        (FKQ_finrank q hq0 hq1 T)
+        (charOfCocycle_injective q hq0 hq1 _ T (tripleCocycle_char q hq0 hq1 T)) hα]
+      simp
+    exact Int.le_of_dvd hd hdvd
+
+
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L]
+  [FiniteDimensional K L] [IsGalois K L] [NormedAlgebra K L] in
+theorem isAlgebraic_of_isConstantExtension {E L' EL : Type u} [Field E] [Algebra K E] [Field L']
+    [Algebra K L'] [Field EL] [Algebra E EL] [Algebra L' EL] [Algebra K EL]
+    [IsScalarTower K E EL] [IsScalarTower K L' EL] [Algebra.IsAlgebraic K L']
+    (h : IsConstantExtension K E L' EL) : Algebra.IsAlgebraic E EL := by
+  refine ⟨fun x => ?_⟩
+  have hle : Subfield.closure (Set.range (algebraMap E EL) ∪ Set.range (algebraMap L' EL)) ≤
+      (algebraicClosure E EL).toSubfield := by
+    rw [Subfield.closure_le]
+    rintro y (⟨e, rfl⟩ | ⟨l, rfl⟩)
+    · exact (mem_algebraicClosure_iff' (F := E)).mpr (isAlgebraic_algebraMap e).isIntegral
+    · have h1 : IsAlgebraic K (algebraMap L' EL l) :=
+        (Algebra.IsAlgebraic.isAlgebraic l).algebraMap
+      exact (mem_algebraicClosure_iff' (F := E)).mpr (h1.tower_top (L := E)).isIntegral
+  rw [h.generated] at hle
+  exact (mem_algebraicClosure_iff' (F := E)).mp (hle (Subfield.mem_top x)) |>.isAlgebraic
+
+include hq0 hq1 in
+theorem FKQ_splitsOver (T : SemiPeriodicTriple K L q) : SplitsOver K (FKQ K L q T) L := by
+  obtain ⟨α, hα⟩ := Field.exists_primitive_element K L
+  refine splitsOver_of_adjoin q (FKQ K L q T) (fun c => rfl) α ?_
+    (fq_hasPrime (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1))
+  have h' := Ezeta_adjoin q hq0 (tripleCocycle q hq0 hq1 T) hα
+  rw [← FKQ_eq_Ezeta q hq0 hq1 T] at h'
+  exact h'
+
+/-- Book, §5, Corollary XIIIb: `L` is the minimal algebraic splitting field of `F_K(𝐐)`. -/
+theorem corXIIIb_minimal (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (T : SemiPeriodicTriple K L q) :
+    SplitsOver K (FKQ K L q T) L ∧
+      ∀ (L' : Type u) [Field L'] [Algebra K L'] [Algebra.IsAlgebraic K L'],
+        SplitsOver K (FKQ K L q T) L' → Nonempty (L →ₐ[K] L') := by
+  refine ⟨FKQ_splitsOver q hq0 hq1 T, ?_⟩
+  intro L' _ _ _ hspl
+  obtain ⟨EL, _, _, _, _, _, _, hconst, P', hP'⟩ := hspl
+  have := FKQ_tower q T
+  have := FKQ_finiteDimensional q hq0 hq1 T
+  have := FKQ_isSeparable q hq0 hq1 T
+  haveI : Algebra.IsAlgebraic (FKQ K L q T) EL := isAlgebraic_of_isConstantExtension hconst
+  let Q' : PrimeDivisor K EL := P'.ofL (K := K)
+  obtain ⟨α, hα, hαP⟩ := core_surj q hq0 hq1 (FKQ K L q T) (Q'.restrict (E := FKQ K L q T))
+  have hdeg : (Q'.restrict (E := FKQ K L q T)).degree = (primeAtK q hq0 hq1 hα).degree := by
+    rw [← hαP]
+    exact (core_count q hq0 hq1 (tripleCocycle q hq0 hq1 T) (FKQ K L q T) (FKQ_fix q hq0 hq1 T)
+      (FKQ_finrank q hq0 hq1 T)
+      (charOfCocycle_injective q hq0 hq1 _ T (tripleCocycle_char q hq0 hq1 T)) hα).1
+  have hpos := primeAtK_degree_pos q hq0 hq1 (primeAtK q hq0 hq1 hα)
+  -- the homomorphism `L → κ(Q)`
+  let Q : PrimeDivisor K (FqSub L (algebraMap K L q)) := primeAtK q hq0 hq1 hα
+  let πα : PrimeDivisor L (FqSub L (algebraMap K L q)) :=
+    primeAt (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1) hα
+  letI : Algebra K (IsLocalRing.ResidueField Q.ring) := resAlg Q
+  letI : Algebra L (IsLocalRing.ResidueField Q.ring) :=
+    ((IsLocalRing.residue Q.ring).comp πα.toRing).toAlgebra
+  haveI : IsScalarTower K L (IsLocalRing.ResidueField Q.ring) :=
+    IsScalarTower.of_algebraMap_eq fun c => by
+      show IsLocalRing.residue Q.ring (Q.toRing c) =
+        IsLocalRing.residue Q.ring (πα.toRing (algebraMap K L c))
+      congr 1
+  let lam : L →ₐ[K] IsLocalRing.ResidueField Q.ring :=
+    IsScalarTower.toAlgHom K L (IsLocalRing.ResidueField Q.ring)
+  -- the homomorphism `κ(Q') → L'`
+  letI : Algebra K (IsLocalRing.ResidueField Q'.ring) := resAlg Q'
+  letI : Algebra L' (IsLocalRing.ResidueField Q'.ring) := resAlg P'
+  haveI : IsScalarTower K L' (IsLocalRing.ResidueField Q'.ring) :=
+    IsScalarTower.of_algebraMap_eq fun c => by
+      show IsLocalRing.residue Q'.ring (Q'.toRing c) =
+        IsLocalRing.residue P'.ring (P'.toRing (algebraMap K L' c))
+      congr 1
+      apply Subtype.ext
+      show algebraMap K EL c = algebraMap L' EL (algebraMap K L' c)
+      exact IsScalarTower.algebraMap_apply K L' _ c
+  have hbij : Function.Bijective (IsScalarTower.toAlgHom K L'
+      (IsLocalRing.ResidueField Q'.ring)) :=
+    ⟨(algebraMap L' (IsLocalRing.ResidueField Q'.ring)).injective,
+      PrimeDivisor.algebraMap_residue_surjective (K := L') hP'⟩
+  let eps : IsLocalRing.ResidueField Q'.ring →ₐ[K] L' :=
+    (AlgEquiv.ofBijective _ hbij).symm.toAlgHom
+  exact exists_alghom_of_residues (E := FKQ K L q T) (Q'.restrict (E := FKQ K L q T)) Q Q'
+    hαP rfl hdeg hpos lam eps
 
 end triple
 
