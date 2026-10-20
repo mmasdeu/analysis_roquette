@@ -246,7 +246,8 @@ theorem prod_aut_eq_prod_pow (T : SemiPeriodicTriple K L q) (x : L) :
 theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
     ∃ ζ : CocycleModQ K L q, (∀ f : FqSub L (algebraMap K L q),
       f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ) ∧
-      charOfCocycle q hq0 hq1 ζ T.gen = Circle.exp (2 * Real.pi / Module.finrank K L) := by
+      charOfCocycle q hq0 hq1 ζ T.gen = Circle.exp (2 * Real.pi / Module.finrank K L) ∧
+      ∃ k : ℤ, ((ζ.1 T.gen : Lˣ) : L) = T.Q * (algebraMap K L q) ^ k := by
   classical
   set σ := T.gen with hσ
   set n := Module.finrank K L with hnn
@@ -327,7 +328,9 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
       show Qp σ Q' (i σ) = _
       rw [this, hQp1, zpow_zero, mul_one]
   obtain ⟨k0, hk0⟩ := hζσ
-  refine ⟨⟨ζU, hcoc⟩, ?_, ?_⟩
+  have hcast0 : (((ζU σ : Lˣ)) : L) = (Q' : L) * (algebraMap K L q) ^ k0 := by
+    rw [hk0]; simp [hqU, qUnit]
+  refine ⟨⟨ζU, hcoc⟩, ?_, ?_, ⟨k0, hcast0⟩⟩
   · intro f
     have hkey : rhoZ q ⟨ζU, hcoc⟩ σ f = f ↔
         translation L Q' (meroGal σ (f : MeroRing L)) = (f : MeroRing L) := by
@@ -380,7 +383,7 @@ theorem thmXI_model (T : SemiPeriodicTriple K L q) :
     ∃ ζ : CocycleModQ K L q, (∀ f, f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ) ∧
       charOfCocycle q hq0 hq1 ζ T.gen = Circle.exp (2 * Real.pi / Module.finrank K L) ∧
       IsEllipticOver K (Ezeta q ζ) ∧ SplitsOver K (Ezeta q ζ) L := by
-  obtain ⟨ζ, h1, h2⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  obtain ⟨ζ, h1, h2, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
   exact ⟨ζ, h1, h2, Ezeta_isElliptic q hq0 hq1 ζ, Ezeta_splitsOver q hq0 hq1 ζ⟩
 
 /-- Book, §5, Theorem XII: `F_K(𝐐)` is an elliptic function field over `K` whose constant field
@@ -390,7 +393,7 @@ theorem thmXII_elliptic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     IsEllipticOver K (FKQ K L q T) ∧
       Subfield.closure (Set.range (FKQ K L q T).subtype ∪
         Set.range (algebraMap L (FqSub L (algebraMap K L q)))) = ⊤ := by
-  obtain ⟨ζ, h1, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  obtain ⟨ζ, h1, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
   have hEq : FKQ K L q T = Ezeta q ζ := Subfield.ext h1
   constructor
   · let σ : Ezeta q ζ ≃ₐ[K] FKQ K L q T :=
