@@ -193,6 +193,21 @@ theorem exists_const_of_degree_one (P : PrimeDivisor K F) (h : P.degree = 1) (x 
   rw [sub_eq_zero]
   rfl
 
+
+theorem ord_one (P : PrimeDivisor K F) : P.ord (1 : F) = 0 :=
+  P.ord_eq (u := 1) (n := 0) (by simp)
+
+theorem ord_prod (P : PrimeDivisor K F) {ι : Type*} (s : Finset ι) (f : ι → F)
+    (h : ∀ i ∈ s, f i ≠ 0) : P.ord (∏ i ∈ s, f i) = ∑ i ∈ s, P.ord (f i) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simpa using P.ord_one
+  | insert a s ha ih =>
+    rw [Finset.prod_insert ha, Finset.sum_insert ha,
+      P.ord_mul (h a (Finset.mem_insert_self a s))
+        (Finset.prod_ne_zero_iff.mpr fun i hi => h i (Finset.mem_insert_of_mem hi)),
+      ih fun i hi => h i (Finset.mem_insert_of_mem hi)]
+
 end PrimeDivisor
 
 end restrict

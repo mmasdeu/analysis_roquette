@@ -61,3 +61,4 @@ import AnalyticTheory.buzzard
 import AnalyticTheory.IsogenyXVII
 import AnalyticTheory.FFExtension
 import AnalyticTheory.FFDedekind
+import AnalyticTheory.FFNorm
