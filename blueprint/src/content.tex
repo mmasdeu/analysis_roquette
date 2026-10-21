@@ -1398,6 +1398,41 @@ $C^0_K(\mathbf Q)$ embeds into $C^0_K(q)$ with quotient isomorphic to $K^\times/
 See the Lean proof of \texttt{normGroupK, corXVa\_quotient}.
 \end{proof}
 
+\begin{lemma}[Hilbert 90 for cyclic and finite-order automorphisms]
+\label{lem:s5-h90}
+\lean{AnalyticTheory.exists_h90, AnalyticTheory.exists_h90_of_finOrder}
+\leanok
+If $\sigma$ generates $\mathrm{Gal}(L|K)$ and $N(x)=1$ then $x=y/\sigma y$; also for any automorphism of finite order of a field, with $N=\prod_{i<\mathrm{ord}}\sigma^i$. Proved for all universes.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_h90, exists\_h90\_of\_finOrder}.
+\end{proof}
+
+\begin{lemma}[Formula (65)]
+\label{lem:s5-formula65}
+\lean{AnalyticTheory.degQ_PhiQ_divAct}
+\uses{thm:XIV}
+\leanok
+$\deg_q(sw)=\deg_q w$ and $\Phi_q(sw)=\sigma\Phi_q(w)\cdot Q^{\deg w}$ for $s=\tau_Q\sigma$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{degQ\_PhiQ\_divAct}.
+\end{proof}
+
+\begin{lemma}[Every constant is a norm of a periodic function]
+\label{lem:s5-norm-const}
+\lean{AnalyticTheory.exists_norm_const}
+\uses{lem:s5-formula65}
+\leanok
+Every $a\in K^\times$ is $\prod_{i<n}(\tau_Q\sigma)^i g$ for some $q$-periodic $g$ (quotient of theta functions).
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_norm\_const}.
+\end{proof}
+
 \begin{theorem}[Theorem XVI (norm theorem)]
 \label{thm:XVI}
 \lean{AnalyticTheory.thmXVI_norm}

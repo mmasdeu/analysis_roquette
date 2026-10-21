@@ -187,6 +187,12 @@ add('theorem','thm:XV','Theorem XV (Abel--Jacobi for semi-periodic functions)',[
  r'$C^0_K(\mathbf Q)\cong N L^\times/q$.')
 add('corollary','cor:XVa','Corollary XVa',['corXVa_quotient'],['thm:XV'],False,
  r'$C^0_K(\mathbf Q)\subset C^0_K(q)$ with quotient $K^\times/NL^\times$.')
+add('lemma','lem:s5-h90','Hilbert 90 for cyclic and finite-order automorphisms',['exists_h90','exists_h90_of_finOrder'],[],False,
+ r'If $\sigma$ generates $\mathrm{Gal}(L|K)$ and $N(x)=1$ then $x=y/\sigma y$; also for any automorphism of finite order of a field, with $N=\prod_{i<\mathrm{ord}}\sigma^i$. Proved for all universes.')
+add('lemma','lem:s5-formula65','Formula (65)',['degQ_PhiQ_divAct'],['thm:XIV'],False,
+ r'$\deg_q(sw)=\deg_q w$ and $\Phi_q(sw)=\sigma\Phi_q(w)\cdot Q^{\deg w}$ for $s=\tau_Q\sigma$.')
+add('lemma','lem:s5-norm-const','Every constant is a norm of a periodic function',['exists_norm_const'],['lem:s5-formula65'],False,
+ r'Every $a\in K^\times$ is $\prod_{i<n}(\tau_Q\sigma)^i g$ for some $q$-periodic $g$ (quotient of theta functions).')
 add('theorem','thm:XVI','Theorem XVI (norm theorem)',['thmXVI_norm'],['thm:XIV','thm:XV'],False,
  r'Every semi-periodic $f\neq 0$ is the norm of some $g\in F_L(q)$.')
 add('theorem','tab:cohomology','Table of cohomology groups',['table_cohomology'],['thm:XVI'],False,
