@@ -434,29 +434,41 @@ theorem periodic_pow_card {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L 
   exact hm.1.2.2 _ _ (minpoly.algEquiv_eq e y)
 
 include hq0 hq1 in
+theorem divAct_pow_card (a : Omega L → ℤ) (ha : a ∈ DivisorsPeriodic L (algebraMap K L q)) :
+    (divAct K L q T ^ Module.finrank K L) a = a := by
+  have hσ := sigma0_spec q T
+  have hq : q ≠ 0 := norm_pos_iff.mp hq0
+  funext x
+  rw [divAct_pow_apply]
+  have := periodic_pow_card q T hσ ha hq ((((semiPerm K L T (sigma0 q T))⁻¹) ^ Module.finrank K L) x)
+  have e : (semiPerm K L T (sigma0 q T) ^ Module.finrank K L)
+      ((((semiPerm K L T (sigma0 q T))⁻¹) ^ Module.finrank K L) x) = x := by
+    rw [inv_pow]; exact Equiv.apply_symm_apply _ x
+  rw [e] at this
+  exact this.symm
+
+include hq0 hq1 in
+theorem rowD_H0 : ∀ a ∈ DivisorsPeriodic L (algebraMap K L q) ⊓ cycFixed (divAct K L q T),
+    a ∈ (DivisorsPeriodic L (algebraMap K L q)).map (cycNorm (divAct K L q T) (Module.finrank K L)) :=
+  cycH0_trivial (divAct K L q T) (divActInv q T) (fundProj q T) (divAct_mul_inv q T)
+    (divAct_inv_mul q T) _ _ (fun a ha => fundProj_mem q hq0 hq1 T ha)
+    (fun a ha => fund_split q hq0 hq1 T ha)
+
+include hq0 hq1 in
+theorem rowD_H1 : ∀ a ∈ DivisorsPeriodic L (algebraMap K L q) ⊓
+    (cycNorm (divAct K L q T) (Module.finrank K L)).ker,
+    a ∈ (DivisorsPeriodic L (algebraMap K L q)).map (divAct K L q T - 1 : AddMonoid.End _) :=
+  cycH1_trivial (divAct K L q T) (divActInv q T) (fundProj q T) (divAct_mul_inv q T)
+    (divAct_inv_mul q T) _ _ (fun a ha => divAct_pow_card q hq0 hq1 T a ha)
+    (fun a ha => divAct_mem_periodic q T ha) (fun a ha => divActInv_mem_periodic q T ha)
+    (fun a ha => fundProj_mem q hq0 hq1 T ha) (fun a ha => fund_split q hq0 hq1 T ha)
+
+include hq0 hq1 in
 theorem row_D :
     Subsingleton (cycH0 (divAct K L q T) (Module.finrank K L) (DivisorsPeriodic L (algebraMap K L q))) ∧
       Subsingleton (cycH1 (divAct K L q T) (Module.finrank K L)
-        (DivisorsPeriodic L (algebraMap K L q))) := by
-  have hσ := sigma0_spec q T
-  have hq : q ≠ 0 := norm_pos_iff.mp hq0
-  constructor
-  · refine subsingleton_cycH0 _ _ _ (cycH0_trivial (divAct K L q T) (divActInv q T) (fundProj q T)
-      (divAct_mul_inv q T) (divAct_inv_mul q T) _ _ (fun a ha => fundProj_mem q hq0 hq1 T ha)
-      (fun a ha => fund_split q hq0 hq1 T ha))
-  · refine subsingleton_cycH1 _ _ _ (cycH1_trivial (divAct K L q T) (divActInv q T) (fundProj q T)
-      (divAct_mul_inv q T) (divAct_inv_mul q T) _ _ ?_ (fun a ha => divAct_mem_periodic q T ha)
-      (fun a ha => divActInv_mem_periodic q T ha) (fun a ha => fundProj_mem q hq0 hq1 T ha)
-      (fun a ha => fund_split q hq0 hq1 T ha))
-    intro a ha
-    funext x
-    rw [divAct_pow_apply]
-    have := periodic_pow_card q T hσ ha hq ((((semiPerm K L T (sigma0 q T))⁻¹) ^ Module.finrank K L) x)
-    have e : (semiPerm K L T (sigma0 q T) ^ Module.finrank K L)
-        ((((semiPerm K L T (sigma0 q T))⁻¹) ^ Module.finrank K L) x) = x := by
-      rw [inv_pow]; exact Equiv.apply_symm_apply _ x
-    rw [e] at this
-    exact this.symm
+        (DivisorsPeriodic L (algebraMap K L q))) :=
+  ⟨subsingleton_cycH0 _ _ _ (rowD_H0 q hq0 hq1 T), subsingleton_cycH1 _ _ _ (rowD_H1 q hq0 hq1 T)⟩
 
 /-- **Formula (65)**: `deg_q(τ_Qσ w) = deg_q w` and `Φ_q(τ_Qσ w) = σ Φ_q(w) · Q^{deg w}`. -/
 theorem degQ_PhiQ_divAct (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {w : Omega L → ℤ}
@@ -529,6 +541,36 @@ theorem degQ_PhiQ_divAct (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {w : Omega L �
   apply Units.ext
   simp [hd, map_zpow₀, hQu]
   ring
+
+include hq0 hq1 in
+/-- The data `(D, D⁰)` for the abstract degree-zero computation. -/
+noncomputable def degDataD : DegData (divAct K L q T) (Module.finrank K L)
+    (DivisorsPeriodic L (algebraMap K L q)) (divisorsDegZero L (algebraMap K L q)) :=
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  have hqL : algebraMap K L q ≠ 0 := norm_pos_iff.mp hq0L
+  { deg := degQ L (algebraMap K L q)
+    deg_add := fun a ha b hb => degQ_add L (algebraMap K L q) hq0L hq1L a b ha hb
+    sA := fun a ha => divAct_mem_periodic q T ha
+    deg_s := fun a ha => (degQ_PhiQ_divAct q T hq0 hq1 ha hqL).1
+    nA := fun a ha => divAct_pow_card q hq0 hq1 T a ha
+    A₀_iff := fun a => mem_divisorsDegZero_iff L (algebraMap K L q) hq0L hq1L a
+    p := pointDivisor L (algebraMap K L q) 1
+    pA := pointDivisor_mem hq0L hq1L one_ne_zero
+    deg_p := by
+      rw [degQ_pointDivisor hq0L hq1L one_ne_zero]
+      exact_mod_cast minpoly.natDegree_eq_one_iff.mpr ⟨1, map_one _⟩
+    H0 := rowD_H0 q hq0 hq1 T
+    H1 := rowD_H1 q hq0 hq1 T
+    npos := Module.finrank_pos }
+
+include hq0 hq1 in
+theorem row_D0 :
+    Subsingleton (cycH0 (divAct K L q T) (Module.finrank K L) (divisorsDegZero L (algebraMap K L q))) ∧
+      Nonempty (cycH1 (divAct K L q T) (Module.finrank K L) (divisorsDegZero L (algebraMap K L q)) ≃+
+        ZMod (Module.finrank K L)) :=
+  ⟨subsingleton_cycH0 _ _ _ (degDataD q hq0 hq1 T).H0_degZero,
+    (degDataD q hq0 hq1 T).cycH1_degZero_equiv⟩
 
 end rows
 

@@ -157,6 +157,188 @@ theorem cycH1_trivial (s t ε : AddMonoid.End Amb) (hst : s * t = 1) (hts : t * 
   have h4 : cycNorm s n a = 0 := hker
   rw [h2, h3, h4, map_zero, sub_zero]
 
+/-- Data for the cohomology of a degree-zero subgroup: `A` is `s`-stable with `sⁿ = 1`, carries an
+additive degree `deg` with `deg ∘ s = deg`, a point `p` of degree `1`, and `Ĥ⁰(A) = Ĥ¹(A) = 0`. -/
+structure DegData (s : AddMonoid.End Amb) (n : ℕ) (A A₀ : AddSubgroup Amb) where
+  deg : Amb → ℤ
+  deg_add : ∀ a ∈ A, ∀ b ∈ A, deg (a + b) = deg a + deg b
+  sA : ∀ a ∈ A, s a ∈ A
+  deg_s : ∀ a ∈ A, deg (s a) = deg a
+  nA : ∀ a ∈ A, (s ^ n) a = a
+  A₀_iff : ∀ a, a ∈ A₀ ↔ a ∈ A ∧ deg a = 0
+  p : Amb
+  pA : p ∈ A
+  deg_p : deg p = 1
+  H0 : ∀ a ∈ A ⊓ cycFixed s, a ∈ A.map (cycNorm s n)
+  H1 : ∀ a ∈ A ⊓ (cycNorm s n).ker, a ∈ A.map (s - 1 : AddMonoid.End Amb)
+  npos : 0 < n
+
+namespace DegData
+
+variable {s : AddMonoid.End Amb} {n : ℕ} {A A₀ : AddSubgroup Amb} (D : DegData s n A A₀)
+
+include D
+
+theorem deg_zero : D.deg 0 = 0 := by
+  have := D.deg_add 0 A.zero_mem 0 A.zero_mem
+  simpa using this
+
+theorem deg_neg {a : Amb} (ha : a ∈ A) : D.deg (-a) = - D.deg a := by
+  have := D.deg_add a ha (-a) (A.neg_mem ha)
+  rw [add_neg_cancel, D.deg_zero] at this
+  linarith
+
+theorem deg_sub {a b : Amb} (ha : a ∈ A) (hb : b ∈ A) : D.deg (a - b) = D.deg a - D.deg b := by
+  rw [sub_eq_add_neg, D.deg_add a ha (-b) (A.neg_mem hb), D.deg_neg hb]; ring
+
+theorem deg_zsmul {a : Amb} (ha : a ∈ A) (k : ℤ) : D.deg (k • a) = k * D.deg a := by
+  induction k using Int.induction_on with
+  | zero => simp [D.deg_zero]
+  | succ i ih =>
+    rw [add_smul, one_smul, D.deg_add _ (A.zsmul_mem ha _) _ ha, ih]; ring
+  | pred i ih =>
+    rw [sub_smul, one_smul, D.deg_sub (A.zsmul_mem ha _) ha, ih]; ring
+
+theorem pow_mem (i : ℕ) {a : Amb} (ha : a ∈ A) : (s ^ i) a ∈ A := by
+  induction i with
+  | zero => simpa using ha
+  | succ i ih => rw [end_pow_succ_apply]; exact D.sA _ ih
+
+theorem deg_pow (i : ℕ) {a : Amb} (ha : a ∈ A) : D.deg ((s ^ i) a) = D.deg a := by
+  induction i with
+  | zero => rfl
+  | succ i ih => rw [end_pow_succ_apply, D.deg_s _ (D.pow_mem i ha), ih]
+
+theorem norm_mem {a : Amb} (ha : a ∈ A) : cycNorm s n a ∈ A ∧ D.deg (cycNorm s n a) = n * D.deg a := by
+  have : ∀ m : ℕ, (∑ i ∈ Finset.range m, (s ^ i) a) ∈ A ∧
+      D.deg (∑ i ∈ Finset.range m, (s ^ i) a) = m * D.deg a := by
+    intro m
+    induction m with
+    | zero => simp [D.deg_zero]
+    | succ m ih =>
+      rw [Finset.sum_range_succ]
+      refine ⟨A.add_mem ih.1 (D.pow_mem m ha), ?_⟩
+      rw [D.deg_add _ ih.1 _ (D.pow_mem m ha), ih.2, D.deg_pow m ha]
+      push_cast; ring
+  have h := this n
+  rw [cycNorm, end_sum_apply]
+  exact h
+
+theorem sub_one_mem {a : Amb} (ha : a ∈ A) :
+    (s - 1 : AddMonoid.End Amb) a ∈ A ∧ D.deg ((s - 1 : AddMonoid.End Amb) a) = 0 := by
+  rw [end_sub_apply]
+  have h1 := D.sA a ha
+  refine ⟨A.sub_mem h1 (by simpa using ha), ?_⟩
+  rw [D.deg_sub h1 (by simpa using ha), D.deg_s a ha]
+  simp
+
+theorem norm_sub_one {a : Amb} (ha : a ∈ A) : cycNorm s n ((s - 1 : AddMonoid.End Amb) a) = 0 := by
+  have h : cycNorm s n * (s - 1 : AddMonoid.End Amb) = s ^ n - 1 := by
+    rw [cycNorm]; exact geom_sum_mul s n
+  rw [← end_mul_apply, h, end_sub_apply, D.nA a ha]
+  simp
+
+theorem sub_one_norm {a : Amb} (ha : a ∈ A) : (s - 1 : AddMonoid.End Amb) (cycNorm s n a) = 0 := by
+  have h : (s - 1 : AddMonoid.End Amb) * cycNorm s n = s ^ n - 1 := by
+    rw [cycNorm]; exact mul_geom_sum s n
+  rw [← end_mul_apply, h, end_sub_apply, D.nA a ha]
+  simp
+
+theorem H0_degZero : ∀ a ∈ A₀ ⊓ cycFixed s, a ∈ A₀.map (cycNorm s n) := by
+  rintro a ⟨ha₀, hfix⟩
+  obtain ⟨haA, hdeg⟩ := (D.A₀_iff a).mp ha₀
+  obtain ⟨b, hbA, hb⟩ := D.H0 a ⟨haA, hfix⟩
+  have h1 := (D.norm_mem hbA).2
+  rw [show cycNorm s n b = a from hb, hdeg] at h1
+  have h2 : D.deg b = 0 := by
+    have : (n : ℤ) * D.deg b = 0 := h1.symm
+    rcases mul_eq_zero.mp this with h | h
+    · exact absurd (by exact_mod_cast h : n = 0) D.npos.ne'
+    · exact h
+  exact ⟨b, (D.A₀_iff b).mpr ⟨hbA, h2⟩, hb⟩
+
+theorem toSub_mem (k : ℤ) :
+    (s - 1 : AddMonoid.End Amb) (k • D.p) ∈ A₀ ⊓ (cycNorm s n).ker := by
+  have hk : k • D.p ∈ A := A.zsmul_mem D.pA k
+  exact ⟨(D.A₀_iff _).mpr (D.sub_one_mem hk), D.norm_sub_one hk⟩
+
+/-- The hom `ℤ → A₀ ⊓ ker N`, `k ↦ (s − 1)(k p)`. -/
+noncomputable def toSub : ℤ →+ ↥(A₀ ⊓ (cycNorm s n).ker) where
+  toFun k := ⟨(s - 1 : AddMonoid.End Amb) (k • D.p), D.toSub_mem k⟩
+  map_zero' := Subtype.ext (by simp)
+  map_add' k l := Subtype.ext (by
+    show (s - 1 : AddMonoid.End Amb) ((k + l) • D.p) =
+      (s - 1 : AddMonoid.End Amb) (k • D.p) + (s - 1 : AddMonoid.End Amb) (l • D.p)
+    rw [add_smul, map_add])
+
+/-- The hom `ℤ → Ĥ¹(A₀)`. -/
+noncomputable def toH1 : ℤ →+ cycH1 s n A₀ :=
+  (QuotientAddGroup.mk' ((A₀.map (s - 1 : AddMonoid.End Amb)).addSubgroupOf
+    (A₀ ⊓ (cycNorm s n).ker))).comp D.toSub
+
+theorem A₀_le : A₀ ≤ A := fun a ha => ((D.A₀_iff a).mp ha).1
+
+theorem toH1_surjective : Function.Surjective D.toH1 := by
+  intro y
+  induction y using QuotientAddGroup.induction_on with
+  | H x =>
+    obtain ⟨u, huA, hu⟩ := D.H1 x.1 ⟨D.A₀_le x.2.1, x.2.2⟩
+    refine ⟨D.deg u, ?_⟩
+    show QuotientAddGroup.mk (D.toSub (D.deg u)) = QuotientAddGroup.mk x
+    rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf]
+    have hkp : D.deg u • D.p ∈ A := A.zsmul_mem D.pA _
+    have h0 : u - D.deg u • D.p ∈ A₀ := by
+      rw [D.A₀_iff]
+      refine ⟨A.sub_mem huA hkp, ?_⟩
+      rw [D.deg_sub huA hkp, D.deg_zsmul D.pA, D.deg_p]; ring
+    refine ⟨u - D.deg u • D.p, h0, ?_⟩
+    have hu' : (s - 1 : AddMonoid.End Amb) u = x.1 := hu
+    show (s - 1 : AddMonoid.End Amb) (u - D.deg u • D.p) = _
+    rw [map_sub, hu']
+    show _ = -(s - 1 : AddMonoid.End Amb) (D.deg u • D.p) + x.1
+    abel
+
+theorem toH1_eq_zero_iff (k : ℤ) : D.toH1 k = 0 ↔ (n : ℤ) ∣ k := by
+  show QuotientAddGroup.mk (D.toSub k) = 0 ↔ _
+  rw [QuotientAddGroup.eq_zero_iff, AddSubgroup.mem_addSubgroupOf]
+  have hkp : k • D.p ∈ A := A.zsmul_mem D.pA k
+  constructor
+  · rintro ⟨u0, hu0, h⟩
+    have hu0A := D.A₀_le hu0
+    have hdu0 := ((D.A₀_iff u0).mp hu0).2
+    have hfix : k • D.p - u0 ∈ A ⊓ cycFixed s := by
+      refine ⟨A.sub_mem hkp hu0A, ?_⟩
+      show (s - 1 : AddMonoid.End Amb) (k • D.p - u0) = 0
+      rw [map_sub]
+      have : (s - 1 : AddMonoid.End Amb) u0 = (s - 1 : AddMonoid.End Amb) (k • D.p) := h
+      rw [this, sub_self]
+    obtain ⟨b, hbA, hb⟩ := D.H0 _ hfix
+    have h1 := (D.norm_mem hbA).2
+    rw [show cycNorm s n b = k • D.p - u0 from hb, D.deg_sub hkp hu0A, D.deg_zsmul D.pA, D.deg_p,
+      hdu0] at h1
+    exact ⟨D.deg b, by linarith⟩
+  · rintro ⟨j, rfl⟩
+    have hjp : j • D.p ∈ A := A.zsmul_mem D.pA j
+    have hN := D.norm_mem hjp
+    refine ⟨(n * j : ℤ) • D.p - cycNorm s n (j • D.p), ?_, ?_⟩
+    · refine (D.A₀_iff _).mpr ⟨A.sub_mem hkp hN.1, ?_⟩
+      rw [D.deg_sub hkp hN.1, hN.2, D.deg_zsmul D.pA, D.deg_zsmul D.pA, D.deg_p]; ring
+    · show (s - 1 : AddMonoid.End Amb) (((n : ℤ) * j) • D.p - cycNorm s n (j • D.p)) =
+        (s - 1 : AddMonoid.End Amb) (((n : ℤ) * j) • D.p)
+      rw [map_sub, D.sub_one_norm hjp, sub_zero]
+
+theorem cycH1_degZero_equiv : Nonempty (cycH1 s n A₀ ≃+ ZMod n) := by
+  have hker : D.toH1.ker = AddSubgroup.zmultiples (n : ℤ) := by
+    ext k
+    rw [AddMonoidHom.mem_ker, D.toH1_eq_zero_iff, AddSubgroup.mem_zmultiples_iff]
+    constructor
+    · rintro ⟨j, rfl⟩; exact ⟨j, by simp [mul_comm]⟩
+    · rintro ⟨j, rfl⟩; exact ⟨j, by simp [mul_comm]⟩
+  exact ⟨(QuotientAddGroup.quotientKerEquivOfSurjective D.toH1 D.toH1_surjective).symm.trans
+    ((QuotientAddGroup.quotientAddEquivOfEq hker).trans (Int.quotientZMultiplesNatEquivZMod n))⟩
+
+end DegData
+
 end cyc
 
 end AnalyticTheory
