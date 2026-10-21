@@ -240,3 +240,154 @@ theorem exists_norm_const (a : K) (ha : a ≠ 0) :
     congr 1
     rw [map_zpow₀, hjL, hcL, inv_inv]
     field_simp
+
+theorem exists_K_of_gen_fixed (u : L) (hu : T.gen u = u) : ∃ a : K, algebraMap K L a = u := by
+  have hall : ∀ τ : L ≃ₐ[K] L, τ u = u := by
+    intro τ
+    obtain ⟨a, rfl⟩ := gen_zpow q T τ
+    induction a using Int.induction_on with
+    | zero => simp
+    | succ i ih => rw [zpow_add_one, AlgEquiv.mul_apply, hu, ih]
+    | pred i ih =>
+      rw [zpow_sub_one, AlgEquiv.mul_apply]
+      have : T.gen⁻¹ u = u := by
+        have e : T.gen (T.gen⁻¹ u) = T.gen u := by
+          rw [hu]; exact AlgEquiv.apply_symm_apply T.gen _
+        exact T.gen.injective e
+      rw [this, ih]
+  have hmem : u ∈ (⊥ : IntermediateField K L) := (IsGalois.mem_bot_iff_fixed u).mpr hall
+  obtain ⟨c, hc⟩ := IntermediateField.mem_bot.mp hmem
+  exact ⟨c, hc⟩
+
+/-- A `q`-periodic function without zeros and poles is a constant. -/
+theorem periodic_const_of_divisor_zero (hqL : algebraMap K L q ≠ 0)
+    (hq0L : 0 < ‖algebraMap K L q‖) (hq1L : ‖algebraMap K L q‖ < 1) {h : MeroRing L}
+    (hh : h ∈ Fq L (algebraMap K L q)) (h0 : h ≠ 0)
+    (hd : divisorOf L h = 0) : ∃ c : L, c ≠ 0 ∧ h = algebraMap L (MeroRing L) c := by
+  have hz : ∀ ξ : Omega L, ξ ≠ 0 → anVal L ξ h = 0 := by
+    intro ξ hξ
+    obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top L hξ h0)
+    have := congrFun hd ξ
+    simp only [divisorOf, if_neg hξ, Pi.zero_apply, ← hv] at this
+    rw [← hv]; simp at this ⊢; exact_mod_cast this
+  obtain ⟨c, n, hc, hcn⟩ := mero_unit_of_anVal_zero h0 hz
+  have hper := (mem_Fq_iff hqL h).mp hh
+  rw [hcn, map_mul, translation_algebraMap, translation_Xm] at hper
+  have hX : algebraMap L (MeroRing L) c * Xm n ≠ 0 := hcn ▸ h0
+  have h2 : algebraMap L (MeroRing L) ((algebraMap K L q) ^ (-n)) = 1 := by
+    have h3 : algebraMap L (MeroRing L) ((algebraMap K L q) ^ (-n)) *
+        (algebraMap L (MeroRing L) c * Xm n) = 1 * (algebraMap L (MeroRing L) c * Xm n) := by
+      simp only [Units.val_mk0] at hper
+      linear_combination hper
+    exact mul_right_cancel₀ hX h3
+  have h4 : (algebraMap K L q) ^ (-n) = 1 := by
+    have := (algebraMap L (MeroRing L)).injective (h2.trans (map_one _).symm)
+    exact this
+  have h5 : ‖algebraMap K L q‖ ^ (-n) = 1 := by
+    rw [← norm_zpow, h4, norm_one]
+  have hn : n = 0 := by
+    have := (zpow_eq_one_iff_right₀ hq0L.le hq1L.ne).mp h5
+    omega
+  subst hn
+  exact ⟨c, hc, by rw [hcn, Xm_zero, mul_one]⟩
+
+include hq0 hq1 in
+theorem tauQSigma_mem_Fq (hqL : algebraMap K L q ≠ 0) {g : MeroRing L}
+    (hg : g ∈ Fq L (algebraMap K L q)) : tauQSigma K L q T g ∈ Fq L (algebraMap K L q) := by
+  rw [mem_Fq_iff hqL] at hg ⊢
+  rw [tauQSigma_comm_q q hq0 hq1 T hqL, hg]
+
+include hq0 hq1 in
+theorem tauQSigma_pow_mem_Fq (hqL : algebraMap K L q ≠ 0) {g : MeroRing L}
+    (hg : g ∈ Fq L (algebraMap K L q)) (i : ℕ) :
+    (tauQSigma K L q T ^ i) g ∈ Fq L (algebraMap K L q) := by
+  induction i with
+  | zero => exact hg
+  | succ i ih =>
+    have e : (tauQSigma K L q T ^ (i + 1)) g = tauQSigma K L q T ((tauQSigma K L q T ^ i) g) := by
+      rw [pow_succ']; rfl
+    rw [e]; exact tauQSigma_mem_Fq q hq0 hq1 T hqL ih
+
+include hq0 hq1 in
+theorem tauQSigma_norm_fixed (hqL : algebraMap K L q ≠ 0) {g : MeroRing L}
+    (hg : g ∈ Fq L (algebraMap K L q)) (hg0 : g ≠ 0) :
+    tauQSigma K L q T (∏ i ∈ Finset.range (Module.finrank K L), (tauQSigma K L q T ^ i) g) =
+      ∏ i ∈ Finset.range (Module.finrank K L), (tauQSigma K L q T ^ i) g := by
+  set n := Module.finrank K L
+  rw [map_prod]
+  have e : ∀ i : ℕ, tauQSigma K L q T ((tauQSigma K L q T ^ i) g) = (tauQSigma K L q T ^ (i + 1)) g :=
+    fun i => by rw [pow_succ']; rfl
+  simp_rw [e]
+  have h1 := Finset.prod_range_succ' (fun i => (tauQSigma K L q T ^ i) g) n
+  have h2 := Finset.prod_range_succ (fun i => (tauQSigma K L q T ^ i) g) n
+  have hn : (tauQSigma K L q T ^ n) g = g := by
+    rw [tauQSigma_pow_card q T hqL, (mem_Fq_iff hqL g).mp hg]
+  have h0 : (tauQSigma K L q T ^ 0) g = g := by simp
+  simp only [h0] at h1
+  simp only [hn] at h2
+  exact mul_right_cancel₀ hg0 (h1.symm.trans h2)
+
+include hq0 hq1 in
+/-- Book, §5, Theorem XVI (norm theorem). -/
+theorem thmXVI_norm (f : FKQ K L q T) (hf : f ≠ 0) :
+    ∃ g : FqSub L (algebraMap K L q), g ≠ 0 ∧
+      ((f : FqSub L (algebraMap K L q)) : MeroRing L) =
+        ∏ i ∈ Finset.range (Module.finrank K L),
+          ((tauQSigma K L q T ^ i) (g : MeroRing L)) := by
+  classical
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  have hqL : algebraMap K L q ≠ 0 := norm_pos_iff.mp hq0L
+  set f' : MeroRing L := ((f : FqSub L (algebraMap K L q)) : MeroRing L) with hf'
+  have hf0 : f' ≠ 0 := by
+    intro h; apply hf; apply Subtype.ext; apply Subtype.ext; exact h
+  have hfFq : f' ∈ Fq L (algebraMap K L q) := (f : FqSub L (algebraMap K L q)).2
+  have hfix : tauQSigma K L q T f' = f' := by
+    rw [tauQSigma_apply]
+    exact f.2 (T.gen, Units.mk0 T.Q T.Q_ne) (Set.mem_singleton _) (meroGal T.gen) (isGalAct_meroGal _)
+  have hP : divisorOf L f' ∈ principalDivisors L (algebraMap K L q) :=
+    (mem_principalDivisors_iff L _ _).mpr ⟨f', hfFq, hf0, rfl⟩
+  have hdiv : divAct K L q T (divisorOf L f') = divisorOf L f' := by
+    rw [← divisorOf_tauQSigma q hq0 hq1 T hf0, hfix]
+  have hfixd : divisorOf L f' ∈ cycFixed (divAct K L q T) := by
+    exact (show divAct K L q T (divisorOf L f') - divisorOf L f' = 0 from by rw [hdiv, sub_self])
+  obtain ⟨m'', hm'', hNm⟩ := AddSubgroup.mem_map.mp (row4_H0 q hq0 hq1 T _ ⟨hP, hfixd⟩)
+  obtain ⟨g', hg'Fq, hg'0, hg'div⟩ := (mem_principalDivisors_iff L _ _).mp hm''
+  set N := ∏ i ∈ Finset.range (Module.finrank K L), (tauQSigma K L q T ^ i) g' with hN
+  have hN0 : N ≠ 0 := Finset.prod_ne_zero_iff.mpr fun i _ => (map_ne_zero _).mpr hg'0
+  have hNFq : N ∈ Fq L (algebraMap K L q) :=
+    (FqSub L (algebraMap K L q)).prod_mem fun i _ => tauQSigma_pow_mem_Fq q hq0 hq1 T hqL hg'Fq i
+  have hNdiv : divisorOf L N = divisorOf L f' := by
+    rw [hN, divisorOf_norm q hq0 hq1 T hg'0, hg'div]; exact hNm
+  set h := f' / N with hh
+  have hh0 : h ≠ 0 := div_ne_zero hf0 hN0
+  have hhFq : h ∈ Fq L (algebraMap K L q) :=
+    (FqSub L (algebraMap K L q)).div_mem hfFq hNFq
+  have hhd : divisorOf L h = 0 := by
+    have : f' = h * N := by rw [hh]; field_simp
+    have h2 := divisorOf_mul L hh0 hN0
+    rw [← this, hNdiv] at h2
+    exact (add_eq_right.mp h2.symm)
+  obtain ⟨c, hc0, hc⟩ := periodic_const_of_divisor_zero q hqL hq0L hq1L hhFq hh0 hhd
+  have hf'eq : f' = algebraMap L (MeroRing L) c * N := by rw [← hc, hh]; field_simp
+  have hsN := tauQSigma_norm_fixed q hq0 hq1 T hqL hg'Fq hg'0
+  have hgc : T.gen c = c := by
+    have h1 : tauQSigma K L q T f' = algebraMap L (MeroRing L) (T.gen c) * N := by
+      rw [hf'eq, map_mul, tauQSigma_alg, hsN]
+    rw [hfix, hf'eq] at h1
+    have := mul_right_cancel₀ hN0 h1
+    exact ((algebraMap L (MeroRing L)).injective this).symm
+  obtain ⟨a, ha⟩ := exists_K_of_gen_fixed q T c hgc
+  have ha0 : a ≠ 0 := by rintro rfl; exact hc0 (by rw [← ha, map_zero])
+  obtain ⟨g1, hg1Fq, hg10, hg1N⟩ := exists_norm_const q hq0 hq1 T a ha0
+  refine ⟨⟨g' * g1, (FqSub L (algebraMap K L q)).mul_mem hg'Fq hg1Fq⟩, ?_, ?_⟩
+  · intro h0
+    have := congrArg Subtype.val h0
+    exact mul_ne_zero hg'0 hg10 this
+  · show f' = ∏ i ∈ Finset.range (Module.finrank K L), (tauQSigma K L q T ^ i) (g' * g1)
+    simp only [map_mul, Finset.prod_mul_distrib]
+    rw [← hN, hg1N, ha, hf'eq, mul_comm]
+
+end norm
+
+end AnalyticTheory

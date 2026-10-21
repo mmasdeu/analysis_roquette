@@ -286,16 +286,7 @@ theorem corXVa_quotient (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
         Nonempty ((Multiplicative (classGroupDegZero K q) ⧸ ι.range) ≃* (Kˣ ⧸ normGroupK K L)) := by
   sorry
 
-/-- Book, §5, Theorem XVI (Norm theorem): every `𝐐`-semi-periodic function `f ≠ 0` is the
-`N_Q`-norm `∏_{i<n} (τ_Q σ)ⁱ g` of a `q`-periodic function `g ∈ F_L(q)`; equivalently
-`Ĥ⁰(G_Q, F_L(q)^×) = 0`. -/
-theorem thmXVI_norm (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) (f : FKQ K L q T) (hf : f ≠ 0) :
-    ∃ g : FqSub L (algebraMap K L q), g ≠ 0 ∧
-      ((f : FqSub L (algebraMap K L q)) : MeroRing L) =
-        ∏ i ∈ Finset.range (Module.finrank K L),
-          ((tauQSigma K L q T ^ i) (g : MeroRing L)) := by
-  sorry
+/-! Theorem XVI (`thmXVI_norm`) is proved in `Sec5Norm.lean`. -/
 
 /-- The cyclic automorphism `τ_Q σ` acting on divisors (`m ↦ m ∘ (Qσ)⁻¹`), for a chosen extension
 `σ'` of `σ` to `Ω_L`. -/
