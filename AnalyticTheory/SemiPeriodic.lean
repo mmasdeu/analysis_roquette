@@ -263,28 +263,9 @@ noncomputable def normGroup : Subgroup Lˣ :=
 noncomputable def normGroupK : Subgroup Kˣ :=
   MonoidHom.range (Units.map (Algebra.norm K : L →* K))
 
-/-- Book, §5, Theorem XV (Abel–Jacobi for semi-periodic functions): the Jacobi isomorphism
-`Φ_q` induces `C⁰_K(𝐐) ≅ N L^×/q`, where `D_K(𝐐)` is identified with the divisor group of
-`F_K(𝐐)` as in Theorem XIV. -/
-theorem thmXV_abel_jacobi (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q)
-    (e : FFDivisor K (FKQ K L q T) ≃+ SemiPeriodicDivisors K L q T) (he : IsSemiDivIso K L q T e)
-    (hqL : algebraMap K L q ≠ 0) :
-    ∃ ψ : Multiplicative (FFClassGroupDegZero K (FKQ K L q T)) ≃*
-        ↥((normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL)))),
-      ∀ D : FFDivisor.degZero K (FKQ K L q T),
-        (ψ (Multiplicative.ofAdd (QuotientAddGroup.mk D)) : Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL)) =
-          PhiQ L (algebraMap K L q) hqL (e (D : FFDivisor K (FKQ K L q T)) : Omega L → ℤ) := by
-  sorry
+/-! Theorem XV (`thmXV_abel_jacobi`) is proved in `Sec5AJ.lean`. -/
 
-/-- Book, §5, Corollary XVa: `C⁰_K(𝐐) ⊂ C⁰_K(q)`, with quotient isomorphic to `K^×/N L^×`. -/
-theorem corXVa_quotient (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    ∃ ι : Multiplicative (FFClassGroupDegZero K (FKQ K L q T)) →*
-        Multiplicative (classGroupDegZero K q),
-      Function.Injective ι ∧
-        Nonempty ((Multiplicative (classGroupDegZero K q) ⧸ ι.range) ≃* (Kˣ ⧸ normGroupK K L)) := by
-  sorry
+/-! Corollary XVa (`corXVa_quotient`) is proved in `Sec5AJ.lean`. -/
 
 /-! Theorem XVI (`thmXVI_norm`) is proved in `Sec5Norm.lean`. -/
 
