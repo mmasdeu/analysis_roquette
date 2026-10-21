@@ -100,3 +100,7 @@ import AnalyticTheory.CycAux
 import AnalyticTheory.Hilbert90U
 import AnalyticTheory.Sec5Table
 import AnalyticTheory.Sec5Norm
+import AnalyticTheory.Hilbert90Fixed
+import AnalyticTheory.Sec5Row4
+import AnalyticTheory.Sec5Row5
+import AnalyticTheory.Sec5Final
