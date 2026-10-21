@@ -1,5 +1,6 @@
 import AnalyticTheory.Sec5Div
 import AnalyticTheory.CycAux
+import AnalyticTheory.Hilbert90U
 
 /-!
 # §5: the cohomology table (rows `D_L(q)`, `D⁰_L(q)`, `C⁰_L(q)`, `P_L(q)`, `F_L(q)^×`)
@@ -573,6 +574,382 @@ theorem row_D0 :
     (degDataD q hq0 hq1 T).cycH1_degZero_equiv⟩
 
 end rows
+
+section row3
+
+variable (hqL : algebraMap K L q ≠ 0)
+
+/-- The group `L^×/q`. -/
+abbrev LQ : Type u := Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL)
+
+/-- The class of `u` in `L^×/q` (written additively). -/
+noncomputable def cls (u : Lˣ) : Additive (LQ q hqL) := Additive.ofMul (QuotientGroup.mk u)
+
+theorem cls_mul (u v : Lˣ) : cls q hqL (u * v) = cls q hqL u + cls q hqL v := rfl
+
+theorem sigmaOnQuot_cls (σ : GalGroup K L) (u : Lˣ) :
+    sigmaOnQuot K L q hqL σ (cls q hqL u) = cls q hqL (Units.map ((σ : L →+* L) : L →* L) u) := rfl
+
+theorem sigmaOnQuot_pow_cls (i : ℕ) (u : Lˣ) :
+    (sigmaOnQuot K L q hqL T.gen ^ i) (cls q hqL u) =
+      cls q hqL (Units.map (((T.gen ^ i : GalGroup K L) : L →+* L) : L →* L) u) := by
+  induction i with
+  | zero => rfl
+  | succ i ih =>
+    rw [pow_succ', show ∀ (x y : AddMonoid.End (Additive (LQ q hqL))) (a : Additive (LQ q hqL)),
+      (x * y) a = x (y a) from fun _ _ _ => rfl, ih, sigmaOnQuot_cls]
+    congr 1
+    apply Units.ext
+    simp [pow_succ', AlgEquiv.mul_apply]
+
+theorem cycNorm_cls (u : Lˣ) :
+    cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (cls q hqL u) =
+      cls q hqL (∏ i ∈ Finset.range (Module.finrank K L),
+        Units.map (((T.gen ^ i : GalGroup K L) : L →+* L) : L →* L) u) := by
+  rw [cycNorm, end_sum_apply]
+  simp only [sigmaOnQuot_pow_cls q T hqL]
+  induction Finset.range (Module.finrank K L) using Finset.induction_on with
+  | empty => rfl
+  | insert a S ha ih => rw [Finset.sum_insert ha, Finset.prod_insert ha, ih, cls_mul]
+
+/-- The norm `N_{L/K} : L^× → K^×` followed by the inclusion `K^× ⊂ L^×`. -/
+noncomputable def normL (K L : Type u) [NontriviallyNormedField K] [NontriviallyNormedField L]
+    [NormedAlgebra K L] [FiniteDimensional K L] : Lˣ →* Lˣ :=
+  (Units.map (algebraMap K L : K →* L)).comp (Units.map (Algebra.norm K : L →* K))
+
+theorem prod_gen_units (u : Lˣ) : ∏ i ∈ Finset.range (Module.finrank K L),
+    Units.map (((T.gen ^ i : GalGroup K L) : L →+* L) : L →* L) u = normL K L u := by
+  apply Units.ext
+  rw [Units.coe_prod]
+  show ∏ i ∈ Finset.range (Module.finrank K L), (T.gen ^ i) (u : L) = algebraMap K L (Algebra.norm K (u : L))
+  rw [← prod_aut_eq_prod_pow q T, Algebra.norm_eq_prod_automorphisms]
+
+theorem cycNorm_cls_eq (u : Lˣ) :
+    cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (cls q hqL u) =
+      cls q hqL (normL K L u) := by
+  rw [cycNorm_cls q T hqL, prod_gen_units q T]
+
+include hq0 hq1 in
+theorem q_pow_card_ne {k : ℕ} (h : (q ^ Module.finrank K L) ^ k = 1) : k = 0 := by
+  have h4 : (‖q‖ ^ Module.finrank K L) ^ k = 1 := by
+    have := congrArg norm h
+    rwa [norm_pow, norm_pow, norm_one] at this
+  have hqn : ‖q‖ ^ Module.finrank K L < 1 := pow_lt_one₀ hq0.le hq1 (Module.finrank_pos.ne')
+  by_contra hk
+  have : (‖q‖ ^ Module.finrank K L) ^ k < 1 :=
+    pow_lt_one₀ (by positivity) hqn hk
+  exact this.ne h4
+
+include hq0 hq1 in
+/-- A class of `L^×/q` fixed by `σ` comes from `K^×`. -/
+theorem exists_K_of_fixed {u : Lˣ} (hfix : sigmaOnQuot K L q hqL T.gen (cls q hqL u) = cls q hqL u) :
+    ∃ c : Kˣ, Units.map (algebraMap K L : K →* L) c = u := by
+  have h1 : (Units.map ((T.gen : L →+* L) : L →* L) u)⁻¹ * u ∈
+      Subgroup.zpowers (Units.mk0 _ hqL) :=
+    (QuotientGroup.eq (s := Subgroup.zpowers (Units.mk0 _ hqL))).mp hfix
+  obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp h1
+  have hjL : (algebraMap K L q) ^ j * T.gen (u : L) = u := by
+    have := congrArg (fun v : Lˣ => (v : L)) hj
+    simp only [Units.val_mul, Units.val_zpow_eq_zpow_val, Units.val_mk0, Units.val_inv_eq_inv_val,
+      Units.coe_map] at this
+    have hσ0 : T.gen (u : L) ≠ 0 := (map_ne_zero T.gen).mpr u.ne_zero
+    rw [this]
+    field_simp
+    rfl
+  have hn0 : Algebra.norm K (u : L) ≠ 0 := (Algebra.norm_ne_zero_iff.mpr u.ne_zero)
+  have hσu : T.gen (u : L) = u := by
+    rcases Int.eq_nat_or_neg j with ⟨k, rfl | rfl⟩
+    · rw [zpow_natCast] at hjL
+      have := congrArg (Algebra.norm K) hjL
+      rw [map_mul, map_pow, Algebra.norm_algebraMap, Algebra.norm_eq_of_algEquiv] at this
+      have h3 : ((q ^ Module.finrank K L) ^ k : K) = 1 := by
+        have h5 : (q ^ Module.finrank K L) ^ k * Algebra.norm K (u : L) = 1 * Algebra.norm K (u : L) := by
+          rw [one_mul]; exact this
+        exact mul_right_cancel₀ hn0 h5
+      have hk0 := q_pow_card_ne q hq0 hq1 h3
+      subst hk0
+      simpa using hjL
+    · rw [zpow_neg, zpow_natCast] at hjL
+      have hq' : (algebraMap K L q) ^ k ≠ 0 := pow_ne_zero _ (norm_pos_iff.mp (norm_alg_pos (L := L) q hq0))
+      have hjL' : T.gen (u : L) = (algebraMap K L q) ^ k * u := by
+        calc T.gen (u : L) = (algebraMap K L q) ^ k * (((algebraMap K L q) ^ k)⁻¹ * T.gen (u : L)) := by
+              field_simp
+          _ = (algebraMap K L q) ^ k * u := by rw [hjL]
+      have := congrArg (Algebra.norm K) hjL'
+      rw [Algebra.norm_eq_of_algEquiv, map_mul, map_pow, Algebra.norm_algebraMap] at this
+      have h3 : ((q ^ Module.finrank K L) ^ k : K) = 1 := by
+        have h5 : (q ^ Module.finrank K L) ^ k * Algebra.norm K (u : L) = 1 * Algebra.norm K (u : L) := by
+          rw [one_mul]; exact this.symm
+        exact mul_right_cancel₀ hn0 h5
+      have hk0 := q_pow_card_ne q hq0 hq1 h3
+      subst hk0
+      simpa using hjL'
+  have hall : ∀ τ : L ≃ₐ[K] L, τ (u : L) = u := by
+    intro τ
+    obtain ⟨a, rfl⟩ := gen_zpow q T τ
+    have : ∀ a : ℤ, (T.gen ^ a) (u : L) = u := by
+      intro a
+      induction a using Int.induction_on with
+      | zero => simp
+      | succ i ih => rw [zpow_add_one, AlgEquiv.mul_apply, hσu, ih]
+      | pred i ih =>
+        rw [zpow_sub_one, AlgEquiv.mul_apply]
+        have : T.gen⁻¹ (u : L) = u := by
+          have e : T.gen (T.gen⁻¹ (u : L)) = T.gen (u : L) := by
+            rw [hσu]; exact AlgEquiv.apply_symm_apply T.gen _
+          exact T.gen.injective e
+        rw [this, ih]
+    exact this a
+  have hmem : (u : L) ∈ (⊥ : IntermediateField K L) :=
+    (IsGalois.mem_bot_iff_fixed (u : L)).mpr hall
+  obtain ⟨c, hc⟩ := IntermediateField.mem_bot.mp hmem
+  have hc0 : c ≠ 0 := by
+    rintro rfl
+    exact u.ne_zero (by rw [← hc, map_zero])
+  exact ⟨Units.mk0 c hc0, Units.ext (by simpa using hc)⟩
+
+/-- `⊤` as a subgroup of the additive group `L^×/q`, with the commutative-group instance path. -/
+abbrev TopQ : @AddSubgroup (Additive (LQ q hqL)) AddCommGroup.toAddGroup := ⊤
+
+/-- The map `K^× → L^×/q`. -/
+noncomputable def constHom : Additive Kˣ →+ Additive (LQ q hqL) :=
+  MonoidHom.toAdditive ((QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL))).comp
+    (Units.map (algebraMap K L : K →* L)))
+
+theorem constHom_apply (c : Kˣ) :
+    constHom q hqL (Additive.ofMul c) = cls q hqL (Units.map (algebraMap K L : K →* L) c) := rfl
+
+include hq0 hq1 in
+theorem constHom_mem_norm (c : Kˣ) :
+    c ∈ normGroupK K L ↔ constHom q hqL (Additive.ofMul c) ∈
+      (TopQ q hqL).map
+        (cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L)) := by
+  rw [constHom_apply]
+  constructor
+  · rintro ⟨v, hv⟩
+    refine ⟨cls q hqL v, trivial, ?_⟩
+    show cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (cls q hqL v) = _
+    rw [cycNorm_cls_eq q T hqL]
+    congr 1
+    show normL K L v = _
+    simp only [normL, MonoidHom.comp_apply]
+    rw [hv]
+  · rintro ⟨x, -, hx⟩
+    obtain ⟨v, rfl⟩ := QuotientGroup.mk_surjective (Additive.toMul x)
+    have hx' : cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (cls q hqL v) =
+        cls q hqL (Units.map (algebraMap K L : K →* L) c) := hx
+    rw [cycNorm_cls_eq q T hqL] at hx'
+    have h1 := (QuotientGroup.eq (s := Subgroup.zpowers (Units.mk0 _ hqL))).mp hx'
+    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp h1
+    have hqN : Units.mk0 (algebraMap K L q) hqL = normL K L (Units.mk0 T.Q T.Q_ne) := by
+      apply Units.ext
+      simp [normL, T.norm_eq]
+    refine ⟨v * (Units.mk0 T.Q T.Q_ne) ^ j, ?_⟩
+    have e1 : normL K L (v * (Units.mk0 T.Q T.Q_ne) ^ j) =
+        Units.map (algebraMap K L : K →* L) c := by
+      rw [map_mul, map_zpow, ← hqN, hj]
+      group
+    exact Units.map_injective (algebraMap K L).injective e1
+
+include hq0 hq1 in
+theorem row3_H0 :
+    Nonempty (cycH0 (Amb := Additive (Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL)))
+      (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) ⊤ ≃+ Additive (Kˣ ⧸ normGroupK K L)) := by
+  obtain ⟨e⟩ := cycH0_equiv_of_hom (Amb := Additive (LQ q hqL)) (sigmaOnQuot K L q hqL T.gen)
+    (Module.finrank K L) (TopQ q hqL) (constHom q hqL) (fun _ => trivial)
+    (fun g => by
+      obtain ⟨c⟩ := (⟨g⟩ : Nonempty (Additive Kˣ))
+      show sigmaOnQuot K L q hqL T.gen (cls q hqL (Units.map (algebraMap K L : K →* L) (Additive.toMul g))) = _
+      rw [sigmaOnQuot_cls]
+      congr 1
+      exact Units.ext (AlgEquiv.commutes T.gen _))
+    (fun a _ ha => by
+      obtain ⟨u, rfl⟩ := QuotientGroup.mk_surjective (Additive.toMul a)
+      obtain ⟨c, hc⟩ := exists_K_of_fixed q hq0 hq1 T hqL (u := u) ha
+      exact ⟨Additive.ofMul c, by rw [constHom_apply, hc]; rfl⟩)
+    (Subgroup.toAddSubgroup (normGroupK K L))
+    (fun g => constHom_mem_norm q hq0 hq1 T hqL (Additive.toMul g))
+  exact ⟨e.trans (addQuotEquiv (normGroupK K L))⟩
+
+/-- `σ`-twisted telescoping: `σ(∏_{i<n} Q_i) = (∏_{i<n} Q_i) · q / Qⁿ`. -/
+theorem sigma_prod_Qp (hQn : Qp T.gen (Units.mk0 T.Q T.Q_ne) (Module.finrank K L) =
+      Units.mk0 (algebraMap K L q) hqL) :
+    (T.gen : L ≃ₐ[K] L) • (∏ i ∈ Finset.range (Module.finrank K L), Qp T.gen (Units.mk0 T.Q T.Q_ne) i) =
+      (∏ i ∈ Finset.range (Module.finrank K L), Qp T.gen (Units.mk0 T.Q T.Q_ne) i) *
+        Units.mk0 (algebraMap K L q) hqL * (Units.mk0 T.Q T.Q_ne)⁻¹ ^ (Module.finrank K L) := by
+  set Qu := Units.mk0 T.Q T.Q_ne with hQu
+  set n := Module.finrank K L with hn
+  have h1 : ∀ i : ℕ, T.gen • Qp T.gen Qu i = Qu⁻¹ * Qp T.gen Qu (i + 1) := by
+    intro i
+    have := Qp_add T.gen Qu 1 i
+    have hq1 : Qp T.gen Qu 1 = Qu := by
+      unfold Qp; rw [Finset.prod_range_one, pow_zero, one_smul]
+    rw [hq1, pow_one] at this
+    rw [show i + 1 = 1 + i from add_comm i 1, this]
+    group
+  rw [Finset.smul_prod', Finset.prod_congr rfl fun i _ => h1 i, Finset.prod_mul_distrib,
+    Finset.prod_const, Finset.card_range]
+  have h2 : ∏ i ∈ Finset.range n, Qp T.gen Qu (i + 1) =
+      (∏ i ∈ Finset.range n, Qp T.gen Qu i) * Qp T.gen Qu n := by
+    have := Finset.prod_range_succ (fun i => Qp T.gen Qu i) n
+    have h0 := Finset.prod_range_succ' (fun i => Qp T.gen Qu i) n
+    have hq0' : Qp T.gen Qu 0 = 1 := by unfold Qp; rw [Finset.prod_range_zero]
+    rw [h0, hq0', mul_one] at this
+    exact this
+  rw [h2, hQn]
+  simp only [inv_pow, zpow_neg, zpow_natCast, mul_assoc, mul_comm, mul_left_comm]
+
+theorem normL_Q : normL K L (Units.mk0 T.Q T.Q_ne) = Units.mk0 (algebraMap K L q) hqL := by
+  apply Units.ext
+  simp [normL, T.norm_eq]
+
+theorem normL_qU : normL K L (Units.mk0 (algebraMap K L q) hqL) =
+    Units.mk0 (algebraMap K L q) hqL ^ Module.finrank K L := by
+  apply Units.ext
+  simp [normL, Algebra.norm_algebraMap]
+
+theorem normL_gen (v : Lˣ) :
+    normL K L (Units.map ((T.gen : L →+* L) : L →* L) v) = normL K L v := by
+  apply Units.ext
+  simp only [normL, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe]
+  show algebraMap K L (Algebra.norm K (T.gen (v : L))) = algebraMap K L (Algebra.norm K (v : L))
+  rw [Algebra.norm_eq_of_algEquiv]
+
+theorem Qp_card : Qp T.gen (Units.mk0 T.Q T.Q_ne) (Module.finrank K L) =
+    Units.mk0 (algebraMap K L q) hqL := by
+  rw [← normL_Q q T hqL, ← prod_gen_units q T]
+  unfold Qp
+  refine Finset.prod_congr rfl fun i _ => ?_
+  rw [AlgEquiv.smul_units_def]
+  rfl
+
+theorem cls_eq_zero_iff (v : Lˣ) : cls q hqL v = 0 ↔ v ∈ Subgroup.zpowers (Units.mk0 _ hqL) :=
+  QuotientGroup.eq_one_iff v
+
+theorem cls_inv (v : Lˣ) : cls q hqL v⁻¹ = - cls q hqL v := by
+  show Additive.ofMul (QuotientGroup.mk v⁻¹ : LQ q hqL) = - Additive.ofMul (QuotientGroup.mk v)
+  rw [QuotientGroup.mk_inv, ofMul_inv]
+
+theorem cls_zpow (v : Lˣ) (k : ℤ) : cls q hqL (v ^ k) = k • cls q hqL v := by
+  show Additive.ofMul (QuotientGroup.mk (v ^ k) : LQ q hqL) = k • Additive.ofMul (QuotientGroup.mk v)
+  rw [← ofMul_zpow, QuotientGroup.mk_zpow]
+
+/-- The generator `σ` acting on `L^×/q`. -/
+noncomputable abbrev sQ : AddMonoid.End (Additive (LQ q hqL)) := sigmaOnQuot K L q hqL T.gen
+
+include hq0 hq1 in
+theorem qU_zpow_inj {a b : ℤ} (h : Units.mk0 (algebraMap K L q) hqL ^ a =
+    Units.mk0 (algebraMap K L q) hqL ^ b) : a = b := by
+  have h1 : (algebraMap K L q) ^ a = (algebraMap K L q) ^ b := by
+    have := congrArg (fun v : Lˣ => (v : L)) h
+    simpa using this
+  have h2 : ‖q‖ ^ a = ‖q‖ ^ b := by
+    have := congrArg norm h1
+    rwa [norm_zpow, norm_zpow, norm_algebraMap'] at this
+  exact zpow_right_injective₀ hq0 hq1.ne h2
+
+include hq0 hq1 in
+theorem row3_H1 :
+    Nonempty (cycH1 (Amb := Additive (Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL)))
+      (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) ⊤ ≃+ ZMod (Module.finrank K L)) := by
+  set Qu := Units.mk0 T.Q T.Q_ne with hQu
+  have hcN : cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (cls q hqL Qu) = 0 := by
+    rw [cycNorm_cls_eq q T hqL, hQu, normL_Q q T hqL, cls_eq_zero_iff]
+    exact Subgroup.mem_zpowers _
+  have key := cycH1_top_equiv_of_gen (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L)
+    (cls q hqL Qu) hcN (by
+    -- generation, by Hilbert's theorem 90
+    intro a haN
+    obtain ⟨u, hu⟩ := QuotientGroup.mk_surjective (Additive.toMul a)
+    have ha : a = cls q hqL u := by
+      unfold cls; rw [hu]; rfl
+    subst ha
+    rw [cycNorm_cls_eq q T hqL, cls_eq_zero_iff] at haN
+    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp haN
+    have hw : normL K L (u * Qu ^ (-j)) = 1 := by
+      rw [map_mul, map_zpow, hQu, normL_Q q T hqL, ← hj, ← zpow_add, add_neg_cancel, zpow_zero]
+    have hnorm : Algebra.norm K ((u * Qu ^ (-j) : Lˣ) : L) = 1 := by
+      have h1 : Units.map (Algebra.norm K : L →* K) (u * Qu ^ (-j)) = 1 :=
+        Units.map_injective (algebraMap K L).injective (by rw [map_one]; exact hw)
+      exact congrArg Units.val h1
+    obtain ⟨y, hy⟩ := exists_h90 (K := K) (L := L) T.gen
+      (fun g => by obtain ⟨a, rfl⟩ := gen_zpow q T g; exact ⟨a, rfl⟩) hnorm
+    refine ⟨j, cls q hqL y⁻¹, ?_⟩
+    have hwy : u * Qu ^ (-j) = y * (Units.map ((T.gen : L →+* L) : L →* L) y)⁻¹ := by
+      apply Units.ext
+      have h0 : (T.gen (y : L)) ≠ 0 := (map_ne_zero T.gen).mpr y.ne_zero
+      rw [← hy]
+      simp only [Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_coe,
+        RingHom.coe_coe]
+      field_simp
+    have h2 : cls q hqL u - j • cls q hqL Qu = cls q hqL (u * Qu ^ (-j)) := by
+      rw [cls_mul, zpow_neg, cls_inv, cls_zpow]
+      exact sub_eq_add_neg (G := Additive (LQ q hqL)) _ _
+    show sigmaOnQuot K L q hqL T.gen (cls q hqL y⁻¹) - cls q hqL y⁻¹ = _
+    rw [h2, hwy, sigmaOnQuot_cls, map_inv, cls_mul, cls_inv, cls_inv]
+    abel) (by
+    intro k
+    constructor
+    · rintro ⟨x, hx⟩
+      obtain ⟨v, hv⟩ := QuotientGroup.mk_surjective (Additive.toMul x)
+      have hxv : x = cls q hqL v := by unfold cls; rw [hv]; rfl
+      subst hxv
+      have h1 : cls q hqL (Units.map ((T.gen : L →+* L) : L →* L) v) - cls q hqL v =
+          cls q hqL (Qu ^ k) := by
+        rw [cls_zpow]; exact hx
+      -- `σ v / v / Q^k ∈ ⟨q⟩`
+      have h2 : cls q hqL (Units.map ((T.gen : L →+* L) : L →* L) v * v⁻¹ * (Qu ^ k)⁻¹) = 0 := by
+        rw [cls_mul, cls_mul, cls_inv, cls_inv]
+        have : cls q hqL (Units.map ((T.gen : L →+* L) : L →* L) v) + -cls q hqL v +
+            -cls q hqL (Qu ^ k) = cls q hqL (Units.map ((T.gen : L →+* L) : L →* L) v) -
+              cls q hqL v - cls q hqL (Qu ^ k) := by abel
+        rw [this, h1]; exact sub_self (cls q hqL (Qu ^ k))
+      rw [cls_eq_zero_iff] at h2
+      obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp h2
+      have h3 := congrArg (normL K L) hm
+      rw [map_mul, map_mul, map_inv, map_inv, map_zpow, map_zpow, normL_gen q T, normL_qU q hqL,
+        hQu, normL_Q q T hqL, mul_inv_cancel, one_mul] at h3
+      -- `q^{-k} = q^{n m}`
+      have h4 : Units.mk0 (algebraMap K L q) hqL ^ ((Module.finrank K L : ℤ) * m) =
+          Units.mk0 (algebraMap K L q) hqL ^ (-k) := by
+        rw [zpow_neg, zpow_mul, zpow_natCast]; exact h3
+      have h5 := qU_zpow_inj q hq0 hq1 hqL h4
+      exact ⟨-m, by linarith⟩
+    · rintro ⟨j, rfl⟩
+      set Z := ∏ i ∈ Finset.range (Module.finrank K L), Qp T.gen Qu i with hZ
+      have hσZ := sigma_prod_Qp q T hqL (Qp_card q T hqL)
+      rw [← hZ] at hσZ
+      have hσZ' : Units.map ((T.gen : L →+* L) : L →* L) Z =
+          Z * Units.mk0 (algebraMap K L q) hqL * Qu⁻¹ ^ (Module.finrank K L) := hσZ
+      have h1 : sigmaOnQuot K L q hqL T.gen (cls q hqL Z) - cls q hqL Z =
+          -((Module.finrank K L : ℤ) • cls q hqL Qu) := by
+        rw [sigmaOnQuot_cls, hσZ', cls_mul, cls_mul, ← zpow_natCast, cls_zpow, cls_inv]
+        have hq0' : cls q hqL (Units.mk0 (algebraMap K L q) hqL) = 0 :=
+          (cls_eq_zero_iff q hqL _).mpr (Subgroup.mem_zpowers _)
+        rw [hq0']
+        have e : (Module.finrank K L : ℤ) • -cls q hqL Qu = -((Module.finrank K L : ℤ) • cls q hqL Qu) :=
+          zsmul_neg (cls q hqL Qu) (Module.finrank K L : ℤ)
+        rw [e]
+        abel
+      refine ⟨j • (-cls q hqL Z), ?_⟩
+      show (sigmaOnQuot K L q hqL T.gen) (j • (-cls q hqL Z)) - j • (-cls q hqL Z) =
+        ((Module.finrank K L : ℤ) * j) • cls q hqL Qu
+      have e1 : (sigmaOnQuot K L q hqL T.gen) (j • (-cls q hqL Z)) =
+          j • (sigmaOnQuot K L q hqL T.gen) (-cls q hqL Z) := map_zsmul (sigmaOnQuot K L q hqL T.gen) j (-cls q hqL Z)
+      have e2 : (sigmaOnQuot K L q hqL T.gen) (-cls q hqL Z) =
+          -(sigmaOnQuot K L q hqL T.gen) (cls q hqL Z) := map_neg (sigmaOnQuot K L q hqL T.gen) (cls q hqL Z)
+      rw [e1, e2]
+      have e3 : j • -(sigmaOnQuot K L q hqL T.gen) (cls q hqL Z) - j • (-cls q hqL Z) =
+          j • (-(sigmaOnQuot K L q hqL T.gen) (cls q hqL Z) - -cls q hqL Z) := (zsmul_sub (-(sigmaOnQuot K L q hqL T.gen) (cls q hqL Z)) (-cls q hqL Z) j).symm
+      rw [e3]
+      have e4 : -(sigmaOnQuot K L q hqL T.gen) (cls q hqL Z) - -cls q hqL Z =
+          -(sigmaOnQuot K L q hqL T.gen (cls q hqL Z) - cls q hqL Z) := by abel
+      rw [e4, h1, neg_neg ((Module.finrank K L : ℤ) • cls q hqL Qu), mul_comm]
+      exact (mul_zsmul (cls q hqL Qu) j (Module.finrank K L : ℤ)).symm)
+
+  exact key
+
+end row3
 
 end table
 
