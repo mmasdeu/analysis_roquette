@@ -105,3 +105,7 @@ import AnalyticTheory.Sec5Row4
 import AnalyticTheory.Sec5Row5
 import AnalyticTheory.Sec5Final
 import AnalyticTheory.Sec5AJ
+import AnalyticTheory.GaloisDescentVec
+import AnalyticTheory.SkolemNoetherMatrix
+import AnalyticTheory.CyclicSplit
+import AnalyticTheory.Sec5Brauer

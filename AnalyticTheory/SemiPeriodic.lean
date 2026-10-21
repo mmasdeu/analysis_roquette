@@ -293,16 +293,7 @@ noncomputable def sigmaOnQuot (q : K) (hqL : algebraMap K L q ≠ 0) (σ : GalGr
 /-! The cohomology table (`table_cohomology`) is proved in `Sec5Table.lean`/`Sec5Row4.lean`/`Sec5Row5.lean`
 and assembled in `Sec5Final.lean`. -/
 
-/-- Book, §5, Corollary XVIa: the natural map `Br(F_K(𝐐)) → Br(F_L(q))` is injective: a central
-simple algebra over `F_K(𝐐)` which is split by `F_L(q)` is split. -/
-theorem corXVIa_brauer (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q)
-    (A : Type u) [Ring A] [Algebra (FKQ K L q T) A] [Algebra.IsCentral (FKQ K L q T) A]
-    [IsSimpleRing A] [FiniteDimensional (FKQ K L q T) A]
-    (hsplit : ∃ m : ℕ, Nonempty (TensorProduct (FKQ K L q T) (FqSub L (algebraMap K L q)) A ≃ₐ[FqSub L (algebraMap K L q)]
-      Matrix (Fin m) (Fin m) (FqSub L (algebraMap K L q)))) :
-    ∃ m : ℕ, Nonempty (A ≃ₐ[FKQ K L q T] Matrix (Fin m) (Fin m) (FKQ K L q T)) := by
-  sorry
+/-! Corollary XVIa (`corXVIa_brauer`) is proved in `Sec5Brauer.lean`. -/
 
 /-- Book, §5, Corollary XVIb: a central simple algebra over `K` is split by `F_K(𝐐)` iff it is
 split by `L`. -/
