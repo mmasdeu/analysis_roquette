@@ -183,14 +183,14 @@ add('corollary','cor:XIIIa','Corollary XIIIa (index)',['corXIIIa_index'],['thm:X
  r'$F_K(\mathbf Q)$ has index $n$.')
 add('corollary','cor:XIIIb','Corollary XIIIb (minimal splitting field)',['corXIIIb_minimal'],['thm:XIII'],True,
  r'$L$ is the minimal algebraic splitting field of $F_K(\mathbf Q)$.')
-add('theorem','thm:XV','Theorem XV (Abel--Jacobi for semi-periodic functions)',['thmXV_abel_jacobi'],['thm:XIV','prop:abel-jacobi-1'],True,
+add('theorem','thm:XV','Theorem XV (Abel--Jacobi for semi-periodic functions)',['thmXV_abel_jacobi'],['thm:XIV','prop:abel-jacobi-1'],False,
  r'$C^0_K(\mathbf Q)\cong N L^\times/q$.')
-add('corollary','cor:XVa','Corollary XVa',['corXVa_quotient'],['thm:XV'],True,
+add('corollary','cor:XVa','Corollary XVa',['corXVa_quotient'],['thm:XV'],False,
  r'$C^0_K(\mathbf Q)\subset C^0_K(q)$ with quotient $K^\times/NL^\times$.')
-add('theorem','thm:XVI','Theorem XVI (norm theorem)',['thmXVI_norm'],['thm:XIV','thm:XV'],True,
+add('theorem','thm:XVI','Theorem XVI (norm theorem)',['thmXVI_norm'],['thm:XIV','thm:XV'],False,
  r'Every semi-periodic $f\neq 0$ is the norm of some $g\in F_L(q)$.')
-add('theorem','tab:cohomology','Table of cohomology groups',['table_cohomology'],['thm:XVI'],True,
- r'$H^0$ and $H^1$ of $D_L(q)$, $D^0_L(q)$, $C^0_L(q)$, $P_L(q)$, $F_L(q)^\times$. Recorded as $\mathrm{True}$.')
+add('theorem','tab:cohomology','Table of cohomology groups',['table_cohomology'],['thm:XVI'],False,
+ r'$H^0$ and $H^1$ of $D_L(q)$, $D^0_L(q)$, $C^0_L(q)$, $P_L(q)$, $F_L(q)^\times$. Proved in \texttt{Sec5Table}, \texttt{Sec5Row4}, \texttt{Sec5Row5}, \texttt{Sec5Final}.')
 add('corollary','cor:XVIa','Corollary XVIa (Brauer)',['corXVIa_brauer'],['thm:XVI'],True,
  r'$\mathrm{Br}(F_K(\mathbf Q))\to\mathrm{Br}(F_L(q))$ is injective.')
 add('corollary','cor:XVIb','Corollary XVIb',['corXVIb_splitting'],['cor:XVIa'],True,

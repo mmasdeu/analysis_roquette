@@ -192,7 +192,17 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   divisors and the algebraic Abel–Jacobi theorem (`Multiplicators.lean`), transport of
   multiplicators along isomorphisms (`MultTransfer.lean`), constant extensions normed by the
   spectral norm.
-* Not started (statements only): §5; the Proposition on absolute integrality of `j` (§6);
+* §4–§5 (`ConstExtAbstract/ConstExtDescent/GaloisPrimes/ZpowAux/ResidueMaps/Sec5/Sec5Div/CycAux/
+  Hilbert90U/Hilbert90Fixed/Sec5Table/Sec5Norm/Sec5Row4/Sec5Row5/Sec5Final/Sec5AJ.lean`), all with
+  standard axioms only: `Ezeta_isElliptic` (conservativity through descent of constant field
+  extensions), Theorems **XII, XIII, XIV, XV, XVI**, Corollaries **XIIIa, XIIIb, XVa**, and the
+  cohomology table of §5 (`table_cohomology`: rows `D_L(q)`, `D⁰_L(q)`, `C⁰_L(q)`, `P_L(q)`,
+  `F_L(q)^×`, via Tate cohomology of the cyclic group `⟨τ_Qσ⟩` and Hilbert 90 in all universes).
+  Correction: the book's `Ĥ¹(D⁰) ≅ ℤ/n` is stated with `ZMod [L:K]`. **Still `sorry`:** Corollaries
+  XVIa/XVIb (Brauer groups: no cyclic-algebra theory in Mathlib), and the §4 bridges
+  `Ezeta_isJacobian`, `jacobian_descent`, `thmX_minimal_splitting` (they need Appendix A1/A2:
+  invariance of the absolute and Hasse invariants).
+* Not started (statements only): the Proposition on absolute integrality of `j` (§6);
   Appendix A2 in general.
 
 ## Buzzard's identity (MathOverflow 469021)

@@ -254,3 +254,9 @@ Main risks: the divisor-class bridge in Phase 5, and the size of 6a.
 * Done: Lemma 2, Galois descent for `F_L(q)`, model Theorems IX and XI (`Sec4.lean`).
 * Open bridges (pragmatic approach 6b): `Ezeta_isElliptic`, `Ezeta_isJacobian`,
   `jacobian_descent`, `thmX_minimal_splitting`; then §5–§6.
+
+## Status (after §5)
+
+* Done: Theorems XII–XVI, Corollaries XIIIa, XIIIb, XVa, the cohomology table (`Sec5*.lean`).
+* Open: Corollaries XVIa/XVIb (need cyclic algebras / Brauer theory), and the bridges
+  `Ezeta_isJacobian`, `jacobian_descent`, `thmX_minimal_splitting` (Appendix A1/A2).
