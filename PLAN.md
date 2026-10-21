@@ -261,3 +261,33 @@ Main risks: the divisor-class bridge in Phase 5, and the size of 6a.
 * Done also: Corollaries XVIa, XVIb.
 * Open: the bridges
   `Ezeta_isJacobian`, `jacobian_descent`, `thmX_minimal_splitting` (Appendix A1/A2).
+
+## Appendices A1/A2: roadmap (started)
+
+Done (`A1Exist.lean`): for an elliptic `F | K` and a degree-one prime `𝔭`, there are `x, y` with pole
+divisors `2𝔭`, `3𝔭` (`exists_poleOrd_two/three`), they satisfy a Weierstraß relation
+(`exists_weierstrass_relation`, `exists_normalForm`: (A1.1) with leading coefficients `1`), and in
+characteristic `≠ 2, 3` its discriminant is nonzero (`wDisc_ne_zero`: otherwise `y/(x − e)` would be a
+nonconstant element of `L(𝔭)`).
+
+The remaining work is, in dependency order:
+
+1. **Existence of `WeierstrassData`** (`thm:A-existence-data`): (a) `F = K(x, y)`: needs the finiteness of the
+   set of poles of a function (the project's `PrimeDivisor` is an arbitrary DVR containing `K`; the
+   fundamental identity of `FFDedekind` assumes separability, so the inseparable case needs the
+   finiteness of the integral closure of `K[g]` in `F`, e.g. through Noether normalization); (b) `Δ ≠ 0`
+   in characteristics `2, 3`: the singular cubic with a non-rational singular point is exactly the
+   non-conservative case, so this needs the genus drop under `K ⊂ K^{1/p}`.
+   Without (a)+(b) `absInv` is the junk value `0` for fields without data, and `absInvGen` of A2 is not
+   well defined (its `Classical.epsilon` could return `0`).
+2. **Invariance under constant field extension** (Remark 3 of A1; `remark_A3_absinv/hasse`): a
+   Weierstraß datum of `F | K` gives one of `FL | L` with the same coefficients (the prime extends with
+   degree one, `L(n𝔭_L) = L ⊗ L(n𝔭)`, `FL = L(x, y)`).  Homogeneity of degree-one primes is *not* needed
+   for the bridges if one works with the datum chosen by `absInv` and transports along `E ⊗ M ≅ F_M(q)`.
+3. **A2 independence of the splitting field** (`absInvGen_independent`, `hasseGen_compatible/unique`):
+   compositum `M ⊇ L, L'` (a quotient of `L ⊗_K L'`), uniqueness of constant extensions, then (2).
+4. **Bridge B1'** `Ezeta_isJacobian` from (3) and `Ezeta_constExt_equiv`.
+5. **Bridge B2** `jacobian_descent`: characteristic cocycle `ζ_E(σ) = ρ_σ σ⁻¹ ∈ Aut(F_L(q) | L)`, that it
+   consists of translations (Lemma A + (53)), and that `E = E_ζ` (Galois descent already available as
+   `Ezeta`).
+6. **Bridge B3** `thmX_minimal_splitting`.
