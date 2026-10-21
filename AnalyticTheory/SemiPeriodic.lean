@@ -330,12 +330,12 @@ theorem table_cohomology (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     -- `D⁰_L(q)`
     (Subsingleton (cycH0 (divAct K L q T) (Module.finrank K L) (divisorsDegZero L (algebraMap K L q))) ∧
       Nonempty (cycH1 (divAct K L q T) (Module.finrank K L) (divisorsDegZero L (algebraMap K L q)) ≃+
-        Additive (ZMod (Module.finrank K L)))) ∧
+        ZMod (Module.finrank K L))) ∧
     -- `C⁰_L(q) ≅ L^×/q`
     (Nonempty (cycH0 (Amb := Additive (Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL))) (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) ⊤ ≃+
         Additive (Kˣ ⧸ normGroupK K L)) ∧
       Nonempty (cycH1 (Amb := Additive (Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL))) (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) ⊤ ≃+
-        Additive (ZMod (Module.finrank K L)))) ∧
+        ZMod (Module.finrank K L))) ∧
     -- `P_L(q)`
     (Subsingleton (cycH0 (divAct K L q T) (Module.finrank K L) (principalDivisors L (algebraMap K L q))) ∧
       Nonempty (cycH1 (divAct K L q T) (Module.finrank K L) (principalDivisors L (algebraMap K L q)) ≃+
