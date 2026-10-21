@@ -248,15 +248,7 @@ def IsSemiDivIso (q : K) (T : SemiPeriodicTriple K L q)
     ∀ β : Omega L, (e (Finsupp.single P 1) : Omega L → ℤ) β =
       open Classical in if IsSemiConj K L T α β then 1 else 0
 
-/-- Book, §5, Theorem XIV. -/
-theorem thmXIV_divisors (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    (∃ e : FFDivisor K (FKQ K L q T) ≃+ SemiPeriodicDivisors K L q T, IsSemiDivIso K L q T e) ∧
-    (∀ m ∈ SemiPeriodicDivisors K L q T, ∃ m' ∈ DivisorsPeriodic L (algebraMap K L q),
-      ∀ σ' : Omega L ≃+* Omega L, IsExtension K L T.gen σ' → ∀ α : Omega L,
-        m α = ∑ i ∈ Finset.range (Module.finrank K L),
-          m' ((((semiPerm K L T σ')⁻¹) ^ i) α)) := by
-  sorry
+/-! Theorem XIV (`thmXIV_divisors`) is proved in `Sec5Div.lean`. -/
 
 /-! Corollary XIIIa (`corXIIIa_index`) is proved in `Sec5.lean`. -/
 

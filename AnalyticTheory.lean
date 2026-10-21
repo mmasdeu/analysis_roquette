@@ -93,4 +93,6 @@ import AnalyticTheory.ConstExtAbstract
 import AnalyticTheory.ConstExtDescent
 import AnalyticTheory.GaloisPrimes
 import AnalyticTheory.ZpowAux
+import AnalyticTheory.ResidueMaps
 import AnalyticTheory.Sec5
+import AnalyticTheory.Sec5Div
