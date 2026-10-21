@@ -1003,6 +1003,13 @@ theorem PhiQ_neg' {m : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algebraM
   exact eq_inv_of_mul_eq_one_right h.symm
 
 include hq0 hq1 in
+theorem PhiA_neg {m : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algebraMap K L q)) :
+    PhiA q hqL (-m) = - PhiA q hqL m := by
+  unfold PhiA
+  rw [PhiQ_neg' q hq0 hq1 hqL hm]
+  rfl
+
+include hq0 hq1 in
 theorem PhiQ_sub' {m n : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algebraMap K L q))
     (hn : n ∈ DivisorsPeriodic L (algebraMap K L q)) :
     PhiQ L (algebraMap K L q) hqL (m - n) =
@@ -1040,6 +1047,213 @@ theorem mem_principal_iff (m : Omega L → ℤ) :
     refine (abel_jacobi_one L (algebraMap K L q) hq0L hq1L m hm).mpr ⟨hd, ?_⟩
     have : Additive.ofMul (PhiQ L (algebraMap K L q) hqL m) = 0 := hΦ
     exact Additive.ofMul.injective (by simpa using this)
+
+include hq0 hq1 in
+theorem PhiA_divAct {w : Omega L → ℤ} (hw : w ∈ DivisorsPeriodic L (algebraMap K L q)) :
+    PhiA q hqL (divAct K L q T w) = sigmaOnQuot K L q hqL T.gen (PhiA q hqL w) +
+      (degQ L (algebraMap K L q) w) • cls q hqL (Units.mk0 T.Q T.Q_ne) :=
+  (degQ_PhiQ_divAct q T hq0 hq1 hw hqL).2
+
+include hq0 hq1 in
+theorem pointDivisor_mem_L (b : L) (hb : b ≠ 0) :
+    pointDivisor L (algebraMap K L q) (algebraMap L (Omega L) b) ∈
+      DivisorsPeriodic L (algebraMap K L q) :=
+  pointDivisor_mem (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1)
+    ((map_ne_zero _).mpr hb)
+
+include hq0 hq1 in
+theorem PhiA_point (b : L) (hb : b ≠ 0) :
+    PhiA q hqL (pointDivisor L (algebraMap K L q) (algebraMap L (Omega L) b)) =
+      cls q hqL (Units.mk0 b hb) := by
+  unfold PhiA
+  rw [PhiQ_pointDivisor_K (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1) hb]
+  rfl
+
+include hq0 hq1 in
+theorem degQ_point (b : L) (hb : b ≠ 0) :
+    degQ L (algebraMap K L q) (pointDivisor L (algebraMap K L q) (algebraMap L (Omega L) b)) = 1 :=
+  degQ_pointDivisor_K (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1) hb
+
+/-- The divisor `[b] − [1]` of degree `0` with `Φ_q = [b]`. -/
+noncomputable def divB (b : L) : Omega L → ℤ :=
+  pointDivisor L (algebraMap K L q) (algebraMap L (Omega L) b) -
+    pointDivisor L (algebraMap K L q) (algebraMap L (Omega L) 1)
+
+include hq0 hq1 in
+theorem divB_mem (b : L) (hb : b ≠ 0) :
+    divB q b ∈ DivisorsPeriodic L (algebraMap K L q) :=
+  (DivisorsPeriodic L (algebraMap K L q)).sub_mem (pointDivisor_mem_L q hq0 hq1 b hb)
+    (pointDivisor_mem_L q hq0 hq1 1 one_ne_zero)
+
+include hq0 hq1 in
+theorem degQ_divB (b : L) (hb : b ≠ 0) : degQ L (algebraMap K L q) (divB q b) = 0 := by
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  have := degQ_sub hq0L hq1L (pointDivisor_mem_L q hq0 hq1 b hb)
+    (pointDivisor_mem_L q hq0 hq1 1 one_ne_zero)
+  rw [divB, this, degQ_point q hq0 hq1 b hb, degQ_point q hq0 hq1 1 one_ne_zero]
+  rfl
+
+include hq0 hq1 in
+theorem PhiA_divB (b : L) (hb : b ≠ 0) : PhiA q hqL (divB q b) = cls q hqL (Units.mk0 b hb) := by
+  rw [divB, PhiA_sub q hq0 hq1 hqL (pointDivisor_mem_L q hq0 hq1 b hb)
+    (pointDivisor_mem_L q hq0 hq1 1 one_ne_zero), PhiA_point q hq0 hq1 hqL b hb,
+    PhiA_point q hq0 hq1 hqL 1 one_ne_zero]
+  have : cls q hqL (Units.mk0 (1 : L) one_ne_zero) = 0 := by
+    rw [cls_eq_zero_iff]
+    have h1 : Units.mk0 (1 : L) one_ne_zero = 1 := Units.ext rfl
+    rw [h1]
+    exact Subgroup.one_mem (Subgroup.zpowers (Units.mk0 (algebraMap K L q) hqL))
+  rw [this]
+  exact sub_zero (cls q hqL (Units.mk0 b hb))
+
+include hq0 hq1 in
+theorem PhiA_nsmul {m : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algebraMap K L q)) (k : ℕ) :
+    PhiA q hqL (k • m) = k • PhiA q hqL m := by
+  induction k with
+  | zero => simp [PhiA_zero q hq0 hq1 hqL]
+  | succ i ih =>
+    rw [succ_nsmul, succ_nsmul,
+      PhiA_add q hq0 hq1 hqL ((DivisorsPeriodic L (algebraMap K L q)).nsmul_mem hm _) hm, ih]
+
+include hq0 hq1 in
+theorem PhiA_zsmul {m : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algebraMap K L q)) (k : ℤ) :
+    PhiA q hqL (k • m) = k • PhiA q hqL m := by
+  rcases Int.eq_nat_or_neg k with ⟨i, rfl | rfl⟩
+  · rw [natCast_zsmul, natCast_zsmul]; exact PhiA_nsmul q hq0 hq1 hqL hm i
+  · rw [neg_zsmul, natCast_zsmul,
+      PhiA_neg q hq0 hq1 hqL ((DivisorsPeriodic L (algebraMap K L q)).nsmul_mem hm i),
+      PhiA_nsmul q hq0 hq1 hqL hm i,
+      neg_zsmul (PhiA q hqL m) (i : ℤ), natCast_zsmul (PhiA q hqL m) i]
+
+include hq0 hq1 in
+theorem PhiA_sum {ι : Type*} (S : Finset ι) (m : ι → Omega L → ℤ)
+    (hm : ∀ i ∈ S, m i ∈ DivisorsPeriodic L (algebraMap K L q)) :
+    PhiA q hqL (∑ i ∈ S, m i) = ∑ i ∈ S, PhiA q hqL (m i) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using PhiA_zero q hq0 hq1 hqL
+  | insert a S ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha,
+      PhiA_add q hq0 hq1 hqL (hm a (Finset.mem_insert_self a S))
+        (AddSubgroup.sum_mem _ fun i hi => hm i (Finset.mem_insert_of_mem hi)),
+      ih fun i hi => hm i (Finset.mem_insert_of_mem hi)]
+
+include hq0 hq1 in
+theorem divAct_pow_mem (i : ℕ) {w : Omega L → ℤ} (hw : w ∈ DivisorsPeriodic L (algebraMap K L q)) :
+    (divAct K L q T ^ i) w ∈ DivisorsPeriodic L (algebraMap K L q) := by
+  induction i with
+  | zero => simpa using hw
+  | succ i ih => rw [end_pow_succ_apply]; exact divAct_mem_periodic q T ih
+
+include hq0 hq1 in
+/-- `Φ_q(sⁱ w) = σⁱ Φ_q(w)` for `w` of degree `0`. -/
+theorem PhiA_divAct_pow (i : ℕ) {w : Omega L → ℤ} (hw : w ∈ DivisorsPeriodic L (algebraMap K L q))
+    (hd : degQ L (algebraMap K L q) w = 0) :
+    degQ L (algebraMap K L q) ((divAct K L q T ^ i) w) = 0 ∧
+      PhiA q hqL ((divAct K L q T ^ i) w) = (sigmaOnQuot K L q hqL T.gen ^ i) (PhiA q hqL w) := by
+  induction i with
+  | zero => exact ⟨by simpa using hd, rfl⟩
+  | succ i ih =>
+    obtain ⟨ih1, ih2⟩ := ih
+    have hmem := divAct_pow_mem q hq0 hq1 T i hw
+    have h65 := degQ_PhiQ_divAct q T hq0 hq1 hmem hqL
+    have e1 : (divAct K L q T ^ (i + 1)) w = divAct K L q T ((divAct K L q T ^ i) w) := by
+      rw [pow_succ']; rfl
+    have e2 : (sigmaOnQuot K L q hqL T.gen ^ (i + 1)) (PhiA q hqL w) =
+        sigmaOnQuot K L q hqL T.gen ((sigmaOnQuot K L q hqL T.gen ^ i) (PhiA q hqL w)) := by
+      rw [pow_succ']; rfl
+    rw [e1, e2]
+    refine ⟨by rw [h65.1, ih1], ?_⟩
+    rw [PhiA_divAct q hq0 hq1 T hqL hmem, ih1, zero_zsmul, add_zero, ih2]
+
+include hq0 hq1 in
+theorem PhiA_cycNorm {w : Omega L → ℤ} (hw : w ∈ DivisorsPeriodic L (algebraMap K L q))
+    (hd : degQ L (algebraMap K L q) w = 0) :
+    PhiA q hqL (cycNorm (divAct K L q T) (Module.finrank K L) w) =
+      cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (PhiA q hqL w) := by
+  rw [cycNorm, end_sum_apply, cycNorm, end_sum_apply,
+    PhiA_sum q hq0 hq1 hqL _ _ (fun i _ => divAct_pow_mem q hq0 hq1 T i hw)]
+  exact Finset.sum_congr rfl fun i _ => (PhiA_divAct_pow q hq0 hq1 T hqL i hw hd).2
+
+include hq0 hq1 in
+theorem row4_H0 : ∀ a ∈ principalDivisors L (algebraMap K L q) ⊓ cycFixed (divAct K L q T),
+    a ∈ (principalDivisors L (algebraMap K L q)).map
+      (cycNorm (divAct K L q T) (Module.finrank K L)) := by
+  rintro a ⟨haP, hfix⟩
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  have hqL : algebraMap K L q ≠ 0 := norm_pos_iff.mp hq0L
+  obtain ⟨hD, hdeg, hΦ⟩ := (mem_principal_iff q hq0 hq1 hqL a).mp haP
+  have ha0 : a ∈ divisorsDegZero L (algebraMap K L q) :=
+    (mem_divisorsDegZero_iff L (algebraMap K L q) hq0L hq1L a).mpr ⟨hD, hdeg⟩
+  obtain ⟨m', hm'0, hNm'⟩ := (degDataD q hq0 hq1 T).H0_degZero a ⟨ha0, hfix⟩
+  obtain ⟨hm'D, hm'd⟩ := (mem_divisorsDegZero_iff L (algebraMap K L q) hq0L hq1L m').mp hm'0
+  -- `Φ(m')` has trivial norm
+  have hN : cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (PhiA q hqL m') = 0 := by
+    rw [← PhiA_cycNorm q hq0 hq1 T hqL hm'D hm'd]
+    have : cycNorm (divAct K L q T) (Module.finrank K L) m' = a := hNm'
+    rw [this]; exact hΦ
+  obtain ⟨k, x, hx⟩ := row3_gen_elem q hq0 hq1 T hqL (PhiA q hqL m') hN
+  obtain ⟨y, hy⟩ := QuotientGroup.mk_surjective (Additive.toMul x)
+  have hxy : x = cls q hqL y := by unfold cls; rw [hy]; rfl
+  subst hxy
+  -- the divisor `u = [y] − [1] + k·[1]`
+  set p1 := pointDivisor L (algebraMap K L q) (algebraMap L (Omega L) 1) with hp1
+  have hp1D : p1 ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    pointDivisor_mem_L q hq0 hq1 1 one_ne_zero
+  have hp1d : degQ L (algebraMap K L q) p1 = 1 := degQ_point q hq0 hq1 1 one_ne_zero
+  have hp1Φ : PhiA q hqL p1 = 0 := by
+    rw [hp1, PhiA_point q hq0 hq1 hqL 1 one_ne_zero, cls_eq_zero_iff, Units.mk0_one]
+    exact Subgroup.one_mem _
+  have hyb := divB_mem q hq0 hq1 (y : L) y.ne_zero
+  have hkp : k • p1 ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    (DivisorsPeriodic L (algebraMap K L q)).zsmul_mem hp1D k
+  set u := divB q (y : L) + k • p1 with hu
+  have huD : u ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    (DivisorsPeriodic L (algebraMap K L q)).add_mem hyb hkp
+  have hud : degQ L (algebraMap K L q) u = k := by
+    rw [hu, degQ_add L (algebraMap K L q) hq0L hq1L _ _ hyb hkp, degQ_divB q hq0 hq1 (y : L) y.ne_zero,
+      degQ_zsmul hq0L hq1L hp1D, hp1d]
+    simp
+  have huΦ : PhiA q hqL u = cls q hqL y := by
+    rw [hu, PhiA_add q hq0 hq1 hqL hyb hkp, PhiA_divB q hq0 hq1 hqL (y : L) y.ne_zero,
+      PhiA_zsmul q hq0 hq1 hqL hp1D, hp1Φ]
+    have h0 : k • (0 : Additive (LQ q hqL)) = 0 := @zsmul_zero (Additive (LQ q hqL)) _ k
+    have : Units.mk0 (y : L) y.ne_zero = y := Units.ext rfl
+    rw [this, h0]
+    exact add_zero (cls q hqL y)
+  -- `v = (s − 1) u`
+  set su := divAct K L q T u with hsu
+  have hsuD : su ∈ DivisorsPeriodic L (algebraMap K L q) := divAct_mem_periodic q T huD
+  set v := su - u with hv
+  have hvD : v ∈ DivisorsPeriodic L (algebraMap K L q) := (DivisorsPeriodic L (algebraMap K L q)).sub_mem hsuD huD
+  have h65 := degQ_PhiQ_divAct q T hq0 hq1 huD hqL
+  have hvd : degQ L (algebraMap K L q) v = 0 := by
+    rw [hv, degQ_sub hq0L hq1L hsuD huD, h65.1]; ring
+  have hvΦ : PhiA q hqL v = sigmaOnQuot K L q hqL T.gen (cls q hqL y) - cls q hqL y +
+      k • cls q hqL (Units.mk0 T.Q T.Q_ne) := by
+    rw [hv, PhiA_sub q hq0 hq1 hqL hsuD huD, hsu, PhiA_divAct q hq0 hq1 T hqL huD, hud, huΦ]
+    abel
+  have hΦv : PhiA q hqL v = PhiA q hqL m' := by
+    rw [hvΦ]
+    have e : sigmaOnQuot K L q hqL T.gen (cls q hqL y) - cls q hqL y + k • cls q hqL (Units.mk0 T.Q T.Q_ne) =
+        (sigmaOnQuot K L q hqL T.gen (cls q hqL y) - cls q hqL y) + k • cls q hqL (Units.mk0 T.Q T.Q_ne) := rfl
+    rw [e, hx]
+    abel
+  have hm''D : m' - v ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    (DivisorsPeriodic L (algebraMap K L q)).sub_mem hm'D hvD
+  have hm''P : m' - v ∈ principalDivisors L (algebraMap K L q) := by
+    refine (mem_principal_iff q hq0 hq1 hqL _).mpr ⟨hm''D, ?_, ?_⟩
+    · rw [degQ_sub hq0L hq1L hm'D hvD, hm'd, hvd]; rfl
+    · rw [PhiA_sub q hq0 hq1 hqL hm'D hvD, hΦv]
+      exact sub_self (PhiA q hqL m')
+  refine ⟨m' - v, hm''P, ?_⟩
+  have hNv : cycNorm (divAct K L q T) (Module.finrank K L) v = 0 :=
+    (degDataD q hq0 hq1 T).norm_sub_one huD
+  show cycNorm (divAct K L q T) (Module.finrank K L) (m' - v) = a
+  rw [map_sub, hNv, sub_zero]
+  exact hNm'
 
 end row4
 
