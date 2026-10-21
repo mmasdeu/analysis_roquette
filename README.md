@@ -198,8 +198,10 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   extensions), Theorems **XII, XIII, XIV, XV, XVI**, Corollaries **XIIIa, XIIIb, XVa**, and the
   cohomology table of §5 (`table_cohomology`: rows `D_L(q)`, `D⁰_L(q)`, `C⁰_L(q)`, `P_L(q)`,
   `F_L(q)^×`, via Tate cohomology of the cyclic group `⟨τ_Qσ⟩` and Hilbert 90 in all universes).
-  Correction: the book's `Ĥ¹(D⁰) ≅ ℤ/n` is stated with `ZMod [L:K]`. **Still `sorry`:** Corollaries
-  XVIa/XVIb (Brauer groups: no cyclic-algebra theory in Mathlib), and the §4 bridges
+  Corollaries **XVIa, XVIb** (Brauer groups; `GaloisDescentVec`, `SkolemNoetherMatrix`, `CyclicSplit`,
+  `BaseChangeSplit`, `Specialization`, `Sec5Eval`, `Sec5Brauer`: Galois descent, Skolem–Noether for
+  matrices, Speiser's lemma, specialization at a rational point). Correction: the book's `Ĥ¹(D⁰) ≅ ℤ/n` is stated
+  with `ZMod [L:K]`. **Still `sorry`:** only the §4 bridges
   `Ezeta_isJacobian`, `jacobian_descent`, `thmX_minimal_splitting` (they need Appendix A1/A2:
   invariance of the absolute and Hasse invariants).
 * Not started (statements only): the Proposition on absolute integrality of `j` (§6);

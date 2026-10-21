@@ -1457,6 +1457,41 @@ For the cyclic group $G_{\mathbf Q}=\langle\tau_Q\sigma\rangle$ of order $n$ wit
 See the Lean proof of \texttt{cycFixed, cycNorm, cycH0, cycH1, divAct, sigmaOnQuot, table\_cohomology}.
 \end{proof}
 
+\begin{lemma}[Algebras split by a cyclic extension with surjective norm]
+\label{lem:s5-split-cyclic}
+\lean{AnalyticTheory.split_of_cyclic, AnalyticTheory.matrix_descent, AnalyticTheory.exists_inner_of_semilinear, AnalyticTheory.span_fixed_eq_top}
+\uses{lem:s5-h90}
+\leanok
+If $\sigma$ has finite order on $F$, fixed field $E$, and every $e\in E^\times$ is $\prod\sigma^i g$, then $F\otimes_E A\cong M_m(F)$ implies $A\cong M_m(E)$ (Galois descent, Skolem--Noether, Speiser).
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{split\_of\_cyclic, matrix\_descent, exists\_inner\_of\_semilinear, span\_fixed\_eq\_top}.
+\end{proof}
+
+\begin{lemma}[Base change of split algebras]
+\label{lem:s5-split-base}
+\lean{AnalyticTheory.split_of_extension, AnalyticTheory.split_tensor_tower}
+\leanok
+$E\otimes_k A\cong M_m(E)$ implies $F\otimes_k A\cong M_m(F)$ for $F\supseteq E$; and $F\otimes_k A\cong M_m(F)$ implies $F\otimes_E(E\otimes_k A)\cong M_m(F)$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{split\_of\_extension, split\_tensor\_tower}.
+\end{proof}
+
+\begin{lemma}[Specialization of split algebras]
+\label{lem:s5-specialization}
+\lean{AnalyticTheory.split_of_specialization, AnalyticTheory.injective_of_split, AnalyticTheory.exists_stable_lattice, AnalyticTheory.exists_evalAtOne}
+\uses{lem:s5-split-base}
+\leanok
+If $F\otimes_L B\cong M_m(F)$ and $F$ has a discrete valuation ring $O\supseteq L$ with an $L$-algebra map $O\to L$ (evaluation at a rational point of $F_L(q)$), then $B\cong M_m(L)$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{split\_of\_specialization, injective\_of\_split, exists\_stable\_lattice, exists\_evalAtOne}.
+\end{proof}
+
 \begin{corollary}[Corollary XVIa (Brauer)]
 \label{cor:XVIa}
 \lean{AnalyticTheory.corXVIa_brauer}
@@ -1465,6 +1500,7 @@ See the Lean proof of \texttt{cycFixed, cycNorm, cycH0, cycH1, divAct, sigmaOnQu
 A central simple algebra over $F_K(\mathbf Q)$ split by $F_L(q)$ is split (injectivity of $\mathrm{Br}(F_K(\mathbf Q))\to\mathrm{Br}(F_L(q))$).
 \end{corollary}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{corXVIa\_brauer}.
 \end{proof}
 
@@ -1476,6 +1512,7 @@ See the Lean proof of \texttt{corXVIa\_brauer}.
 A central simple algebra over $K$ is split by $F_K(\mathbf Q)$ iff it is split by $L$.
 \end{corollary}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{corXVIb\_splitting}.
 \end{proof}
 

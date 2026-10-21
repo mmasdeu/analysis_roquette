@@ -16,9 +16,7 @@ called _semi-periodic_. The automorphism $`\tau_Q\sigma` of $`M_L` (the Galois a
 the translation by $`Q`) has order $`n` on $`F_L(q)`; its fixed field $`F_K(\mathbf Q)` is the field of
 _$`\mathbf Q`-semi-periodic functions_.
 
-_Scope of this chapter._ Everything below is completely formalized (no `sorry`), except the two
-Corollaries XVIa, XVIb on Brauer groups, which are not reproduced: Mathlib has no theory of cyclic
-algebras. The proofs avoid the transitivity of the Galois group on primes by a counting argument
+_Scope of this chapter._ Everything below is completely formalized (no `sorry`). The proofs avoid the transitivity of the Galois group on primes by a counting argument
 (the fundamental identity forces the $`n` conjugates of a prime to be all primes above it).
 
 The Lean code on this page refers to the following context.
@@ -157,3 +155,27 @@ automorphism of finite order:
 #stmt exists_h90_of_finOrder
 
 #stmt table_cohomology
+
+/-!
+## Brauer groups
+
+*Corollary XVIa.* _A central simple algebra over $`F_K(\mathbf Q)` which is split by $`F_L(q)` is
+split._ (Mathlib has no theory of cyclic algebras; the proof is by Galois descent: $`\sigma\otimes 1`
+induces a $`\sigma`-semilinear automorphism of $`M_m(F_L(q))`, which is $`\mathrm{Ad}(u)\circ\sigma` by
+Skolem–Noether; the norm theorem XVI normalises the cocycle $`u`, and Speiser's lemma trivialises
+it.)
+-/
+
+#stmt split_of_cyclic
+
+#stmt corXVIa_brauer
+
+/-!
+*Corollary XVIb.* _A central simple algebra over $`K` is split by $`F_K(\mathbf Q)` iff it is split
+by $`L`._ One direction is XVIa; the other specializes a splitting of $`A\otimes F_L(q)` at the
+rational point $`1` of $`F_L(q)` (a lattice argument over the discrete valuation ring of that point).
+-/
+
+#stmt split_of_specialization
+
+#stmt corXVIb_splitting

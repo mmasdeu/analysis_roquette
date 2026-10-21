@@ -197,9 +197,15 @@ add('theorem','thm:XVI','Theorem XVI (norm theorem)',['thmXVI_norm'],['thm:XIV',
  r'Every semi-periodic $f\neq 0$ is the norm of some $g\in F_L(q)$.')
 add('theorem','tab:cohomology','Table of cohomology groups',['table_cohomology'],['thm:XVI'],False,
  r'$H^0$ and $H^1$ of $D_L(q)$, $D^0_L(q)$, $C^0_L(q)$, $P_L(q)$, $F_L(q)^\times$. Proved in \texttt{Sec5Table}, \texttt{Sec5Row4}, \texttt{Sec5Row5}, \texttt{Sec5Final}.')
-add('corollary','cor:XVIa','Corollary XVIa (Brauer)',['corXVIa_brauer'],['thm:XVI'],True,
+add('lemma','lem:s5-split-cyclic','Algebras split by a cyclic extension with surjective norm',['split_of_cyclic','matrix_descent','exists_inner_of_semilinear','span_fixed_eq_top'],['lem:s5-h90'],False,
+ r'If $\sigma$ has finite order on $F$, fixed field $E$, and every $e\in E^\times$ is $\prod\sigma^i g$, then $F\otimes_E A\cong M_m(F)$ implies $A\cong M_m(E)$ (Galois descent, Skolem--Noether, Speiser).')
+add('lemma','lem:s5-split-base','Base change of split algebras',['split_of_extension','split_tensor_tower'],[],False,
+ r'$E\otimes_k A\cong M_m(E)$ implies $F\otimes_k A\cong M_m(F)$ for $F\supseteq E$; and $F\otimes_k A\cong M_m(F)$ implies $F\otimes_E(E\otimes_k A)\cong M_m(F)$.')
+add('lemma','lem:s5-specialization','Specialization of split algebras',['split_of_specialization','injective_of_split','exists_stable_lattice','exists_evalAtOne'],['lem:s5-split-base'],False,
+ r'If $F\otimes_L B\cong M_m(F)$ and $F$ has a discrete valuation ring $O\supseteq L$ with an $L$-algebra map $O\to L$ (evaluation at a rational point of $F_L(q)$), then $B\cong M_m(L)$.')
+add('corollary','cor:XVIa','Corollary XVIa (Brauer)',['corXVIa_brauer'],['thm:XVI'],False,
  r'$\mathrm{Br}(F_K(\mathbf Q))\to\mathrm{Br}(F_L(q))$ is injective.')
-add('corollary','cor:XVIb','Corollary XVIb',['corXVIb_splitting'],['cor:XVIa'],True,
+add('corollary','cor:XVIb','Corollary XVIb',['corXVIb_splitting'],['cor:XVIa'],False,
  r'An algebra is split by $F_K(\mathbf Q)$ iff it is split by $L$.')
 
 # ---------------- Chapter 6: §6

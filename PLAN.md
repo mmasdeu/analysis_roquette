@@ -258,5 +258,6 @@ Main risks: the divisor-class bridge in Phase 5, and the size of 6a.
 ## Status (after §5)
 
 * Done: Theorems XII–XVI, Corollaries XIIIa, XIIIb, XVa, the cohomology table (`Sec5*.lean`).
-* Open: Corollaries XVIa/XVIb (need cyclic algebras / Brauer theory), and the bridges
+* Done also: Corollaries XVIa, XVIb.
+* Open: the bridges
   `Ezeta_isJacobian`, `jacobian_descent`, `thmX_minimal_splitting` (Appendix A1/A2).

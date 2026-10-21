@@ -34,13 +34,13 @@ checked mechanically. Concretely, the companion contains:
   $`\Delta`);
 * from §4: Lemma 2, the classification of the fields obtained by Galois descent, and the
   description of the fields of semi-periodic functions as such fields;
-* all of §5 except the Brauer-group corollaries XVIa, XVIb: Theorems XII–XVI, Corollaries XIIIa,
-  XIIIb, XVa and the table of Tate cohomology groups;
+* all of §5: Theorems XII–XVI, Corollaries XIIIa, XIIIb, XVa, XVIa, XVIb and the table of Tate
+  cohomology groups;
 * from §6: the substitution $`\mu_m`, the formulas (72), (73) and Theorem XVII;
 * from Appendix §A1: the absolute and Hasse invariants, Lemma A, and the fact that an elliptic
   function field with a prime divisor of degree $`1` is determined by its invariants.
 
-The Corollaries XVIa, XVIb, the remainder of §§4 and 6 (Theorems IX in its general form, X, XIX and their
+The remainder of §§4 and 6 (Theorems IX in its general form, X, XIX and their
 corollaries) and Appendix §A2 are not reproduced. Their proofs rest on parts of the algebraic
 theory of function fields (genus under Galois descent, Jacobians of fields without a rational
 point) that are not yet formalized.
