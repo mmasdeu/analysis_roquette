@@ -12,6 +12,7 @@ show_docstrings = true
   "Book.Periodic",
   "Book.Weierstrass",
   "Book.Jacobian",
+  "Book.SemiPeriodic",
   "Book.Isogenies",
   "Book.AppendixA1",
 ]
@@ -30,6 +31,9 @@ title = "§3. The absolute and the Hasse invariant"
 
 [modules."Book.Jacobian"]
 title = "§4. Periodic Jacobian fields"
+
+[modules."Book.SemiPeriodic"]
+title = "§5. Fields of semi-periodic functions"
 
 [modules."Book.Isogenies"]
 title = "§6. Elliptic subfields and isogenies"
