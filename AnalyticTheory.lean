@@ -96,3 +96,7 @@ import AnalyticTheory.ZpowAux
 import AnalyticTheory.ResidueMaps
 import AnalyticTheory.Sec5
 import AnalyticTheory.Sec5Div
+import AnalyticTheory.CycAux
+import AnalyticTheory.Hilbert90U
+import AnalyticTheory.Sec5Table
+import AnalyticTheory.Sec5Norm
