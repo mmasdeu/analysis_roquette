@@ -1,6 +1,8 @@
 import AnalyticTheory.Sec5AJ
 import AnalyticTheory.CyclicSplit
 import AnalyticTheory.BaseChangeSplit
+import AnalyticTheory.Specialization
+import AnalyticTheory.Sec5Eval
 
 /-!
 # §5: Corollaries XVIa, XVIb (Brauer groups)
@@ -105,6 +107,54 @@ theorem split_FKQ_of_split_L (A : Type u) [Ring A] [Algebra K A] [FiniteDimensio
   obtain ⟨θ'⟩ := split_tensor_tower (k := K) (E := FKQ K L q T) (F := FqSub L (algebraMap K L q)) A m θF
   obtain ⟨hfin, hfix, hnorm⟩ := sigmaAlg_hyps q hq0 hq1 T
   exact ⟨m, split_of_cyclic (sigmaAlg q T) (TensorProduct K (FKQ K L q T) A) hfin hnorm hfix m θ'⟩
+
+theorem algEquiv_zero_of_finrank {E : Type u} [Field E] (B : Type u) [Ring B] [Algebra E B]
+    [FiniteDimensional E B] (h : Module.finrank E B = 0) :
+    Nonempty (B ≃ₐ[E] Matrix (Fin 0) (Fin 0) E) := by
+  have : Subsingleton B := Module.finrank_zero_iff.mp h
+  exact ⟨{ toFun := fun _ => 0, invFun := fun _ => 0,
+           left_inv := fun a => Subsingleton.elim _ _,
+           right_inv := fun b => Subsingleton.elim _ _,
+           map_mul' := fun _ _ => Subsingleton.elim _ _,
+           map_add' := fun _ _ => Subsingleton.elim _ _,
+           commutes' := fun _ => Subsingleton.elim _ _ }⟩
+
+include hq0 hq1 in
+/-- `A ⊗ F_K(𝐐)` split implies `A ⊗ L` split (specialization at a rational point of `F_L(q)`). -/
+theorem split_L_of_split_FKQ (A : Type u) [Ring A] [Algebra K A] [FiniteDimensional K A]
+    (hsplit : ∃ m : ℕ, Nonempty (TensorProduct K (FKQ K L q T) A ≃ₐ[FKQ K L q T]
+      Matrix (Fin m) (Fin m) (FKQ K L q T))) :
+    ∃ m : ℕ, Nonempty (TensorProduct K L A ≃ₐ[L] Matrix (Fin m) (Fin m) L) := by
+  obtain ⟨m, ⟨θE⟩⟩ := hsplit
+  have := FKQ_tower q T
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  obtain ⟨θF⟩ := split_of_extension (k := K) (E := FKQ K L q T) (F := FqSub L (algebraMap K L q)) A m θE
+  obtain ⟨θ'⟩ := split_tensor_tower (k := K) (E := L) (F := FqSub L (algebraMap K L q)) A m θF
+  rcases Nat.eq_zero_or_pos m with hm | hm
+  · subst hm
+    refine ⟨0, algEquiv_zero_of_finrank _ ?_⟩
+    have h1 : Module.finrank L (L ⊗[K] A) = Module.finrank K A := Module.finrank_baseChange
+    have h2 : Module.finrank (FKQ K L q T) (FKQ K L q T ⊗[K] A) = Module.finrank K A :=
+      Module.finrank_baseChange
+    rw [h1, ← h2, LinearEquiv.finrank_eq θE.toLinearEquiv, Module.finrank_matrix]
+    simp
+  · obtain ⟨ev, hev⟩ := exists_evalAtOne hq0L hq1L
+    haveI := (primeAt hq0L hq1L (one_ne_zero (α := Omega L))).isDVR
+    exact ⟨m, split_of_specialization (primeAt hq0L hq1L (one_ne_zero (α := Omega L))).ring
+      (TensorProduct K L A) hm θ' (fun l => (primeAt hq0L hq1L (one_ne_zero (α := Omega L))).contains l)
+      ev hev⟩
+
+include hq0 hq1 in
+/-- Book, §5, Corollary XVIb: a central simple algebra over `K` is split by `F_K(𝐐)` iff it is
+split by `L`. -/
+theorem corXVIb_splitting
+    (A : Type u) [Ring A] [Algebra K A] [Algebra.IsCentral K A] [IsSimpleRing A]
+    [FiniteDimensional K A] :
+    (∃ m : ℕ, Nonempty (TensorProduct K (FKQ K L q T) A ≃ₐ[FKQ K L q T]
+        Matrix (Fin m) (Fin m) (FKQ K L q T))) ↔
+      (∃ m : ℕ, Nonempty (TensorProduct K L A ≃ₐ[L] Matrix (Fin m) (Fin m) L)) :=
+  ⟨split_L_of_split_FKQ q hq0 hq1 T A, split_FKQ_of_split_L q hq0 hq1 T A⟩
 
 end brauer
 

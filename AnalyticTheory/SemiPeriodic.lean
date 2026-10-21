@@ -295,16 +295,7 @@ and assembled in `Sec5Final.lean`. -/
 
 /-! Corollary XVIa (`corXVIa_brauer`) is proved in `Sec5Brauer.lean`. -/
 
-/-- Book, §5, Corollary XVIb: a central simple algebra over `K` is split by `F_K(𝐐)` iff it is
-split by `L`. -/
-theorem corXVIb_splitting (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q)
-    (A : Type u) [Ring A] [Algebra K A] [Algebra.IsCentral K A] [IsSimpleRing A]
-    [FiniteDimensional K A] :
-    (∃ m : ℕ, Nonempty (TensorProduct K (FKQ K L q T) A ≃ₐ[FKQ K L q T]
-        Matrix (Fin m) (Fin m) (FKQ K L q T))) ↔
-      (∃ m : ℕ, Nonempty (TensorProduct K L A ≃ₐ[L] Matrix (Fin m) (Fin m) L)) := by
-  sorry
+/-! Corollary XVIb (`corXVIb_splitting`) is proved in `Sec5Brauer.lean`. -/
 
 end Galois
 

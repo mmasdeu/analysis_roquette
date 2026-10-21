@@ -109,3 +109,6 @@ import AnalyticTheory.GaloisDescentVec
 import AnalyticTheory.SkolemNoetherMatrix
 import AnalyticTheory.CyclicSplit
 import AnalyticTheory.Sec5Brauer
+import AnalyticTheory.BaseChangeSplit
+import AnalyticTheory.Specialization
+import AnalyticTheory.Sec5Eval
