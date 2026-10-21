@@ -291,3 +291,9 @@ The remaining work is, in dependency order:
    consists of translations (Lemma A + (53)), and that `E = E_ζ` (Galois descent already available as
    `Ezeta`).
 6. **Bridge B3** `thmX_minimal_splitting`.
+
+Update: Theorem X (`thmX_minimal_splitting`) was proved without the appendices (`Sec4B3.lean`), and
+`A1Gen.lean` proves `F = K(x, y)` and the existence of Weierstraß data for `char K ≠ 2, 3`
+(`exists_weierstrassData`).  Open: Weierstraß data in characteristic 2, 3 (needs the genus drop of the
+non-conservative singular cubic), general homogeneity of degree-one primes (translations through the
+group law on the generic point), constant-extension compatibility, then bridges B1', B2.

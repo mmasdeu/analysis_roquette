@@ -201,9 +201,12 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   Corollaries **XVIa, XVIb** (Brauer groups; `GaloisDescentVec`, `SkolemNoetherMatrix`, `CyclicSplit`,
   `BaseChangeSplit`, `Specialization`, `Sec5Eval`, `Sec5Brauer`: Galois descent, Skolem–Noether for
   matrices, Speiser's lemma, specialization at a rational point). Correction: the book's `Ĥ¹(D⁰) ≅ ℤ/n` is stated
-  with `ZMod [L:K]`. **Still `sorry`:** only the §4 bridges
-  `Ezeta_isJacobian`, `jacobian_descent`, `thmX_minimal_splitting` (they need Appendix A1/A2:
-  invariance of the absolute and Hasse invariants).
+  with `ZMod [L:K]`. Theorem **X** (`thmX_minimal_splitting`, `Sec4B3.lean`: from Theorem XIIIb through the
+  inflation `E_ζ(L) ≅ E_{ζ̃}(K_χ)` of `ConstExtDescent`) is also proved. **Still `sorry`:** only the §4 bridges
+  `Ezeta_isJacobian`, `jacobian_descent` (they need Appendix A1/A2: invariance of the absolute and
+  Hasse invariants under constant extension, independence of the splitting field, the
+  characteristic cocycle). Appendix A1 progress: `A1Exist.lean`, `A1Gen.lean` (existence of Weierstraß
+  data for `char ≠ 2, 3`).
 * Not started (statements only): the Proposition on absolute integrality of `j` (§6);
   Appendix A2 in general.
 

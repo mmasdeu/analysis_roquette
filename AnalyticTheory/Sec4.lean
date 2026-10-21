@@ -187,14 +187,7 @@ theorem thmIX_every (hp : HasPrimeOfDegreeOne K (FqSub K q)) (E : Type u) [Field
   obtain ⟨χ, hχ⟩ := jacobian_descent q hq0 hq1 hp E hE hJ hs
   exact ⟨χ, qtrivial_of_isCharInvariant q hq0 hq1 E χ hχ, hχ⟩
 
-/-- **Bridge B3** (Book, §4, Theorem X; constant field extensions): if `E` has character
-invariant `χ` then the cyclic field `K_χ` is the unique minimal algebraic splitting field of `E`:
-it splits `E` and lies in every Galois splitting field `M ⊂ L`. Not yet proved. -/
-theorem thmX_minimal_splitting (E : Type u) [Field E] [Algebra K E] (hE : IsEllipticOver K E)
-    (χ : CharGroup K L) (hχ : IsCharInvariant q hq0 hq1 E χ) :
-    SplitsOver K E (Kchi K L χ) ∧
-      ∀ (M : IntermediateField K L) (_ : IsGalois K M), SplitsOver K E M → Kchi K L χ ≤ M := by
-  sorry
+/-! Theorem X (`thmX_minimal_splitting`) is proved in `Sec4B3.lean` (it only needs Theorem XIII). -/
 
 end bridges
 
