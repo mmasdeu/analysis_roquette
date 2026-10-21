@@ -1,5 +1,6 @@
 import AnalyticTheory.Sec5AJ
 import AnalyticTheory.CyclicSplit
+import AnalyticTheory.BaseChangeSplit
 
 /-!
 # §5: Corollaries XVIa, XVIb (Brauer groups)
@@ -55,6 +56,28 @@ theorem orderOf_sigmaAlg : orderOf (sigmaAlg q T) = Module.finrank K L := by
     exact AlgEquiv.ext fun x => (sigmaAlg_pow q T k x).trans (DFunLike.congr_fun h x)
 
 include hq0 hq1 in
+theorem sigmaAlg_hyps :
+    IsOfFinOrder (sigmaAlg q T) ∧
+    (∀ x : FqSub L (algebraMap K L q), sigmaAlg q T x = x →
+      ∃ e : FKQ K L q T, algebraMap (FKQ K L q T) (FqSub L (algebraMap K L q)) e = x) ∧
+    (∀ e : FKQ K L q T, e ≠ 0 → ∃ g : FqSub L (algebraMap K L q), g ≠ 0 ∧
+      ∏ i ∈ Finset.range (orderOf (sigmaAlg q T)), (sigmaAlg q T ^ i) g =
+        algebraMap (FKQ K L q T) (FqSub L (algebraMap K L q)) e) := by
+  have hord := orderOf_sigmaAlg q hq0 hq1 T
+  refine ⟨orderOf_pos_iff.mp (by rw [hord]; exact Module.finrank_pos), fun x h =>
+    ⟨⟨x, mem_FKQ_of_fixed q hq0 hq1 T x h⟩, rfl⟩, ?_⟩
+  intro e he
+  obtain ⟨g, hg0, hg⟩ := thmXVI_norm q hq0 hq1 T e he
+  refine ⟨g, hg0, ?_⟩
+  rw [hord]
+  apply (FqSub L (algebraMap K L q)).subtype.injective
+  rw [map_prod]
+  show ∏ i ∈ Finset.range (Module.finrank K L),
+    (((sigmaAlg q T ^ i) g : FqSub L (algebraMap K L q)) : MeroRing L) = _
+  simp only [sigmaAlg_pow, sigmaF_pow_coe]
+  exact hg.symm
+
+include hq0 hq1 in
 /-- Book, §5, Corollary XVIa: the natural map `Br(F_K(𝐐)) → Br(F_L(q))` is injective: a central
 simple algebra over `F_K(𝐐)` which is split by `F_L(q)` is split. -/
 theorem corXVIa_brauer
@@ -64,26 +87,24 @@ theorem corXVIa_brauer
       Matrix (Fin m) (Fin m) (FqSub L (algebraMap K L q)))) :
     ∃ m : ℕ, Nonempty (A ≃ₐ[FKQ K L q T] Matrix (Fin m) (Fin m) (FKQ K L q T)) := by
   obtain ⟨m, ⟨θ⟩⟩ := hsplit
-  have hord := orderOf_sigmaAlg q hq0 hq1 T
-  have hfin : IsOfFinOrder (sigmaAlg q T) :=
-    orderOf_pos_iff.mp (by rw [hord]; exact Module.finrank_pos)
-  have hfix : ∀ x : FqSub L (algebraMap K L q), sigmaAlg q T x = x →
-      ∃ e : FKQ K L q T, algebraMap (FKQ K L q T) (FqSub L (algebraMap K L q)) e = x := fun x h =>
-    ⟨⟨x, mem_FKQ_of_fixed q hq0 hq1 T x h⟩, rfl⟩
-  have hnorm : ∀ e : FKQ K L q T, e ≠ 0 → ∃ g : FqSub L (algebraMap K L q), g ≠ 0 ∧
-      ∏ i ∈ Finset.range (orderOf (sigmaAlg q T)), (sigmaAlg q T ^ i) g =
-        algebraMap (FKQ K L q T) (FqSub L (algebraMap K L q)) e := by
-    intro e he
-    obtain ⟨g, hg0, hg⟩ := thmXVI_norm q hq0 hq1 T e he
-    refine ⟨g, hg0, ?_⟩
-    rw [hord]
-    apply (FqSub L (algebraMap K L q)).subtype.injective
-    rw [map_prod]
-    show ∏ i ∈ Finset.range (Module.finrank K L),
-      (((sigmaAlg q T ^ i) g : FqSub L (algebraMap K L q)) : MeroRing L) = _
-    simp only [sigmaAlg_pow, sigmaF_pow_coe]
-    exact hg.symm
+  obtain ⟨hfin, hfix, hnorm⟩ := sigmaAlg_hyps q hq0 hq1 T
   exact ⟨m, split_of_cyclic (sigmaAlg q T) A hfin hnorm hfix m θ⟩
+
+local instance fqTowerL'' (q : K) : IsScalarTower K L (FqSub L (algebraMap K L q)) :=
+  fqK_tower_L (L := L) q
+
+include hq0 hq1 in
+/-- `A ⊗ L` split implies `A ⊗ F_K(𝐐)` split. -/
+theorem split_FKQ_of_split_L (A : Type u) [Ring A] [Algebra K A] [FiniteDimensional K A]
+    (hsplit : ∃ m : ℕ, Nonempty (TensorProduct K L A ≃ₐ[L] Matrix (Fin m) (Fin m) L)) :
+    ∃ m : ℕ, Nonempty (TensorProduct K (FKQ K L q T) A ≃ₐ[FKQ K L q T]
+      Matrix (Fin m) (Fin m) (FKQ K L q T)) := by
+  obtain ⟨m, ⟨θ⟩⟩ := hsplit
+  have := FKQ_tower q T
+  obtain ⟨θF⟩ := split_of_extension (k := K) (E := L) (F := FqSub L (algebraMap K L q)) A m θ
+  obtain ⟨θ'⟩ := split_tensor_tower (k := K) (E := FKQ K L q T) (F := FqSub L (algebraMap K L q)) A m θF
+  obtain ⟨hfin, hfix, hnorm⟩ := sigmaAlg_hyps q hq0 hq1 T
+  exact ⟨m, split_of_cyclic (sigmaAlg q T) (TensorProduct K (FKQ K L q T) A) hfin hnorm hfix m θ'⟩
 
 end brauer
 
