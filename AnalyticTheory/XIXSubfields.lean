@@ -1,4 +1,5 @@
 import AnalyticTheory.XIXDescent
+import AnalyticTheory.ConstExtAbstract
 
 /-!
 # §6, Theorem XIX (ii): the elliptic subfields of `F_K(𝐐)` with a given period
@@ -305,5 +306,98 @@ theorem Em_subDeg (ζ : CocycleModQ K L q)
   nlinarith [this]
 
 end Em
+
+section periodUnique
+
+variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
+variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
+variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+
+/-- A subfield `S ⊂ F_L(q)` with `S = F_L(q̄|Xᵐ)` (in `M_L`) and containing `L` is `L`-isomorphic
+to `F_L(q̄)`. -/
+theorem subfield_equiv_fq (S : Subfield (FqSub L (algebraMap K L q)))
+    (hL : ∀ l : L, algebraMap L _ l ∈ S) {qb : L} {m : ℕ} (hm : 0 < m)
+    (hEq : S.map (FqSub L (algebraMap K L q)).subtype = FqbarXm L qb m) :
+    letI := subAlg S hL
+    Nonempty (S ≃ₐ[L] FqSub L qb) := by
+  letI := subAlg S hL
+  have hmz : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'
+  let μ0 : FqSub L qb →+* MeroRing L := (substPow L m).comp (FqSub L qb).subtype
+  have hμinj : Function.Injective μ0 := (substPow_injective hmz).comp Subtype.val_injective
+  have hmem : ∀ x : S, (((x : FqSub L (algebraMap K L q))) : MeroRing L) ∈ μ0.fieldRange := by
+    intro x
+    have : (((x : FqSub L (algebraMap K L q))) : MeroRing L) ∈ FqbarXm L qb m := by
+      rw [← hEq]; exact ⟨x, x.2, rfl⟩
+    obtain ⟨g, hg, hge⟩ := this
+    exact ⟨⟨g, hg⟩, hge⟩
+  let j : S →+* μ0.fieldRange :=
+    { toFun := fun x => ⟨_, hmem x⟩
+      map_one' := Subtype.ext rfl
+      map_mul' := fun _ _ => Subtype.ext rfl
+      map_zero' := Subtype.ext rfl
+      map_add' := fun _ _ => Subtype.ext rfl }
+  let ψ : S →+* FqSub L qb := μ0.rangeRestrictFieldEquiv.symm.toRingHom.comp j
+  have hψ : ∀ x, μ0 (ψ x) = (((x : FqSub L (algebraMap K L q))) : MeroRing L) := fun x =>
+    μ0.rangeRestrictFieldEquiv_apply_symm_apply ⟨_, hmem x⟩
+  have hbij : Function.Bijective ψ := by
+    refine ⟨ψ.injective, fun g => ?_⟩
+    have : μ0 g ∈ FqbarXm L qb m := ⟨g, g.2, rfl⟩
+    rw [← hEq] at this
+    obtain ⟨y, hy, hye⟩ := this
+    exact ⟨⟨y, hy⟩, hμinj (by rw [hψ]; exact hye)⟩
+  let Ψ : S →ₐ[L] FqSub L qb :=
+    { ψ with
+      commutes' := fun l => by
+        apply hμinj
+        rw [show (ψ.toFun (algebraMap L S l)) = ψ (algebraMap L S l) from rfl, hψ]
+        show algebraMap L (MeroRing L) l = substPow L m (algebraMap L (MeroRing L) l)
+        rw [substPow_algebraMapK hmz] }
+  exact ⟨AlgEquiv.ofBijective Ψ hbij⟩
+
+include hq0 hq1 in
+/-- The period of an elliptic subfield is unique: if `EL = F_L(q̄|Xᵐ)` and `E` admits the period
+`q'`, then `q' = q̄`. -/
+theorem period_eq_of_torsor (E : Subfield (FKQ K L q T)) (h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E)
+    {qb qK : K} (hqb0 : 0 < ‖qb‖) (hqb1 : ‖qb‖ < 1) (hqK0 : 0 < ‖qK‖) (hqK1 : ‖qK‖ < 1)
+    {m : ℕ} (hm : 0 < m)
+    (hEq : (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype =
+      FqbarXm L (algebraMap K L qK) m)
+    (ht : letI := subfieldAlgebra K E h; IsFqTorsor (L := L) qb E) : qb = qK := by
+  letI := subfieldAlgebra K E h
+  obtain ⟨-, ζ1, -, ⟨e⟩⟩ := fqTorsor_descent qb hqb0 hqb1 E ht
+  letI := fqKAlgebra (L := L) q
+  haveI : IsScalarTower K L (FqSub L (algebraMap K L q)) := fqK_tower_L (L := L) q
+  let ιE : E →ₐ[K] FqSub L (algebraMap K L q) := { toRingHom := xiIota q T E, commutes' := fun _ => rfl }
+  let ι' : Ezeta qb ζ1 →ₐ[K] FqSub L (algebraMap K L q) := ιE.comp e.symm.toAlgHom
+  have hrange : elSub (L := L) ι'.toRingHom = elSub (L := L) (xiIota q T E) := by
+    unfold elSub
+    congr 2
+    ext y
+    constructor
+    · rintro ⟨x, rfl⟩; exact ⟨e.symm x, rfl⟩
+    · rintro ⟨x, rfl⟩
+      refine ⟨e x, ?_⟩
+      show ιE (e.symm (e x)) = _
+      rw [e.symm_apply_apply]; rfl
+  -- `EL ≅ F_L(q')`
+  letI := fqKAlgebra (L := L) qb
+  haveI : IsScalarTower K L (FqSub L (algebraMap K L qb)) := fqK_tower_L (L := L) qb
+  haveI : IsScalarTower K (Ezeta qb ζ1) (FqSub L (algebraMap K L qb)) := fqK_tower_E qb ζ1
+  obtain ⟨i1⟩ := @exists_algEquiv_of_basis K (Ezeta qb ζ1) L (FqSub L (algebraMap K L qb)) (EL L ι')
+    _ _ _ _ _ _ _ _ (fqKAlgebra (L := L) qb) (fqK_tower_L (L := L) qb) _ _ _ _ _
+    (IsScalarTower.toAlgHom K (Ezeta qb ζ1) (FqSub L (algebraMap K L qb)))
+    (fun x => Submodule.span_mono (by rintro _ ⟨j, rfl⟩; exact ⟨_, rfl⟩)
+      (Ezeta_L_span qb hqb0 ζ1 x))
+    (Ezeta_L_indep qb hqb0 ζ1) (EL_constExt L ι').generated
+  -- `EL ≅ F_L(q̄)`
+  have hEq' : (elSub (L := L) ι'.toRingHom).map (FqSub L (algebraMap K L q)).subtype =
+      FqbarXm L (algebraMap K L qK) m := by rw [hrange]; exact hEq
+  obtain ⟨i2⟩ := subfield_equiv_fq q (elSub (L := L) ι'.toRingHom) (algebraMap_mem_elSub _) hm hEq'
+  have := thmVIIIa_period_unique (K := L) (norm_alg_pos (L := L) qb hqb0) (norm_alg_lt (L := L) qb hqb1)
+    (norm_alg_pos (L := L) qK hqK0) (norm_alg_lt (L := L) qK hqK1) (i1.symm.trans i2)
+  exact (algebraMap K L).injective this
+
+end periodUnique
 
 end AnalyticTheory
