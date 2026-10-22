@@ -297,3 +297,25 @@ Update: Theorem X (`thmX_minimal_splitting`) was proved without the appendices (
 (`exists_weierstrassData`).  Open: Weierstraß data in characteristic 2, 3 (needs the genus drop of the
 non-conservative singular cubic), general homogeneity of degree-one primes (translations through the
 group law on the generic point), constant-extension compatibility, then bridges B1', B2.
+
+## Update (A1 finished except existence)
+
+Done: `A1Homog.lean` (homogeneity of the degree-one primes by translations: residues at `𝔭'` give a point
+`T ∈ W(K)`, the group law of Mathlib on the generic point gives `ψ_T`, `ψ_{-T}` inverse, pole of `ψ_T(x)` at
+`𝔭'` including the 2-torsion case); `RatFuncInfty.lean` (`inftyPrime`, `ord_∞ X = -1`, degree `1`,
+unique prime of `k(X)` with a pole of `X`); `WeierstrassModel.lean` (model-prime lemma
+`exists_prime_of_model` by the fundamental identity for `F | k(x)`); `A1Remarks.lean` ((A1.8), (A1.13),
+Remarks 1, 2, 3).
+
+Still open in A1: Weierstraß data in `char 2, 3` (genus drop of a singular cubic), and
+`absolute_hasse_exists` (genus of the function field of a Weierstraß curve).
+
+Still open in A2 and the bridges `Ezeta_isJacobian`, `jacobian_descent`: the definitions of
+`SplittingData`/`absInvGen`/`hasseGen` quantify over arbitrary extension fields `L` and arbitrary
+generated fields `EL` (no linear disjointness, `L` possibly transcendental).  Then
+(i) `absInvGen_independent` is not even correct for degenerate `EL` (e.g. `EL = E` with `L ↪ E`);
+(ii) `hasseGen` is determined only through `E_1 ≅ E`, i.e. `E ⊗_K E`, a domain iff `E | K` is separable,
+which for conservative genus-one fields needs genus-change theory (Tate, Rosenlicht).
+A faithful completion needs: independent constant extensions in the definition of `SplittingData`,
+`IsEllipticOver L EL` for them (including `L` alg. closed in `EL`), regularity of elliptic fields, then
+the characteristic cocycle valued in translations.

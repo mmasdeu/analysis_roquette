@@ -1960,13 +1960,14 @@ See the Lean proof of \texttt{corXIXd\_degree\_n}.
 
 \begin{proposition}[Absolute invariant in Weierstraß form (A1.8)]
 \label{prop:absinv-weierstrass}
-\lean{AnalyticTheory.absInv_weierstrass}
-\uses{def:absolute-invariant, def:normal-forms}
+\lean{AnalyticTheory.absInv_weierstrass, AnalyticTheory.exists_data_of_weierstrassNormal, AnalyticTheory.exists_data_of_model, AnalyticTheory.transcendental_of_generators, AnalyticTheory.wDisc_weierstrassNormal, AnalyticTheory.wC4_weierstrassNormal}
+\uses{def:absolute-invariant, def:normal-forms, lem:A1-model-prime, lem:A1-independence}
 \leanok
-In Weierstraß normal form, $j=12^3g_2^3/(g_2^3-27g_3^2)$.
+For generators $x,y$ of $F\,|\,K$ with $y^2=4x^3-g_2x-g_3$, $\operatorname{char}K\ne2,3$, $g_2^3-27g_3^2\ne0$: $j=12^3g_2^3/(g_2^3-27g_3^2)$. Proof: $(x,y/2)$ is a Weierstra\ss\ model, hence a datum by the model-prime lemma; apply the independence of the datum. (The non-vanishing of the discriminant is a hypothesis, automatic for elliptic $F$.)
 \end{proposition}
 \begin{proof}
-See the Lean proof of \texttt{absInv\_weierstrass}.
+\leanok
+See the Lean proof of \texttt{absInv\_weierstrass, exists\_data\_of\_weierstrassNormal, exists\_data\_of\_model, transcendental\_of\_generators, wDisc\_weierstrassNormal, wC4\_weierstrassNormal}.
 \end{proof}
 
 \begin{definition}[Relative degrees of subfields]
@@ -2029,13 +2030,14 @@ The Hasse invariant $\gamma$ (a representative in $K$): $-c_4/c_6$ if $\operator
 
 \begin{proposition}[Hasse invariant in Weierstraß form (A1.13)]
 \label{prop:hasse-weierstrass}
-\lean{AnalyticTheory.hasseInv_weierstrass}
-\uses{def:hasse-invariant, def:normal-forms}
+\lean{AnalyticTheory.hasseInv_weierstrass, AnalyticTheory.wC6_weierstrassNormal}
+\uses{def:hasse-invariant, def:normal-forms, lem:A1-model-prime, lem:A1-independence}
 \leanok
-$\gamma\equiv-\tfrac12 g_2/g_3$ modulo squares.
+Under the same hypotheses, $\gamma\equiv-\tfrac12g_2/g_3$ modulo squares ($-c_4/c_6=-g_2/(18g_3)=(1/3)^2\cdot(-\tfrac12g_2/g_3)$).
 \end{proposition}
 \begin{proof}
-See the Lean proof of \texttt{hasseInv\_weierstrass}.
+\leanok
+See the Lean proof of \texttt{hasseInv\_weierstrass, wC6\_weierstrassNormal}.
 \end{proof}
 
 \begin{lemma}[Lemma A (unique nontrivial automorphism)]
@@ -2052,14 +2054,14 @@ See the Lean proof of \texttt{lemmaA, lemmaA\_data, stab\_eq, negChange\_smul}.
 
 \begin{lemma}[Independence of $j$ and $\gamma$ of the Weierstra\ss\ datum]
 \label{lem:A1-independence}
-\lean{AnalyticTheory.absInv_eq_of_data, AnalyticTheory.hasseInv_eq_of_data}
-\uses{def:absolute-invariant, def:hasse-invariant}
+\lean{AnalyticTheory.absInv_eq_of_data, AnalyticTheory.hasseInv_eq_of_data, AnalyticTheory.absInv_eq_jOfData, AnalyticTheory.hasseInv_eq_hasseOfData}
+\uses{def:absolute-invariant, def:hasse-invariant, lem:A1-homogeneity}
 \leanok
-The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ (with $j\ne0,12^3$) coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (coordinate changes $x\mapsto\lambda^2x+r$). Proved for fields in which the prime divisors of degree one are permuted transitively by automorphisms (e.g.\ $F_K(q)$).
+The absolute invariant and the class of the Hasse invariant computed from any Weierstra\ss\ datum of $F\,|\,K$ coincide with $\mathrm{absInv}$, $\mathrm{hasseInv}$ (same prime: coordinate changes $x\mapsto\lambda^2x+r$; different primes: translations, see \texttt{lem:A1-homogeneity}).
 \end{lemma}
 \begin{proof}
 \leanok
-See the Lean proof of \texttt{absInv\_eq\_of\_data, hasseInv\_eq\_of\_data}.
+See the Lean proof of \texttt{absInv\_eq\_of\_data, hasseInv\_eq\_of\_data, absInv\_eq\_jOfData, hasseInv\_eq\_hasseOfData}.
 \end{proof}
 
 \begin{lemma}[$\dim L(n\mathfrak p)=n$]
@@ -2113,34 +2115,37 @@ See the Lean proof of \texttt{exists\_variableChange\_of\_invariants}.
 \begin{remark}[Remark 1 (formula for $j$ from $y^2+xy=x^3+Bx+C$)]
 \label{rem:A-1}
 \lean{AnalyticTheory.remark_A1_absinv}
-\uses{def:absolute-invariant}
+\uses{def:absolute-invariant, lem:A1-model-prime, lem:A1-independence}
 \leanok
-$j=(1-48B)^3/\Delta$ in any characteristic.
+If $F=K(x,y)$ with $y^2+xy=x^3+Bx+C$, $\Delta=B^2-C-64B^3+72BC-432C^2\ne0$, then $j=(1-48B)^3/\Delta$ in every characteristic.
 \end{remark}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{remark\_A1\_absinv}.
 \end{proof}
 
 \begin{remark}[Remark 2 (separably closed $K$)]
 \label{rem:A-2}
-\lean{AnalyticTheory.remark_A2_sep_closed}
-\uses{def:hasse-invariant}
+\lean{AnalyticTheory.remark_A2_sep_closed, AnalyticTheory.squareEquiv_trans, AnalyticTheory.piEquiv_trans}
+\uses{def:hasse-invariant, lem:A1-independence}
 \leanok
-Over a separably closed field the Hasse invariant is trivial.
+Over a separably closed field the Hasse invariant is trivial (for $j\ne0,12^3$ and $F$ with a Weierstra\ss\ datum): $-c_4/c_6$ (resp.\ $b_2$) is a square, and every class modulo $\pi(K^+)$ is trivial, since $X^2-a$ and $X^2+X+c$ are separable.
 \end{remark}
 \begin{proof}
-See the Lean proof of \texttt{remark\_A2\_sep\_closed}.
+\leanok
+See the Lean proof of \texttt{remark\_A2\_sep\_closed, squareEquiv\_trans, piEquiv\_trans}.
 \end{proof}
 
 \begin{remark}[Remark 3 (constant extensions)]
 \label{rem:A-3}
-\lean{AnalyticTheory.remark_A3_absinv, AnalyticTheory.remark_A3_hasse}
-\uses{def:absolute-invariant, def:hasse-invariant, def:constant-extension}
+\lean{AnalyticTheory.remark_A3, AnalyticTheory.adjoin_const_ext, AnalyticTheory.jOfData_map, AnalyticTheory.hasseOfData_map, AnalyticTheory.wDisc_map, AnalyticTheory.ringChar_eq_of_hom}
+\uses{def:absolute-invariant, def:hasse-invariant, def:constant-extension, lem:A1-model-prime, lem:A1-independence}
 \leanok
-Absolute invariant is preserved by constant extensions; Hasse invariant maps to the image class.
+For a finite constant extension $FL\,|\,L$ (elliptic) of $F\,|\,K$ with a Weierstra\ss\ datum, $j_{FL}=j_F$ and $\gamma_{FL}$ is the image of $\gamma_F$: the generators $x,y$ of $F$ generate $FL$ over $L$ and satisfy the same Weierstra\ss\ equation, so $(x,y)$ is a datum of $FL$ by the model-prime lemma.
 \end{remark}
 \begin{proof}
-See the Lean proof of \texttt{remark\_A3\_absinv, remark\_A3\_hasse}.
+\leanok
+See the Lean proof of \texttt{remark\_A3, adjoin\_const\_ext, jOfData\_map, hasseOfData\_map, wDisc\_map, ringChar\_eq\_of\_hom}.
 \end{proof}
 
 \begin{theorem}[Uniqueness of $F\,|\,K$]
@@ -2194,11 +2199,35 @@ Generators $x,y$ of $F\,|\,K$ satisfying a Weierstra\ss\ equation of nonzero dis
 \label{thm:A-existence-eq}
 \lean{AnalyticTheory.exists_poleOrd_two, AnalyticTheory.exists_poleOrd_three, AnalyticTheory.exists_weierstrass_relation, AnalyticTheory.exists_normalForm, AnalyticTheory.wDisc_ne_zero, AnalyticTheory.isAlgebraic_adjoin_of_transcendental, AnalyticTheory.adjoin_xy_eq_top, AnalyticTheory.exists_weierstrassData, AnalyticTheory.nonempty_weierstrassData}
 \leanok
-For an elliptic $F\,|\,K$ and a prime $\mathfrak p$ of degree $1$ there are $x,y$ with pole divisors $2\mathfrak p$, $3\mathfrak p$ satisfying (A1.1) with leading coefficients $1$; $F=K(x,y)$; for $\operatorname{char}K\neq 2,3$ the discriminant is nonzero, so a Weierstra\ss\ datum exists. (Open: existence for $\operatorname{char}K=2,3$; general homogeneity of the degree-one primes via translations, which is needed to make $j,\gamma$ independent of the prime; see the roadmap in \texttt{PLAN.md}.)
+For an elliptic $F\,|\,K$ and a prime $\mathfrak p$ of degree $1$ there are $x,y$ with pole divisors $2\mathfrak p$, $3\mathfrak p$ satisfying (A1.1) with leading coefficients $1$; $F=K(x,y)$; for $\operatorname{char}K\neq 2,3$ the discriminant is nonzero, so a Weierstra\ss\ datum exists. (Open: existence for $\operatorname{char}K=2,3$, which needs the genus drop of a singular cubic over an imperfect field.)
 \end{theorem}
 \begin{proof}
 \leanok
 See the Lean proof of \texttt{exists\_poleOrd\_two, exists\_poleOrd\_three, exists\_weierstrass\_relation, exists\_normalForm, wDisc\_ne\_zero, isAlgebraic\_adjoin\_of\_transcendental, adjoin\_xy\_eq\_top, exists\_weierstrassData, nonempty\_weierstrassData}.
+\end{proof}
+
+\begin{lemma}[Homogeneity of the primes of degree one (translations)]
+\label{lem:A1-homogeneity}
+\lean{AnalyticTheory.exists_translation_hom, AnalyticTheory.exists_translation_equiv, AnalyticTheory.translate_pole, AnalyticTheory.normalForm_residue, AnalyticTheory.WeierstrassData.exists_aut, AnalyticTheory.degOneHomogeneous_of_data, AnalyticTheory.absInv_eq_jOfData, AnalyticTheory.hasseInv_eq_hasseOfData}
+\uses{lem:A1-same-prime, def:weierstrass-data}
+\leanok
+Let $F\,|\,K$ be elliptic with a Weierstra\ss\ datum $(x,y)$ at $\mathfrak p$ and let $\mathfrak p'\ne\mathfrak p$ be a prime of degree $1$. The residues $(\xi,\eta)\in W(K)$ of $(x,y)$ at $\mathfrak p'$ give, via the group law of Mathlib, a $K$-endomorphism $\psi_T$ of $F$ with $(x,y)\mapsto(x,y)+T$, $T=-(\xi,\eta)$; its inverse is $\psi_{-T}$ (associativity of the group law on the generic point). The function $\psi_T(x)=\lambda^2+a_1\lambda-a_2-x-\xi$, $\lambda=(y-y_T)/(x-\xi)$, has a pole at $\mathfrak p'$ (for $2$-torsion $T$: $\psi_T(x)=\xi+c/(x-\xi)$ with $c\ne0$ by non-singularity), hence $\psi_T(\mathfrak p)=\mathfrak p'$. Consequently $j,\gamma$ computed from any datum are $\mathrm{absInv},\mathrm{hasseInv}$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{exists\_translation\_hom, exists\_translation\_equiv, translate\_pole, normalForm\_residue, exists\_aut, degOneHomogeneous\_of\_data, absInv\_eq\_jOfData, hasseInv\_eq\_hasseOfData}.
+\end{proof}
+
+\begin{lemma}[The prime at infinity of a Weierstra\ss\ model]
+\label{lem:A1-model-prime}
+\lean{AnalyticTheory.inftyPrime, AnalyticTheory.inftyPrime_ord_X, AnalyticTheory.inftyPrime_degree, AnalyticTheory.eq_inftyPrime, AnalyticTheory.model_infty_prime, AnalyticTheory.exists_prime_of_model, AnalyticTheory.model_val_pole, AnalyticTheory.model_ord_pole}
+\uses{def:weierstrass-data}
+\leanok
+If $x,y$ generate $F\,|\,k$, $x$ is transcendental and $y^2+(a_1x+a_3)y=x^3+a_2x^2+a_4x+a_6$ with $\Delta\ne0$, then $F$ has a prime $\mathfrak P$ of degree $1$ with $\mathrm{div}_\infty(x)=2\mathfrak P$, $\mathrm{div}_\infty(y)=3\mathfrak P$. Proof: $F\,|\,k(x)$ is separable of degree $\le2$; by the fundamental identity at the place $\infty$ of $k(x)$ (degree $1$, $\operatorname{ord}_\infty x=-1$, the only place of $k(x)$ at which $x$ has a pole) the ramification indices satisfy $\sum e_P\deg P\le2$; the equation gives $2\operatorname{ord}_Py=3\operatorname{ord}_Px=-3e_P$, so $e_P\ge2$ is even and $P$ is unique with $e_P=2$, $\deg P=1$.
+\end{lemma}
+\begin{proof}
+\leanok
+See the Lean proof of \texttt{inftyPrime, inftyPrime\_ord\_X, inftyPrime\_degree, eq\_inftyPrime, model\_infty\_prime, exists\_prime\_of\_model, model\_val\_pole, model\_ord\_pole}.
 \end{proof}
 
 \section{Appendix \S A2: arbitrary elliptic fields}

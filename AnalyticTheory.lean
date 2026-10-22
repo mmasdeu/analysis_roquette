@@ -117,4 +117,5 @@ import AnalyticTheory.A1Gen
 import AnalyticTheory.A1Homog
 import AnalyticTheory.RatFuncInfty
 import AnalyticTheory.WeierstrassModel
+import AnalyticTheory.A1Remarks
 import AnalyticTheory.Sec4B3

@@ -18,9 +18,10 @@ which suffices for these notes.
 _Scope of this chapter._ The companion contains the definitions of the invariants, their
 independence of the choices made, Lemma A, and the theorem that $`F\,|\,K` is determined up to
 $`K`-isomorphism by $`j` and $`\gamma`. The existence of Weierstraß data is proved for
-$`\operatorname{char}(K) \ne 2, 3` (below); the cases $`\operatorname{char}(K) = 2, 3`, the general
-homogeneity of the degree-one primes, Remarks 1–3 and §A2 (arbitrary elliptic fields) are not yet
-formalized (statements only, with `sorry`).
+$`\operatorname{char}(K) \ne 2, 3` (below); the homogeneity of the degree-one primes, the formulas
+(A1.8), (A1.13) and Remarks 1–3 are proved. Not yet formalized: the existence of Weierstraß data in
+$`\operatorname{char}(K) = 2, 3`, the existence of a field with given invariants, and §A2 (arbitrary
+elliptic fields).
 
 ## Weierstraß equations
 
@@ -229,9 +230,8 @@ $`j` not at all and $`\gamma` by squares (resp. by elements $`\pi(\beta')`), by 
 
 They also do not depend on the choice of the prime $`\mathfrak{p}` of degree $`1`, since for any
 two prime divisors $`\mathfrak{p}, \mathfrak{p}'` of degree $`1` of $`F\,|\,K` there is an
-automorphism of $`F` transforming $`\mathfrak{p}` into $`\mathfrak{p}'`. In the formalization this
-homogeneity is an explicit hypothesis, which is proved for the fields $`F_K(q)` (by the
-translations of §2).
+automorphism of $`F` transforming $`\mathfrak{p}` into $`\mathfrak{p}'` (the book's "well known"
+remark). The formalization proves this by the group law (translations): see the next section.
 
 > Prime divisors of degree one of `F | K` are permuted transitively by `K`-automorphisms (book, footnote of §A1).
 -/
@@ -247,14 +247,142 @@ translations of §2).
 
 /-!
 
-> Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv`.
+## Translations
+
+Let $`(x,y)` be a Weierstraß datum of the elliptic field $`F\,|\,K` at $`\mathfrak{p}` and
+$`\mathfrak{p}' \ne \mathfrak{p}` another prime of degree $`1`. Since $`x, y` have no pole at
+$`\mathfrak{p}'` and the residue field is $`K`, their residues $`(\xi, \eta)` form a point of the
+Weierstraß curve $`W` over $`K` (`normalForm_residue`). Let $`T = -(\xi, \eta)`. The formulas of the
+group law, applied to the generic point $`(x, y) \in W(F)` and $`T`, define a $`K`-homomorphism
+$`\psi_T : F \to F` with $`(x,y) \mapsto (x,y) + T` (`exists_translation_hom`), whose inverse is
+$`\psi_{-T}` by associativity of the group law (`exists_translation_equiv`). Finally
+$`\psi_T(x) = \lambda^2 + a_1 \lambda - a_2 - x - \xi` with $`\lambda = (y - y_T)/(x - \xi)` has a
+pole at $`\mathfrak{p}'` (for a $`2`-torsion point $`T`: $`\psi_T(x) = \xi + c/(x-\xi)` with $`c \ne 0`,
+by non-singularity), so that $`\psi_T(\mathfrak{p}) = \mathfrak{p}'` (`translate_pole`).
+
+> Every prime divisor of degree one is the image of the prime of a Weierstraß datum under a `K`-automorphism.
+-/
+
+#stmt WeierstrassData.exists_aut
+
+/-!
+
+> The prime divisors of degree one of an elliptic function field with a Weierstraß datum are permuted transitively by its `K`-automorphisms.
+-/
+
+#stmt degOneHomogeneous_of_data
+
+/-!
+
+> Book, §A1: the absolute invariant computed from *any* Weierstraß datum equals `absInv`.
+-/
+
+#stmt absInv_eq_jOfData
+
+/-!
+
+> Book, §A1: the Hasse invariant computed from *any* Weierstraß datum is equivalent to `hasseInv`.
+-/
+
+#stmt hasseInv_eq_hasseOfData
+
+/-!
+
+## The prime at infinity of a Weierstraß model
+
+If $`x, y` generate $`F\,|\,k`, $`x` is transcendental, and $`x, y` satisfy a Weierstraß equation
+with non-zero discriminant, then $`F` has a prime divisor $`\mathfrak{P}` of degree $`1` with pole
+divisors $`2\mathfrak{P}` and $`3\mathfrak{P}` for $`x` and $`y`. The prime at infinity of $`k(x)`
+(`inftyPrime`) has degree $`1` and $`\operatorname{ord}_\infty x = -1`, and is the only prime of
+$`k(x)` at which $`x` has a pole. The extension $`F\,|\,k(x)` is separable of degree $`\le 2`
+(here $`\Delta \ne 0` is used in characteristic $`2`); by the fundamental identity the
+ramification indices $`e_P` of the primes above $`\infty` satisfy $`\sum e_P \deg P \le 2`, while
+the equation gives $`2\operatorname{ord}_P y = 3 \operatorname{ord}_P x = -3 e_P`, so each $`e_P` is
+even and there is exactly one such prime, with $`e_P = 2`.
+
+> The prime at infinity of `k(X)` has degree one.
+-/
+
+#stmt inftyPrime_degree
+
+/-!
+
+> Model-prime lemma: a Weierstraß model `(x, y)` of `F | k` with `Δ ≠ 0` has a prime `𝔓` of degree one with pole divisors `2𝔓`, `3𝔓`.
+-/
+
+#stmt exists_prime_of_model
+
+/-!
+
+## The formulas for the invariants
+
+Using the model-prime lemma every pair of generators satisfying a Weierstraß equation of non-zero
+discriminant is a Weierstraß datum; the independence of the datum then gives (A1.8), (A1.13) and the
+Remarks. (The non-vanishing of the discriminant, which holds automatically for elliptic fields, is a
+hypothesis here.)
+
+> Book, §A1, (A1.8).
+-/
+
+#stmt absInv_weierstrass
+
+/-!
+
+> Book, §A1, (A1.13).
+-/
+
+#stmt hasseInv_weierstrass
+
+/-!
+
+*Remark 1.* _If $`F = K(x,y)` with $`y^2 + xy = x^3 + Bx + C` then $`j = (1-48B)^3/\Delta`._
+
+> Book, §A1, Remark 1.
+-/
+
+#stmt remark_A1_absinv
+
+/-!
+
+*Remark 2.* _If $`K` is separably closed, the Hasse invariant is trivial._
+
+> Book, §A1, Remark 2 (for $`j \ne 0, 12^3` and $`F` with a Weierstraß datum).
+-/
+
+#stmt remark_A2_sep_closed
+
+/-!
+
+*Remark 3.* _The absolute invariant is preserved by constant field extensions and the Hasse
+invariant of $`FL` is the image of that of $`F`._ The generators $`x, y` of $`F` generate $`FL`
+over $`L` and satisfy the same equation, so $`(x, y)` is a datum of $`FL` by the model-prime lemma.
+
+> Book, §A1, Remark 3 (finite constant extensions).
+-/
+
+#stmt remark_A3
+
+/-!
+
+*Existence.* The existence of an elliptic field with prescribed invariants $`j, \gamma` needs the
+genus of the function field of a Weierstraß curve (Riemann–Roch for arbitrary divisors) and is not yet
+formalized.
+
+> Book, §A1, existence (statement only).
+-/
+
+#stmt absolute_hasse_exists
+
+/-!
+
+> Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv` (given the homogeneity of the degree-one primes).
 -/
 
 #stmt absInv_eq_of_data
 
 /-!
 
-> Book, §A1: the Hasse invariant computed from any Weierstraß datum is equivalent to `hasseInv` (modulo squares, resp. modulo `π(K⁺)` in characteristic `2`).
+> Book, §A1: the Hasse invariant computed from any Weierstraß datum is equivalent to `hasseInv` (given the homogeneity).
 -/
 
 #stmt hasseInv_eq_of_data

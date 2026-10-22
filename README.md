@@ -153,8 +153,13 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   `y ∈ L(3𝔭)`), change of variables through Mathlib's `WeierstrassCurve.VariableChange` and normal forms,
   `F ≅ K(X)[Y]/(P)` through `PowerBasis.equivOfMinpoly`.  **Section 3 is complete** (no `sorry` in its
   dependency chain; `#print axioms` shows only `propext`, `Classical.choice`, `Quot.sound`).
-* Appendix A1: Lemma A (`A1LemmaA.lean`), independence and uniqueness of Weierstraß data, homogeneity
-  of `F_K(q)` under translations (`FqHomogeneous.lean`); existence of `A` and general homogeneity remain.
+* Appendix A1: Lemma A (`A1LemmaA.lean`), independence and uniqueness of Weierstraß data, existence of
+  Weierstraß data for `char ≠ 2, 3` (`A1Exist.lean`, `A1Gen.lean`), **homogeneity of the degree-one primes of
+  an arbitrary elliptic field by translations** (`A1Homog.lean`: group law of Mathlib on the generic point),
+  hence independence of `absInv`/`hasseInv` of the datum; the **prime at infinity of a Weierstraß model**
+  (`RatFuncInfty.lean`, `WeierstrassModel.lean`: fundamental identity for `F | k(x)`), and with it
+  (A1.8), (A1.13), Remarks 1, 2, 3 (`A1Remarks.lean`; hypotheses: `Δ ≠ 0`, a datum for `char 2, 3`,
+  elliptic `FL | L` for Remark 3). Open: existence of data in `char 2, 3` and `absolute_hasse_exists`.
 * §4, pragmatic form (`Lemma2.lean`, `Lemma2b.lean`, `ForMathlib/FieldTheory/ExtendRingEquiv.lean`, `FqDescent.lean`, `Sec4.lean`):
   Lemma 2 (`H¹(G, L^×/q) ≅ Ĝ(q)`), Galois descent of `F_L(q)` along the twisted action
   `ρ_σ = τ_{ζ(σ)}σ`, the model fields `E_ζ`, their classification up to `K`-isomorphism by
@@ -203,10 +208,11 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   matrices, Speiser's lemma, specialization at a rational point). Correction: the book's `Ĥ¹(D⁰) ≅ ℤ/n` is stated
   with `ZMod [L:K]`. Theorem **X** (`thmX_minimal_splitting`, `Sec4B3.lean`: from Theorem XIIIb through the
   inflation `E_ζ(L) ≅ E_{ζ̃}(K_χ)` of `ConstExtDescent`) is also proved. **Still `sorry`:** only the §4 bridges
-  `Ezeta_isJacobian`, `jacobian_descent` (they need Appendix A1/A2: invariance of the absolute and
-  Hasse invariants under constant extension, independence of the splitting field, the
-  characteristic cocycle). Appendix A1 progress: `A1Exist.lean`, `A1Gen.lean` (existence of Weierstraß
-  data for `char ≠ 2, 3`).
+  `Ezeta_isJacobian`, `jacobian_descent`, Appendix A2 and `absolute_hasse_exists`.  The bridges need
+  A2 with *arbitrary* splitting fields (the Hasse invariant of an elliptic field `E | K` is unique only
+  through the splitting field `E_1 ≅ E`, i.e. through the independent compositum `E ⊗_K E`, which is a domain
+  only for separably generated `E`: genus-change theory for conservative fields is not available), the
+  characteristic cocycle and its values in the translations.
 * Not started (statements only): the Proposition on absolute integrality of `j` (§6);
   Appendix A2 in general.
 

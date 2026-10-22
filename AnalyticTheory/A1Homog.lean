@@ -209,6 +209,7 @@ theorem normalForm_of_nonsingular {x y : F} (h : (W.baseChange F).toAffine.Nonsi
   simpa [NormalForm, WeierstrassCurve.baseChange, WeierstrassCurve.map] using this
 
 
+omit [W.IsElliptic] in
 open Polynomial in
 /-- A solution `(x, y)` of the Weierstraß equation with `x` constant has `y` integral over `K`. -/
 theorem isIntegral_y_of_const {x y : F} (hxy : NormalForm W x y) {a : K}
