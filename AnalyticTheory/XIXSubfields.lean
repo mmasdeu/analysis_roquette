@@ -12,6 +12,31 @@ namespace AnalyticTheory
 
 universe u
 
+section relDegAux
+
+variable {M : Type*} [Field M]
+
+theorem relDeg_map_subtype (F : Subfield M) (S : Subfield F) :
+    relDeg (S.map F.subtype) F = Module.finrank S F := by
+  have hle : S.map F.subtype ≤ F := by rintro _ ⟨x, -, rfl⟩; exact x.2
+  rw [relDeg_eq hle]
+  let := (Subfield.inclusion hle).toAlgebra
+  let f : S →+* S.map F.subtype := RingHom.codRestrict (F.subtype.comp S.subtype) _
+    fun x => ⟨x, x.2, rfl⟩
+  have hf : Function.Bijective f := by
+    refine ⟨f.injective, fun ⟨y, hy⟩ => ?_⟩
+    obtain ⟨x, hx, rfl⟩ := hy
+    exact ⟨⟨x, hx⟩, rfl⟩
+  exact (Algebra.finrank_eq_of_equiv_equiv (RingEquiv.ofBijective f hf) (RingEquiv.refl _)
+    (by ext e; rfl)).symm
+
+theorem relDeg_top (S : Subfield M) : relDeg S ⊤ = Module.finrank S M := by
+  rw [relDeg_eq le_top]
+  let := (Subfield.inclusion (le_top : S ≤ ⊤)).toAlgebra
+  exact Algebra.finrank_eq_of_equiv_equiv (RingEquiv.refl S) Subfield.topEquiv (by ext e; rfl)
+
+end relDegAux
+
 section powCocycle
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
@@ -211,6 +236,73 @@ theorem Em_props (ζ : CocycleModQ K L q)
   refine ⟨(Ezeta_isElliptic qb hqb0 hqb1 _).of_algEquiv e.symm,
     IsFqTorsor.of_algEquiv e (Ezeta_isFqTorsor qb hqb0 _), ⟨powCocycle q ζ hd, ?_, ⟨e⟩⟩⟩
   exact charOfCocycle_powCocycle q hq0 hq1 ζ hqb0 hqb1 hm hd
+
+include hq0 hq1 in
+/-- `[F : E_m] = dm`. -/
+theorem Em_subDeg (ζ : CocycleModQ K L q)
+    (hζ : ∀ f : FqSub L (algebraMap K L q), f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ)
+    {qb : K} (hqb0 : 0 < ‖qb‖) (hqb1 : ‖qb‖ < 1) {m d : ℕ} (hm : 0 < m) (hdpos : 0 < d)
+    (hd : qb ^ d = q ^ m) : subDeg (Em q T qb m) = d * m := by
+  set F' := FqSub L (algebraMap K L q) with hF'
+  set qL := algebraMap K L qb with hqL
+  set Ff : Subfield F' := FKQ K L q T
+  set Af : Subfield F' := (Em q T qb m).map Ff.subtype
+  set Bf : Subfield F' := (FqbarXm L qL m).comap F'.subtype
+  have hAF : Af ≤ Ff := by rintro _ ⟨x, -, rfl⟩; exact x.2
+  have hAB : Af ≤ Bf := by rintro _ ⟨x, hx, rfl⟩; exact hx
+  have h1 := relDeg_mul hAF (le_top : Ff ≤ ⊤)
+  have h2 := relDeg_mul hAB (le_top : Bf ≤ ⊤)
+  rw [h1] at h2
+  have rAF : relDeg Af Ff = subDeg (Em q T qb m) := relDeg_map_subtype Ff _
+  have hFE : Ff = Ezeta q ζ := by ext f; exact hζ f
+  have rFT : relDeg Ff ⊤ = Module.finrank K L := by
+    rw [relDeg_top, hFE]; exact Ezeta_finrank_eq q hq0 ζ
+  -- `[F_L(q) : F_L(q̄|Xᵐ)] = dm`
+  have hBmap : Bf.map F'.subtype = FqbarXm L qL m := by
+    ext y
+    constructor
+    · rintro ⟨x, hx, rfl⟩; exact hx
+    · intro hy
+      obtain ⟨g, hg, rfl⟩ := hy
+      exact ⟨⟨_, Em_hsub q hq0 hq1 hqb0 hqb1 hm hd ⟨g, hg⟩⟩, ⟨g, hg, rfl⟩, rfl⟩
+  have htop : (⊤ : Subfield F').map F'.subtype = F' := by
+    ext y; constructor
+    · rintro ⟨x, -, rfl⟩; exact x.2
+    · intro hy; exact ⟨⟨y, hy⟩, trivial, rfl⟩
+  have rBT : relDeg Bf ⊤ = d * m := by
+    rw [← relDeg_map F'.subtype (le_top : Bf ≤ ⊤), hBmap, htop]
+    exact thmXVII_degree L (algebraMap K L q) qL (norm_alg_pos (L := L) q hq0)
+      (norm_alg_lt (L := L) q hq1) (by rw [hqL, norm_algebraMap']; exact hqb0)
+      (by rw [hqL, norm_algebraMap']; exact hqb1) m d hm hdpos
+      (by rw [hqL, ← map_pow, hd, map_pow])
+  -- `[F_L(q̄|Xᵐ) : E_m] = n`
+  set Ez := Ezeta qb (powCocycle q ζ hd)
+  have hAmap : Af.map F'.subtype =
+      (Ez.map (FqSub L qL).subtype).map (substPow L m) := by
+    ext y
+    constructor
+    · rintro ⟨_, ⟨x, hx, rfl⟩, rfl⟩
+      obtain ⟨g, hg, hge⟩ := (Em_char q hq0 hq1 T ζ hζ hqb0 hqb1 hm hd x).mp hx
+      exact ⟨g.1, ⟨g, hg, rfl⟩, hge⟩
+    · rintro ⟨_, ⟨g, hg, rfl⟩, rfl⟩
+      let x : FKQ K L q T := ⟨_, Em_mapF q hq0 hq1 T ζ hζ hqb0 hqb1 hm hd (⟨g, hg⟩ : Ez)⟩
+      exact ⟨_, ⟨x, ⟨g, g.2, rfl⟩, rfl⟩, rfl⟩
+  have htop' : (⊤ : Subfield (FqSub L qL)).map (FqSub L qL).subtype = FqSub L qL := by
+    ext y; constructor
+    · rintro ⟨x, -, rfl⟩; exact x.2
+    · intro hy; exact ⟨⟨y, hy⟩, trivial, rfl⟩
+  have rAB : relDeg Af Bf = Module.finrank K L := by
+    rw [← relDeg_map F'.subtype hAB, hAmap, hBmap]
+    show relDeg _ ((FqSub L qL).map (substPow L m)) = _
+    have e1 : (FqSub L qL).map (substPow L m) =
+        ((⊤ : Subfield (FqSub L qL)).map (FqSub L qL).subtype).map (substPow L m) := by rw [htop']
+    rw [e1, relDeg_map (substPow L m) (by rintro _ ⟨x, -, rfl⟩; exact ⟨x, trivial, rfl⟩),
+      relDeg_map (FqSub L qL).subtype le_top, relDeg_top]
+    exact Ezeta_finrank_eq qb hqb0 _
+  rw [rAF, rFT, rAB, rBT] at h2
+  have hn : 0 < Module.finrank K L := Module.finrank_pos
+  have := h2.symm
+  nlinarith [this]
 
 end Em
 
