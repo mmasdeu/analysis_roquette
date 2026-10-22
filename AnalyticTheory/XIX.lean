@@ -1,4 +1,4 @@
-import AnalyticTheory.XIXPeriod
+import AnalyticTheory.XIXDescent
 import AnalyticTheory.Sec4Torsor
 
 /-!
@@ -42,7 +42,11 @@ commensurable with `q`. -/
 theorem thmXIX_period (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
     (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K E) :
     ∃ qbar : K, 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ Commensurable K q qbar ∧ AdmitsPeriod K L q T qbar E := by
-  sorry
+  obtain ⟨qK, m, d, hqK0, hqK1, hm, hd, hdq, hEq⟩ := exists_period_elSub q T hq0 hq1 E hE
+  obtain ⟨ζ, hζ, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  refine ⟨qK, hqK0, hqK1, ⟨d, m, by exact_mod_cast hd.ne', by exact_mod_cast hm.ne', by
+    rw [zpow_natCast, zpow_natCast]; exact hdq⟩, hE.1, ?_⟩
+  exact isFqTorsor_of_period q T hq0 hq1 ζ hζ E hE.1 hqK0 hqK1 hm hdq hEq
 
 /-- Book, §6, Theorem XIX (ii): for `q̄` commensurable with `q` the elliptic subfields `E ⊂ F` with
 period `q̄` correspond `1 − 1` to the integers `m > 0` divisible by the order of `q mod^× q̄`; if `E`

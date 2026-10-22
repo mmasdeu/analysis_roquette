@@ -265,6 +265,98 @@ theorem exists_period_elSub (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfiel
   rw [map_pow, map_pow]
   simpa [zpow_natCast] using hd
 
+include hq0 hq1 in
+/-- The descent: `E` is the field of invariants of `τ_{ζ(σ)^m} σ` on `F_L(q̄)`, i.e. `E` admits the
+period `q̄` (its characteristic cocycle is `σ ↦ ζ(σ)^m`, a translation). -/
+theorem isFqTorsor_of_period (ζ : CocycleModQ K L q)
+    (hζ : ∀ f : FqSub L (algebraMap K L q), f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ)
+    (E : Subfield (FKQ K L q T)) (h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E)
+    {qK : K} (hqK0 : 0 < ‖qK‖) (hqK1 : ‖qK‖ < 1) {m d : ℕ} (hm : 0 < m) (hd : qK ^ d = q ^ m)
+    (hEq : (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype =
+      FqbarXm L (algebraMap K L qK) m) :
+    letI := subfieldAlgebra K E h; IsFqTorsor (L := L) qK E := by
+  letI := subfieldAlgebra K E h
+  have hmz : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'
+  set qb := algebraMap K L qK with hqb
+  have hqb0 : qb ≠ 0 := (map_ne_zero_iff _ (algebraMap K L).injective).mpr (norm_pos_iff.mp hqK0)
+  -- the substitution `μ_m : F_L(q̄) → M_L` and its inverse on `F_L(q̄|Xᵐ)`
+  let μ0 : FqSub L qb →+* MeroRing L := (substPow L m).comp (FqSub L qb).subtype
+  have hμinj : Function.Injective μ0 := (substPow_injective hmz).comp Subtype.val_injective
+  have hrange : ∀ y : MeroRing L, y ∈ FqbarXm L qb m ↔ y ∈ μ0.fieldRange := by
+    intro y
+    constructor
+    · rintro ⟨g, hg, rfl⟩; exact ⟨⟨g, hg⟩, rfl⟩
+    · rintro ⟨g, rfl⟩; exact ⟨g, g.2, rfl⟩
+  have hEmem : ∀ e : E, ((xiIota q T E e : FqSub L (algebraMap K L q)) : MeroRing L) ∈
+      μ0.fieldRange := by
+    intro e
+    rw [← hrange, ← hEq]
+    exact ⟨_, range_mem_elSub (L := L) _ e, rfl⟩
+  let ι' : E →+* FqSub L qb := μ0.rangeRestrictFieldEquiv.symm.toRingHom.comp
+    { toFun := fun e => ⟨_, hEmem e⟩
+      map_one' := Subtype.ext (by simp [xiIota])
+      map_mul' := fun x y => Subtype.ext (by simp [xiIota])
+      map_zero' := Subtype.ext (by simp [xiIota])
+      map_add' := fun x y => Subtype.ext (by simp [xiIota]) }
+  have hι' : ∀ e, μ0 (ι' e) = ((xiIota q T E e : FqSub L (algebraMap K L q)) : MeroRing L) := by
+    intro e
+    exact μ0.rangeRestrictFieldEquiv_apply_symm_apply ⟨_, hEmem e⟩
+  -- the twisted action on `M_L`
+  let R : (L ≃ₐ[K] L) → MeroRing L → MeroRing L := fun τ x => translation L (ζ.1 τ) (meroGal τ x)
+  let a : GalGroup K L → Lˣ := fun τ => ζ.1 τ ^ m
+  have hrel : ∀ τ (g : FqSub L qb), μ0 (rhoA qK a τ g) = R τ (μ0 g) := by
+    intro τ g
+    show substPow L m (translation L (ζ.1 τ ^ m) (meroGal τ (g : MeroRing L))) =
+      translation L (ζ.1 τ) (meroGal τ (substPow L m (g : MeroRing L)))
+    rw [meroGal_substPow τ hmz, ← substPow_translation hmz, zpow_natCast]
+  -- `F_L(q̄|Xᵐ) ⊆ F_L(q)`
+  have hsub : ∀ g : FqSub L qb, μ0 g ∈ FqSub L (algebraMap K L q) := by
+    intro g
+    have hdvd : OrderDvd L (algebraMap K L q) qb (m : ℤ) :=
+      ⟨d, by rw [hqb, zpow_natCast, zpow_natCast, ← map_pow, hd, map_pow]⟩
+    exact (fq_qbar_Xm_subset L (algebraMap K L q) qb (norm_alg_pos (L := L) q hq0)
+      (norm_alg_lt (L := L) q hq1) (by rw [hqb, norm_algebraMap']; exact hqK0)
+      (by rw [hqb, norm_algebraMap']; exact hqK1) m hmz hdvd).1 ⟨g, g.2, rfl⟩
+  have hR : ∀ τ (g : FqSub L qb), R τ (μ0 g) =
+      ((rhoZ q ζ τ ⟨μ0 g, hsub g⟩ : FqSub L (algebraMap K L q)) : MeroRing L) := fun _ _ => rfl
+  have hEfix : ∀ e τ, rhoZ q ζ τ (xiIota q T E e) = xiIota q T E e := fun e τ =>
+    (mem_semiFixed_iff q ζ _).mp ((hζ _).mp (e : FKQ K L q T).2) τ
+  refine ⟨ι', a, ι'.injective, fun c => ?_, fun σ τ g => ?_, fun g => ?_⟩
+  · apply hμinj
+    rw [hι']
+    show algebraMap L (MeroRing L) (algebraMap K L c) =
+      substPow L m (algebraMap L (MeroRing L) (algebraMap K L c))
+    rw [substPow_algebraMapK hmz]
+  · apply hμinj
+    rw [hrel, hrel, hrel, hR, hR]
+    have := rhoZ_mul q hq0 ζ σ τ ⟨μ0 g, hsub g⟩
+    rw [this]
+    show _ = R σ (R τ (μ0 g))
+    rw [hR τ g]
+    have hh : R τ (μ0 g) = μ0 (rhoA qK a τ g) := (hrel τ g).symm
+    rw [← hh] at *
+    rfl
+  · constructor
+    · rintro ⟨e, rfl⟩ σ
+      apply hμinj
+      rw [hrel, hι']
+      exact congrArg Subtype.val (hEfix e σ)
+    · intro hfix
+      obtain ⟨y, hy, hye⟩ : ∃ y ∈ elSub (L := L) (xiIota q T E),
+          ((y : FqSub L (algebraMap K L q)) : MeroRing L) = μ0 g := by
+        have : μ0 g ∈ FqbarXm L qb m := ⟨g, g.2, rfl⟩
+        rw [← hEq] at this
+        obtain ⟨y, hy, hye⟩ := this
+        exact ⟨y, hy, hye⟩
+      have hyfix : ∀ τ, rhoZ q ζ τ y = y := by
+        intro τ
+        apply Subtype.ext
+        have e1 : y = ⟨μ0 g, hsub g⟩ := Subtype.ext hye
+        rw [e1, ← hR, ← hrel, hfix τ]
+      obtain ⟨e, he⟩ := mem_fieldRange_of_fixed q T ζ E h hEfix hy hyfix
+      refine ⟨e, hμinj ?_⟩
+      rw [hι', he, hye]
+
 end descent
 
 end AnalyticTheory
