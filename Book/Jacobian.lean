@@ -329,6 +329,31 @@ of mutually inverse $`q`-trivial characters of $`G`._
 
 /-!
 
+*Theorem X.* _Let $`E` be an elliptic field with character invariant $`\chi`. Then the fixed field
+$`K_\chi` of the kernel of $`\chi` is a splitting field of $`E`, and every finite Galois splitting
+field of $`E` inside $`L` contains $`K_\chi`._
+
+The formalization derives this from Theorem XIIIb: writing $`E \cong E_\zeta` with
+$`e_q(\zeta) = \chi`, the cocycle is inflated from $`G(K_\chi\,|\,K)` (`cocycleExt`), which
+identifies $`E_\zeta(L)` with $`E_{\tilde\zeta}(K_\chi)`; conversely a splitting by $`M` forces
+$`\chi` to be trivial on $`G(L\,|\,M)`. No `sorry` is involved.
+
+> Book, §4, Theorem X: `K_χ` is the (unique) minimal Galois splitting field of `E` inside `L`.
+-/
+
+#stmt thmX_minimal_splitting
+
+/-!
+
+_Status of the two bridges._ The statements `Ezeta_isJacobian` (the fields $`E_\zeta` are Jacobian
+fields in the sense of Appendix A2) and `jacobian_descent` (the converse descent, giving the
+cocycle of a Jacobian field) are the only remaining `sorry`s of §4–§5. They require the invariance
+of the absolute and Hasse invariants under constant field extension (§A2) and are in progress; see
+`PLAN.md`.
+-/
+
+/-!
+
 ## Semi-periodic functions
 
 Now we ask the following question: Given a $`q`-trivial character $`\chi`, how can we explicitly

@@ -1272,9 +1272,10 @@ See the Lean proof of \texttt{thmIX\_realise, thmIX\_classification, thmIX\_exis
 \lean{AnalyticTheory.thmX_minimal_splitting}
 \uses{thm:IX, def:K-chi}
 \leanok
-$K_\chi$ is the unique minimal algebraic splitting field of $E$.
+$K_\chi$ is the unique minimal algebraic splitting field of $E$. Proof: via Theorem XIIIb and the inflation $E_\zeta(L)\cong E_{\tilde\zeta}(K_\chi)$ of descent of constant field extensions (fully formalized, no \texttt{sorry}).
 \end{theorem}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{thmX\_minimal\_splitting}.
 \end{proof}
 
@@ -2191,13 +2192,13 @@ Generators $x,y$ of $F\,|\,K$ satisfying a Weierstra\ss\ equation of nonzero dis
 
 \begin{theorem}[Weierstra\ss equation (existence part)]
 \label{thm:A-existence-eq}
-\lean{AnalyticTheory.exists_poleOrd_two, AnalyticTheory.exists_poleOrd_three, AnalyticTheory.exists_weierstrass_relation, AnalyticTheory.exists_normalForm, AnalyticTheory.wDisc_ne_zero}
+\lean{AnalyticTheory.exists_poleOrd_two, AnalyticTheory.exists_poleOrd_three, AnalyticTheory.exists_weierstrass_relation, AnalyticTheory.exists_normalForm, AnalyticTheory.wDisc_ne_zero, AnalyticTheory.isAlgebraic_adjoin_of_transcendental, AnalyticTheory.adjoin_xy_eq_top, AnalyticTheory.exists_weierstrassData, AnalyticTheory.nonempty_weierstrassData}
 \leanok
-For an elliptic $F\,|\,K$ and a prime $\mathfrak p$ of degree $1$ there are $x,y$ with pole divisors $2\mathfrak p$, $3\mathfrak p$ satisfying (A1.1) with leading coefficients $1$; for $\operatorname{char}K\neq 2,3$ the discriminant is nonzero. (That $F=K(x,y)$ and the cases $\operatorname{char}K=2,3$ remain.)
+For an elliptic $F\,|\,K$ and a prime $\mathfrak p$ of degree $1$ there are $x,y$ with pole divisors $2\mathfrak p$, $3\mathfrak p$ satisfying (A1.1) with leading coefficients $1$; $F=K(x,y)$; for $\operatorname{char}K\neq 2,3$ the discriminant is nonzero, so a Weierstra\ss\ datum exists. (Open: existence for $\operatorname{char}K=2,3$; general homogeneity of the degree-one primes via translations, which is needed to make $j,\gamma$ independent of the prime; see the roadmap in \texttt{PLAN.md}.)
 \end{theorem}
 \begin{proof}
 \leanok
-See the Lean proof of \texttt{exists\_poleOrd\_two, exists\_poleOrd\_three, exists\_weierstrass\_relation, exists\_normalForm, wDisc\_ne\_zero}.
+See the Lean proof of \texttt{exists\_poleOrd\_two, exists\_poleOrd\_three, exists\_weierstrass\_relation, exists\_normalForm, wDisc\_ne\_zero, isAlgebraic\_adjoin\_of\_transcendental, adjoin\_xy\_eq\_top, exists\_weierstrassData, nonempty\_weierstrassData}.
 \end{proof}
 
 \section{Appendix \S A2: arbitrary elliptic fields}

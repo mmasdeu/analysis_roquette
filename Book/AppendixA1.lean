@@ -17,8 +17,10 @@ which suffices for these notes.
 
 _Scope of this chapter._ The companion contains the definitions of the invariants, their
 independence of the choices made, Lemma A, and the theorem that $`F\,|\,K` is determined up to
-$`K`-isomorphism by $`j` and $`\gamma`. Not reproduced are the existence of a field with given
-invariants, Remarks 1–3 and §A2 (arbitrary elliptic fields), which are not formalized.
+$`K`-isomorphism by $`j` and $`\gamma`. The existence of Weierstraß data is proved for
+$`\operatorname{char}(K) \ne 2, 3` (below); the cases $`\operatorname{char}(K) = 2, 3`, the general
+homogeneity of the degree-one primes, Remarks 1–3 and §A2 (arbitrary elliptic fields) are not yet
+formalized (statements only, with `sorry`).
 
 ## Weierstraß equations
 
@@ -98,6 +100,32 @@ substitutes of the Weierstraß normal form.
 -/
 
 #stmt IsNormalFormA32
+
+/-!
+
+## Existence of Weierstraß equations
+
+Let $`F\,|\,K` be elliptic with a prime $`\mathfrak{p}` of degree $`1`. By Riemann–Roch,
+$`L(2\mathfrak{p})` and $`L(3\mathfrak{p})` contain elements $`x, y` with pole divisors
+$`2\mathfrak{p}`, $`3\mathfrak{p}`; the seven functions $`1, x, y, x^2, xy, x^3, y^2` lie in
+$`L(6\mathfrak{p})`, which has dimension $`6`, whence a relation. Scaling gives a normal form
+(A1.26), and $`F = K(x, y)`: the field $`K(x,y)` has $`[F:K(x)] = 2` and contains elements of
+pole orders $`2` and $`3` at $`\mathfrak{p}`. For $`\operatorname{char}(K) \ne 2, 3` the
+discriminant is non-zero, since a double root would produce a non-constant function in
+$`L(\mathfrak{p})`.
+
+> Book, §A1: existence of $`x, y` with pole divisors $`2\mathfrak p`, $`3\mathfrak p` satisfying a Weierstraß relation.
+-/
+
+#stmt exists_weierstrass_relation
+
+#stmt exists_normalForm
+
+#stmt wDisc_ne_zero
+
+#stmt adjoin_xy_eq_top
+
+#stmt nonempty_weierstrassData
 
 /-!
 
