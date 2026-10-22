@@ -229,7 +229,7 @@ theorem translation_mem_fkq (ζ : CocycleModQ K L q)
   have hfix := (mem_semiFixed_iff q ζ f).mp ((hζ f).mp hf) σ
   apply Subtype.ext
   have hσr : Units.map (σ : L →* L) rL = rL := Units.ext (by
-    simp only [Units.coe_map, MonoidHom.coe_coe, rL, Units.val_mk0]; exact σ.commutes r)
+    simp only [Units.coe_map, MonoidHom.coe_ofClass, rL, Units.val_mk0]; exact σ.commutes r)
   show translation L (ζ.1 σ) (meroGal σ (translation L rL (f : MeroRing L))) =
     translation L rL (f : MeroRing L)
   rw [meroGal_translation, hσr, translation_comm]
@@ -415,6 +415,130 @@ theorem fkqLift_bijective (ζ : CocycleModQ K L q)
       obtain ⟨a, rfl⟩ := hy
       exact ⟨c • a, map_smul _ _ _⟩
   exact ⟨hinj, hsurj⟩
+
+include hq0 hq1 in
+/-- Every automorphism of `F` over `E = F ∩ F_L(q̄|Xᵐ)` is a translation `τ_u` with `u ∈ K`,
+`u^m ∈ q̄^ℤ` (its extension to `FL = F_L(q)` fixes `EL = F_L(q̄|Xᵐ)`, Theorem XVII over `L`, and
+commutes with the Galois action). -/
+theorem aut_eq_translation (ζ : CocycleModQ K L q)
+    (hζ : ∀ f : FqSub L (algebraMap K L q), f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ)
+    (E : Subfield (FKQ K L q T)) (h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E)
+    {qbar : K} (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) {m d : ℕ} (hm : 0 < m) (hd : 0 < d)
+    (hqd : qbar ^ d = q ^ m)
+    (hEq : (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype =
+      FqbarXm L (algebraMap K L qbar) m)
+    (φ : FKQ K L q T ≃ₐ[E] FKQ K L q T) :
+    ∃ u : Kˣ, u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m ∧ ∀ x : FKQ K L q T,
+      (((φ x : FKQ K L q T) : FqSub L (algebraMap K L q)) : MeroRing L) =
+        translation L (Units.map (algebraMap K L : K →* L) u)
+          (((x : FqSub L (algebraMap K L q))) : MeroRing L) := by
+  classical
+  letI := subfieldAlgebra K E h
+  haveI : IsScalarTower K E (FKQ K L q T) := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  set F' := FqSub L (algebraMap K L q) with hF'
+  let φK : FKQ K L q T ≃ₐ[K] FKQ K L q T := φ.restrictScalars K
+  let Ψ : L ⊗[K] FKQ K L q T ≃ₐ[L] F' :=
+    AlgEquiv.ofBijective (fkqLift q T) (fkqLift_bijective q hq0 T ζ hζ)
+  let Φ : F' ≃ₐ[L] F' :=
+    Ψ.symm.trans ((Algebra.TensorProduct.congr (AlgEquiv.refl : L ≃ₐ[L] L) φK).trans Ψ)
+  have hΨ : ∀ (l : L) (f : FKQ K L q T), Ψ (l ⊗ₜ f) = algebraMap L F' l * (f : F') :=
+    fkqLift_tmul q T
+  have hΦt : ∀ t : L ⊗[K] FKQ K L q T, Φ (Ψ t) =
+      Ψ (Algebra.TensorProduct.congr (AlgEquiv.refl : L ≃ₐ[L] L) φK t) := by
+    intro t
+    show Ψ ((Algebra.TensorProduct.congr (AlgEquiv.refl : L ≃ₐ[L] L) φK) (Ψ.symm (Ψ t))) = _
+    rw [AlgEquiv.symm_apply_apply]
+  have hΦ : ∀ f : FKQ K L q T, Φ (f : F') = ((φ f : FKQ K L q T) : F') := by
+    intro f
+    have h1 : (f : F') = Ψ (1 ⊗ₜ f) := by rw [hΨ, map_one, one_mul]
+    rw [h1, hΦt, Algebra.TensorProduct.congr_apply, Algebra.TensorProduct.map_tmul, hΨ]
+    simp [φK]
+  have hΦL : ∀ l : L, Φ (algebraMap L F' l) = algebraMap L F' l := fun l => Φ.commutes l
+  -- `Φ` fixes `EL`
+  have hfixEL : ∀ x ∈ elSub (L := L) (xiIota q T E), Φ x = x := by
+    have hle : elSub (L := L) (xiIota q T E) ≤ RingHom.eqLocusField Φ.toRingEquiv.toRingHom
+        (RingHom.id F') := by
+      unfold elSub
+      rw [Subfield.closure_le]
+      rintro _ (⟨e, rfl⟩ | ⟨l, rfl⟩)
+      · show Φ (xiIota q T E e) = xiIota q T E e
+        show Φ ((e : FKQ K L q T) : F') = ((e : FKQ K L q T) : F')
+        rw [hΦ]
+        have := φ.commutes e
+        exact congrArg Subtype.val this
+      · show Φ (algebraMap L F' l) = algebraMap L F' l
+        exact hΦL l
+    intro x hx
+    exact hle hx
+  have hΦfix : Φ.toRingEquiv ∈ autFixing (FqbarXm L (algebraMap K L qbar) m) F' := by
+    intro x hx
+    rw [← hEq] at hx
+    obtain ⟨y, hy, hyx⟩ := hx
+    have : y = x := Subtype.ext hyx
+    subst this
+    exact hfixEL y hy
+  have hqbL0 : 0 < ‖algebraMap K L qbar‖ := by rw [norm_algebraMap']; exact hqb0
+  have hqbL1 : ‖algebraMap K L qbar‖ < 1 := by rw [norm_algebraMap']; exact hqb1
+  obtain ⟨u, hu, hux⟩ := ((thmXVII_automorphisms L (algebraMap K L q) (algebraMap K L qbar)
+    (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1) hqbL0 hqbL1 m d hm hd
+    (by rw [← map_pow, ← map_pow, hqd])).1 Φ.toRingEquiv).mp hΦfix
+  have hux' : ∀ x : F', ((Φ x : F') : MeroRing L) = translation L u (x : MeroRing L) := hux
+  -- `Φ` commutes with the twisted Galois action
+  have hcomm : ∀ (σ : L ≃ₐ[K] L) (x : F'), Φ (rhoZ q ζ σ x) = rhoZ q ζ σ (Φ x) := by
+    intro σ x
+    obtain ⟨t, rfl⟩ := Ψ.surjective x
+    induction t using TensorProduct.induction_on with
+    | zero => simp
+    | tmul l f =>
+      have hconst : ∀ l : L, rhoZ q ζ σ (algebraMap L F' l) = algebraMap L F' (σ l) :=
+        fun l => rhoZ_const q ζ σ l
+      have h1 : rhoZ q ζ σ (f : F') = f := (mem_semiFixed_iff q ζ _).mp ((hζ _).mp f.2) σ
+      have h2 : rhoZ q ζ σ ((φ f : FKQ K L q T) : F') = (φ f : FKQ K L q T) :=
+        (mem_semiFixed_iff q ζ _).mp ((hζ _).mp (φ f).2) σ
+      rw [hΨ, map_mul, map_mul, map_mul, map_mul, hconst, hΦL, hΦL, hconst, h1, hΦ, h2]
+    | add a b ha hb => simp only [map_add]; rw [ha, hb]
+  -- `u` is Galois invariant
+  have hufix : ∀ σ : L ≃ₐ[K] L, σ (u : L) = u := by
+    intro σ
+    have hall : ∀ y : F', translation L (u * (Units.map (σ : L →* L) u)⁻¹) (y : MeroRing L) =
+        (y : MeroRing L) := by
+      intro y
+      obtain ⟨x, rfl⟩ := (galFq q σ).surjective y
+      have h1 := congrArg (fun z : F' => (z : MeroRing L)) (hcomm σ x)
+      rw [hux', rhoZ_coe, rhoZ_coe, hux', meroGal_translation] at h1
+      rw [translation_comm] at h1
+      have h2 := (translation L (ζ.1 σ)).injective h1
+      show translation L (u * (Units.map (σ : L →* L) u)⁻¹) (meroGal σ (x : MeroRing L)) = _
+      rw [translation_mul, translation_comm, h2, ← translation_mul, inv_mul_cancel, translation_one]
+      rfl
+    obtain ⟨k, hk⟩ := translation_trivial (q := algebraMap K L q) (norm_alg_pos (L := L) q hq0)
+      (norm_alg_lt (L := L) q hq1) _ (fun f => hall ⟨f.1, f.2⟩)
+    have hn := congrArg norm hk
+    simp only [Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_ofClass,
+      norm_mul, norm_inv, gal_norm, norm_zpow] at hn
+    have hu0 : ‖(u : L)‖ ≠ 0 := norm_ne_zero_iff.mpr u.ne_zero
+    rw [mul_inv_cancel₀ hu0] at hn
+    have hk0 : k = 0 := by
+      have := (zpow_right_injective₀ (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1).ne)
+        (show ‖algebraMap K L q‖ ^ k = ‖algebraMap K L q‖ ^ (0 : ℤ) by rw [zpow_zero]; exact hn.symm)
+      exact this
+    rw [hk0, zpow_zero] at hk
+    have := congrArg (· * (σ (u : L))) hk
+    simp only [Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_ofClass,
+      one_mul] at this
+    rw [mul_assoc, inv_mul_cancel₀ ((map_ne_zero σ).mpr u.ne_zero), mul_one] at this
+    exact this.symm
+  obtain ⟨uK, huK⟩ := (IsGalois.mem_range_algebraMap_iff_fixed (F := K) (u : L)).mpr hufix
+  have huK0 : uK ≠ 0 := by
+    rintro rfl; rw [map_zero] at huK; exact u.ne_zero huK.symm
+  refine ⟨Units.mk0 uK huK0, ?_, fun x => ?_⟩
+  · obtain ⟨k, hk⟩ := hu
+    refine ⟨k, (algebraMap K L).injective ?_⟩
+    rw [Units.val_mk0, map_pow, map_zpow₀, huK]
+    exact hk
+  · have hU : Units.map (algebraMap K L : K →* L) (Units.mk0 uK huK0) = u :=
+      Units.ext (by simp [huK])
+    rw [hU, ← hux', ← hΦ]
 
 end autXIX
 
