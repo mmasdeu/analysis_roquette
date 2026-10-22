@@ -123,3 +123,4 @@ import AnalyticTheory.Sec4Torsor
 import AnalyticTheory.XIXPeriod
 import AnalyticTheory.XIXDescent
 import AnalyticTheory.XIX
+import AnalyticTheory.XIXCor

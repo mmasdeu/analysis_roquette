@@ -393,7 +393,82 @@ theorem corXIXb_maximal_split (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T
           (orderOf (QuotientGroup.mk (Units.mk0 qbar (norm_pos_iff.mp hqb0)) :
             Kˣ ⧸ Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0)))) ∧
         q ^ m₀ = qbar ^ d₀ ∧ subDeg E₀ = d₀ * m₀ := by
-  sorry
+  classical
+  obtain ⟨ζ, hζ, hχ, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  set n := Module.finrank K L with hn
+  have hnpos : 0 < n := Module.finrank_pos
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0
+  set qU := Units.mk0 q hq0' with hqU
+  set qbU := Units.mk0 qbar hqb0' with hqbU
+  set c : Kˣ ⧸ Subgroup.zpowers qU := QuotientGroup.mk qbU with hc
+  -- `c` has finite order `r`
+  have hcpow : ∀ (d : ℕ) (m : ℕ), qbar ^ d = q ^ m → c ^ d = 1 := by
+    intro d m h
+    rw [hc, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]
+    refine ⟨m, Units.ext ?_⟩
+    simp [hqU, hqbU, h]
+  obtain ⟨dc, mc, hdc, hmc, hdmc⟩ := hcomm
+  have hfin : IsOfFinOrder c := by
+    refine (isOfFinOrder_iff_zpow_eq_one (x := c)).mpr ⟨dc, hdc, ?_⟩
+    rw [hc, ← QuotientGroup.mk_zpow, QuotientGroup.eq_one_iff]
+    exact ⟨mc, Units.ext (by simp [hqU, hqbU, hdmc])⟩
+  set r := orderOf c with hr
+  have hrpos : 0 < r := hfin.orderOf_pos
+  set d0 := Nat.lcm n r with hd0
+  have hd0pos : 0 < d0 := Nat.lcm_pos hnpos hrpos
+  -- `q̄^{d₀} = q^{m₀}`
+  have hcd0 : c ^ d0 = 1 := orderOf_dvd_iff_pow_eq_one.mp (Nat.dvd_lcm_right n r)
+  obtain ⟨k, hk⟩ : ∃ k : ℤ, qU ^ k = qbU ^ d0 := by
+    rw [hc, ← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at hcd0
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp hcd0
+    exact ⟨k, hk⟩
+  have hkpos : 0 < k := by
+    by_contra hle
+    push_neg at hle
+    have h1 := congrArg (fun u : Kˣ => ‖(u : K)‖) hk
+    simp only [Units.val_zpow_eq_zpow_val, Units.val_pow_eq_pow_val, hqU, hqbU, Units.val_mk0,
+      norm_zpow, norm_pow] at h1
+    have h2 : 1 ≤ ‖q‖ ^ k := one_le_zpow_of_nonpos₀ hq0 hq1.le hle
+    have h3 : ‖qbar‖ ^ d0 < 1 := pow_lt_one₀ (norm_nonneg _) hqb1 hd0pos.ne'
+    linarith
+  obtain ⟨m0, rfl⟩ := Int.eq_ofNat_of_zero_le hkpos.le
+  have hm0pos : 0 < m0 := by exact_mod_cast hkpos
+  have hqd0 : qbar ^ d0 = q ^ m0 := by
+    have := congrArg (fun u : Kˣ => (u : K)) hk
+    simp only [Units.val_zpow_eq_zpow_val, Units.val_pow_eq_pow_val, hqU, hqbU, Units.val_mk0,
+      zpow_natCast] at this
+    exact this.symm
+  have hsplit0 := Em_split_iff q hq0 hq1 T ζ hζ hχ hqb0 hqb1 hm0pos hqd0
+  obtain ⟨e0⟩ := hsplit0.2 (Nat.dvd_lcm_left n r)
+  refine ⟨Em q T qbar m0, ⟨⟨⟨const_mem_Em q T qbar hm0pos,
+    (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 hm0pos hqd0).1⟩, ⟨const_mem_Em q T qbar hm0pos, ⟨e0⟩⟩,
+    ⟨const_mem_Em q T qbar hm0pos, hsplit0.1.mpr (Nat.dvd_lcm_left n r)⟩⟩, ?_⟩,
+    d0, m0, rfl, hqd0.symm, Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 hm0pos hd0pos hqd0⟩
+  -- maximality
+  rintro E ⟨hE, ⟨h, ⟨eE⟩⟩, hP⟩
+  letI := subfieldAlgebra K E h
+  have ht : IsFqTorsor (L := L) qbar E := torsor_of_equiv_fq E hqb0 eE
+  obtain ⟨m, d, hm, hd, hdq, hEm, -, -⟩ := eq_Em_of_torsor q hq0 hq1 T E hE hqb0 hqb1 ht
+  have hndvd : n ∣ d := by
+    subst hEm
+    obtain ⟨h', hP⟩ := hP
+    exact ((Em_split_iff q hq0 hq1 T ζ hζ hχ hqb0 hqb1 hm hdq).1).mp hP
+  have hrdvd : r ∣ d := orderOf_dvd_of_pow_eq_one (hcpow d m hdq)
+  obtain ⟨s, hs⟩ : d0 ∣ d := Nat.lcm_dvd hndvd hrdvd
+  have hcross := cross_mul_eq K hqb0 hqb1 hqd0 hdq
+  have hms : m = m0 * s := by
+    rw [hs] at hcross
+    have : d0 * m = d0 * (m0 * s) := by rw [hcross]; ring
+    exact Nat.eq_of_mul_eq_mul_left hd0pos this
+  have hspos : 0 < s := by
+    rcases Nat.eq_zero_or_pos s with h0 | h0
+    · rw [h0, mul_zero] at hms; omega
+    · exact h0
+  rw [hEm, hms]
+  intro x hx
+  rw [mem_Em] at hx ⊢
+  exact FqbarXm_mul_le ((map_ne_zero_iff _ (algebraMap K L).injective).mpr hqb0') hm0pos hspos hx
 
 /-- Book, §6, Corollary XIXc: there is a unique maximal subfield `F₀ ⊂ F` which is `K`-isomorphic
 to the Jacobian `F_K(q)`, with `[F : F₀] = n²`. -/
@@ -404,7 +479,20 @@ theorem corXIXc_maximal_jacobian (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
         ∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
           letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E} F₀ ∧
       subDeg F₀ = Module.finrank K L ^ 2 := by
-  sorry
+  obtain ⟨F₀, hF₀, d0, m0, hd0, hqm, hdeg⟩ := corXIXb_maximal_split K L q hq0 hq1 T q hq0 hq1
+    ⟨1, 1, one_ne_zero, one_ne_zero, rfl⟩
+  refine ⟨F₀, hF₀, ?_⟩
+  have hord : orderOf (QuotientGroup.mk (Units.mk0 q (norm_pos_iff.mp hq0)) :
+      Kˣ ⧸ Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))) = 1 := by
+    rw [orderOf_eq_one_iff, QuotientGroup.eq_one_iff]
+    exact Subgroup.mem_zpowers _
+  rw [hord, Nat.lcm_one_right] at hd0
+  subst hd0
+  have hm0 : m0 = Module.finrank K L := by
+    have := congrArg norm hqm
+    rw [norm_pow, norm_pow] at this
+    exact pow_right_injective₀ hq0 hq1.ne this
+  rw [hdeg, hm0, sq]
 
 /-- Book, §6, Corollary XIXd: the degree of `F` over any elliptic subfield that splits over `K` is
 divisible by `n = [L:K]`; subfields of degree `n` exist iff `q` is an `n`-th power in `K`; they are in
