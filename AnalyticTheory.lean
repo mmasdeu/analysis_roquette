@@ -114,4 +114,5 @@ import AnalyticTheory.Specialization
 import AnalyticTheory.Sec5Eval
 import AnalyticTheory.A1Exist
 import AnalyticTheory.A1Gen
+import AnalyticTheory.A1Homog
 import AnalyticTheory.Sec4B3
