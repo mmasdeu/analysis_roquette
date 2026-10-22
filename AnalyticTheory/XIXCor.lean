@@ -345,6 +345,21 @@ variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 variable (L : Type u) [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
   [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 
+/-- A split elliptic subfield of `F` is some `E_m` with `n ∣ d`. -/
+theorem split_subfield_data (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+    (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K E)
+    (hP : ∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
+      letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) :
+    ∃ (qK : K) (m d : ℕ), 0 < ‖qK‖ ∧ ‖qK‖ < 1 ∧ 0 < m ∧ 0 < d ∧ qK ^ d = q ^ m ∧
+      Module.finrank K L ∣ d ∧ E = Em q T qK m := by
+  obtain ⟨qK, hqK0, hqK1, -, h', ht⟩ := thmXIX_period K L q hq0 hq1 T E hE
+  obtain ⟨m, d, hm, hd, hdq, hEm, -, -⟩ := eq_Em_of_torsor q hq0 hq1 T E hE hqK0 hqK1 ht
+  obtain ⟨ζ, hζ, hχ, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  refine ⟨qK, m, d, hqK0, hqK1, hm, hd, hdq, ?_, hEm⟩
+  subst hEm
+  obtain ⟨h, hP⟩ := hP
+  exact ((Em_split_iff q hq0 hq1 T ζ hζ hχ hqK0 hqK1 hm hdq).1).mp hP
+
 /-- Book, §6, Corollary XIXa: for an elliptic subfield `E ⊂ F` of period `q̄` belonging to `m`:
 (i) the degree of inseparability of `F | E` is `p^r`, the largest `p`-power dividing `m`; (ii) the
 automorphism group of `F | E` is `U/q`, `U = {u ∈ K^× | u^m ≡ 1 mod^× q̄}`; (iii) `F | E` is Galois
@@ -406,7 +421,70 @@ theorem corXIXd_degree_n (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : Se
           subDeg E = Module.finrank K L},
       (∀ r, HasPeriod K (e r).1 r.1) ∧
       (∀ r, IsGalois (e r).1 (FKQ K L q T) ∧ IsCyclic (FKQ K L q T ≃ₐ[(e r).1] FKQ K L q T)) := by
-  sorry
+  classical
+  obtain ⟨ζ, hζ, hχ, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  set n := Module.finrank K L with hn
+  have hnpos : 0 < n := Module.finrank_pos
+  have hroot : ∀ r : K, r ^ n = q → 0 < ‖r‖ ∧ ‖r‖ < 1 := by
+    intro r hr
+    have h1 : ‖r‖ ^ n = ‖q‖ := by rw [← norm_pow, hr]
+    constructor
+    · by_contra h
+      push_neg at h
+      have h0 : ‖r‖ = 0 := le_antisymm h (norm_nonneg _)
+      rw [h0, zero_pow hnpos.ne'] at h1
+      linarith
+    · by_contra h
+      push_neg at h
+      have := one_le_pow₀ (n := n) h
+      linarith
+  refine ⟨fun E hE hP => ?_, ?_⟩
+  · obtain ⟨qK, m, d, hqK0, hqK1, hm, hd, hdq, hdvd, rfl⟩ := split_subfield_data K L q hq0 hq1 T E hE hP
+    rw [Em_subDeg q hq0 hq1 T ζ hζ hqK0 hqK1 hm hd hdq]
+    exact Dvd.dvd.mul_right hdvd m
+  have hrd : ∀ r : {r : K // r ^ n = q}, r.1 ^ n = q ^ 1 := fun r => by rw [r.2, pow_one]
+  let f : {r : K // r ^ n = q} → {E : Subfield (FKQ K L q T) // IsEllipticSubfield K E ∧
+      (∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
+        letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) ∧ subDeg E = n} := fun r =>
+    ⟨Em q T r.1 1, ⟨const_mem_Em q T r.1 one_pos,
+      (Em_props q hq0 hq1 T ζ hζ (hroot r r.2).1 (hroot r r.2).2 one_pos (hrd r)).1⟩,
+      ⟨const_mem_Em q T r.1 one_pos,
+        ((Em_split_iff q hq0 hq1 T ζ hζ hχ (hroot r r.2).1 (hroot r r.2).2 one_pos (hrd r)).1).mpr
+          dvd_rfl⟩,
+      by rw [Em_subDeg q hq0 hq1 T ζ hζ (hroot r r.2).1 (hroot r r.2).2 one_pos hnpos (hrd r),
+        mul_one]⟩
+  have hinj : Function.Injective f := by
+    intro r r' hrr
+    have h1 : Em q T r.1 1 = Em q T r'.1 1 := congrArg Subtype.val hrr
+    obtain ⟨e1⟩ := (Em_split_iff q hq0 hq1 T ζ hζ hχ (hroot r r.2).1 (hroot r r.2).2 one_pos
+      (hrd r)).2 dvd_rfl
+    obtain ⟨e2⟩ := (Em_split_iff q hq0 hq1 T ζ hζ hχ (hroot r' r'.2).1 (hroot r' r'.2).2 one_pos
+      (hrd r')).2 dvd_rfl
+    letI := subfieldAlgebra K (Em q T r.1 1) (const_mem_Em q T r.1 one_pos)
+    letI := subfieldAlgebra K (Em q T r'.1 1) (const_mem_Em q T r'.1 one_pos)
+    let c : Em q T r.1 1 ≃ₐ[K] Em q T r'.1 1 :=
+      AlgEquiv.ofRingEquiv (f := RingEquiv.subfieldCongr h1) (fun _ => rfl)
+    exact Subtype.ext (thmVIIIa_period_unique (hroot r r.2).1 (hroot r r.2).2 (hroot r' r'.2).1
+      (hroot r' r'.2).2 (e1.symm.trans (c.trans e2)))
+  have hsurj : Function.Surjective f := by
+    rintro ⟨E, hE, hP, hdeg⟩
+    obtain ⟨qK, m, d, hqK0, hqK1, hm, hd, hdq, hdvd, rfl⟩ := split_subfield_data K L q hq0 hq1 T E hE hP
+    rw [Em_subDeg q hq0 hq1 T ζ hζ hqK0 hqK1 hm hd hdq] at hdeg
+    have hdn : d = n := by
+      have h1 : n ≤ d := Nat.le_of_dvd hd hdvd
+      have h2 : d ≤ d * m := Nat.le_mul_of_pos_right d hm
+      omega
+    have hm1 : m = 1 := by
+      rw [hdn] at hdeg
+      have : n * m = n * 1 := by rw [mul_one]; exact hdeg
+      exact Nat.eq_of_mul_eq_mul_left hnpos this
+    subst hm1
+    refine ⟨⟨qK, by rw [← hdn, hdq, pow_one]⟩, ?_⟩
+    rfl
+  refine ⟨Equiv.ofBijective f ⟨hinj, hsurj⟩, fun r => ?_, fun r => ?_⟩
+  · exact ⟨const_mem_Em q T r.1 one_pos,
+      (Em_split_iff q hq0 hq1 T ζ hζ hχ (hroot r r.2).1 (hroot r r.2).2 one_pos (hrd r)).2 dvd_rfl⟩
+  · exact Em_one_galois_cyclic q hq0 hq1 T ζ hζ (hroot r r.2).1 (hroot r r.2).2 r.2
 
 end cors
 
