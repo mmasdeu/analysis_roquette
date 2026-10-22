@@ -540,6 +540,139 @@ theorem aut_eq_translation (ζ : CocycleModQ K L q)
       Units.ext (by simp [huK])
     rw [hU, ← hux', ← hΦ]
 
+include hq0 hq1 in
+/-- Book, §6, Corollary XIXa (ii) for `E = E_m`: `Aut(F | E) ≅ U/q`. -/
+theorem aut_Em_equiv {qbar : K} (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) {m d : ℕ} (hm : 0 < m)
+    (hd : 0 < d) (hqd : qbar ^ d = q ^ m) :
+    Nonempty ((FKQ K L q T ≃ₐ[Em q T qbar m] FKQ K L q T) ≃*
+      (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸
+        (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
+          (Usub K qbar (norm_pos_iff.mp hqb0) m))) := by
+  classical
+  obtain ⟨ζ, hζ, -, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0
+  have hmz : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'
+  set U := Usub K qbar hqb0' m
+  set F' := FqSub L (algebraMap K L q)
+  let uL : Kˣ → Lˣ := fun u => Units.map (algebraMap K L : K →* L) u
+  have hmem : ∀ (u : Kˣ) (f : F'), f ∈ FKQ K L q T → translationFq (algebraMap K L q) (uL u) f ∈ FKQ K L q T := by
+    intro u f hf
+    have := translation_mem_fkq q T ζ hζ u.ne_zero hf
+    have hU : uL u = Units.mk0 (algebraMap K L (u : K))
+        ((map_ne_zero_iff _ (algebraMap K L).injective).mpr u.ne_zero) := Units.ext rfl
+    rw [hU]; exact this
+  -- `τ_u` fixes `E_m` for `u ∈ U`
+  have hfixE : ∀ u : U, ∀ x : FKQ K L q T, x ∈ Em q T qbar m →
+      translationFq (algebraMap K L q) (uL u) (x : F') = x := by
+    rintro ⟨u, k, hk⟩ x hx
+    obtain ⟨g, hg, hge⟩ := (mem_Em q T x).mp hx
+    apply Subtype.ext
+    show translation L (uL u) _ = _
+    rw [← hge, ← substPow_translation hmz]
+    congr 1
+    have hqbL : algebraMap K L qbar ≠ 0 := (map_ne_zero_iff _ (algebraMap K L).injective).mpr hqb0'
+    have hU : (uL u) ^ (m : ℤ) = Units.mk0 (algebraMap K L qbar) hqbL ^ k := by
+      apply Units.ext
+      simp only [uL, zpow_natCast, Units.val_pow_eq_pow_val, Units.coe_map, MonoidHom.coe_ofClass,
+        Units.val_zpow_eq_zpow_val, Units.val_mk0]
+      rw [← map_pow, hk, map_zpow₀]
+    rw [hU]
+    exact translation_zpow_of_periodic rfl hg k
+  -- the ring automorphism `τ_u` of `F`
+  let tr : Kˣ → FKQ K L q T ≃+* FKQ K L q T := fun u =>
+    { toFun := fun x => ⟨translationFq (algebraMap K L q) (uL u) x, hmem u x x.2⟩
+      invFun := fun x => ⟨translationFq (algebraMap K L q) (uL u⁻¹) x, hmem u⁻¹ x x.2⟩
+      left_inv := fun x => by
+        apply Subtype.ext; apply Subtype.ext
+        show translation L (uL u⁻¹) (translation L (uL u) _) = _
+        rw [← translation_mul, show uL u⁻¹ * uL u = 1 by simp [uL], translation_one]
+      right_inv := fun x => by
+        apply Subtype.ext; apply Subtype.ext
+        show translation L (uL u) (translation L (uL u⁻¹) _) = _
+        rw [← translation_mul, show uL u * uL u⁻¹ = 1 by simp [uL], translation_one]
+      map_mul' := fun x y => Subtype.ext (map_mul _ _ _)
+      map_add' := fun x y => Subtype.ext (map_add _ _ _) }
+  have htr : ∀ u x, ((((tr u x : FKQ K L q T)) : F') : MeroRing L) =
+      translation L (uL u) (((x : F')) : MeroRing L) := fun _ _ => rfl
+  let θ : U →* (FKQ K L q T ≃ₐ[Em q T qbar m] FKQ K L q T) :=
+    { toFun := fun u => AlgEquiv.ofRingEquiv (f := tr u) (fun e => by
+        apply Subtype.ext
+        exact hfixE u e e.2)
+      map_one' := by
+        apply AlgEquiv.ext; intro x
+        apply Subtype.ext; apply Subtype.ext
+        show translation L (uL 1) _ = _
+        rw [show uL 1 = 1 by simp [uL], translation_one]; rfl
+      map_mul' := fun u v => by
+        apply AlgEquiv.ext; intro x
+        apply Subtype.ext; apply Subtype.ext
+        show translation L (uL (u * v)) _ = translation L (uL u) (translation L (uL v) _)
+        rw [← translation_mul]
+        simp [uL] }
+  have hθ : ∀ u x, (((θ u x : FKQ K L q T) : F') : MeroRing L) =
+      translation L (uL u) (((x : F')) : MeroRing L) := fun _ _ => rfl
+  -- surjectivity: `aut_eq_translation`
+  have hEm : IsEllipticSubfield K (Em q T qbar m) :=
+    ⟨const_mem_Em q T qbar hm, (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 hm hqd).1⟩
+  obtain ⟨m1, d1, hm1, hd1, hdq1, hEm1, hEq1, -⟩ := eq_Em_of_torsor q hq0 hq1 T _ hEm hqb0 hqb1
+    (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 hm hqd).2.1
+  have hmm1 : m1 = m := by
+    have h2 := Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 hm hd hqd
+    have h3 := Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 hm1 hd1 hdq1
+    rw [← hEm1] at h3
+    have h4 := cross_mul_eq K hqb0 hqb1 hqd hdq1
+    have h5 : d * m = d1 * m1 := h2.symm.trans h3
+    have h6 : d * (m * m) = d * (m1 * m1) := by
+      calc d * (m * m) = (d * m) * m := by ring
+        _ = (d1 * m1) * m := by rw [h5]
+        _ = (d1 * m) * m1 := by ring
+        _ = (d * m1) * m1 := by rw [h4]
+        _ = d * (m1 * m1) := by ring
+    exact (Nat.mul_self_inj.mp (Nat.eq_of_mul_eq_mul_left hd h6)).symm
+  subst hmm1
+  have hsurj : Function.Surjective θ := by
+    intro φ
+    obtain ⟨u, hu, hux⟩ := aut_eq_translation q hq0 hq1 T ζ hζ (Em q T qbar m1)
+      (const_mem_Em q T qbar hm1) hqb0 hqb1 hm1 hd1 hdq1 hEq1 φ
+    refine ⟨⟨u, hu⟩, ?_⟩
+    apply AlgEquiv.ext; intro x
+    apply Subtype.ext; apply Subtype.ext
+    rw [hθ]; exact (hux x).symm
+  -- the kernel
+  have hker : θ.ker = (Subgroup.zpowers (Units.mk0 q hq0')).subgroupOf U := by
+    ext ⟨u, hu⟩
+    rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf]
+    constructor
+    · intro h1
+      have htriv : ∀ f : F', f ∈ FKQ K L q T → translationFq (algebraMap K L q) (uL u) f = f := by
+        intro f hf
+        have := congrArg (fun ψ : FKQ K L q T ≃ₐ[Em q T qbar m1] FKQ K L q T => ψ ⟨f, hf⟩) h1
+        exact congrArg Subtype.val this
+      have hall := translation_trivial_of_fkq q hq0 T ζ hζ (uL u) htriv
+      obtain ⟨k, hk⟩ := translation_trivial (q := algebraMap K L q) (norm_alg_pos (L := L) q hq0)
+        (norm_alg_lt (L := L) q hq1) (uL u) (fun f => congrArg Subtype.val (hall ⟨f.1, f.2⟩))
+      refine ⟨k, Units.ext ((algebraMap K L).injective ?_)⟩
+      simp only [Units.val_zpow_eq_zpow_val, Units.val_mk0, map_zpow₀]
+      exact hk.symm
+    · rintro ⟨k, hk⟩
+      apply AlgEquiv.ext; intro x
+      apply Subtype.ext; apply Subtype.ext
+      show translation L (uL u) _ = _
+      have hqL : algebraMap K L q ≠ 0 := (map_ne_zero_iff _ (algebraMap K L).injective).mpr hq0'
+      have : uL u = Units.mk0 (algebraMap K L q) hqL ^ k := by
+        apply Units.ext
+        have hk' : ((u : Kˣ) : K) = q ^ k := by
+          have := congrArg (fun v : Kˣ => (v : K)) hk
+          simpa using this.symm
+        simp only [uL, Units.coe_map, MonoidHom.coe_ofClass, Units.val_zpow_eq_zpow_val,
+          Units.val_mk0]
+        rw [hk', map_zpow₀]
+      rw [this]
+      exact translation_zpow_of_periodic rfl (x : F').2 k
+  exact ⟨((QuotientGroup.quotientMulEquivOfEq hker).symm.trans
+    (QuotientGroup.quotientKerEquivOfSurjective θ hsurj)).symm⟩
+
 end autXIX
 
 section cors
