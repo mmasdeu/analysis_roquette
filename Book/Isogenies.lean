@@ -19,7 +19,8 @@ Theorem XVIII (every elliptic subfield is of this form) and Corollary XVIIIa. Th
 the general algebraic theory of elliptic function fields over $`\Omega` is replaced by a
 formalized theory of finite extensions of function fields and of constant field extensions
 inside $`F_L(q)` (see the section on Theorem XVIII). Corollary XVIIIb (no complex
-multiplication) is also proved; the results on semi-periodic fields are not reproduced.
+multiplication) is also proved, and so are Theorem XIX and its corollaries on the elliptic
+subfields of the fields of semi-periodic functions.
 
 The Lean code on this page refers to the following context.
 -/
@@ -642,3 +643,114 @@ $`\mathbf M_K(q)` is $`\mathbb Z`, and the same holds after every finite constan
 -/
 
 #stmt corXVIIIb_no_cm
+
+/-!
+## Elliptic subfields of the fields of semi-periodic functions
+
+Let $`F = F_K(\mathbf Q)` be a field of semi-periodic functions: the field of fixed elements of
+$`\tau_Q\sigma` in $`F_L(q)`, where $`\sigma` generates $`\operatorname{Gal}(L\,|\,K)` and
+$`N_{L|K}(Q) = q`. An elliptic subfield $`E\subset F` _admits the period_ $`\bar q` if its Jacobian
+function field is $`F_K(\bar q)`. In the formalization this is the torsor form of the definition
+(the footnote to (52) in Appendix §A2): $`E` is $`K`-isomorphic to the field of invariants of
+$`\rho_\sigma = \tau_{a(\sigma)}\sigma` in $`F_L(\bar q)` for some cocycle $`a`, as in Theorem IX.
+-/
+
+#stmt AdmitsPeriod
+
+/-!
+For $`\bar q` commensurable with $`q` and $`m > 0` with $`\bar q^{\,d} = q^m`, the candidate
+subfield is $`E_m = F\cap F_L(\bar q\,|\,X^m)`.
+-/
+
+#stmt Em
+
+/-!
+*Theorem XIX.* _Let $`F\,|\,K` be an elliptic function field admitting the period $`q`, and let
+$`\chi` be its character invariant. (i) Every elliptic subfield $`E` of $`F` admits a period
+$`\bar q\in K`, commensurable with $`q`. (ii) Let $`\bar q\in K`, $`0<|\bar q|<1`, be commensurable
+with $`q`. The elliptic subfields $`E\subset F` with period $`\bar q` correspond $`1`–$`1` to the
+integers $`m>0` divisible by the order of $`q \bmod^\times \bar q`. If $`E` belongs to $`m`, then
+$`[F:E] = dm` with $`q^m = \bar q^{\,d}`, the character invariant of $`E` is $`\chi^d`, and $`m` is
+maximal such that $`E` lies in an elliptic subfield admitting the period $`q^m`._
+
+The proof follows the book. The constant field extension $`EL` is an elliptic subfield of
+$`F_L(q)`, so $`EL = F_L(\bar q\,|\,X^m)` by Theorem XVIII over $`L`; the period $`\bar q` lies in
+$`K` because $`EL` is stable under $`\tau_Q\sigma` (this replaces the book's argument through the
+absolute invariant), and $`\tau_Q\sigma` induces $`\tau_{Q^m}\sigma` on $`F_L(\bar q\,|\,Y)`,
+$`Y = X^m`. A trace argument gives $`EL\cap F = E`, so $`E = E_m`, and $`E_m` is $`K`-isomorphic to
+the descended field $`E_{\zeta^m}` of $`F_L(\bar q)`, whence the period, the degree and the
+character invariant.
+-/
+
+#stmt thmXIX_period
+
+#stmt thmXIX_subfields
+
+/-!
+*Corollary XIXa.* _Let $`E\subset F` be an elliptic subfield admitting the period $`\bar q` and
+belonging to $`m`. Then: (i) the degree of inseparability of $`F\,|\,E` is $`p^r`, the maximal
+$`p`-power dividing $`m`; (ii) the group of automorphisms of $`F\,|\,E` is isomorphic to $`U/q`,
+where $`U` consists of all $`u\in K^\times` with $`u^m \equiv 1 \bmod^\times \bar q`; (iii) $`F\,|\,E`
+is Galois if and only if $`m\not\equiv 0 \bmod p`, $`K` contains the $`m`-th roots of unity and
+$`\bar q` has an $`m`-th root in $`K`._
+
+Every automorphism of $`F` over $`E` extends to $`FL = F_L(q)` over $`EL`, where by Theorem XVII it
+is a translation $`\tau_u`; it commutes with $`\tau_Q\sigma`, hence $`u\in K`. The extension uses
+$`L\otimes_K F \cong F_L(q)`:
+-/
+
+#stmt fkqLift_bijective
+
+#stmt aut_eq_translation
+
+#stmt aut_Em_equiv
+
+/-!
+For (i), let $`P = p^r` and $`E' = F\cap F_L(q^P\,|\,X^P)`. By Theorem XVII (ii) over $`L`, $`F` is
+purely inseparable over $`E'` of degree $`P`, and every element of $`E'` is separable over
+$`F_L(\bar q\,|\,X^m) = EL`. Since $`EL` is generated over $`E` by the separable extension $`L`,
+these elements are separable over $`E`:
+-/
+
+#stmt isSeparable_of_le_closure
+
+#stmt Em_insepDeg
+
+/-!
+For (iii), $`F\,|\,E` is Galois iff $`|U/q| = dm`, and the count of Theorem XVII (iv) applies:
+-/
+
+#stmt card_quot_eq_iff
+
+#stmt corXIXa_galois
+
+/-!
+A subfield $`E` splits over $`K` iff its character invariant $`\chi^d` is trivial, i.e. iff
+$`n \mid d`; a split $`E` of period $`\bar q` is then $`K`-isomorphic to $`F_K(\bar q)`.
+
+*Corollary XIXb.* _Let $`\bar q\in K`, $`0<|\bar q|<1`, be commensurable with $`q`. There exists
+one and only one maximal elliptic subfield $`E_0` of $`F` which has period $`\bar q` and splits over
+$`K`. The degree $`[F:E_0]` is $`d_0m_0` where $`d_0` is the least common multiple of the order
+$`n` of $`\chi` and the order $`r` of $`\bar q \bmod^\times q`, and $`q^{m_0} = \bar q^{\,d_0}`._
+-/
+
+#stmt Em_split_iff
+
+#stmt corXIXb_maximal_split
+
+/-!
+*Corollary XIXc.* _There is one and only one maximal subfield $`F_0\subset F` which is
+$`K`-isomorphic to the Jacobian function field $`F_K(q)` of $`F`. The degree of $`F\,|\,F_0` is
+$`n^2`._
+-/
+
+#stmt corXIXc_maximal_jacobian
+
+/-!
+*Corollary XIXd.* _The degree of $`F` over any elliptic subfield which splits over $`K` is divisible
+by $`n`. There exist such subfields $`E_0` with $`[F:E_0] = n` if and only if $`q` is an $`n`-th
+power in $`K`; these fields correspond $`1`–$`1` to the $`n`-th roots of $`q` in $`K`, which are
+their periods, and $`F\,|\,E_0` is cyclic._
+-/
+
+#stmt corXIXd_degree_n

@@ -32,18 +32,20 @@ checked mechanically. Concretely, the companion contains:
   proof;
 * all of §3 (the Weierstraß function, Theorems VI, VII, VIII, VIIIa, and the product formula for
   $`\Delta`);
-* from §4: Lemma 2, the classification of the fields obtained by Galois descent, and the
-  description of the fields of semi-periodic functions as such fields;
+* from §4: Lemma 2, the classification of the fields obtained by Galois descent, Theorems IX and X,
+  and the description of the fields of semi-periodic functions as such fields;
 * all of §5: Theorems XII–XVI, Corollaries XIIIa, XIIIb, XVa, XVIa, XVIb and the table of Tate
   cohomology groups;
-* from §6: the substitution $`\mu_m`, the formulas (72), (73) and Theorem XVII;
+* from §6: the substitution $`\mu_m`, the formulas (72), (73), Theorems XVII, XVIII, XIX and
+  Corollaries XVIIIa, XVIIIb, XIXa–XIXd;
 * from Appendix §A1: the absolute and Hasse invariants, Lemma A, and the fact that an elliptic
   function field with a prime divisor of degree $`1` is determined by its invariants.
 
-The remainder of §§4 and 6 (Theorems IX in its general form, X, XIX and their
-corollaries) and Appendix §A2 are not reproduced. Their proofs rest on parts of the algebraic
-theory of function fields (genus under Galois descent, Jacobians of fields without a rational
-point) that are not yet formalized.
+Theorems IX and X appear in the torsor form of "the Jacobian of $`E` is $`F_K(q)`" (the footnote
+to (52)). Appendix §A2, the existence of the absolute and Hasse invariants for fields without a
+rational point, and the Proposition on absolute integrality of $`j` (§6) are not reproduced: their
+proofs rest on parts of the algebraic theory of function fields (genus change under inseparable
+constant extensions) that are not yet formalized.
 
 ## Conventions of the formalization
 

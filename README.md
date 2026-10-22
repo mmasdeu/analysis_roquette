@@ -17,7 +17,8 @@ progress is traced by the Lean blueprint in `blueprint/`.
 | `AnalyticTheory/Weierstrass.lean` | §3: `℘`, `℘′`, `B`, `C`, `j(q)`, Lemma 1, Theorems VI–VIIIa |
 | `AnalyticTheory/AppendixA2.lean` | §A2: general invariants, Jacobian field, cocycles, (51)–(53) |
 | `AnalyticTheory/SemiPeriodic.lean` | §4–§5: `q`-trivial characters, Lemma 2, Theorems IX–XVI, Corollaries |
-| `AnalyticTheory/Isogeny.lean` | §6: commensurable periods, Theorems XVII–XIX, isogenies, CM |
+| `AnalyticTheory/Isogeny.lean` | §6: commensurable periods, Theorems XVII–XVIII, isogenies, CM |
+| `AnalyticTheory/XIX*.lean`, `XIXCor.lean` | §6: Theorem XIX and Corollaries XIXa–XIXd (elliptic subfields of `F_K(𝐐)`) |
 | `AnalyticTheory/FunctionField.lean` | prime divisors, divisors, Riemann–Roch spaces, genus |
 | `AnalyticTheory/Remarks.lean` | §2, additional remarks 1–2 |
 | `ForMathlib/` | general results not in Mathlib, independent of `AnalyticTheory` (see `ForMathlib/README.md`), including the non-archimedean function theory of entire Laurent series (`ForMathlib/Analysis/Nonarchimedean/EntireLaurent/`), on which §2 is built |
@@ -41,8 +42,8 @@ Verso's literate-Lean format: the text of Roquette's monograph, chapter by chapt
 Verso docstrings (`/-! … -/`) and the Lean declarations of each definition and result are shown
 next to it with `#print` / `#check`, so the displayed statements are the ones the library actually
 proves. Only completely formalized parts appear (results whose proofs and dependencies are free of
-`sorry`); §5, Theorems IX (general form), X, XVIII, XIX, their corollaries and Appendix §A2 are
-left out. The site is configured by `literate.toml`.
+`sorry`); Appendix §A2, `absolute_hasse_exists` and the Proposition on absolute integrality of `j`
+are left out. The site is configured by `literate.toml`.
 
 ```
 ./build-book.sh                  # builds the pages, prints the output directory
@@ -79,7 +80,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
 
 ## Status
 
-* Blueprint nodes: 213 (80 definitions, 133 lemmas/propositions/theorems/corollaries/remarks; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
+* Blueprint nodes: 223 (definitions and 133 lemmas/propositions/theorems/corollaries/remarks; `\leanok` on a proof is set by `emit.py` from the absence of `sorry`).
 * **No placeholder objects remain**: there is no `opaque` constant, no `sorry`-bodied definition,
   instance or structure field, and no statement recorded as `True`. Every `sorry` is the proof of
   a theorem (all statements compile; `lake build` reports them as warnings).
@@ -215,6 +216,16 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   characteristic cocycle and its values in the translations.
 * Not started (statements only): the Proposition on absolute integrality of `j` (§6);
   Appendix A2 in general.
+
+* §6, **Theorem XIX and Corollaries XIXa–XIXd completely** (`XIXPeriod`, `XIXDescent`,
+  `XIXSubfields`, `XIX`, `XIXCor`; standard axioms only). The statements use the torsor notion of a
+  period (`AdmitsPeriod`: `E` is a twist of `F_K(q̄)` split by `L`, as in Theorem IX); the earlier
+  statements used the invariant-based `HasPeriod` of A2, which is false for non-split `E`.
+  `EL = F_L(q̄|Xᵐ)` by Theorem XVIII over `L`, `E = E_m = F ∩ F_L(q̄|Xᵐ) ≅ E_{ζ^m}`, `[F:E] = dm`,
+  `χ̄ = χ^d`, maximality of `m`; `L ⊗_K F ≅ F_L(q)`, automorphisms are translations by `u ∈ K`,
+  `Aut(F|E) ≅ U/q`, inseparable degree `p^r`, Galois criterion, the maximal split subfield `E₀`
+  (`[F:E₀] = d₀m₀`), the maximal Jacobian subfield (`[F:F₀] = n²`), and the subfields of degree `n`.
+* Remaining `sorry`s (12): Appendix A2 (10), `absolute_hasse_exists`, `prop_cm_absolutely_integral`.
 
 ## Buzzard's identity (MathOverflow 469021)
 

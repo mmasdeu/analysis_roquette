@@ -546,8 +546,20 @@ _upd('def:complex-multiplication', text=r'The ring $\mathbf M(F\,|\,K)$ generate
      lean=['multiplicatorRing', 'HasComplexMultiplication'], uses=['def:isogeny'])
 _upd('thm:XIX', text=r'For $F=F_K(\mathbf Q)$: every elliptic subfield has a period $\bar q\in K$ commensurable with $q$; the subfields of period $\bar q$ correspond $1$--$1$ to $m>0$ divisible by the order of $q\bmod^\times\bar q$, with $[F:E]=dm$, $\bar\chi=\chi^d$, $m$ maximal such that $E$ lies in an elliptic subfield of period $q^m$.',
      lean=['thmXIX_period', 'thmXIX_subfields'], uses=['thm:XVIII', 'thm:IX', 'thm:X', 'thm:XI'])
-for _l in ('cor:XIXa', 'cor:XIXb', 'cor:XIXc', 'cor:XIXd'):
-    pass
+add('definition', 'def:admits-period', 'Period of an elliptic subfield', ['AdmitsPeriod', 'IsFqTorsor', 'Em'],
+    ['def:elliptic-subfield', 'thm:IX'], False,
+    r'An elliptic subfield $E\subseteq F_K(\mathbf Q)$ has period $\bar q$ if it is a twist of $F_K(\bar q)$ split by $L$: $E$ is $K$-isomorphic to the invariants of $\rho_\sigma=\tau_{a(\sigma)}\sigma$ on $F_L(\bar q)$ for some cocycle $a$ (Theorem IX). $E_m=F\cap F_L(\bar q\,|\,X^m)$.')
+_adduses('thm:XIX', 'def:admits-period')
+_addlean('thm:XIX', 'exists_period_elSub', 'eq_Em_of_torsor', 'Em_props', 'Em_subDeg', 'Em_isGreatest')
+_upd('cor:XIXa', text=r'Let $E\subseteq F$ have period $\bar q$ and belong to $m$ ($\bar q^d=q^m$). (i) The degree of inseparability of $F\,|\,E$ is the largest power $p^r$ of the characteristic dividing $m$; (ii) $\operatorname{Aut}(F\,|\,E)\cong U/q^{\mathbb Z}$, $U=\{u\in K^\times\mid u^m\in\bar q^{\mathbb Z}\}$, all automorphisms being translations; (iii) $F\,|\,E$ is Galois iff $p\nmid m$, $K$ contains the $m$-th roots of unity and $\bar q$ is an $m$-th power in $K$.',
+     lean=['corXIXa_galois', 'Em_insepDeg', 'aut_Em_equiv', 'aut_eq_translation', 'fkqLift_bijective', 'isSeparable_of_le_closure', 'card_quot_eq_iff'],
+     uses=['thm:XIX', 'thm:XVII'])
+_upd('cor:XIXb', text=r'For each $\bar q$ commensurable with $q$ there is a unique maximal elliptic subfield $E_0\subseteq F$ of period $\bar q$ that splits over $K$; $[F:E_0]=d_0m_0$ with $d_0=\operatorname{lcm}(n,r)$ ($n=[L:K]$, $r$ the order of $\bar q\bmod^\times q$) and $q^{m_0}=\bar q^{d_0}$.',
+     lean=['corXIXb_maximal_split', 'Em_split_iff', 'split_subfield_data', 'equiv_fq_of_char_one', 'char_one_of_hasPrime'],
+     uses=['thm:XIX', 'thm:XIII'])
+_upd('cor:XIXc', text=r'There is a unique maximal subfield $F_0\subseteq F$ that is $K$-isomorphic to the Jacobian field $F_K(q)$; $[F:F_0]=n^2$.')
+_upd('cor:XIXd', text=r'The degree of $F$ over any elliptic subfield splitting over $K$ is divisible by $n$; the split subfields of degree $n$ correspond $1$--$1$ to the $n$-th roots of $q$ in $K$ (their periods), and $F$ is cyclic over each of them.',
+     lean=['corXIXd_degree_n', 'Em_one_galois_cyclic'])
 
 # --- Appendix A1
 _upd('def:square-equiv', text=r'$a\sim b$ iff $a=t^2b$ for some $t\in K^\times$.')

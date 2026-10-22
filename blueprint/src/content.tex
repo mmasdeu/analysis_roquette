@@ -1592,13 +1592,14 @@ See the Lean proof of \texttt{corXVIIIb\_no\_cm}.
 
 \begin{theorem}[Theorem XIX]
 \label{thm:XIX}
-\lean{AnalyticTheory.thmXIX_period, AnalyticTheory.thmXIX_subfields}
-\uses{thm:XVIII, thm:IX, thm:X, thm:XI}
+\lean{AnalyticTheory.thmXIX_period, AnalyticTheory.thmXIX_subfields, AnalyticTheory.exists_period_elSub, AnalyticTheory.eq_Em_of_torsor, AnalyticTheory.Em_props, AnalyticTheory.Em_subDeg, AnalyticTheory.Em_isGreatest}
+\uses{thm:XVIII, thm:IX, thm:X, thm:XI, def:admits-period}
 \leanok
 For $F=F_K(\mathbf Q)$: every elliptic subfield has a period $\bar q\in K$ commensurable with $q$; the subfields of period $\bar q$ correspond $1$--$1$ to $m>0$ divisible by the order of $q\bmod^\times\bar q$, with $[F:E]=dm$, $\bar\chi=\chi^d$, $m$ maximal such that $E$ lies in an elliptic subfield of period $q^m$.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmXIX\_period, thmXIX\_subfields}.
+\leanok
+See the Lean proof of \texttt{thmXIX\_period, thmXIX\_subfields, exists\_period\_elSub, eq\_Em\_of\_torsor, Em\_props, Em\_subDeg, Em\_isGreatest}.
 \end{proof}
 
 \begin{definition}[Action of the Galois group on $M_L$]
@@ -1917,24 +1918,26 @@ See the Lean proof of \texttt{prop\_cm\_absolutely\_integral}.
 
 \begin{corollary}[Corollary XIXa]
 \label{cor:XIXa}
-\lean{AnalyticTheory.corXIXa_galois}
-\uses{thm:XIX}
+\lean{AnalyticTheory.corXIXa_galois, AnalyticTheory.Em_insepDeg, AnalyticTheory.aut_Em_equiv, AnalyticTheory.aut_eq_translation, AnalyticTheory.fkqLift_bijective, AnalyticTheory.isSeparable_of_le_closure, AnalyticTheory.card_quot_eq_iff}
+\uses{thm:XIX, thm:XVII}
 \leanok
-Inseparability degree $p^r$, automorphisms $U/q$, and Galois criterion for $F|E$.
+Let $E\subseteq F$ have period $\bar q$ and belong to $m$ ($\bar q^d=q^m$). (i) The degree of inseparability of $F\,|\,E$ is the largest power $p^r$ of the characteristic dividing $m$; (ii) $\operatorname{Aut}(F\,|\,E)\cong U/q^{\mathbb Z}$, $U=\{u\in K^\times\mid u^m\in\bar q^{\mathbb Z}\}$, all automorphisms being translations; (iii) $F\,|\,E$ is Galois iff $p\nmid m$, $K$ contains the $m$-th roots of unity and $\bar q$ is an $m$-th power in $K$.
 \end{corollary}
 \begin{proof}
-See the Lean proof of \texttt{corXIXa\_galois}.
+\leanok
+See the Lean proof of \texttt{corXIXa\_galois, Em\_insepDeg, aut\_Em\_equiv, aut\_eq\_translation, fkqLift\_bijective, isSeparable\_of\_le\_closure, card\_quot\_eq\_iff}.
 \end{proof}
 
 \begin{corollary}[Corollary XIXb]
 \label{cor:XIXb}
-\lean{AnalyticTheory.corXIXb_maximal_split}
-\uses{thm:XIX}
+\lean{AnalyticTheory.corXIXb_maximal_split, AnalyticTheory.Em_split_iff, AnalyticTheory.split_subfield_data, AnalyticTheory.equiv_fq_of_char_one, AnalyticTheory.char_one_of_hasPrime}
+\uses{thm:XIX, thm:XIII}
 \leanok
-A unique maximal elliptic subfield with period $\bar q$ splitting over $K$.
+For each $\bar q$ commensurable with $q$ there is a unique maximal elliptic subfield $E_0\subseteq F$ of period $\bar q$ that splits over $K$; $[F:E_0]=d_0m_0$ with $d_0=\operatorname{lcm}(n,r)$ ($n=[L:K]$, $r$ the order of $\bar q\bmod^\times q$) and $q^{m_0}=\bar q^{d_0}$.
 \end{corollary}
 \begin{proof}
-See the Lean proof of \texttt{corXIXb\_maximal\_split}.
+\leanok
+See the Lean proof of \texttt{corXIXb\_maximal\_split, Em\_split\_iff, split\_subfield\_data, equiv\_fq\_of\_char\_one, char\_one\_of\_hasPrime}.
 \end{proof}
 
 \begin{corollary}[Corollary XIXc]
@@ -1942,21 +1945,23 @@ See the Lean proof of \texttt{corXIXb\_maximal\_split}.
 \lean{AnalyticTheory.corXIXc_maximal_jacobian}
 \uses{cor:XIXb}
 \leanok
-A unique maximal subfield $F_0\subseteq F$ isomorphic to $F_K(q)$, with $[F:F_0]=n^2$.
+There is a unique maximal subfield $F_0\subseteq F$ that is $K$-isomorphic to the Jacobian field $F_K(q)$; $[F:F_0]=n^2$.
 \end{corollary}
 \begin{proof}
+\leanok
 See the Lean proof of \texttt{corXIXc\_maximal\_jacobian}.
 \end{proof}
 
 \begin{corollary}[Corollary XIXd]
 \label{cor:XIXd}
-\lean{AnalyticTheory.corXIXd_degree_n}
+\lean{AnalyticTheory.corXIXd_degree_n, AnalyticTheory.Em_one_galois_cyclic}
 \uses{cor:XIXb}
 \leanok
-Degrees divisible by $n$; equality $[F:E_0]=n$ iff $q$ is an $n$-th power in $K$.
+The degree of $F$ over any elliptic subfield splitting over $K$ is divisible by $n$; the split subfields of degree $n$ correspond $1$--$1$ to the $n$-th roots of $q$ in $K$ (their periods), and $F$ is cyclic over each of them.
 \end{corollary}
 \begin{proof}
-See the Lean proof of \texttt{corXIXd\_degree\_n}.
+\leanok
+See the Lean proof of \texttt{corXIXd\_degree\_n, Em\_one\_galois\_cyclic}.
 \end{proof}
 
 \begin{proposition}[Absolute invariant in Weierstraß form (A1.8)]
@@ -1989,6 +1994,14 @@ For $m\neq 0$, $\mu_m$ is the injective endomorphism of $M_K$ extending $g(X)\ma
 \leanok
 See the Lean proof of \texttt{holExpand, expandSeq, hol\_decomp, meroSubst, substPow\_eq, substPow\_translation, finrank\_Sm}.
 \end{proof}
+
+\begin{definition}[Period of an elliptic subfield]
+\label{def:admits-period}
+\lean{AnalyticTheory.AdmitsPeriod, AnalyticTheory.IsFqTorsor, AnalyticTheory.Em}
+\uses{def:elliptic-subfield, thm:IX}
+\leanok
+An elliptic subfield $E\subseteq F_K(\mathbf Q)$ has period $\bar q$ if it is a twist of $F_K(\bar q)$ split by $L$: $E$ is $K$-isomorphic to the invariants of $\rho_\sigma=\tau_{a(\sigma)}\sigma$ on $F_L(\bar q)$ for some cocycle $a$ (Theorem IX). $E_m=F\cap F_L(\bar q\,|\,X^m)$.
+\end{definition}
 
 \section{Appendix \S A1: fields with a prime divisor of degree 1}
 

@@ -325,3 +325,22 @@ the characteristic cocycle valued in translations.
 Bridges B1', B2 are now theorems (`Sec4Torsor.lean`: `Ezeta_isFqTorsor`, `fqTorsor_descent`, `thmIX_realise`,
 `thmIX_every`) for the torsor definition `IsFqTorsor`. `Ezeta_isJacobian`/`jacobian_descent` for the
 invariant-based `IsJacobianField` were removed from Sec4; Appendix A2 stays open (see above).
+
+## Update (Theorem XIX and Corollaries XIXa–XIXd)
+
+The statements were reformulated with the torsor notion of a period (`AdmitsPeriod`: `E` contains `K`
+and is a twist of `F_K(q̄)` split by `L`); the earlier statements used the invariant-based
+`HasPeriod`, which cannot be proved without A2.  All of Theorem XIX and its corollaries are now proved:
+
+* `XIXPeriod.lean`, `XIXDescent.lean`: `EL` is elliptic over `L`, equal to `F_L(q̄|Xᵐ)` (Theorem XVIII over
+  `L`), `q̄ ∈ K` by `τ_Qσ`-stability, and `E` is the invariant field of `τ_{Q^m}σ` (trace argument).
+* `XIXSubfields.lean`: `E_m = F ∩ F_L(q̄|Xᵐ) ≅ E_{ζ^m}`, degree `dm`, character `χ^d`, and every
+  elliptic subfield of period `q̄` is some `E_m`.
+* `XIX.lean`: `thmXIX_period` (i), `thmXIX_subfields` (ii).
+* `XIXCor.lean`: split criterion (`Em_split_iff`), XIXb, XIXc, XIXd; `L ⊗_K F ≅ F_L(q)`
+  (`fkqLift_bijective`), automorphisms are translations by `u ∈ K` (`aut_eq_translation`),
+  `Aut(F|E) ≅ U/q` (`aut_Em_equiv`), inseparable degree `p^r` (`Em_insepDeg`, through
+  `E' = F ∩ F_L(q^{p^r}|X^{p^r})` and separability descent `isSeparable_of_le_closure`), Galois
+  criterion through `card_quot_eq_iff` (factored out of Theorem XVII (iv)); `corXIXa_galois`.
+
+Remaining `sorry`s (12): Appendix A2 (10), `absolute_hasse_exists`, `prop_cm_absolutely_integral`.
