@@ -152,40 +152,7 @@ Proved using the descent of Riemann–Roch spaces (`Ezeta_genus`) and the identi
 theorem Ezeta_isElliptic (ζ : CocycleModQ K L q) : IsEllipticOver K (Ezeta q ζ) :=
   ⟨Ezeta_isFunctionField q hq0 hq1 ζ, Ezeta_genus q hq0 hq1 ζ, Ezeta_conservative q hq0 hq1 ζ⟩
 
-include hq0 hq1 in
-/-- **Bridge B1'**: `F_K(q)` is the Jacobian field of `E_ζ` (same absolute and Hasse invariants,
-since `E_ζ L = F_L(q)`). Not yet proved. -/
-theorem Ezeta_isJacobian (hp : HasPrimeOfDegreeOne K (FqSub K q)) (ζ : CocycleModQ K L q) :
-    IsJacobianField K (Ezeta q ζ) (FqSub K q) (Ezeta_isElliptic q hq0 hq1 ζ) hp := by
-  sorry
-
-/-- **Bridge B2** (Appendix A2: characteristic cocycle, Jacobian fields): an elliptic field of
-period `q` (Jacobian field `F_K(q)`) split by the finite Galois extension `L | K` is a field `E_ζ`.
-Not yet proved. -/
-theorem jacobian_descent (hp : HasPrimeOfDegreeOne K (FqSub K q)) (E : Type u) [Field E]
-    [Algebra K E] (hE : IsEllipticOver K E) (hJ : IsJacobianField K E (FqSub K q) hE hp)
-    (hs : SplitsOver K E L) : ∃ χ : CharGroup K L, IsCharInvariant q hq0 hq1 E χ := by
-  sorry
-
-/-- Book, §4, Theorem IX: the elliptic function fields `E | K` of period `q` split by `L`
-correspond `1–1` (up to `K`-isomorphism) to the pairs `{χ, χ⁻¹}` of `q`-trivial characters.
-(`thmIX_classification`, `isCharInvariant_unique`, `thmIX_exists` and the two bridges.) -/
-theorem thmIX_realise (hp : HasPrimeOfDegreeOne K (FqSub K q)) (χ : CharGroup K L)
-    (hχ : IsQTrivial K L q χ) :
-    ∃ (E : Type u) (_ : Field E) (_ : Algebra K E) (hE : IsEllipticOver K E)
-      (_ : SplitsOver K E L), IsJacobianField K E (FqSub K q) hE hp ∧
-        IsCharInvariant q hq0 hq1 E χ := by
-  obtain ⟨ζ, hζ⟩ := thmIX_exists q hq0 hq1 χ hχ
-  exact ⟨Ezeta q ζ, inferInstance, inferInstance, Ezeta_isElliptic q hq0 hq1 ζ,
-    Ezeta_splitsOver q hq0 hq1 ζ, Ezeta_isJacobian q hq0 hq1 hp ζ, hζ⟩
-
-/-- Every elliptic field of period `q` split by `L` has a `q`-trivial character invariant. -/
-theorem thmIX_every (hp : HasPrimeOfDegreeOne K (FqSub K q)) (E : Type u) [Field E]
-    [Algebra K E] (hE : IsEllipticOver K E) (hJ : IsJacobianField K E (FqSub K q) hE hp)
-    (hs : SplitsOver K E L) : ∃ χ : CharGroup K L, IsQTrivial K L q χ ∧
-      IsCharInvariant q hq0 hq1 E χ := by
-  obtain ⟨χ, hχ⟩ := jacobian_descent q hq0 hq1 hp E hE hJ hs
-  exact ⟨χ, qtrivial_of_isCharInvariant q hq0 hq1 E χ hχ, hχ⟩
+/-! The Jacobian bridges and Theorem IX are in `Sec4Torsor.lean`. -/
 
 /-! Theorem X (`thmX_minimal_splitting`) is proved in `Sec4B3.lean` (it only needs Theorem XIII). -/
 

@@ -167,7 +167,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   (`thmXI_model`): `F_K(𝐐) = E_ζ` with `e_q(ζ)(σ) = exp(2πi/[L:K])`. The characters invariant is
   `IsCharInvariant` (defined through `E_ζ`).
   Unproved bridges, clearly marked `sorry`: `Ezeta_isElliptic` (genus of a Galois descent),
-  `Ezeta_isJacobian`, `jacobian_descent` (Appendix A2) and `thmX_minimal_splitting` (Theorem X).
+  `Ezeta_isJacobian`, `jacobian_descent` (Appendix A2) and `thmX_minimal_splitting` (Theorem X)  [superseded: see `Sec4Torsor.lean`].
 * §6 (`Isogeny.lean`, `IsogenyXVII.lean`): the substitution `μ_m : f(X) ↦ f(Xᵐ)` on `M_K`
   (built from `EntireLaurent.holExpand`), formulas (72), (73), and **Theorem XVII** completely:
   (i) `[F_K(q) : F_K(q̄|Xᵐ)] = dm`, (ii) inseparability degree `p^r` with maximal separable
@@ -208,7 +208,7 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   matrices, Speiser's lemma, specialization at a rational point). Correction: the book's `Ĥ¹(D⁰) ≅ ℤ/n` is stated
   with `ZMod [L:K]`. Theorem **X** (`thmX_minimal_splitting`, `Sec4B3.lean`: from Theorem XIIIb through the
   inflation `E_ζ(L) ≅ E_{ζ̃}(K_χ)` of `ConstExtDescent`) is also proved. **Still `sorry`:** only the §4 bridges
-  `Ezeta_isJacobian`, `jacobian_descent`, Appendix A2 and `absolute_hasse_exists`.  The bridges need
+  Appendix A2 and `absolute_hasse_exists`. The §4 bridges are proved in `Sec4Torsor.lean` for the *torsor* definition of "Jacobian is `F_K(q)`" (`IsFqTorsor`: `E` is the invariant field of `ρ_σ = τ_{a(σ)}σ` on `F_L(q)`; the book's footnote to (52)), not for the invariant-based `IsJacobianField` of A2.  The bridges need
   A2 with *arbitrary* splitting fields (the Hasse invariant of an elliptic field `E | K` is unique only
   through the splitting field `E_1 ≅ E`, i.e. through the independent compositum `E ⊗_K E`, which is a domain
   only for separably generated `E`: genus-change theory for conservative fields is not available), the

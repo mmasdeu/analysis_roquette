@@ -345,12 +345,37 @@ $`\chi` to be trivial on $`G(L\,|\,M)`. No `sorry` is involved.
 
 /-!
 
-_Status of the two bridges._ The statements `Ezeta_isJacobian` (the fields $`E_\zeta` are Jacobian
-fields in the sense of Appendix A2) and `jacobian_descent` (the converse descent, giving the
-cocycle of a Jacobian field) are the only remaining `sorry`s of §4–§5. They require the invariance
-of the absolute and Hasse invariants under constant field extension (§A2) and are in progress; see
-`PLAN.md`.
+_Jacobian fields and the two bridges._ In the book, "$`F_K(q)` is the Jacobian field of $`E`" is
+defined through the absolute and Hasse invariants (Appendix A2) and characterized by the Galois
+cohomology: $`EL \cong F_L(q)` and the characteristic cocycle takes values in the translations. The
+companion uses the latter ("principal homogeneous space", the definition mentioned in the footnote to
+(52)) as the definition: $`E` is the field of invariants in $`F_L(q)` of a Galois action
+$`\rho_\sigma = \tau_{a(\sigma)}\sigma`. With it the two bridges are theorems: every $`E_\zeta` is such a form
+(`Ezeta_isFqTorsor`), and every such form is some $`E_\zeta` (`fqTorsor_descent`: the relation
+$`\rho_{\sigma\tau}=\rho_\sigma\rho_\tau` gives the cocycle relation modulo $`q` because $`\tau_c = \mathrm{id}` on
+$`F_L(q)` only for $`c \in q^{\mathbb Z}`). The equivalence with the invariant-based definition is
+Appendix A2 and is not formalized.
+
+> Every `E_ζ` is a form of `F_K(q)` split by `L`.
 -/
+
+#stmt Ezeta_isFqTorsor
+
+/-!
+
+> Every form of `F_K(q)` split by `L` is some `E_ζ`.
+-/
+
+#stmt fqTorsor_descent
+
+/-!
+
+> Book, §4, Theorem IX (existence and exhaustion).
+-/
+
+#stmt thmIX_realise
+
+#stmt thmIX_every
 
 /-!
 

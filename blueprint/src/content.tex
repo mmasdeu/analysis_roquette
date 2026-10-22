@@ -1258,13 +1258,14 @@ The character invariant $\chi_E=e_q(\zeta)$ of an elliptic field $E$ of period $
 
 \begin{theorem}[Theorem IX]
 \label{thm:IX}
-\lean{AnalyticTheory.thmIX_realise, AnalyticTheory.thmIX_classification, AnalyticTheory.thmIX_exists, AnalyticTheory.thmIX_every, AnalyticTheory.isCharInvariant_unique, AnalyticTheory.Ezeta_iso_iff, AnalyticTheory.Ezeta_splitsOver, AnalyticTheory.Ezeta_isElliptic, AnalyticTheory.jacobian_descent}
+\lean{AnalyticTheory.thmIX_realise, AnalyticTheory.thmIX_classification, AnalyticTheory.thmIX_exists, AnalyticTheory.thmIX_every, AnalyticTheory.isCharInvariant_unique, AnalyticTheory.Ezeta_iso_iff, AnalyticTheory.Ezeta_splitsOver, AnalyticTheory.Ezeta_isElliptic, AnalyticTheory.Ezeta_isFqTorsor, AnalyticTheory.fqTorsor_descent, AnalyticTheory.isCocycleModQ_of_hom, AnalyticTheory.IsFqTorsor}
 \uses{lem:2, def:char-invariant, def:splitting-field}
 \leanok
 Elliptic fields of period $q$ split by $L$ correspond to pairs $\{\chi,\chi^{-1}\}$ of $q$-trivial characters. Proved in model form: the fields $E_\zeta$ are classified up to $K$-isomorphism by $e_q(\zeta)^{\pm1}$ (Galois descent for $F_L(q)$); the abstract bridges (genus of a Galois descent, Jacobian descent, Appendix A2) remain open.
 \end{theorem}
 \begin{proof}
-See the Lean proof of \texttt{thmIX\_realise, thmIX\_classification, thmIX\_exists, thmIX\_every, isCharInvariant\_unique, Ezeta\_iso\_iff, Ezeta\_splitsOver, Ezeta\_isElliptic, jacobian\_descent}.
+\leanok
+See the Lean proof of \texttt{thmIX\_realise, thmIX\_classification, thmIX\_exists, thmIX\_every, isCharInvariant\_unique, Ezeta\_iso\_iff, Ezeta\_splitsOver, Ezeta\_isElliptic, Ezeta\_isFqTorsor, fqTorsor\_descent, isCocycleModQ\_of\_hom, IsFqTorsor}.
 \end{proof}
 
 \begin{theorem}[Theorem X (minimal splitting field)]

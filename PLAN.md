@@ -319,3 +319,9 @@ which for conservative genus-one fields needs genus-change theory (Tate, Rosenli
 A faithful completion needs: independent constant extensions in the definition of `SplittingData`,
 `IsEllipticOver L EL` for them (including `L` alg. closed in `EL`), regularity of elliptic fields, then
 the characteristic cocycle valued in translations.
+
+## Update (bridges)
+
+Bridges B1', B2 are now theorems (`Sec4Torsor.lean`: `Ezeta_isFqTorsor`, `fqTorsor_descent`, `thmIX_realise`,
+`thmIX_every`) for the torsor definition `IsFqTorsor`. `Ezeta_isJacobian`/`jacobian_descent` for the
+invariant-based `IsJacobianField` were removed from Sec4; Appendix A2 stays open (see above).
