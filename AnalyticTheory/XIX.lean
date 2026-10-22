@@ -95,6 +95,81 @@ theorem elSub_mono (q : K) (T : SemiPeriodicTriple K L q) {E E' : Subfield (FKQ 
   · exact Or.inl ⟨⟨e, h e.2⟩, rfl⟩
   · exact Or.inr ⟨l, rfl⟩
 
+/-- The integer `m` of `E_m` is the largest `k` such that `E_m` lies in an elliptic subfield admitting
+the period `q^k`. -/
+theorem Em_isGreatest (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hdpos : 0 < d)
+    (hqd : qbar ^ d = q ^ m) :
+    IsGreatest {k : ℕ | ∃ E' : Subfield (FKQ K L q T), IsEllipticSubfield K E' ∧
+      Em q T qbar m ≤ E' ∧ AdmitsPeriod K L q T (q ^ k) E'} m := by
+  obtain ⟨ζ, hζ, hchar, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  -- `m = m'` from the degrees
+  have hm_eq : ∀ {m m' d d' : ℕ}, 0 < m → 0 < m' → 0 < d → qbar ^ d = q ^ m → qbar ^ d' = q ^ m' →
+      d * m = d' * m' → m = m' := by
+    intro m m' d d' hm hm' hd hqd hqd' h1
+    have h2 := cross_mul_eq K hqb0 hqb1 hqd hqd'
+    have h3 : d * (m * m) = d * (m' * m') := by
+      calc d * (m * m) = (d * m) * m := by ring
+        _ = (d' * m') * m := by rw [h1]
+        _ = (d' * m) * m' := by ring
+        _ = (d * m') * m' := by rw [h2]
+        _ = d * (m' * m') := by ring
+    exact Nat.mul_self_inj.mp (Nat.eq_of_mul_eq_mul_left hd h3)
+  -- maximality of `m`
+  have hqm0 : 0 < ‖q ^ m‖ := norm_pow_pos hq0 _
+  have hqm1 : ‖q ^ m‖ < 1 := norm_pow_lt_one hq1 hm
+  refine ⟨⟨Em q T (q ^ m) m, ⟨const_mem_Em q T _ hm,
+    (Em_props q hq0 hq1 T ζ hζ hqm0 hqm1 hm (pow_one _)).1⟩, ?_,
+    ⟨const_mem_Em q T _ hm, (Em_props q hq0 hq1 T ζ hζ hqm0 hqm1 hm (pow_one _)).2.1⟩⟩, ?_⟩
+  · intro x hx
+    obtain ⟨g, hg, hge⟩ := (mem_Em q T x).mp hx
+    refine (mem_Em q T x).mpr ⟨g, ?_, hge⟩
+    have hqb' : algebraMap K L qbar ≠ 0 :=
+      (map_ne_zero_iff _ (algebraMap K L).injective).mpr (norm_pos_iff.mp hqb0)
+    intro a ha
+    have : a = Units.mk0 (algebraMap K L qbar) hqb' ^ (d : ℤ) := by
+      apply Units.ext
+      rw [ha, Units.val_zpow_eq_zpow_val, Units.val_mk0, zpow_natCast, ← map_pow, hqd]
+    rw [this]
+    exact translation_zpow_of_periodic rfl hg _
+  · rintro k ⟨E', hE', hle, h', ht'⟩
+    rcases Nat.eq_zero_or_pos k with hk | hk
+    · rw [hk]; exact Nat.zero_le _
+    have hqk0 : 0 < ‖q ^ k‖ := norm_pow_pos hq0 k
+    have hqk1 : ‖q ^ k‖ < 1 := norm_pow_lt_one hq1 hk
+    -- the data of `E_m`
+    have hEmE : IsEllipticSubfield K (Em q T qbar m) :=
+      ⟨const_mem_Em q T qbar hm, (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 hm hqd).1⟩
+    obtain ⟨m1, d1, hm1, hd1, hdq1, hEm1, hEq1, hgr1⟩ := eq_Em_of_torsor q hq0 hq1 T _ hEmE hqb0
+      hqb1 (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 hm hqd).2.1
+    have hm1 : m = m1 := by
+      have h2 := Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 hm hdpos hqd
+      have h3 := Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 hm1 hd1 hdq1
+      rw [← hEm1] at h3
+      exact hm_eq hm hm1 hdpos hqd hdq1 (h2.symm.trans h3)
+    -- the data of `E'`
+    obtain ⟨m2, d2, hm2, hd2, hdq2, -, hEq2, -⟩ := eq_Em_of_torsor q hq0 hq1 T E' hE' hqk0 hqk1 ht'
+    have hle2 : (elSub (L := L) (xiIota q T (Em q T qbar m))).map
+        (FqSub L (algebraMap K L q)).subtype ≤ (substPow L m2).fieldRange := by
+      intro y hy
+      have : y ∈ (elSub (L := L) (xiIota q T E')).map (FqSub L (algebraMap K L q)).subtype := by
+        obtain ⟨z, hz, rfl⟩ := hy
+        exact ⟨z, elSub_mono K L q T hle hz, rfl⟩
+      rw [hEq2] at this
+      obtain ⟨g, -, rfl⟩ := this
+      exact ⟨g, rfl⟩
+    have hm2le : m2 ≤ m1 := hgr1.2 ⟨hm2, hle2⟩
+    have hkm2 : k * d2 = m2 := by
+      have h1 : q ^ (k * d2) = q ^ m2 := by rw [pow_mul, hdq2]
+      have := congrArg norm h1
+      rw [norm_pow, norm_pow] at this
+      exact pow_right_injective₀ hq0 hq1.ne this
+    show k ≤ m
+    rw [hm1]
+    calc k ≤ k * d2 := Nat.le_mul_of_pos_right k hd2
+      _ = m2 := hkm2
+      _ ≤ m1 := hm2le
+
 /-- Book, §6, Theorem XIX (ii): for `q̄` commensurable with `q` the elliptic subfields `E ⊂ F` with
 period `q̄` correspond `1 − 1` to the integers `m > 0` divisible by the order of `q mod^× q̄`; if `E`
 belongs to `m` then `[F : E] = dm` with `q^m = q̄^d`, the character invariant of `E` is `χ^d`, and `m`
@@ -159,60 +234,7 @@ theorem thmXIX_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : Se
   · refine ⟨const_mem_Em q T qbar m.2.1, ?_⟩
     rw [tripleChar_eq K L q hq0 hq1 T ζ hchar χ hχ]
     exact (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 m.2.1 hqd).2.2
-  -- maximality of `m`
-  have hqm0 : 0 < ‖q ^ (m : ℕ)‖ := norm_pow_pos hq0 _
-  have hqm1 : ‖q ^ (m : ℕ)‖ < 1 := norm_pow_lt_one hq1 m.2.1
-  refine ⟨⟨Em q T (q ^ (m : ℕ)) m, ⟨const_mem_Em q T _ m.2.1,
-    (Em_props q hq0 hq1 T ζ hζ hqm0 hqm1 m.2.1 (pow_one _)).1⟩, ?_,
-    ⟨const_mem_Em q T _ m.2.1, (Em_props q hq0 hq1 T ζ hζ hqm0 hqm1 m.2.1 (pow_one _)).2.1⟩⟩, ?_⟩
-  · intro x hx
-    obtain ⟨g, hg, hge⟩ := (mem_Em q T x).mp hx
-    refine (mem_Em q T x).mpr ⟨g, ?_, hge⟩
-    have hqb' : algebraMap K L qbar ≠ 0 :=
-      (map_ne_zero_iff _ (algebraMap K L).injective).mpr (norm_pos_iff.mp hqb0)
-    intro a ha
-    have : a = Units.mk0 (algebraMap K L qbar) hqb' ^ (d : ℤ) := by
-      apply Units.ext
-      rw [ha, Units.val_zpow_eq_zpow_val, Units.val_mk0, zpow_natCast, ← map_pow, hqd]
-    rw [this]
-    exact translation_zpow_of_periodic rfl hg _
-  · rintro k ⟨E', hE', hle, h', ht'⟩
-    rcases Nat.eq_zero_or_pos k with hk | hk
-    · rw [hk]; exact Nat.zero_le _
-    have hqk0 : 0 < ‖q ^ k‖ := norm_pow_pos hq0 k
-    have hqk1 : ‖q ^ k‖ < 1 := norm_pow_lt_one hq1 hk
-    -- the data of `E_m`
-    have hEmE : IsEllipticSubfield K (Em q T qbar m) :=
-      ⟨const_mem_Em q T qbar m.2.1, (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 m.2.1 hqd).1⟩
-    obtain ⟨m1, d1, hm1, hd1, hdq1, hEm1, hEq1, hgr1⟩ := eq_Em_of_torsor q hq0 hq1 T _ hEmE hqb0
-      hqb1 (Em_props q hq0 hq1 T ζ hζ hqb0 hqb1 m.2.1 hqd).2.1
-    have hm1 : (m : ℕ) = m1 := by
-      have h2 := Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 m.2.1 hdpos hqd
-      have h3 := Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 hm1 hd1 hdq1
-      rw [← hEm1] at h3
-      exact hm_eq m.2.1 hm1 hdpos hqd hdq1 (h2.symm.trans h3)
-    -- the data of `E'`
-    obtain ⟨m2, d2, hm2, hd2, hdq2, -, hEq2, -⟩ := eq_Em_of_torsor q hq0 hq1 T E' hE' hqk0 hqk1 ht'
-    have hle2 : (elSub (L := L) (xiIota q T (Em q T qbar m))).map
-        (FqSub L (algebraMap K L q)).subtype ≤ (substPow L m2).fieldRange := by
-      intro y hy
-      have : y ∈ (elSub (L := L) (xiIota q T E')).map (FqSub L (algebraMap K L q)).subtype := by
-        obtain ⟨z, hz, rfl⟩ := hy
-        exact ⟨z, elSub_mono K L q T hle hz, rfl⟩
-      rw [hEq2] at this
-      obtain ⟨g, -, rfl⟩ := this
-      exact ⟨g, rfl⟩
-    have hm2le : m2 ≤ m1 := hgr1.2 ⟨hm2, hle2⟩
-    have hkm2 : k * d2 = m2 := by
-      have h1 : q ^ (k * d2) = q ^ m2 := by rw [pow_mul, hdq2]
-      have := congrArg norm h1
-      rw [norm_pow, norm_pow] at this
-      exact pow_right_injective₀ hq0 hq1.ne this
-    show k ≤ m
-    rw [hm1]
-    calc k ≤ k * d2 := Nat.le_mul_of_pos_right k hd2
-      _ = m2 := hkm2
-      _ ≤ m1 := hm2le
+  exact Em_isGreatest K L q hq0 hq1 T qbar hqb0 hqb1 m d m.2.1 hdpos hqd
 
 /-! Corollaries XIXa–d are in `XIXCor.lean`. -/
 
