@@ -214,68 +214,7 @@ theorem thmXIX_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : Se
       _ = m2 := hkm2
       _ ≤ m1 := hm2le
 
-/-- Book, §6, Corollary XIXa: for an elliptic subfield `E ⊂ F` of period `q̄` belonging to `m`:
-(i) the degree of inseparability of `F | E` is `p^r`, the largest `p`-power dividing `m`; (ii) the
-automorphism group of `F | E` is `U/q`, `U = {u ∈ K^× | u^m ≡ 1 mod^× q̄}`; (iii) `F | E` is Galois
-iff `p ∤ m`, `K` contains the `m`-th roots of unity and `q̄` has an `m`-th root in `K`. -/
-theorem corXIXa_galois (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
-    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1)
-    (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K E) (hper : AdmitsPeriod K L q T qbar E)
-    (m d : ℕ) (hm : 0 < m) (hd : 0 < d) (hqd : qbar ^ d = q ^ m)
-    (hmax : IsGreatest {k : ℕ | ∃ E' : Subfield (FKQ K L q T), IsEllipticSubfield K E' ∧
-      E ≤ E' ∧ HasPeriod K E' (q ^ k)} m) :
-    Field.finInsepDegree E (FKQ K L q T) = ringChar K ^ (m.factorization (ringChar K)) ∧
-    Nonempty ((FKQ K L q T ≃ₐ[E] FKQ K L q T) ≃*
-      (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸
-        (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
-          (Usub K qbar (norm_pos_iff.mp hqb0) m))) ∧
-    (IsGalois E (FKQ K L q T) ↔
-      (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar)) := by
-  sorry
-
-/-- Book, §6, Corollary XIXb: for each commensurable `q̄` there is a unique maximal elliptic
-subfield `E₀ ⊂ F` of period `q̄` that splits over `K`; `[F : E₀] = d₀ m₀` with `d₀ = lcm(n, r)`,
-`n` the order of the character invariant (`n = [L:K]`), `r` the order of `q̄ mod^× q`, and
-`q^{m₀} = q̄^{d₀}`. -/
-theorem corXIXb_maximal_split (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
-    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) :
-    ∃ E₀ : Subfield (FKQ K L q T),
-      IsGreatest {E : Subfield (FKQ K L q T) | IsEllipticSubfield K E ∧ HasPeriod K E qbar ∧
-        ∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
-          letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E} E₀ ∧
-      ∃ d₀ m₀ : ℕ, d₀ = Nat.lcm (Module.finrank K L)
-          (orderOf (QuotientGroup.mk (Units.mk0 qbar (norm_pos_iff.mp hqb0)) :
-            Kˣ ⧸ Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0)))) ∧
-        q ^ m₀ = qbar ^ d₀ ∧ subDeg E₀ = d₀ * m₀ := by
-  sorry
-
-/-- Book, §6, Corollary XIXc: there is a unique maximal subfield `F₀ ⊂ F` which is `K`-isomorphic
-to the Jacobian `F_K(q)`, with `[F : F₀] = n²`. -/
-theorem corXIXc_maximal_jacobian (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
-    (T : SemiPeriodicTriple K L q) :
-    ∃ F₀ : Subfield (FKQ K L q T),
-      IsGreatest {E : Subfield (FKQ K L q T) | IsEllipticSubfield K E ∧ HasPeriod K E q ∧
-        ∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
-          letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E} F₀ ∧
-      subDeg F₀ = Module.finrank K L ^ 2 := by
-  sorry
-
-/-- Book, §6, Corollary XIXd: the degree of `F` over any elliptic subfield that splits over `K` is
-divisible by `n = [L:K]`; subfields of degree `n` exist iff `q` is an `n`-th power in `K`; they are in
-`1 − 1` correspondence with the `n`-th roots of `q` in `K` (their periods), and `F | E₀` is cyclic. -/
-theorem corXIXd_degree_n (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q) :
-    (∀ E : Subfield (FKQ K L q T), IsEllipticSubfield K E →
-      (∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
-        letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) →
-      Module.finrank K L ∣ subDeg E) ∧
-    ∃ e : {r : K // r ^ Module.finrank K L = q} ≃
-        {E : Subfield (FKQ K L q T) // IsEllipticSubfield K E ∧
-          (∃ h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E,
-            letI := subfieldAlgebra K E h; HasPrimeOfDegreeOne K E) ∧
-          subDeg E = Module.finrank K L},
-      (∀ r, HasPeriod K (e r).1 r.1) ∧
-      (∀ r, IsGalois (e r).1 (FKQ K L q T) ∧ IsCyclic (FKQ K L q T ≃ₐ[(e r).1] FKQ K L q T)) := by
-  sorry
+/-! Corollaries XIXa–d are in `XIXCor.lean`. -/
 
 end XIX
 
