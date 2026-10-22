@@ -1055,6 +1055,50 @@ theorem range_psiHom_eq_top_iff :
     rw [hx, ← h1]
     exact Subgroup.zpow_mem _ (MonoidHom.mem_range.mpr ⟨_, rfl⟩) _
 
+include hq1 hqb1 hm hd hqd in
+/-- `|U/⟨q⟩| = dm` iff `p ∤ m`, `K` contains the `m`-th roots of unity and `q̄` is an `m`-th power. -/
+theorem card_quot_eq_iff :
+    Nat.card (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸ qSub hq0 hqb0 (m := m)) = d * m ↔
+      (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar) := by
+  have : NeZero m := ⟨hm.ne'⟩
+  have hcount := card_quot_mul_index hq0 hq1 hqb0 hqb1 hm hqd
+  have hW : Nat.card (rootsOfUnity m K) ≤ m := by
+    exact card_rootsOfUnity K m
+  have hW1 : 1 ≤ Nat.card (rootsOfUnity m K) := Nat.card_pos (α := rootsOfUnity m K)
+  set N := Nat.card (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸ qSub hq0 hqb0 (m := m))
+  set i := (psiHom hqb0 hqb1 (m := m)).range.index
+  set W := Nat.card (rootsOfUnity m K)
+  have hroots : W = m ↔ ∃ ζ : K, IsPrimitiveRoot ζ m := by
+    show Nat.card (rootsOfUnity m K) = m ↔ _
+    exact card_rootsOfUnity_eq_iff_exists_isPrimitiveRoot
+  have hi1 : i = 1 ↔ ∃ r : K, r ^ m = qbar := by
+    rw [Subgroup.index_eq_one]; exact range_psiHom_eq_top_iff hqb0 hqb1 hm
+  have hchar : (∃ ζ : K, IsPrimitiveRoot ζ m) → ¬ (ringChar K ∣ m) := by
+    rintro ⟨ζ, hζ⟩ hdvd
+    have := hζ.neZero'
+    exact NeZero.ne ((m : ℕ) : K) ((ringChar.spec K m).mpr hdvd)
+  constructor
+  · intro hN
+    rw [hN] at hcount
+    have hi0 : i ≠ 0 := by
+      intro h0; rw [h0, mul_zero] at hcount
+      exact absurd hcount.symm (Nat.mul_ne_zero (by omega) hd.ne')
+    have hmi : m * i = W := by
+      have : d * (m * i) = d * W := by rw [← mul_assoc, hcount, mul_comm]
+      exact Nat.eq_of_mul_eq_mul_left hd this
+    have hi : i = 1 := by
+      by_contra hne
+      have : 2 ≤ i := by omega
+      nlinarith
+    rw [hi, mul_one] at hmi
+    have hζ := hroots.mp hmi.symm
+    exact ⟨hchar hζ, hζ, hi1.mp hi⟩
+  · rintro ⟨-, hζ, hr⟩
+    have hW' := hroots.mpr hζ
+    have hi := hi1.mpr hr
+    rw [hi, mul_one, hW'] at hcount
+    rw [hcount, mul_comm]
+
 end counting
 
 /-- Ring automorphisms of `F` fixing a subfield `F₀` are the `F₀`-algebra automorphisms. -/
@@ -1091,10 +1135,6 @@ theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   have hcard : Nat.card (FqSub K q ≃ₐ[FqbarXm K qbar m] FqSub K q) =
       Nat.card (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸ qSub hq0 hqb0 (m := m)) :=
     (Nat.card_congr (autFixingEquiv hle)).trans (Nat.card_congr e.toEquiv)
-  have hcount := card_quot_mul_index hq0 hq1 hqb0 hqb1 hm hqd
-  have hW : Nat.card (rootsOfUnity m K) ≤ m := by
-    exact card_rootsOfUnity K m
-  have hW1 : 1 ≤ Nat.card (rootsOfUnity m K) := Nat.card_pos (α := rootsOfUnity m K)
   have hgal : IsRelGalois (FqbarXm K qbar m) (FqSub K q) ↔
       Nat.card (FqSub K q ≃ₐ[FqbarXm K qbar m] FqSub K q) = d * m := by
     constructor
@@ -1106,39 +1146,7 @@ theorem thmXVII_galois (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
       refine ⟨hle, ?_⟩
       exact IsGalois.of_card_aut_eq_finrank (FqbarXm K qbar m) (FqSub K q) (h.trans hdeg.symm)
   rw [hgal, hcard]
-  set N := Nat.card (Usub K qbar (norm_pos_iff.mp hqb0) m ⧸ qSub hq0 hqb0 (m := m))
-  set i := (psiHom hqb0 hqb1 (m := m)).range.index
-  set W := Nat.card (rootsOfUnity m K)
-  have hroots : W = m ↔ ∃ ζ : K, IsPrimitiveRoot ζ m := by
-    show Nat.card (rootsOfUnity m K) = m ↔ _
-    exact card_rootsOfUnity_eq_iff_exists_isPrimitiveRoot
-  have hi1 : i = 1 ↔ ∃ r : K, r ^ m = qbar := by
-    rw [Subgroup.index_eq_one]; exact range_psiHom_eq_top_iff hqb0 hqb1 hm
-  have hchar : (∃ ζ : K, IsPrimitiveRoot ζ m) → ¬ (ringChar K ∣ m) := by
-    rintro ⟨ζ, hζ⟩ hdvd
-    have := hζ.neZero'
-    exact NeZero.ne ((m : ℕ) : K) ((ringChar.spec K m).mpr hdvd)
-  constructor
-  · intro hN
-    rw [hN] at hcount
-    have hi0 : i ≠ 0 := by
-      intro h0; rw [h0, mul_zero] at hcount
-      exact absurd hcount.symm (Nat.mul_ne_zero (by omega) hd.ne')
-    have hmi : m * i = W := by
-      have : d * (m * i) = d * W := by rw [← mul_assoc, hcount, mul_comm]
-      exact Nat.eq_of_mul_eq_mul_left hd this
-    have hi : i = 1 := by
-      by_contra hne
-      have : 2 ≤ i := by omega
-      nlinarith
-    rw [hi, mul_one] at hmi
-    have hζ := hroots.mp hmi.symm
-    exact ⟨hchar hζ, hζ, hi1.mp hi⟩
-  · rintro ⟨-, hζ, hr⟩
-    have hW' := hroots.mpr hζ
-    have hi := hi1.mpr hr
-    rw [hi, mul_one, hW'] at hcount
-    rw [hcount, mul_comm]
+  exact card_quot_eq_iff hq0 hq1 hqb0 hqb1 hm hd hqd
 
 /-! ### Theorem XVII (ii): separability and inseparability -/
 
