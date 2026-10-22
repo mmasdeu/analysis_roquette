@@ -398,6 +398,42 @@ theorem period_eq_of_torsor (E : Subfield (FKQ K L q T)) (h : ∀ c : K, algebra
     (norm_alg_pos (L := L) qK hqK0) (norm_alg_lt (L := L) qK hqK1) (i1.symm.trans i2)
   exact (algebraMap K L).injective this
 
+include hq0 hq1 in
+/-- An elliptic subfield admitting the period `q̄` is some `E_m`, with `EL = F_L(q̄|Xᵐ)` and `m` maximal
+for `EL ⊆ μ_k(M_L)`. -/
+theorem eq_Em_of_torsor (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K E)
+    {qb : K} (hqb0 : 0 < ‖qb‖) (hqb1 : ‖qb‖ < 1)
+    (ht : letI := subfieldAlgebra K E hE.1; IsFqTorsor (L := L) qb E) :
+    ∃ m d : ℕ, 0 < m ∧ 0 < d ∧ qb ^ d = q ^ m ∧ E = Em q T qb m ∧
+      (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype =
+        FqbarXm L (algebraMap K L qb) m ∧
+      IsGreatest {k : ℕ | 0 < k ∧ (elSub (L := L) (xiIota q T E)).map
+        (FqSub L (algebraMap K L q)).subtype ≤ (substPow L k).fieldRange} m := by
+  obtain ⟨qK, m, d, hqK0, hqK1, hm, hd, hdq, hEq, hgr⟩ := exists_period_elSub q T hq0 hq1 E hE
+  have hqK : qb = qK := period_eq_of_torsor q hq0 hq1 T E hE.1 hqb0 hqb1 hqK0 hqK1 hm hEq ht
+  subst hqK
+  obtain ⟨ζ, hζ, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  refine ⟨m, d, hm, hd, hdq, ?_, hEq, hgr⟩
+  ext x
+  constructor
+  · intro hx
+    rw [mem_Em, ← hEq]
+    exact ⟨_, range_mem_elSub (L := L) (xiIota q T E) ⟨x, hx⟩, rfl⟩
+  · intro hx
+    have hx' : (((x : FqSub L (algebraMap K L q))) : MeroRing L) ∈
+        (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype := by
+      rw [hEq]; exact hx
+    obtain ⟨y, hy, hyx⟩ := hx'
+    have hyx' : y = (x : FqSub L (algebraMap K L q)) := Subtype.ext hyx
+    subst hyx'
+    have hEfix : ∀ e τ, rhoZ q ζ τ (xiIota q T E e) = xiIota q T E e := fun e τ =>
+      (mem_semiFixed_iff q ζ _).mp ((hζ _).mp (e : FKQ K L q T).2) τ
+    have hfix : ∀ τ, rhoZ q ζ τ (x : FqSub L (algebraMap K L q)) = x := fun τ =>
+      (mem_semiFixed_iff q ζ _).mp ((hζ _).mp x.2) τ
+    obtain ⟨e, he⟩ := mem_fieldRange_of_fixed q T ζ E hE.1 hEfix hy hfix
+    have : (e : FKQ K L q T) = x := Subtype.ext he
+    rw [← this]; exact e.2
+
 end periodUnique
 
 end AnalyticTheory

@@ -232,7 +232,9 @@ include hq0 hq1 in
 theorem exists_period_elSub (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K E) :
     ∃ (qK : K) (m : ℕ) (d : ℕ), 0 < ‖qK‖ ∧ ‖qK‖ < 1 ∧ 0 < m ∧ 0 < d ∧ qK ^ d = q ^ m ∧
       (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype =
-        FqbarXm L (algebraMap K L qK) m := by
+        FqbarXm L (algebraMap K L qK) m ∧
+      IsGreatest {k : ℕ | 0 < k ∧ (elSub (L := L) (xiIota q T E)).map
+        (FqSub L (algebraMap K L q)).subtype ≤ (substPow L k).fieldRange} m := by
   obtain ⟨h, hE'⟩ := hE
   letI := subfieldAlgebra K E h
   letI := fqKAlgebra (L := L) q
@@ -243,7 +245,7 @@ theorem exists_period_elSub (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfiel
     fq_is_function_field L (algebraMap K L q) (norm_alg_pos (L := L) q hq0)
       (norm_alg_lt (L := L) q hq1)
   have hEL : IsEllipticOver L (EL L ι) := EL_isElliptic L ι hE' hF
-  obtain ⟨qb, m, hqb0, hqb1, -, hm, ⟨d, hd⟩, hEq, -, -⟩ :=
+  obtain ⟨qb, m, hqb0, hqb1, -, hm, ⟨d, hd⟩, hEq, -, hgr⟩ :=
     thmXVIII_main (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1)
       (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _) hEL
   have hfix := gen_fixes_period q T E hqb0 hqb1 hm hEq
@@ -260,7 +262,7 @@ theorem exists_period_elSub (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfiel
       rw [zpow_natCast]; exact pow_lt_one₀ (norm_nonneg _) hq1 hm.ne'
     linarith
   obtain ⟨d', rfl⟩ := Int.eq_ofNat_of_zero_le hdpos.le
-  refine ⟨qK, m, d', hqb0, hqb1, hm, by exact_mod_cast hdpos, ?_, hEq⟩
+  refine ⟨qK, m, d', hqb0, hqb1, hm, by exact_mod_cast hdpos, ?_, hEq, hgr⟩
   apply (algebraMap K L).injective
   rw [map_pow, map_pow]
   simpa [zpow_natCast] using hd
