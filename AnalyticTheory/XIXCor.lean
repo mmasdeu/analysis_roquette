@@ -339,6 +339,85 @@ theorem Em_one_galois_cyclic (ζ : CocycleModQ K L q)
 
 end splitEm
 
+section autXIX
+
+open TensorProduct
+
+variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
+variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
+
+attribute [local instance] fqKAlgebra
+
+theorem fqK_towerL' (q : K) : IsScalarTower K L (FqSub L (algebraMap K L q)) := fqK_tower_L q
+
+theorem FKQ_tower' (q : K) (T : SemiPeriodicTriple K L q) :
+    IsScalarTower K (FKQ K L q T) (FqSub L (algebraMap K L q)) :=
+  IsScalarTower.of_algebraMap_eq fun _ => rfl
+
+attribute [local instance] fqK_towerL' FKQ_tower'
+
+variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
+
+/-- `L ⊗_K F_K(𝐐) → F_L(q)`. -/
+noncomputable def fkqLift : L ⊗[K] FKQ K L q T →ₐ[L] FqSub L (algebraMap K L q) :=
+  Algebra.TensorProduct.lift (Algebra.ofId L _) (IsScalarTower.toAlgHom K (FKQ K L q T) _)
+    (fun _ _ => Commute.all _ _)
+
+theorem fkqLift_tmul (l : L) (f : FKQ K L q T) :
+    fkqLift q T (l ⊗ₜ f) = algebraMap L _ l * (f : FqSub L (algebraMap K L q)) := by
+  rw [fkqLift, Algebra.TensorProduct.lift_tmul]; rfl
+
+include hq0 in
+/-- `L ⊗_K F_K(𝐐) ≅ F_L(q)` (Galois descent). -/
+theorem fkqLift_bijective (ζ : CocycleModQ K L q)
+    (hζ : ∀ f : FqSub L (algebraMap K L q), f ∈ FKQ K L q T ↔ f ∈ Ezeta q ζ) :
+    Function.Bijective (fkqLift q T) := by
+  classical
+  let B := Module.Free.chooseBasis K (FKQ K L q T)
+  let := twistAction q hq0 ζ
+  have hc : IsSemilinear K L (FqSub L (algebraMap K L q)) := fun σ l => rhoZ_const q ζ σ l
+  have hind : LinearIndependent L (fun j => ((B j : FKQ K L q T) : FqSub L (algebraMap K L q))) := by
+    refine linearIndependent_of_fixed hc _ (fun j g => ?_) ?_
+    · exact (mem_semiFixed_iff q ζ _).mp ((hζ _).mp (B j).2) g
+    · have := B.linearIndependent.map'
+        (IsScalarTower.toAlgHom K (FKQ K L q T) (FqSub L (algebraMap K L q))).toLinearMap
+        (LinearMap.ker_eq_bot.mpr (FKQ K L q T).subtype.injective)
+      exact this
+  have hinj : Function.Injective (fkqLift q T) := by
+    rw [injective_iff_map_eq_zero]
+    intro t ht
+    obtain ⟨b, rfl⟩ := TensorProduct.eq_repr_basis_right B t
+    have hb : b = 0 := by
+      refine (linearIndependent_iff.mp hind) b ?_
+      rw [map_finsuppSum] at ht
+      have ht' : ∑ x ∈ b.support, algebraMap L (FqSub L (algebraMap K L q)) (b x) *
+          ((B x : FKQ K L q T) : FqSub L (algebraMap K L q)) = 0 := by
+        simpa [fkqLift_tmul, Finsupp.sum] using ht
+      rw [Finsupp.linearCombination_apply, Finsupp.sum]
+      refine (Finset.sum_congr rfl fun x _ => ?_).trans ht'
+      exact Algebra.smul_def _ _
+    simp [hb]
+  have hsurj : Function.Surjective (fkqLift q T) := by
+    intro x
+    have hx := Ezeta_L_span q hq0 ζ x
+    induction hx using Submodule.span_induction with
+    | mem y hy =>
+      obtain ⟨j, rfl⟩ := hy
+      refine ⟨1 ⊗ₜ ⟨_, (hζ _).mpr (Module.Free.chooseBasis K (Ezeta q ζ) j).2⟩, ?_⟩
+      rw [fkqLift_tmul, map_one, one_mul]; rfl
+    | zero => exact ⟨0, map_zero _⟩
+    | add y z _ _ hy hz =>
+      obtain ⟨a, rfl⟩ := hy
+      obtain ⟨b, rfl⟩ := hz
+      exact ⟨a + b, map_add _ _ _⟩
+    | smul c y _ hy =>
+      obtain ⟨a, rfl⟩ := hy
+      exact ⟨c • a, map_smul _ _ _⟩
+  exact ⟨hinj, hsurj⟩
+
+end autXIX
+
 section cors
 
 variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
