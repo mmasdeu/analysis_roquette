@@ -120,3 +120,4 @@ import AnalyticTheory.WeierstrassModel
 import AnalyticTheory.A1Remarks
 import AnalyticTheory.Sec4B3
 import AnalyticTheory.Sec4Torsor
+import AnalyticTheory.XIXPeriod
