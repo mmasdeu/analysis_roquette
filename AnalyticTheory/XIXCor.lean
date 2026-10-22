@@ -880,7 +880,28 @@ theorem corXIXa_galois (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : Semi
           (Usub K qbar (norm_pos_iff.mp hqb0) m))) ∧
     (IsGalois E (FKQ K L q T) ↔
       (¬ (ringChar K ∣ m) ∧ (∃ ζ : K, IsPrimitiveRoot ζ m) ∧ ∃ r : K, r ^ m = qbar)) := by
-  sorry
+  classical
+  obtain ⟨h, ht⟩ := hper
+  obtain ⟨m1, d1, hm1, hd1, hdq1, hEm1, -, -⟩ := eq_Em_of_torsor q hq0 hq1 T E hE hqb0 hqb1 ht
+  have hgr := Em_isGreatest K L q hq0 hq1 T qbar hqb0 hqb1 m1 d1 hm1 hd1 hdq1
+  rw [← hEm1] at hgr
+  have hmm : m1 = m := hgr.unique hmax
+  subst hmm hEm1
+  obtain ⟨ζ, hζ, -, -, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
+  refine ⟨Em_insepDeg q hq0 hq1 T hqb0 hqb1 hm hd hqd, aut_Em_equiv q hq0 hq1 T hqb0 hqb1 hm hd hqd,
+    ?_⟩
+  have hdeg : Module.finrank (Em q T qbar m1) (FKQ K L q T) = d * m1 :=
+    Em_subDeg q hq0 hq1 T ζ hζ hqb0 hqb1 hm hd hqd
+  haveI : FiniteDimensional (Em q T qbar m1) (FKQ K L q T) :=
+    Module.finite_of_finrank_pos (by rw [hdeg]; positivity)
+  obtain ⟨e⟩ := aut_Em_equiv q hq0 hq1 T hqb0 hqb1 hm hd hqd
+  rw [← card_quot_eq_iff hq0 hq1 hqb0 hqb1 hm hd hqd, ← Nat.card_congr e.toEquiv]
+  constructor
+  · intro hG
+    rw [← hdeg]
+    exact IsGalois.card_aut_eq_finrank _ _
+  · intro hc
+    exact IsGalois.of_card_aut_eq_finrank _ _ (hc.trans hdeg.symm)
 
 /-- Book, §6, Corollary XIXb: for each commensurable `q̄` there is a unique maximal elliptic
 subfield `E₀ ⊂ F` of period `q̄` that splits over `K`; `[F : E₀] = d₀ m₀` with `d₀ = lcm(n, r)`,
