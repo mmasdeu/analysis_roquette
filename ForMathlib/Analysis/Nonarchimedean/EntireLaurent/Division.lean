@@ -457,6 +457,7 @@ theorem gnorm_diff_le {A B Y Y' : holSubring K L} (hB : B ≠ 0) {ρ : ℝ} (hρ
   rw [this]
   exact le_trans (gnorm_sub_le hρ _ _) (max_le h1 h2)
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem coeff_le_gnorm {ρ : ℝ} (hρ : 0 < ρ) (f : holSubring K L) (n : ℤ) :
     ‖holCoeff K f n‖ * ρ ^ n ≤ gnorm K ρ f := wt_le_gnorm hρ f n
 

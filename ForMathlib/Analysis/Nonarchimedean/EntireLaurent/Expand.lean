@@ -108,6 +108,7 @@ omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem holExpand_apply {m : ℤ} (hm : m ≠ 0) (g : holSubring K L) (α : Punct L) :
     (holExpand K L m hm g).1 α = g.1 ⟨α.1 ^ m, zpow_ne_zero m α.2⟩ := rfl
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_holExpand {m : ℤ} (hm : m ≠ 0) (g : holSubring K L) :
     holCoeff K (holExpand K L m hm g) = expandSeq K m (holCoeff K g) :=
   holCoeff_eq K (expandSeq_convergent K hm (holCoeff_convergent K g)) (fun α =>
@@ -144,6 +145,7 @@ theorem residueSeq_convergent {m : ℕ} (hm : 0 < m) (i : ℕ) {a : ℤ → K}
   simp only [Function.comp, residueSeq]
   rw [mul_assoc, ← zpow_add₀ hρ0.ne', sub_add_cancel, zpow_mul, zpow_natCast, hρm]
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_sum {ι : Type*} (s : Finset ι) (g : ι → holSubring K L) (n : ℤ) :
     holCoeff K (∑ i ∈ s, g i) n = ∑ i ∈ s, holCoeff K (g i) n := by
   classical

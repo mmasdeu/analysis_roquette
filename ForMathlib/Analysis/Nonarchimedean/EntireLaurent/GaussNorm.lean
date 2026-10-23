@@ -26,21 +26,25 @@ noncomputable def gnorm (r : ℝ) (f : holSubring K L) : ℝ := ⨆ n : ℤ, wt 
 
 variable {K}
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_zero : holCoeff K (0 : holSubring K L) = fun _ => 0 :=
-  holCoeff_eq K (fun r hr => by simp) (fun x => by simpa using hasSum_zero)
+  holCoeff_eq K (fun r hr => by simp) (fun x => by simp)
 
 omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem wt_bddAbove {r : ℝ} (hr : 0 < r) (f : holSubring K L) :
     BddAbove (Set.range (fun n : ℤ => wt K r (holCoeff K f) n)) :=
   (wt_tendsto K (holCoeff_convergent K f) hr).bddAbove_range_of_cofinite
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem wt_le_gnorm {r : ℝ} (hr : 0 < r) (f : holSubring K L) (n : ℤ) :
     wt K r (holCoeff K f) n ≤ gnorm K r f :=
   le_ciSup (wt_bddAbove hr f) n
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem gnorm_nonneg {r : ℝ} (hr : 0 < r) (f : holSubring K L) : 0 ≤ gnorm K r f :=
   le_trans (wt_nonneg K hr _ 0) (wt_le_gnorm hr f 0)
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem gnorm_le_iff {r : ℝ} (hr : 0 < r) (f : holSubring K L) {M : ℝ} :
     gnorm K r f ≤ M ↔ ∀ n, wt K r (holCoeff K f) n ≤ M :=
   ⟨fun h n => le_trans (wt_le_gnorm hr f n) h, fun h => ciSup_le h⟩

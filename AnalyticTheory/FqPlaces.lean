@@ -54,6 +54,7 @@ theorem not_conjModQ_zero (hq0' : q ≠ 0) {α : Omega K} (hα : α ≠ 0) : ¬ 
   rw [h1] at hk
   exact mul_ne_zero hα (zpow_ne_zero _ hQ) hk.symm
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_shift_right (hq0' : q ≠ 0) {α x : Omega K} :
     ConjModQ K q α (algebraMap K (Omega K) q * x) ↔ ConjModQ K q α x := by
   have h : ConjModQ K q x (algebraMap K (Omega K) q * x) := by
@@ -1351,6 +1352,7 @@ section degreeAt
 variable {K} {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 include hq0 hq1 in
+omit [CompleteSpace K] in
 theorem exists_K_point_not_conj (α : Omega K) :
     ∃ c : K, c ≠ 0 ∧ ¬ ConjModQ K q (algebraMap K (Omega K) c) α := by
   have hq0' := norm_pos_iff.mp hq0

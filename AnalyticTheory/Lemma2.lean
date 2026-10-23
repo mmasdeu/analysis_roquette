@@ -35,6 +35,7 @@ theorem expq_mul (q : K) {a b : L} (ha : a ≠ 0) (hb : b ≠ 0) :
   rw [norm_mul, Real.log_mul (norm_ne_zero_iff.mpr ha) (norm_ne_zero_iff.mpr hb), add_div,
     mul_add, Circle.exp_add]
 
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem expq_gal (q : K) (σ : L ≃ₐ[K] L) (a : L) : expq K L q (σ a) = expq K L q a := by
   unfold expq; rw [gal_norm]
 
@@ -61,6 +62,7 @@ section chars
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 include hq0 hq1 in
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem expq_cocycle_mul (ζ : CocycleModQ K L q) (σ τ : L ≃ₐ[K] L) :
     expq K L q ((ζ.1 (σ * τ) : Lˣ) : L) = expq K L q (ζ.1 σ : L) * expq K L q (ζ.1 τ : L) := by
   obtain ⟨k, hk⟩ := ζ.2 σ τ
@@ -86,6 +88,7 @@ theorem charOfCocycle_apply (ζ : CocycleModQ K L q) (σ : L ≃ₐ[K] L) :
     charOfCocycle q hq0 hq1 ζ σ = expq K L q (ζ.1 σ : L) := rfl
 
 include hq0 hq1 in
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem expq_cocycleEquiv {ζ ζ' : CocycleModQ K L q} (h : CocycleEquiv K L q ζ ζ')
     (σ : L ≃ₐ[K] L) : expq K L q (ζ'.1 σ : L) = expq K L q (ζ.1 σ : L) := by
   obtain ⟨a, ha⟩ := h
@@ -198,6 +201,7 @@ theorem vq_mul (x y : Lˣ) : vq q (x * y) = vq q x + vq q y := by
   rw [Units.val_mul, norm_mul, Real.log_mul (norm_ne_zero_iff.mpr x.ne_zero)
     (norm_ne_zero_iff.mpr y.ne_zero), add_div]
 
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem vq_gal (σ : L ≃ₐ[K] L) (x : Lˣ) : vq q (Units.map (σ : L →* L) x) = vq q x := by
   unfold vq
   simp only [Units.coe_map, MonoidHom.coe_ofClass]
@@ -308,6 +312,7 @@ section surj
 
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem vq_Qp (σ : L ≃ₐ[K] L) (Q : Lˣ) (i : ℕ) :
     vq q (Qp σ Q i) = i * vq q Q := by
   induction i with
@@ -525,6 +530,7 @@ theorem vq_inv' (x : Lˣ) : vq q x⁻¹ = - vq q x := by
   have := vq_mul q x x⁻¹
   rw [mul_inv_cancel, vq_one] at this; linarith
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem vq_zpow (Q : Lˣ) (hQ : vq q Q = 1) (k : ℤ) : vq q (Q ^ k) = k := by
   induction k using Int.induction_on with
   | zero => simpa using vq_one q

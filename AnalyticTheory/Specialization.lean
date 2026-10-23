@@ -244,7 +244,7 @@ theorem split_of_specialization {m : ℕ} (hm : 0 < m)
           hιO (by
             rw [hC, AlgHom.commutes]
             ext i j
-            by_cases h : i = j <;> simp [ιO, h, Matrix.algebraMap_eq_diagonal] <;> rfl)
+            by_cases h : i = j <;> simp [ιO, h, Matrix.algebraMap_eq_diagonal]; rfl)
         rw [this]
         ext i j
         by_cases h : i = j <;> simp [h, hev, Matrix.algebraMap_eq_diagonal] }

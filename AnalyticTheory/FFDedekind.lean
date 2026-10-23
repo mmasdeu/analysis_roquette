@@ -201,6 +201,7 @@ theorem locOf_isDVR (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] (h : 𝔪 ≠ ⊥)
     IsDiscreteValuationRing (Q.locOf 𝔪) :=
   IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (Q.intCl F) h _
 
+omit [Algebra K F] [IsScalarTower K E F] in
 theorem locOf_mem_or_inv_mem (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] (h : 𝔪 ≠ ⊥) (x : F) :
     x ∈ (Q.locOf 𝔪).toSubring ∨ x⁻¹ ∈ (Q.locOf 𝔪).toSubring := by
   have := Q.locOf_isDVR 𝔪 h

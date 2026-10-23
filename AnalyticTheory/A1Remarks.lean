@@ -147,9 +147,7 @@ theorem exists_data_of_weierstrassNormal (hF : IsFunctionFieldOver K F) (x y : F
     · rw [Set.mem_singleton_iff.mp h]
       have hy2 : y / 2 ∈ IntermediateField.adjoin K ({x, y / 2} : Set F) :=
         IntermediateField.subset_adjoin K _ (by simp)
-      have h2m : (2 : F) ∈ IntermediateField.adjoin K ({x, y / 2} : Set F) := by
-        have := (IntermediateField.adjoin K ({x, y / 2} : Set F)).algebraMap_mem (2 : K)
-        simpa using this
+      have h2m : (2 : F) ∈ IntermediateField.adjoin K ({x, y / 2} : Set F) := by simp
       have hmem := mul_mem h2m hy2
       have e : (2 : F) * (y / 2) = y := by field_simp
       rw [e] at hmem

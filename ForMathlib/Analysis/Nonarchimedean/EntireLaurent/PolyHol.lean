@@ -73,14 +73,17 @@ theorem polyHol_apply (P : K[X]) (x : Punct L) :
     simp
 
 
+omit [IsAlgClosed L] in
 theorem monoHol_nat (m : ℕ) : monoHol K L (m : ℤ) = monoHol K L 1 ^ m := by
   induction m with
   | zero => simpa using monoHol_zero K
   | succ m ih => rw [Nat.cast_succ, monoHol_add, ih, pow_succ]
 
+omit [IsAlgClosed L] in
 theorem polyHol_X_pow (m : ℕ) : polyHol K L (X ^ m) = monoHol K L (m : ℤ) := by
   rw [map_pow, monoHol_nat, polyHol, Polynomial.aeval_X]
 
+omit [IsAlgClosed L] in
 theorem monoHol_neg_mul (s : ℤ) : monoHol K L (-s) * monoHol K L s = 1 := by
   rw [← monoHol_add, neg_add_cancel, monoHol_zero]
 
@@ -93,6 +96,7 @@ theorem isConvergentLaurent_add {a b : ℤ → K} (ha : IsConvergentLaurent K a)
   have hp : 0 ≤ r ^ n := zpow_nonneg hr.le n
   nlinarith
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_add (f g : holSubring K L) :
     holCoeff K (f + g) = fun n => holCoeff K f n + holCoeff K g n := by
   refine holCoeff_eq K (isConvergentLaurent_add K (holCoeff_convergent K f)
@@ -100,12 +104,14 @@ theorem holCoeff_add (f g : holSubring K L) :
   have := (holCoeff_hasSum K f α).add (holCoeff_hasSum K g α)
   simpa [map_add, add_mul] using this
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_neg (f : holSubring K L) : holCoeff K (-f) = fun n => - holCoeff K f n := by
   refine holCoeff_eq K (fun r hr => ?_) (fun α => ?_)
   · simpa using holCoeff_convergent K f r hr
   · have := (holCoeff_hasSum K f α).neg
     simpa [map_neg, neg_mul] using this
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_sub (f g : holSubring K L) :
     holCoeff K (f - g) = fun n => holCoeff K f n - holCoeff K g n := by
   rw [sub_eq_add_neg, holCoeff_add, holCoeff_neg]
@@ -123,6 +129,7 @@ theorem holCoeff_monoHol (n m : ℤ) : holCoeff K (monoHol K L n) m = if m = n t
     simp [hm])
   exact congrFun this m
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_algebraMap_mul (c : K) (g : holSubring K L) :
     holCoeff K (algebraMap K (holSubring K L) c * g) = fun n => c * holCoeff K g n := by
   refine holCoeff_eq K (fun r hr => ?_) (fun α => ?_)
@@ -430,11 +437,13 @@ theorem hol_phi_division {α : L} (hα : α ≠ 0) (f : holSubring K L) :
     rw [h4.unique h3]; rfl
 
 
+omit [IsAlgClosed L] in
 theorem polyHol_minpoly_apply {α : L} (hα : α ≠ 0) :
     (polyHol K L (minpoly K α)).1 ⟨α, hα⟩ = 0 := by
   rw [polyHol_apply]
   simp [Polynomial.eval_map_algebraMap]
 
+omit [IsAlgClosed L] in
 theorem polyHol_apply_eq_aeval (P : K[X]) {α : L} (hα : α ≠ 0) :
     (polyHol K L P).1 ⟨α, hα⟩ = Polynomial.aeval α P := by
   rw [polyHol_apply]
@@ -465,7 +474,7 @@ theorem polyHol_minpoly_prime {α : L} (hα : α ≠ 0) : Prime (polyHol K L (mi
     have hint : IsIntegral K α := Algebra.IsIntegral.isIntegral α
     have h1 : holCoeff K (0 : holSubring K L) ((minpoly K α).natDegree : ℤ) = 0 := by
       have := holCoeff_eq K (f := (0 : holSubring K L)) (a := fun _ => 0) (fun r hr => by simp)
-        (fun x => by simpa using hasSum_zero)
+        (fun x => by simp)
       rw [this]
     rw [h1] at this
     simp [(minpoly.monic hint).coeff_natDegree] at this

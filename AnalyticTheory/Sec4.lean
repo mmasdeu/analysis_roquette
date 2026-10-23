@@ -183,6 +183,7 @@ theorem orderOf_gen (T : SemiPeriodicTriple K L q) :
   obtain ⟨a, rfl⟩ := gen_zpow q T g
   exact ⟨a, rfl⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 theorem prod_aut_eq_prod_pow (T : SemiPeriodicTriple K L q) (x : L) :
     ∏ τ : L ≃ₐ[K] L, τ x = ∏ j ∈ Finset.range (Module.finrank K L), (T.gen ^ j) x := by
   have hn := orderOf_gen q T

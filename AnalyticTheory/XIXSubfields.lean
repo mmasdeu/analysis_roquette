@@ -112,6 +112,7 @@ theorem mem_Em {qb : K} {m : ℕ} (x : FKQ K L q T) :
     x ∈ Em q T qb m ↔ (((x : FqSub L (algebraMap K L q)) : MeroRing L)) ∈
       FqbarXm L (algebraMap K L qb) m := Iff.rfl
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 theorem const_mem_Em (qb : K) {m : ℕ} (hm : 0 < m) (c : K) :
     algebraMap K (FKQ K L q T) c ∈ Em q T qb m := by
   have hmz : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'

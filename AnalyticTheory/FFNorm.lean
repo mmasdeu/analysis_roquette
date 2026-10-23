@@ -51,6 +51,7 @@ theorem mem_intCl_of_forall {x : F} (h : ∀ P : Q.Over F, x ∈ P.1.ring) : x �
   obtain ⟨y, rfl⟩ := hx
   exact y.2
 
+omit [Algebra K F] [IsScalarTower K E F] in
 theorem finite_maximals : {I : Ideal (Q.intCl F) | I.IsMaximal}.Finite :=
   (IsDedekindDomain.primesOver_finite (IsLocalRing.maximalIdeal Q.ring) (Q.intCl F)).subset
     fun I hI => by have : I.IsMaximal := hI; exact Q.mem_primesOver_of_isMaximal I
@@ -129,6 +130,7 @@ theorem algebraMap_intNorm' (x : Q.intCl F) :
     algebraMap Q.ring E (Algebra.intNorm Q.ring (Q.intCl F) x) = Algebra.norm E (x : F) :=
   Algebra.algebraMap_intNorm (K := E) (L := F) x
 
+omit [Algebra K F] [IsScalarTower K E F] in
 /-- The norm of a unit of `S` has order `0`. -/
 theorem ord_norm_of_unit {u : F} (hu : u ∈ Q.intCl F) (hu' : u⁻¹ ∈ Q.intCl F) (hu0 : u ≠ 0) :
     Q.ord (Algebra.norm E u) = 0 := by

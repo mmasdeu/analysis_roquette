@@ -98,6 +98,7 @@ theorem conjModQ_of_shift (q : K) (α : Omega K) (k : ℤ) :
     ConjModQ K q α (α * algebraMap K (Omega K) q ^ k) :=
   ⟨_, rfl, k, rfl⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- The chosen system of representatives has the defining property. -/
 theorem repSystem_spec {q : K} (hq0 : 0 < ‖q‖) (_hq1 : ‖q‖ < 1) :
     ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →

@@ -153,10 +153,10 @@ theorem serD_eq_serPsi : serD = serPsi := by
   have hq0 : 0 < ‖((2 : ℚ_[2]) ^ k) ^ 2‖ := by rw [hqn]; positivity
   have hq1 : ‖((2 : ℚ_[2]) ^ k) ^ 2‖ < 1 := by
     rw [hqn]; exact pow_lt_one₀ (by positivity) (by norm_num) (by omega)
-  have hne : (2 : ℚ_[2]) ^ k ≠ 0 := pow_ne_zero _ (by simpa using hπ0.ne')
+  have hne : (2 : ℚ_[2]) ^ k ≠ 0 := pow_ne_zero _ (by simp)
   rw [evalZ_sub hq1, evalZ_serD hq1,
     evalZ_serPsi hq1 (norm_pos_iff.mp hq0),
-    delta_product_core hq0 hq1 (by simpa using hπ0.ne') hne rfl, sub_self]
+    delta_product_core hq0 hq1 (by simp) hne rfl, sub_self]
 
 /-- Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic. -/
 theorem remark3_delta_product (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :

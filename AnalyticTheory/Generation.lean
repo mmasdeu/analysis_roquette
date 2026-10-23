@@ -39,6 +39,7 @@ theorem pDiv_eq_divisorOf (n : ℕ) :
       rw [anVal_Th hq0 hq1 hα]; split_ifs <;> rfl)]
     by_cases h : ConjModQ K q 1 α <;> simp [h, hα] ; rfl
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_one_shift {α : Omega K} (hq0' : q ≠ 0) :
     ConjModQ K q 1 (algebraMap K (Omega K) q * α) ↔ ConjModQ K q 1 α := by
   have h : ConjModQ K q α (algebraMap K (Omega K) q * α) := by

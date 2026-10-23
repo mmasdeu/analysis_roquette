@@ -52,6 +52,7 @@ theorem holGal_holExt (σ : L ≃ₐ[K] L) (τ : K' ≃ₐ[K] K')
   funext n
   exact h _
 
+omit [IsScalarTower K K' L] in
 theorem meroGal_meroExt' (σ : L ≃ₐ[K] L) (τ : K' ≃ₐ[K] K')
     (h : ∀ c : K', σ (algebraMap K' L c) = algebraMap K' L (τ c)) (f : MeroRing K') :
     meroGal σ (meroExt (L := L) f) = meroExt (meroGal τ f) := by
@@ -87,6 +88,7 @@ theorem resK_commutes (σ : L ≃ₐ[K] L) (c : Kchi K L χ) :
     algebraMap (Kchi K L χ) L (resK χ σ c) = σ (algebraMap (Kchi K L χ) L c) :=
   AlgEquiv.restrictNormal_commutes σ (Kchi K L χ) c
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 theorem mem_ker_iff_resK (g : L ≃ₐ[K] L) : g ∈ MonoidHom.ker χ ↔ resK χ g = 1 := by
   constructor
   · intro hg
@@ -111,6 +113,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpac
 theorem resK_surjective : Function.Surjective (resK χ) :=
   AlgEquiv.restrictNormalHom_surjective (F := K) (K₁ := Kchi K L χ) L
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 /-- A generator of `Gal(L|K)` modulo `ker χ` gives a generator of `Gal(K_χ|K)`. -/
 theorem resK_closure (σ : L ≃ₐ[K] L) (hgen : ∀ g : L ≃ₐ[K] L, ∃ a : ℤ, χ g = χ σ ^ a) :
     Subgroup.closure ({resK χ σ} : Set (Kchi K L χ ≃ₐ[K] Kchi K L χ)) = ⊤ := by
@@ -126,6 +129,7 @@ theorem resK_closure (σ : L ≃ₐ[K] L) (hgen : ∀ g : L ≃ₐ[K] L, ∃ a :
   rw [map_mul, map_zpow, zpow_neg, mul_inv_eq_one] at h2
   exact h2.symm
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 theorem orderOf_resK (σ : L ≃ₐ[K] L) : orderOf (resK χ σ) = orderOf (χ σ) := by
   apply orderOf_eq_orderOf_iff.mpr
   intro m
@@ -150,6 +154,7 @@ theorem charOfCocycle_cocycleExt (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   show expq K L q (algebraMap (Kchi K L χ) L ((ζ'.1 (resK χ g) : (Kchi K L χ)ˣ) : Kchi K L χ)) = _
   exact expq_algebraMap χ q _
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 theorem resK_zpow (σ g : L ≃ₐ[K] L) (a : ℤ) (h : χ g = χ σ ^ a) :
     resK χ g = resK χ σ ^ a := by
   have h1 : g * σ ^ (-a) ∈ MonoidHom.ker χ := by
@@ -228,7 +233,7 @@ theorem exists_triple_of_isCharInvariant (E : Type u) [Field E] [Algebra K E] (�
 include hq0 hq1 in
 /-- Book, §4, Theorem X (minimal splitting field): if `E` has character invariant `χ` then the
 cyclic field `K_χ` splits `E` and lies in every Galois splitting field `M ⊂ L`. -/
-theorem thmX_minimal_splitting (E : Type u) [Field E] [Algebra K E] (hE : IsEllipticOver K E)
+theorem thmX_minimal_splitting (E : Type u) [Field E] [Algebra K E] (_hE : IsEllipticOver K E)
     (χ : CharGroup K L) (hχ : IsCharInvariant q hq0 hq1 E χ) :
     SplitsOver K E (Kchi K L χ) ∧
       ∀ (M : IntermediateField K L) (_ : IsGalois K M), SplitsOver K E M → Kchi K L χ ≤ M := by

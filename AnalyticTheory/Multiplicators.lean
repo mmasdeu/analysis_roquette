@@ -386,6 +386,7 @@ theorem finrank_ptBelow (u : Kˣ) (m : ℤ) (β : Omega K) :
   rw [← adjoin.finrank (Algebra.IsIntegral.isIntegral γ),
     ← adjoin.finrank (Algebra.IsIntegral.isIntegral β), Module.finrank_mul_finrank]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem pointDivisor_congr {a b : Omega K} (hq : q ≠ 0) (h : ConjModQ K q a b) :
     pointDivisor K q a = pointDivisor K q b := by
   classical

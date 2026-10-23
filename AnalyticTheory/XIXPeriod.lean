@@ -221,7 +221,7 @@ theorem EL_conservative (hE : IsEllipticOver K E) : IsConservative L (EL L ι) :
         · exact Subfield.subset_closure (Or.inr ⟨algebraMap L L' l, by
             show algebraMap L' FL' (algebraMap L L' l) = algebraMap (EL L ι) FL' (algebraMap L (EL L ι) l)
             rw [← IsScalarTower.algebraMap_apply L L' FL', IsScalarTower.algebraMap_apply L (EL L ι) FL']⟩)
-      | one => simpa using one_mem _
+      | one => simp
       | add x y _ _ hx hy => simpa using add_mem hx hy
       | neg x _ hx => simpa using neg_mem hx
       | inv x _ hx => simpa using inv_mem hx

@@ -729,13 +729,16 @@ omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem gal_norm (σ : L ≃ₐ[K] L) (x : L) : ‖σ x‖ = ‖x‖ := by
   rw [normL_eq_spectral (K := K), normL_eq_spectral (K := K) x, ← spectralNorm_eq_of_equiv σ x]
 
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem gal_isometry (σ : L ≃ₐ[K] L) : Isometry σ :=
   AddMonoidHomClass.isometry_of_norm σ (gal_norm σ)
 
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem isConvergentLaurent_gal (σ : L ≃ₐ[K] L) {a : ℤ → L} (ha : IsConvergentLaurent L a) :
     IsConvergentLaurent L (fun n => σ (a n)) := by
   intro r hr; simpa [gal_norm] using ha r hr
 
+omit [IsGalois K L] in
 theorem convCoeff_gal (σ : L ≃ₐ[K] L) {a b : ℤ → L} (ha : IsConvergentLaurent L a)
     (hb : IsConvergentLaurent L b) :
     (fun n => σ (convCoeff L a b n)) = convCoeff L (fun n => σ (a n)) (fun n => σ (b n)) := by
@@ -751,6 +754,7 @@ theorem convCoeff_gal (σ : L ≃ₐ[K] L) {a b : ℤ → L} (ha : IsConvergentL
 noncomputable def holGalFun (σ : L ≃ₐ[K] L) (g : holSubring L) : holSubring L :=
   holOfSeq L (Omega L) (fun n => σ (holCoeff L g n)) (isConvergentLaurent_gal σ (holCoeff_convergent L g))
 
+omit [IsGalois K L] in
 theorem holCoeff_holGalFun (σ : L ≃ₐ[K] L) (g : holSubring L) :
     holCoeff L (holGalFun σ g) = fun n => σ (holCoeff L g n) := holCoeff_holOfSeq L (L := Omega L) _ _
 

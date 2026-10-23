@@ -131,10 +131,12 @@ theorem holCoeff_holOfSeq (a : ℤ → K) (ha : IsConvergentLaurent K a) :
     holCoeff K (holOfSeq K L a ha : holSubring K L) = a :=
   holCoeff_eq K ha (holOfSeq_hasSum K a ha)
 
+omit [IsAlgClosed L] in
 theorem holCoeff_injective : Function.Injective (holCoeff K (L := L)) := fun f g h => by
   rw [← holOfSeq_holCoeff K f, ← holOfSeq_holCoeff K g]
   congr 1
 
+omit [Algebra.IsIntegral K L] in
 /-- The Laurent coefficients of a product are the convolution of the coefficients. -/
 theorem holCoeff_mul (f g : holSubring K L) :
     holCoeff K (f * g) = convCoeff K (holCoeff K f) (holCoeff K g) :=
@@ -152,6 +154,7 @@ theorem deltaSeq_convergent : IsConvergentLaurent K (deltaSeq K) := by
   filter_upwards [hev] with n hn
   simp [deltaSeq, hn]
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_one : holCoeff K (1 : holSubring K L) = deltaSeq K := by
   refine holCoeff_eq K (deltaSeq_convergent K) (fun α => ?_)
   have h := hasSum_single (f := fun n : ℤ => algebraMap K L (deltaSeq K n) * α.1 ^ n) 0
@@ -187,6 +190,7 @@ theorem monoHol_apply (n : ℤ) (α : Punct L) : (monoHol K L n).1 α = α.1 ^ n
   simp only [ite_true, map_one, one_mul] at this
   exact this
 
+omit [Algebra.IsIntegral K L] in
 /-- The units of `H_K` are the functions `c Xⁿ`. -/
 theorem hol_unit {f g : holSubring K L} (h : f * g = 1) :
     ∃ (c : K) (n : ℤ), c ≠ 0 ∧ ∀ α : Punct L, f.1 α = algebraMap K L c * α.1 ^ n := by

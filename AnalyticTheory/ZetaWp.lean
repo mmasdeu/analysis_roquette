@@ -269,12 +269,12 @@ end factors
 
 section main
 
-include hq0 hq1 in
+include hq0 in
 theorem thF_eq_binom (n : ℕ) : thF q (minpoly K (1 : Omega K)) n = binom1 (q ^ n) (-1) := by
   refine Subtype.ext (funext fun y => ?_)
   rw [thF_one hq0, binom1_apply, zpow_neg_one, map_pow]
 
-include hq0 hq1 in
+include hq0 in
 theorem thG_eq_binom (n : ℕ) :
     thG q (minpoly K (1 : Omega K)) (n + 1) = binom1 (q ^ (n + 1)) 1 := by
   refine Subtype.ext (funext fun y => ?_)
@@ -423,18 +423,18 @@ theorem GP_pointwise (x : OmegaX K) (hx : (Th hq0 hq1).1 x ≠ 0) :
     intro N
     rw [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl (fun j _ => ?_)
-    rw [add_sub_cancel, thF_eq_binom hq0 hq1]
+    rw [add_sub_cancel, thF_eq_binom hq0]
     refine ldm_F_term hq0' j x ?_
-    rw [← binom1_apply, ← thF_eq_binom hq0 hq1]
+    rw [← binom1_apply, ← thF_eq_binom hq0]
     exact hfF j
   have eG : ∀ N : ℕ, ∑ j ∈ Finset.range N, ldm (1 + (thG q φ (j + 1) - 1)) x =
       -∑ j ∈ Finset.range N, tmx q x.1 ((j : ℤ) + 1) := by
     intro N
     rw [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl (fun j _ => ?_)
-    rw [add_sub_cancel, thG_eq_binom hq0 hq1]
+    rw [add_sub_cancel, thG_eq_binom hq0]
     refine ldm_G_term hq0' j x ?_
-    rw [← binom1_apply, ← thG_eq_binom hq0 hq1]
+    rw [← binom1_apply, ← thG_eq_binom hq0]
     exact hfG j
   have hsum := tendsto_symm_partial (wpSeries_hasSum hq0 hq1 x hx)
   have hlim := (hMF.add hMG).neg

@@ -107,6 +107,7 @@ theorem FFDivisor.deg_ofL (D : FFDivisor L F) :
   show D P * ((P.ofL (K := K)).degree : ℤ) = _
   rw [PrimeDivisor.degree_ofL]; push_cast; ring
 
+omit [FiniteDimensional K L] in
 theorem mem_rrSpace_ofL (D : FFDivisor L F) (f : F) :
     f ∈ rrSpace (FFDivisor.ofL (K := K) D) ↔ f ∈ rrSpace D := by
   rw [mem_rrSpace_iff, mem_rrSpace_iff]

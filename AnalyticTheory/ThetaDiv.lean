@@ -134,6 +134,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem mem_thetaS {α : Omega K} : α ∈ thetaS hq0 hq1 hm ↔ α ∈ repAnnulus K q ∧ m α ≠ 0 := by
   unfold thetaS; rw [Set.Finite.mem_toFinset]; rfl
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem ne_zero_of_mem_thetaS {α : Omega K} (h : α ∈ thetaS hq0 hq1 hm) : α ≠ 0 := by
   rintro rfl
   have := ((mem_thetaS hq0 hq1 hm).mp h).1
@@ -318,6 +319,7 @@ theorem degQ_eq_dTheta : degQ K q m = dTheta hq0 hq1 hm := by
       exact ⟨((mem_thetaS hq0 hq1 hm).mp hα).1, hne⟩
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem aTheta_ne_zero : aTheta hq0 hq1 hm ≠ 0 := by
   unfold aTheta
   refine Finset.prod_ne_zero_iff.mpr (fun α hα => zpow_ne_zero _ ?_)

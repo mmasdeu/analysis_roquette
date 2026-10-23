@@ -162,6 +162,7 @@ theorem thGpoly_coeff_le {q : K} (hq0 : q ≠ 0) {φ : Polynomial K} (hc0 : φ.c
     rw [gcoef, ← h1]; field_simp
   rw [this]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem thGpoly_coeff_bound {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial K}
     (hc0 : φ.coeff 0 ≠ 0) (n : ℕ) (j : ℕ) :
     ‖(thGpoly q φ n).coeff j‖ ≤

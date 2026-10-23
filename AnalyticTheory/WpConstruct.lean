@@ -73,6 +73,7 @@ theorem evalsTo_unique {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {f f' : M
   rw [div_eq_div_iff h1 h2, ← map_mul, ← map_mul, key]
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_one_iff {q : K} (hq0 : q ≠ 0) {ξ : Omega K} :
     ConjModQ K q 1 ξ ↔ ∃ k : ℤ, ξ = algebraMap K (Omega K) q ^ k := by
   constructor

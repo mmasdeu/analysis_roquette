@@ -195,6 +195,7 @@ theorem aj_backward (hd : degQ K q m = 0) (hΦ : PhiQ K q (norm_pos_iff.mp hq0) 
 
 end aj
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem eq_of_conjModQ_K {q : K} (hq0 : q ≠ 0) {γ : Omega K} {y : K}
     (h : ConjModQ K q γ (algebraMap K (Omega K) y)) : ∃ k : ℤ, γ = algebraMap K (Omega K) (q ^ k * y) := by
   classical
@@ -209,6 +210,7 @@ theorem eq_of_conjModQ_K {q : K} (hq0 : q ≠ 0) {γ : Omega K} {y : K}
   simp only [map_sub, Polynomial.aeval_X, Polynomial.aeval_C] at this
   exact ⟨k, sub_eq_zero.mp this⟩
 
+omit [CompleteSpace K] in
 theorem conj_family_subsingleton {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {c : K} (hc : c ≠ 0)
     (γ : Omega K) :
     {n : ℕ | ConjModQ K q γ (algebraMap K (Omega K) (c * (1 + q ^ (n + 1))))}.Subsingleton := by
@@ -391,6 +393,7 @@ def IsRepSystem (q : K) (R : Set (Omega K)) : Prop :=
   ∀ α : Omega K, ‖q‖ < omegaNorm K α → omegaNorm K α ≤ 1 →
     ∃! β, β ∈ R ∧ (‖q‖ < omegaNorm K β ∧ omegaNorm K β ≤ 1) ∧ ConjModQ K q α β
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem system_bijOn {q : K} (hq0 : q ≠ 0) {R R' : Set (Omega K)} (hR : IsRepSystem q R)
     (hR' : IsRepSystem q R') :
     ∃ e : Omega K → Omega K, (annPart q R).BijOn e (annPart q R') ∧
@@ -478,6 +481,7 @@ theorem annPart_ne_zero {q : K} (hq0 : 0 < ‖q‖) {R : Set (Omega K)} {α : Om
   have : omegaNorm K (0 : Omega K) = 0 := spectralNorm_zero
   linarith
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem system_prod_ratio {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
     (hm : m ∈ DivisorsPeriodic K q) {R R' : Set (Omega K)} (hR : IsRepSystem q R)
     (hR' : IsRepSystem q R') :
@@ -525,6 +529,7 @@ theorem system_prod_ratio {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : O
     rw [periodic_conj hq0' hm (hconj β hβ)]; exact hγA.2
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem annPart_prod_ne_zero {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
     (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K)) :
     ∏ᶠ α ∈ annPart q R, normGen α ^ m α ≠ 0 := by

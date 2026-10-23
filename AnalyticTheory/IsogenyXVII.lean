@@ -918,6 +918,7 @@ noncomputable def psiHom : Usub K qbar (norm_pos_iff.mp hqb0) m →* Multiplicat
         zpow_add₀ (norm_pos_iff.mp hqb0)])]
     rfl
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem mem_ker_psiHom (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
     u ∈ (psiHom hqb0 hqb1 (m := m)).ker ↔ ((u : Kˣ) : K) ^ m = 1 := by
   rw [MonoidHom.mem_ker]
@@ -930,6 +931,7 @@ theorem mem_ker_psiHom (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
     rw [psiExp_eq hqb0 hqb1 (k := 0) (by rw [h, zpow_zero])]
 
 include hqb1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem card_ker_psiHom :
     Nat.card (psiHom hqb0 hqb1 (m := m)).ker = Nat.card (rootsOfUnity m K) := by
   refine Nat.card_congr
@@ -952,6 +954,7 @@ noncomputable abbrev qSub : Subgroup (Usub K qbar (norm_pos_iff.mp hqb0) m) :=
     (Usub K qbar (norm_pos_iff.mp hqb0) m)
 
 include hq1 hm in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem qSub_inf_ker : qSub hq0 hqb0 (m := m) ⊓ (psiHom hqb0 hqb1 (m := m)).ker = ⊥ := by
   rw [eq_bot_iff]
   rintro ⟨u, hu⟩ hx
@@ -981,6 +984,7 @@ theorem qU_mem_Usub : Units.mk0 q (norm_pos_iff.mp hq0) ∈ Usub K qbar (norm_po
   ⟨d, by rw [Units.val_mk0, ← hqd, zpow_natCast]⟩
 
 include hqd in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem map_qSub : (qSub hq0 hqb0 (m := m)).map (psiHom hqb0 hqb1 (m := m)) =
     Subgroup.zpowers (Multiplicative.ofAdd (d : ℤ)) := by
   have hmem := qU_mem_Usub hq0 hqb0 hqd
@@ -1036,6 +1040,7 @@ theorem card_quot_mul_index :
   rw [← h1, h2, h3, mul_assoc, h4, card_ker_psiHom hqb0 hqb1]
 
 include hqb1 hm in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- `ψ(U) = ℤ` iff `q̄` is an `m`-th power in `K`. -/
 theorem range_psiHom_eq_top_iff :
     (psiHom hqb0 hqb1 (m := m)).range = ⊤ ↔ ∃ r : K, r ^ m = qbar := by

@@ -219,7 +219,7 @@ theorem isIntegral_y_of_const {x y : F} (hxy : NormalForm W x y) {a : K}
     (ha : algebraMap K F a = x) : _root_.IsIntegral K y := by
   refine ⟨X ^ 2 + C (W.a₁ * a + W.a₃) * X - C (a ^ 3 + W.a₂ * a ^ 2 + W.a₄ * a + W.a₆), ?_, ?_⟩
   · have h1 : (C (W.a₁ * a + W.a₃) * X - C (a ^ 3 + W.a₂ * a ^ 2 + W.a₄ * a + W.a₆) : K[X]).degree < 2 := by
-      compute_degree <;> norm_num
+      compute_degree; norm_num
     have := (monic_X_pow 2).add_of_left (q := C (W.a₁ * a + W.a₃) * X - C (a ^ 3 + W.a₂ * a ^ 2 + W.a₄ * a + W.a₆)) (by simpa using h1)
     convert this using 1
     ring
@@ -362,11 +362,12 @@ theorem exists_translation_equiv (hK : ∀ z : F, _root_.IsIntegral K z → ∃ 
   exact h1
 
 omit [W.IsElliptic] in
-theorem baseChange_a (c : K) : ((W.baseChange F).a₁ = algebraMap K F W.a₁) ∧
+theorem baseChange_a (_c : K) : ((W.baseChange F).a₁ = algebraMap K F W.a₁) ∧
     ((W.baseChange F).a₂ = algebraMap K F W.a₂) ∧ ((W.baseChange F).a₃ = algebraMap K F W.a₃) ∧
     ((W.baseChange F).a₄ = algebraMap K F W.a₄) ∧ ((W.baseChange F).a₆ = algebraMap K F W.a₆) :=
   ⟨rfl, rfl, rfl, rfl, rfl⟩
 
+omit [W.IsElliptic] in
 /-- The `x`-coordinate of the translate `(x, y) + T` has a pole at `P` if `T = (ξ, η₂)` is the
 negative of the reduction of `(x, y)` at `P`. -/
 theorem translate_pole (P : PrimeDivisor K F) {x y : F} (hx : x ∈ P.ring) (hxy : NormalForm W x y)

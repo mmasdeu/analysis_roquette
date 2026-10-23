@@ -119,7 +119,7 @@ include hq0 hq1 in
 /-- Book, §4, Theorem IX (existence): for every `q`-trivial character `χ` there is an elliptic
 function field of period `q`, split by `L`, with character invariant `χ`. -/
 theorem thmIX_realise (χ : CharGroup K L) (hχ : IsQTrivial K L q χ) :
-    ∃ (E : Type u) (_ : Field E) (_ : Algebra K E) (hE : IsEllipticOver K E)
+    ∃ (E : Type u) (_ : Field E) (_ : Algebra K E) (_ : IsEllipticOver K E)
       (_ : SplitsOver K E L), IsFqTorsor (L := L) q E ∧ IsCharInvariant q hq0 hq1 E χ := by
   obtain ⟨ζ, hζ⟩ := thmIX_exists q hq0 hq1 χ hχ
   exact ⟨Ezeta q ζ, inferInstance, inferInstance, Ezeta_isElliptic q hq0 hq1 ζ,

@@ -56,7 +56,7 @@ theorem end_sum_apply {ι : Type*} (S : Finset ι) (f : ι → AddMonoid.End Amb
 theorem end_pow_succ_apply (x : AddMonoid.End Amb) (n : ℕ) (a : Amb) :
     (x ^ (n + 1)) a = x ((x ^ n) a) := by rw [pow_succ']; rfl
 
-theorem cycH0_trivial (s t ε : AddMonoid.End Amb) (hst : s * t = 1) (hts : t * s = 1) (n : ℕ)
+theorem cycH0_trivial (s t ε : AddMonoid.End Amb) (_hst : s * t = 1) (hts : t * s = 1) (n : ℕ)
     (A : AddSubgroup Amb) (hεA : ∀ a ∈ A, ε a ∈ A)
     (hsplit : ∀ a ∈ A, ∑ i ∈ Finset.range n, (s ^ i * ε * t ^ i) a = a) :
     ∀ a ∈ A ⊓ cycFixed s, a ∈ A.map (cycNorm s n) := by

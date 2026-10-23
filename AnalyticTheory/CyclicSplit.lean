@@ -62,7 +62,7 @@ theorem tensorSigma_pow_tmul (k : ℕ) (x : F) (a : A) :
     rw [this, ih, pow_succ]
     rfl
 
-theorem tensorSigma_pow_card (hfin : IsOfFinOrder σ) (b : F ⊗[E] A) :
+theorem tensorSigma_pow_card (_hfin : IsOfFinOrder σ) (b : F ⊗[E] A) :
     (tensorSigma σ A ^ orderOf σ) b = b := by
   induction b using TensorProduct.inductionOn with
   | tmul x a => rw [tensorSigma_pow_tmul, pow_orderOf_eq_one]; rfl
@@ -219,7 +219,7 @@ theorem sM_scalar (k : ℕ) (c : F) : sM (n := n) σ k (Matrix.scalar n c) = Mat
   ext i j
   by_cases h : i = j <;> simp [sM, h]
 
-theorem sM_pow_card (hfin : IsOfFinOrder σ) (a : Matrix n n F) : sM (n := n) σ (orderOf σ) a = a := by
+theorem sM_pow_card (_hfin : IsOfFinOrder σ) (a : Matrix n n F) : sM (n := n) σ (orderOf σ) a = a := by
   ext i j
   simp [sM, pow_orderOf_eq_one]
 

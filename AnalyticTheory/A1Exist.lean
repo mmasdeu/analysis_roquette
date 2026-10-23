@@ -117,7 +117,7 @@ theorem wC6_map {R : Type*} [Field R] (σ : K →+* R) (a₁ a₃ a₂ a₄ a₆
 divisors `2𝔭`, `3𝔭` does not vanish (otherwise `y/(x − e)` would be a nonconstant element of
 `L(𝔭)`). -/
 theorem wDisc_ne_zero (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {x y : F} {a₁ a₃ a₂ a₄ a₆ : K}
-    (hx : PoleOrd 𝔭 x 2) (hy : PoleOrd 𝔭 y 3) (hnf : IsNormalFormA1 x y a₁ a₃ a₂ a₄ a₆)
+    (hx : PoleOrd 𝔭 x 2) (_hy : PoleOrd 𝔭 y 3) (hnf : IsNormalFormA1 x y a₁ a₃ a₂ a₄ a₆)
     (h2 : (2 : K) ≠ 0) (h3 : (3 : K) ≠ 0) : wDisc a₁ a₃ a₂ a₄ a₆ ≠ 0 := by
   intro hd
   set σ := algebraMap K F with hσ

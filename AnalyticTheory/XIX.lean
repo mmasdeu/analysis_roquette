@@ -53,7 +53,7 @@ theorem thmXIX_period (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiP
 
 omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- `q̄^d = q^m` with `m > 0` forces `d > 0`. -/
-theorem exists_nat_of_orderDvd {q qb : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qb‖)
+theorem exists_nat_of_orderDvd {q qb : K} (_hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qb‖)
     (hqb1 : ‖qb‖ < 1) {m : ℕ} (hm : 0 < m) (h : OrderDvd K q qb m) :
     ∃ d : ℕ, 0 < d ∧ qb ^ d = q ^ m := by
   obtain ⟨d, hd⟩ := h
@@ -178,7 +178,7 @@ period `q̄` correspond `1 − 1` to the integers `m > 0` divisible by the order
 belongs to `m` then `[F : E] = dm` with `q^m = q̄^d`, the character invariant of `E` is `χ^d`, and `m`
 is the largest integer such that `E` lies in an elliptic subfield of `F` admitting the period `q^m`. -/
 theorem thmXIX_subfields (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
-    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (hcomm : Commensurable K q qbar) :
+    (qbar : K) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (_hcomm : Commensurable K q qbar) :
     ∃ e : {m : ℕ // 0 < m ∧ OrderDvd K q qbar m} ≃
         {E : Subfield (FKQ K L q T) // IsEllipticSubfield K E ∧ AdmitsPeriod K L q T qbar E},
       ∀ m : {m : ℕ // 0 < m ∧ OrderDvd K q qbar m},
