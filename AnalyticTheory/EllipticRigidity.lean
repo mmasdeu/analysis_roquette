@@ -1,4 +1,6 @@
-import AnalyticTheory.FFNorm
+module
+
+public import AnalyticTheory.FFNorm
 
 /-!
 # Rigidity of degree-one points of elliptic function fields
@@ -7,6 +9,8 @@ For an elliptic function field `E | K` and two prime divisors `Q₁ ≠ Q₂` of
 `Q₁ − Q₂` is not principal (`L(Q₂) = K`). Together with the norm formula this gives the rigidity of
 the point map of an elliptic subfield of `F_K(q)` (`π(αβ) + π(1) ∼ π(α) + π(β)`).
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

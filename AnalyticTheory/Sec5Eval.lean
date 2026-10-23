@@ -1,5 +1,7 @@
-import AnalyticTheory.FqResidue
-import AnalyticTheory.Specialization
+module
+
+public import AnalyticTheory.FqResidue
+public import AnalyticTheory.Specialization
 
 /-!
 # Evaluation at a rational point of `F_L(q)`
@@ -7,6 +9,8 @@ import AnalyticTheory.Specialization
 For the point `1 ∈ Ω_L^×`, the valuation ring of `F_L(q)` at `1` has an `L`-algebra homomorphism
 to `L` (evaluation at `1`), whose value lies in `L` because `1` is rational.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

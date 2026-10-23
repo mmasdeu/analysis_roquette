@@ -1,6 +1,8 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.WeierstrassPrep
-import Mathlib.RingTheory.SimpleRing.Principal
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.WeierstrassPrep
+public import Mathlib.RingTheory.SimpleRing.Principal
 
 /-!
 # Existence of zeros of holomorphic functions on tie spheres
@@ -9,6 +11,8 @@ If the dominant terms of a convergent Laurent series over `K` at radius `ρ` are
 different indices, then the series has a zero `x ∈ Ω` with `|x| = ρ`. The proof applies the Weierstrass
 preparation theorem on the unit circle after scaling by an element of norm `ρ`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

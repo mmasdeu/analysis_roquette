@@ -1,4 +1,6 @@
-import AnalyticTheory.Basic
+module
+
+public import AnalyticTheory.Basic
 
 /-!
 # Powers of a "twisted multiplication"
@@ -6,6 +8,8 @@ import AnalyticTheory.Basic
 If `M ε = c * ρ ε` for a ring automorphism `ρ` fixing `c ≠ 0` then `(M^j) ε = c^j * (ρ^j) ε` for all
 integers `j`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

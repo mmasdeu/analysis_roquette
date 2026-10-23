@@ -1,4 +1,6 @@
-import AnalyticTheory.ConstSplit
+module
+
+public import AnalyticTheory.ConstSplit
 
 /-!
 # Descent from a constant field extension
@@ -7,6 +9,8 @@ The substitution `μ_m : X ↦ Xᵐ` commutes with the coefficient inclusion `M_
 Galois action on `M_L`. Hence a function of `M_K` lying in `F_L(q̄ | Xᵐ)` (with `q̄ ∈ K`) lies in
 `F_K(q̄ | Xᵐ)`, and if `E_L = F_L(q̄ | Xᵐ)` then `q̄` is fixed by `Gal(L | K)`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

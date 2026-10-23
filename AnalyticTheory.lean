@@ -1,126 +1,130 @@
-import AnalyticTheory.FunctionField
-import AnalyticTheory.Basic
-import AnalyticTheory.Holomorphic
-import AnalyticTheory.Analytic
-import AnalyticTheory.Valuation
-import AnalyticTheory.Rationality
-import AnalyticTheory.Normalize
-import AnalyticTheory.HolDiv
-import AnalyticTheory.Theta
-import AnalyticTheory.ThetaOrder
-import AnalyticTheory.Classes
-import AnalyticTheory.ThetaDiv
-import AnalyticTheory.PeriodicSol
-import AnalyticTheory.AbelJacobi
-import AnalyticTheory.WpConstruct
-import AnalyticTheory.Generation
-import AnalyticTheory.Relation
-import AnalyticTheory.RelationCoeffs
-import AnalyticTheory.QSeries
-import AnalyticTheory.CubicCoeffs
-import AnalyticTheory.FqPlaces
-import AnalyticTheory.FqGenus
-import AnalyticTheory.ConstExt
-import AnalyticTheory.FqStructure
-import AnalyticTheory.TheoremVI
-import AnalyticTheory.Structure
-import AnalyticTheory.AppendixA1
-import AnalyticTheory.Weierstrass
-import AnalyticTheory.AppendixA2
-import AnalyticTheory.SemiPeriodic
-import AnalyticTheory.Isogeny
-import AnalyticTheory.Remarks
-import AnalyticTheory.ConstRemarks
-import AnalyticTheory.Sec3
-import AnalyticTheory.DOperator
-import AnalyticTheory.Sec3D
-import AnalyticTheory.ZetaWp
-import AnalyticTheory.Delta1
-import AnalyticTheory.Delta2
-import AnalyticTheory.Delta3
-import AnalyticTheory.Delta4
-import AnalyticTheory.Delta5
-import AnalyticTheory.Delta6
-import AnalyticTheory.Delta7
-import AnalyticTheory.A1Invariance
-import AnalyticTheory.Sec3VIII
-import AnalyticTheory.EllipticBasics
-import AnalyticTheory.A1Normal
-import AnalyticTheory.A1Transfer
-import AnalyticTheory.FqHomogeneous
-import AnalyticTheory.FqOrd
-import AnalyticTheory.A1Unique
-import AnalyticTheory.A1Classify
-import AnalyticTheory.A1Determine
-import AnalyticTheory.A1LemmaA
-import AnalyticTheory.Lemma2
-import AnalyticTheory.Lemma2b
-import AnalyticTheory.FqDescent
-import AnalyticTheory.Sec4
-import AnalyticTheory.buzzard
-import AnalyticTheory.IsogenyXVII
-import AnalyticTheory.FFExtension
-import AnalyticTheory.FFDedekind
-import AnalyticTheory.FFNorm
-import AnalyticTheory.EllipticRigidity
-import AnalyticTheory.EllipticSubfield
-import AnalyticTheory.PeriodGroup
-import AnalyticTheory.EllipticSplit
-import AnalyticTheory.FqResidue
-import AnalyticTheory.FFUnramified
-import AnalyticTheory.EllipticGood
-import AnalyticTheory.ConstSubfield
-import AnalyticTheory.ConstGalois
-import AnalyticTheory.ConstRigid
-import AnalyticTheory.ConstSplit
-import AnalyticTheory.ConstDescent
-import AnalyticTheory.EllipticSeparable
-import AnalyticTheory.FFFinite
-import AnalyticTheory.EllipticTransfer
-import AnalyticTheory.FqInsep
-import AnalyticTheory.EllipticXVIII
-import AnalyticTheory.CorXVIIIa
-import AnalyticTheory.Multiplicators
-import AnalyticTheory.MultTransfer
-import AnalyticTheory.CorXVIIIb
-import AnalyticTheory.FFFundamental
-import AnalyticTheory.GaloisDescent
-import AnalyticTheory.PrimeBaseChange
-import AnalyticTheory.ConormDescent
-import AnalyticTheory.GenusDescent
-import AnalyticTheory.EzetaElliptic
-import AnalyticTheory.ConstExtAbstract
-import AnalyticTheory.ConstExtDescent
-import AnalyticTheory.GaloisPrimes
-import AnalyticTheory.ZpowAux
-import AnalyticTheory.ResidueMaps
-import AnalyticTheory.Sec5
-import AnalyticTheory.Sec5Div
-import AnalyticTheory.CycAux
-import AnalyticTheory.Hilbert90U
-import AnalyticTheory.Sec5Table
-import AnalyticTheory.Sec5Norm
-import AnalyticTheory.Hilbert90Fixed
-import AnalyticTheory.Sec5Row4
-import AnalyticTheory.Sec5Row5
-import AnalyticTheory.Sec5Final
-import AnalyticTheory.Sec5AJ
-import AnalyticTheory.GaloisDescentVec
-import AnalyticTheory.SkolemNoetherMatrix
-import AnalyticTheory.CyclicSplit
-import AnalyticTheory.Sec5Brauer
-import AnalyticTheory.BaseChangeSplit
-import AnalyticTheory.Specialization
-import AnalyticTheory.Sec5Eval
-import AnalyticTheory.A1Exist
-import AnalyticTheory.A1Gen
-import AnalyticTheory.A1Homog
-import AnalyticTheory.RatFuncInfty
-import AnalyticTheory.WeierstrassModel
-import AnalyticTheory.A1Remarks
-import AnalyticTheory.Sec4B3
-import AnalyticTheory.Sec4Torsor
-import AnalyticTheory.XIXPeriod
-import AnalyticTheory.XIXDescent
-import AnalyticTheory.XIX
-import AnalyticTheory.XIXCor
+module
+
+public import AnalyticTheory.FunctionField
+public import AnalyticTheory.Basic
+public import AnalyticTheory.Holomorphic
+public import AnalyticTheory.Analytic
+public import AnalyticTheory.Valuation
+public import AnalyticTheory.Rationality
+public import AnalyticTheory.Normalize
+public import AnalyticTheory.HolDiv
+public import AnalyticTheory.Theta
+public import AnalyticTheory.ThetaOrder
+public import AnalyticTheory.Classes
+public import AnalyticTheory.ThetaDiv
+public import AnalyticTheory.PeriodicSol
+public import AnalyticTheory.AbelJacobi
+public import AnalyticTheory.WpConstruct
+public import AnalyticTheory.Generation
+public import AnalyticTheory.Relation
+public import AnalyticTheory.RelationCoeffs
+public import AnalyticTheory.QSeries
+public import AnalyticTheory.CubicCoeffs
+public import AnalyticTheory.FqPlaces
+public import AnalyticTheory.FqGenus
+public import AnalyticTheory.ConstExt
+public import AnalyticTheory.FqStructure
+public import AnalyticTheory.TheoremVI
+public import AnalyticTheory.Structure
+public import AnalyticTheory.AppendixA1
+public import AnalyticTheory.Weierstrass
+public import AnalyticTheory.AppendixA2
+public import AnalyticTheory.SemiPeriodic
+public import AnalyticTheory.Isogeny
+public import AnalyticTheory.Remarks
+public import AnalyticTheory.ConstRemarks
+public import AnalyticTheory.Sec3
+public import AnalyticTheory.DOperator
+public import AnalyticTheory.Sec3D
+public import AnalyticTheory.ZetaWp
+public import AnalyticTheory.Delta1
+public import AnalyticTheory.Delta2
+public import AnalyticTheory.Delta3
+public import AnalyticTheory.Delta4
+public import AnalyticTheory.Delta5
+public import AnalyticTheory.Delta6
+public import AnalyticTheory.Delta7
+public import AnalyticTheory.A1Invariance
+public import AnalyticTheory.Sec3VIII
+public import AnalyticTheory.EllipticBasics
+public import AnalyticTheory.A1Normal
+public import AnalyticTheory.A1Transfer
+public import AnalyticTheory.FqHomogeneous
+public import AnalyticTheory.FqOrd
+public import AnalyticTheory.A1Unique
+public import AnalyticTheory.A1Classify
+public import AnalyticTheory.A1Determine
+public import AnalyticTheory.A1LemmaA
+public import AnalyticTheory.Lemma2
+public import AnalyticTheory.Lemma2b
+public import AnalyticTheory.FqDescent
+public import AnalyticTheory.Sec4
+public import AnalyticTheory.buzzard
+public import AnalyticTheory.IsogenyXVII
+public import AnalyticTheory.FFExtension
+public import AnalyticTheory.FFDedekind
+public import AnalyticTheory.FFNorm
+public import AnalyticTheory.EllipticRigidity
+public import AnalyticTheory.EllipticSubfield
+public import AnalyticTheory.PeriodGroup
+public import AnalyticTheory.EllipticSplit
+public import AnalyticTheory.FqResidue
+public import AnalyticTheory.FFUnramified
+public import AnalyticTheory.EllipticGood
+public import AnalyticTheory.ConstSubfield
+public import AnalyticTheory.ConstGalois
+public import AnalyticTheory.ConstRigid
+public import AnalyticTheory.ConstSplit
+public import AnalyticTheory.ConstDescent
+public import AnalyticTheory.EllipticSeparable
+public import AnalyticTheory.FFFinite
+public import AnalyticTheory.EllipticTransfer
+public import AnalyticTheory.FqInsep
+public import AnalyticTheory.EllipticXVIII
+public import AnalyticTheory.CorXVIIIa
+public import AnalyticTheory.Multiplicators
+public import AnalyticTheory.MultTransfer
+public import AnalyticTheory.CorXVIIIb
+public import AnalyticTheory.FFFundamental
+public import AnalyticTheory.GaloisDescent
+public import AnalyticTheory.PrimeBaseChange
+public import AnalyticTheory.ConormDescent
+public import AnalyticTheory.GenusDescent
+public import AnalyticTheory.EzetaElliptic
+public import AnalyticTheory.ConstExtAbstract
+public import AnalyticTheory.ConstExtDescent
+public import AnalyticTheory.GaloisPrimes
+public import AnalyticTheory.ZpowAux
+public import AnalyticTheory.ResidueMaps
+public import AnalyticTheory.Sec5
+public import AnalyticTheory.Sec5Div
+public import AnalyticTheory.CycAux
+public import AnalyticTheory.Hilbert90U
+public import AnalyticTheory.Sec5Table
+public import AnalyticTheory.Sec5Norm
+public import AnalyticTheory.Hilbert90Fixed
+public import AnalyticTheory.Sec5Row4
+public import AnalyticTheory.Sec5Row5
+public import AnalyticTheory.Sec5Final
+public import AnalyticTheory.Sec5AJ
+public import AnalyticTheory.GaloisDescentVec
+public import AnalyticTheory.SkolemNoetherMatrix
+public import AnalyticTheory.CyclicSplit
+public import AnalyticTheory.Sec5Brauer
+public import AnalyticTheory.BaseChangeSplit
+public import AnalyticTheory.Specialization
+public import AnalyticTheory.Sec5Eval
+public import AnalyticTheory.A1Exist
+public import AnalyticTheory.A1Gen
+public import AnalyticTheory.A1Homog
+public import AnalyticTheory.RatFuncInfty
+public import AnalyticTheory.WeierstrassModel
+public import AnalyticTheory.A1Remarks
+public import AnalyticTheory.Sec4B3
+public import AnalyticTheory.Sec4Torsor
+public import AnalyticTheory.XIXPeriod
+public import AnalyticTheory.XIXDescent
+public import AnalyticTheory.XIX
+public import AnalyticTheory.XIXCor
+
+@[expose] public section

@@ -1,5 +1,7 @@
-import AnalyticTheory.Sec3
-import ForMathlib.RingTheory.PowerSeries.TsumEval
+module
+
+public import AnalyticTheory.Sec3
+public import ForMathlib.RingTheory.PowerSeries.TsumEval
 
 /-!
 # Theorem VII: `j(q) = 1/q + R(q)`
@@ -7,6 +9,8 @@ import ForMathlib.RingTheory.PowerSeries.TsumEval
 `B, C, Δ` are integer power series (universal in every characteristic); evaluation of integer power
 series at `q ∈ K`, `|q| < 1`, is a ring homomorphism (norm-summable Cauchy products).
 -/
+
+@[expose] public section
 
 open Filter Topology PowerSeries
 

@@ -1,4 +1,6 @@
-import AnalyticTheory.SemiPeriodic
+module
+
+public import AnalyticTheory.SemiPeriodic
 
 /-!
 # Tate cohomology of a cyclic group: modules with a splitting
@@ -7,6 +9,8 @@ If `A ⊂ Amb` is stable under the generator `s` (of order dividing `n`), its in
 there is an additive `ε` preserving `A` with `∑_{i<n} sⁱ ε tⁱ = id` on `A` (e.g. a projection onto a
 fundamental domain of a free permutation module), then `Ĥ⁰(A) = Ĥ¹(A) = 0`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

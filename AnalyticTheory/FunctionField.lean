@@ -1,4 +1,6 @@
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Algebraic function fields: prime divisors, divisors, Riemann–Roch spaces, genus
@@ -11,6 +13,8 @@ Riemann–Roch space `L(D)` and the genus (through the Riemann–Roch formula
 Blueprint nodes: `def:prime-divisor`, `def:divisor-ff`, `def:rr-space`, `def:genus`,
 `def:degree-one-prime`, `def:principal-divisor-ff`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,8 +1,12 @@
-import AnalyticTheory.Sec5
+module
+
+public import AnalyticTheory.Sec5
 
 /-!
 # §5: semi-periodic divisors (Theorem XIV)
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

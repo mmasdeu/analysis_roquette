@@ -1,4 +1,6 @@
-import AnalyticTheory.XIX
+module
+
+public import AnalyticTheory.XIX
 
 /-!
 # §6, Corollaries of Theorem XIX: split subfields
@@ -6,6 +8,8 @@ import AnalyticTheory.XIX
 A field with character invariant `χ` has a prime divisor of degree one iff `χ = 1`, and then it is
 `K`-isomorphic to `F_K(q)`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

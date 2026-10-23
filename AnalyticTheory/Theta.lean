@@ -1,4 +1,6 @@
-import AnalyticTheory.HolDiv
+module
+
+public import AnalyticTheory.HolDiv
 
 /-!
 # The theta functions `T_φ`
@@ -11,6 +13,8 @@ Gauss norm and
 has the zeros of `∏ Θ(β⁻¹ X)^{e}` over the conjugates `β` of `α`; it satisfies
 `T_φ(q⁻¹ X) = φ(0)⁻¹ X^N T_φ(X)`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

@@ -1,4 +1,6 @@
-import AnalyticTheory.EllipticXVIII
+module
+
+public import AnalyticTheory.EllipticXVIII
 
 /-!
 # Corollary XVIIIa: isogenies onto `F_K(q)`
@@ -7,6 +9,8 @@ An elliptic field `E | K` admits an isogeny `E → F_K(q)` iff `E ≅ F_K(q̄)` 
 with `q`; and every isogeny `F_K(q̄) → F_K(q)` is `μ_m τ_u` (`m ≠ 0` divisible by the order of
 `q mod^× q̄`, `τ_u` a translation).
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

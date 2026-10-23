@@ -1,7 +1,9 @@
-import AnalyticTheory.A1Homog
-import AnalyticTheory.RatFuncInfty
-import AnalyticTheory.FFFundamental
-import AnalyticTheory.ConormDescent
+module
+
+public import AnalyticTheory.A1Homog
+public import AnalyticTheory.RatFuncInfty
+public import AnalyticTheory.FFFundamental
+public import AnalyticTheory.ConormDescent
 
 /-!
 # Appendix A1: the prime at infinity of a Weierstraß model
@@ -15,6 +17,8 @@ In particular `(x, y)` is a `WeierstrassData` of `F`.
 
 Blueprint nodes: `lem:A1-model-prime`.
 -/
+
+@[expose] public section
 
 open Polynomial
 

@@ -1,4 +1,6 @@
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Hilbert's Theorem 90 for cyclic extensions, in arbitrary universes
@@ -6,6 +8,8 @@ import Mathlib
 Mathlib's `groupCohomology.exists_div_of_norm_eq_one` is stated for fields in `Type`. We reprove it
 (the classical Dedekind-independence argument) for all universes.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,5 +1,7 @@
-import AnalyticTheory.FqStructure
-import AnalyticTheory.EllipticBasics
+module
+
+public import AnalyticTheory.FqStructure
+public import AnalyticTheory.EllipticBasics
 
 /-!
 # Orders of `F_K(q)` at the prime divisors, in terms of the analytic valuations
@@ -9,6 +11,8 @@ For a prime divisor `P` of `F_K(q) | K` with attached point `ptOf P`, the discre
 
 Blueprint nodes: `lem:Fq-ord`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

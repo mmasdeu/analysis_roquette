@@ -1,7 +1,9 @@
-import AnalyticTheory.Sec4
-import AnalyticTheory.GaloisPrimes
-import AnalyticTheory.ZpowAux
-import AnalyticTheory.ResidueMaps
+module
+
+public import AnalyticTheory.Sec4
+public import AnalyticTheory.GaloisPrimes
+public import AnalyticTheory.ZpowAux
+public import AnalyticTheory.ResidueMaps
 
 /-!
 # §5: semi-periodic function fields
@@ -10,6 +12,8 @@ Prime divisors of `F_K(𝐐)`, the semi-periodic divisors, the Abel–Jacobi map
 Blueprint nodes: `thm:XIII`, `thm:XIV`, `cor:XIIIa`, `cor:XIIIb`, `thm:XV`, `cor:XVa`,
 `thm:XVI`, `thm:cohomology-table`, `cor:XVIa`, `cor:XVIb`.
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

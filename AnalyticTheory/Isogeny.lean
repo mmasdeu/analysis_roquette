@@ -1,8 +1,10 @@
-import AnalyticTheory.Structure
-import AnalyticTheory.AppendixA2
-import AnalyticTheory.SemiPeriodic
-import AnalyticTheory.FqDescent
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Expand
+module
+
+public import AnalyticTheory.Structure
+public import AnalyticTheory.AppendixA2
+public import AnalyticTheory.SemiPeriodic
+public import AnalyticTheory.FqDescent
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Expand
 
 /-!
 # Elliptic subfields and isogenies (book, §6)
@@ -19,6 +21,8 @@ Blueprint nodes: `def:commensurable`, `def:Fq-qbar-Xm`, `lem:XVII`, `thm:XVII`, 
 `cor:XVIIIa`, `cor:XVIIIb`, `prop:abs-integral`, `thm:XIX`, `cor:XIXa`, `cor:XIXb`, `cor:XIXc`,
 `cor:XIXd`, `def:isogeny`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

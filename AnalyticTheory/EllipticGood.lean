@@ -1,6 +1,8 @@
-import AnalyticTheory.EllipticSplit
-import AnalyticTheory.FqResidue
-import AnalyticTheory.FFUnramified
+module
+
+public import AnalyticTheory.EllipticSplit
+public import AnalyticTheory.FqResidue
+public import AnalyticTheory.FFUnramified
 
 /-!
 # Good rational points of elliptic subfields
@@ -11,6 +13,8 @@ divisor `p_α` of `F_K(q)` is unramified and its point `α` is separable over `K
 finite fibres on the infinitely many classes of `K^×/q`, there is a rational point `a` with `π(a)`
 good.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

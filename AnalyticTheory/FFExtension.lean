@@ -1,4 +1,6 @@
-import AnalyticTheory.EllipticBasics
+module
+
+public import AnalyticTheory.EllipticBasics
 
 /-!
 # Finite extensions of function fields: restriction of prime divisors
@@ -10,6 +12,8 @@ restricts to a prime divisor `P ∩ E` of `E | K`, and `ord_P = e · ord_{P ∩ 
 These are the first steps of the algebraic theory of finite extensions of function fields that
 replaces, in §6, the book's appeal to the general theory of elliptic function fields.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

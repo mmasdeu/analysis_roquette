@@ -1,4 +1,6 @@
-import AnalyticTheory.Relation
+module
+
+public import AnalyticTheory.Relation
 
 /-!
 # The coefficients of the cubic relation
@@ -8,6 +10,8 @@ We show `A = 0`, `B = −5s₃`, `C = −(5s₃ + 7s₅)/12` by expanding `℘, 
 `Σₘ qᵐ/(1 − qᵐ) · P(m)` (`P` integer-valued polynomials), and comparing the coefficients of `h⁰, …, h⁶`
 (through the valuation `w₁`) gives the coefficients.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

@@ -1,5 +1,7 @@
-import AnalyticTheory.ConstRemarks
-import AnalyticTheory.EllipticSplit
+module
+
+public import AnalyticTheory.ConstRemarks
+public import AnalyticTheory.EllipticSplit
 
 /-!
 # Constant field extensions of subfields of `F_K(q)`
@@ -9,6 +11,8 @@ For a finite extension `L | K` and a subfield `E ⊆ F_K(q)` (an abstract field 
 basis `(bᵢ)` of `L | K` and the decomposition `F_L(q) = ⊕ bᵢ F_K(q)` (`fq_decomp`), the elements of
 `E_L` are exactly the `∑ bᵢ eᵢ` with `eᵢ ∈ E`; in particular `E_L ∩ F_K(q) = E`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

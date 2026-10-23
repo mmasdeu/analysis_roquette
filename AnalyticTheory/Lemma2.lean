@@ -1,6 +1,8 @@
-import AnalyticTheory.SemiPeriodic
-import AnalyticTheory.ConstRemarks
-import AnalyticTheory.Lemma2b
+module
+
+public import AnalyticTheory.SemiPeriodic
+public import AnalyticTheory.ConstRemarks
+public import AnalyticTheory.Lemma2b
 
 /-!
 # §4, Lemma 2: `H¹(G, L^×/q) ≅ Ĝ(q)`
@@ -10,6 +12,8 @@ extension `K_χ`.
 
 Blueprint nodes: `lem:2`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,4 +1,6 @@
-import AnalyticTheory.QSeries
+module
+
+public import AnalyticTheory.QSeries
 
 /-!
 # The coefficients of the cubic relation
@@ -8,6 +10,8 @@ the points `X = 1 + h` of `K`, `h = q^{j+1}`; there `U = h²℘` and `V = h³℘
 with explicit coefficients, and `V² + hUV − U³ − Ah²U² − Bh⁴U − Ch⁶ = 0` forces the coefficients of
 `h⁰, …, h⁶` of the truncated expansion to vanish.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

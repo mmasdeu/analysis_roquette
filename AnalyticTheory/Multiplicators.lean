@@ -1,4 +1,6 @@
-import AnalyticTheory.CorXVIIIa
+module
+
+public import AnalyticTheory.CorXVIIIa
 
 /-!
 # Multiplicators of `F_K(q)` (book, §6, Corollary XVIIIb)
@@ -8,6 +10,8 @@ The ring of multiplicators of `F_K(q)` is `ℤ`. Every endomorphism of `F_K(q)` 
 `k = [K(β) : K(γ)]`, hence multiplies `Φ_q` of a divisor of degree `0` by its `m`-th power. By the
 algebraic form of the Abel–Jacobi theorem the induced map on `C⁰` is multiplication by `m`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

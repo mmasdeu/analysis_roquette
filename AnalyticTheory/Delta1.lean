@@ -1,10 +1,14 @@
-import AnalyticTheory.ZetaWp
+module
+
+public import AnalyticTheory.ZetaWp
 
 /-!
 # The product formula (45), part 1: values at `K`-rational points
 
 For `a ∈ K^×` the values of holomorphic functions are `K`-rational.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,5 +1,7 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolFun
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Zeros
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolFun
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Zeros
 
 /-!
 # Zeros of an entire Laurent function in closed annuli
@@ -7,6 +9,8 @@ import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Zeros
 A non-zero element of `holSubring K L` has only finitely many zeros in every closed annulus
 `r ≤ ‖x‖ ≤ r'` of `L^×` (`holZeros_finite`).
 -/
+
+@[expose] public section
 
 open Filter Topology
 

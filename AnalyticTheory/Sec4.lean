@@ -1,5 +1,7 @@
-import AnalyticTheory.FqDescent
-import AnalyticTheory.ConstExtDescent
+module
+
+public import AnalyticTheory.FqDescent
+public import AnalyticTheory.ConstExtDescent
 
 /-!
 # §4: Theorems IX, X, XI (pragmatic form)
@@ -13,6 +15,8 @@ period `q` split by `L` is some `E_ζ` (Appendix A2) — are stated as separate 
 
 Blueprint nodes: `def:char-invariant`, `thm:IX`, `thm:X`, `thm:XI`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

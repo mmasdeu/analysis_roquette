@@ -1,8 +1,12 @@
-import AnalyticTheory.Sec5Table
+module
+
+public import AnalyticTheory.Sec5Table
 
 /-!
 # §5: the norm theorem (Theorem XVI)
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

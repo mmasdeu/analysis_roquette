@@ -1,4 +1,6 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolSeq
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolSeq
 
 /-!
 # Summable families of convergent Laurent series
@@ -10,6 +12,8 @@ the coefficientwise sums `bₙ = ∑ᵢ cᵢ n` form a convergent Laurent sequen
 finite partial sums in every Gauss norm, and the corresponding holomorphic function is the pointwise
 sum `∑ᵢ fᵢ(α)`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,5 +1,7 @@
-import AnalyticTheory.ConstRigid
-import AnalyticTheory.EllipticGood
+module
+
+public import AnalyticTheory.ConstRigid
+public import AnalyticTheory.EllipticGood
 
 /-!
 # Splitting of a good rational point in a constant field extension
@@ -8,6 +10,8 @@ Let `a ∈ K^×` be such that `π(a)` is good (`IsGoodGen`) and let `L | K` be f
 the points of `F_K(q)` over `π(a)`. Then every prime divisor of `F_L(q)` over `π_L(a)` is
 `L`-rational and unramified over `E_L`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

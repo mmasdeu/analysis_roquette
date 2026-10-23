@@ -1,4 +1,6 @@
-import AnalyticTheory.FqOrd
+module
+
+public import AnalyticTheory.FqOrd
 
 /-!
 # The residue field of `F_K(q)` at a point
@@ -11,6 +13,8 @@ A function `f` without pole at `α` is written `f = A / B` with `A, B ∈ H_K`, 
 value is `A(α) / B(α)`; the values of holomorphic functions lie in `K[α]` by the division
 `A = φ_α g + S` (`hol_phi_division`).
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,8 +1,10 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
-import Mathlib.Algebra.Order.Star.Real
-import Mathlib.Topology.ContinuousMap.ZeroAtInfty
-import Mathlib.Topology.MetricSpace.Contracting
-import Mathlib.Topology.UniformSpace.Uniformizable
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
+public import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.Topology.ContinuousMap.ZeroAtInfty
+public import Mathlib.Topology.MetricSpace.Contracting
+public import Mathlib.Topology.UniformSpace.Uniformizable
 
 /-!
 # Weierstrass preparation on the unit circle
@@ -13,6 +15,8 @@ form*: `‖hₘ‖ ≤ 1`, `‖h₀‖ = ‖hₛ‖ = 1`, and `‖hₘ‖ ≤ ε
 `Q` a null sequence and `R` a polynomial of degree `< s` with coefficients of norm `≤ 1`, i.e.
 `P = yˢ − R = Q H` is a monic polynomial whose roots on `|y| = 1` are zeros of `H`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

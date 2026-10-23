@@ -1,8 +1,12 @@
-import AnalyticTheory.ConstExt
+module
+
+public import AnalyticTheory.ConstExt
 
 /-!
 # Elliptic function fields are preserved by isomorphisms
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,4 +1,6 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.PolyHol
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.PolyHol
 
 /-!
 # Gauss norms on `H_K`
@@ -6,6 +8,8 @@ import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.PolyHol
 `gnorm r f = sup_n |aₙ| rⁿ` for the Laurent coefficients `a = holCoeff f`. It is multiplicative
 (Gauss' lemma) and ultrametric.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,4 +1,6 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
 
 /-!
 # Gauss norms of convergent Laurent series and extremal indices
@@ -8,6 +10,8 @@ The *leftmost* (*rightmost*) maximal index is additive under convolution: this i
 `|a * b|_r = |a|_r |b|_r` together with its refinement to extremal indices. Consequences: the
 maximal index is monotone in `r`, and the units of the convolution algebra are monomials.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

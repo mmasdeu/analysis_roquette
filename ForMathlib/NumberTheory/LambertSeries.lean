@@ -1,4 +1,6 @@
-import Mathlib.NumberTheory.TsumDivisorsAntidiagonal
+module
+
+public import Mathlib.NumberTheory.TsumDivisorsAntidiagonal
 
 /-!
 # Lambert series with bounded coefficients
@@ -17,6 +19,8 @@ of the Tate curve, where `F(m) = m (uᵐ + u⁻ᵐ − 2)` for a unit `u` of a n
 * `hasSum_lambert_pnat`: the identity, summed over `ℕ+`.
 * `hasSum_lambert`: the identity, summed over `ℕ` (the term `m = 0` vanishes).
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,4 +1,6 @@
-import AnalyticTheory.A1Transfer
+module
+
+public import AnalyticTheory.A1Transfer
 
 /-!
 # Appendix A1: invariance of `j` and `γ` under change of Weierstraß datum
@@ -11,6 +13,8 @@ in general).  Hence the values do not depend on the choice.
 
 Blueprint nodes: `lem:A1-independence`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

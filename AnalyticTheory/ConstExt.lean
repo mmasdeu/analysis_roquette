@@ -1,4 +1,6 @@
-import AnalyticTheory.FqGenus
+module
+
+public import AnalyticTheory.FqGenus
 
 /-!
 # Constant field extensions of `F_K(q)`
@@ -8,6 +10,8 @@ For a finite extension `L | K` (with its extended absolute value) the coefficien
 `M_L` over `M_K` and of `F_L(q)` over `F_K(q)` (book, §2, proof of item IV). Hence
 `F_K(q) ⊗_K L ≅ F_L(q)` and every constant field extension of `F_K(q)` by `L` is `F_L(q)`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 open scoped TensorProduct

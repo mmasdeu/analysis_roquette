@@ -1,8 +1,12 @@
-import AnalyticTheory.Sec5Table
+module
+
+public import AnalyticTheory.Sec5Table
 
 /-!
 # §5: the row `P_L(q)` of the cohomology table: `Ĥ¹(P_L(q)) ≅ K^×/N L^×`
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

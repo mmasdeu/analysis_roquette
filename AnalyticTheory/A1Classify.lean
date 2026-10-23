@@ -1,4 +1,6 @@
-import AnalyticTheory.A1Normal
+module
+
+public import AnalyticTheory.A1Normal
 
 /-!
 # Appendix A1: classification of Weierstraß curves by `(j, γ)`
@@ -11,6 +13,8 @@ book's notation.
 
 Blueprint nodes: `lem:A1-classify`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

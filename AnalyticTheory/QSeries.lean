@@ -1,7 +1,9 @@
-import AnalyticTheory.RelationCoeffs
-import Mathlib.NumberTheory.TsumDivisorsAntidiagonal
-import ForMathlib.NumberTheory.LambertSeries
-import ForMathlib.Topology.Algebra.InfiniteSum.NonarchimedeanProd
+module
+
+public import AnalyticTheory.RelationCoeffs
+public import Mathlib.NumberTheory.TsumDivisorsAntidiagonal
+public import ForMathlib.NumberTheory.LambertSeries
+public import ForMathlib.Topology.Algebra.InfiniteSum.NonarchimedeanProd
 
 /-!
 # `q`-series in a complete ultrametric field
@@ -9,6 +11,8 @@ import ForMathlib.Topology.Algebra.InfiniteSum.NonarchimedeanProd
 Expansions of the terms of `℘`, `℘′` as `q`-series. The general facts used here (double series in
 non-archimedean groups, Lambert series) are in `ForMathlib`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

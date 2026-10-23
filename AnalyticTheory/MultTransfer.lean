@@ -1,4 +1,6 @@
-import AnalyticTheory.Multiplicators
+module
+
+public import AnalyticTheory.Multiplicators
 
 /-!
 # Multiplicators under isomorphisms of function fields
@@ -8,6 +10,8 @@ divisors, and the pull-back of `μ` to that of `σ μ σ⁻¹`. Hence the proper
 on divisors of degree `0`, modulo principal divisors, as multiplication by an integer" (which
 forces the ring of multiplicators to be `ℤ`) is invariant under `K`-isomorphisms.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,5 +1,7 @@
-import AnalyticTheory.AbelJacobi
-import AnalyticTheory.Weierstrass
+module
+
+public import AnalyticTheory.AbelJacobi
+public import AnalyticTheory.Weierstrass
 
 /-!
 # Construction of `℘` and `℘′` as meromorphic functions
@@ -9,6 +11,8 @@ With `Θ = T_{X-1}` (the theta function of the point `1`) and `Θ = (X - q⁻ⁿ
 `℘ = G/Θ² − 2s₁` and `℘′ = G′/Θ³ + s₁`. A meromorphic function is determined by its values
 (`evalsTo_unique`), so these are the functions `wpM`, `wpPrimeM`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

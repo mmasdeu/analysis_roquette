@@ -1,4 +1,6 @@
-import Mathlib.Analysis.Normed.Unbundled.SpectralNorm
+module
+
+public import Mathlib.Analysis.Normed.Unbundled.SpectralNorm
 
 /-!
 # The algebraic closure of a complete non-archimedean field as a normed field
@@ -7,6 +9,8 @@ import Mathlib.Analysis.Normed.Unbundled.SpectralNorm
 `K`; it is an algebraically closed, ultrametric, normed `K`-algebra (not complete in general).
 It is the canonical field of points for the theory of entire Laurent series.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

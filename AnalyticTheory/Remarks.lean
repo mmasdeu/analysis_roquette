@@ -1,4 +1,6 @@
-import AnalyticTheory.SemiPeriodic
+module
+
+public import AnalyticTheory.SemiPeriodic
 
 /-!
 # Additional remarks of §2 (extension of the field of constants)
@@ -14,6 +16,8 @@ Remarks 1, 2 for such `L`; it is recorded in the blueprint only.
 
 Blueprint nodes: `rem:S2-ext-const`, `rem:S2-galois`; the statements are in `ConstRemarks.lean`.
 -/
+
+@[expose] public section
 
 
 namespace AnalyticTheory

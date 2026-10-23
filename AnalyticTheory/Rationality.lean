@@ -1,4 +1,6 @@
-import AnalyticTheory.Valuation
+module
+
+public import AnalyticTheory.Valuation
 
 /-!
 # Rationality and finiteness of divisors of meromorphic functions
@@ -9,6 +11,8 @@ import AnalyticTheory.Valuation
 * A non-zero meromorphic function has only finitely many zeros and poles in every closed
   annulus (finiteness condition (i)), by `zeros_annulus_finite`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

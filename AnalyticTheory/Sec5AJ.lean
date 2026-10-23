@@ -1,8 +1,12 @@
-import AnalyticTheory.Sec5Final
+module
+
+public import AnalyticTheory.Sec5Final
 
 /-!
 # §5: Abel–Jacobi for semi-periodic functions (Theorem XV and Corollary XVa)
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

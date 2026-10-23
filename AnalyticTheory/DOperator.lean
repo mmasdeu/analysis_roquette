@@ -1,4 +1,6 @@
-import AnalyticTheory.ConstRemarks
+module
+
+public import AnalyticTheory.ConstRemarks
 
 /-!
 # The derivation `D = X d/dX` on `H_K` and `M_K`
@@ -7,6 +9,8 @@ import AnalyticTheory.ConstRemarks
 in the ultrametric field `K`. It satisfies the Leibniz rule, extends uniquely to `M_K`, and agrees
 with the operator `Dop` defined from `DholFun`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

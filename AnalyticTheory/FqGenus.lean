@@ -1,4 +1,6 @@
-import AnalyticTheory.FqPlaces
+module
+
+public import AnalyticTheory.FqPlaces
 
 /-!
 # The genus of `F_K(q)`
@@ -6,6 +8,8 @@ import AnalyticTheory.FqPlaces
 The algebraic divisors of `F_K(q) | K` are the `q`-periodic divisors, the Riemann–Roch spaces are
 the spaces `L_K(q | 𝔪)`, and by Proposition 2 the genus is `1` (book, §2, item IV).
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,7 +1,9 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.ZerosFinite
-import Mathlib.Order.BourbakiWitt
-import Mathlib.Topology.Algebra.Polynomial
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.ZerosFinite
+public import Mathlib.Order.BourbakiWitt
+public import Mathlib.Topology.Algebra.Polynomial
 
 /-!
 # The division theorem in `H_K`
@@ -16,6 +18,8 @@ holomorphic approximate quotients `X_J` with `gnorm ρ (B X_J − A) → 0` for 
 approximations for different annuli have the same coefficientwise limit, which is the
 quotient `A / B`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

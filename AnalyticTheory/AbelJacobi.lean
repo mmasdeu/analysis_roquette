@@ -1,10 +1,14 @@
-import AnalyticTheory.PeriodicSol
+module
+
+public import AnalyticTheory.PeriodicSol
 
 /-!
 # The Abel–Jacobi theorem and the Riemann–Roch theorem for periodic divisors
 
 Proposition 1 and Proposition 2 of §2, via the theta functions `Θ_𝔪`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

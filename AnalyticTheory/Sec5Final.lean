@@ -1,9 +1,13 @@
-import AnalyticTheory.Sec5Row4
-import AnalyticTheory.Sec5Row5
+module
+
+public import AnalyticTheory.Sec5Row4
+public import AnalyticTheory.Sec5Row5
 
 /-!
 # §5: the cohomology table, assembled
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

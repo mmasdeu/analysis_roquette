@@ -1,9 +1,13 @@
-import AnalyticTheory.Sec5Norm
-import AnalyticTheory.Hilbert90Fixed
+module
+
+public import AnalyticTheory.Sec5Norm
+public import AnalyticTheory.Hilbert90Fixed
 
 /-!
 # §5: the row `F_L(q)^×` of the cohomology table
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

@@ -1,4 +1,6 @@
-import AnalyticTheory.FunctionField
+module
+
+public import AnalyticTheory.FunctionField
 
 /-!
 # Basic notions (Introduction and terminology of the book)
@@ -10,6 +12,8 @@ Blueprint nodes: `def:local-field`, `def:function-field`, `def:genus`,
 `def:conservative`, `def:elliptic`, `def:degree-one-prime`, `def:splitting-field`,
 `def:constant-extension`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

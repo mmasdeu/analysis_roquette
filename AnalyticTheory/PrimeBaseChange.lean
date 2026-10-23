@@ -1,5 +1,7 @@
-import AnalyticTheory.EllipticBasics
-import AnalyticTheory.ConstExt
+module
+
+public import AnalyticTheory.EllipticBasics
+public import AnalyticTheory.ConstExt
 
 /-!
 # Prime divisors over a tower of constant fields
@@ -9,6 +11,8 @@ the same valuation rings (a valuation ring containing `K` contains all elements 
 over `K`, in particular `L`). Orders agree, degrees multiply by `[L : K]`, and the Riemann–Roch
 spaces of corresponding divisors coincide as sets.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,5 +1,7 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Dominance
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Taylor
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Dominance
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Taylor
 
 /-!
 # Identity theorem: a convergent Laurent series vanishing on a ball is zero
@@ -8,6 +10,8 @@ If `F(x) = ∑ aₙ xⁿ` (`aₙ ∈ K`) vanishes on `{α + h : |h| < |α|}` the
 The proof reduces to a polynomial `Q` in `t = h/α` collecting the terms of maximal norm, and
 evaluates `Q` at a point `t` with `|t| < 1` of generic radius, where one monomial dominates.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

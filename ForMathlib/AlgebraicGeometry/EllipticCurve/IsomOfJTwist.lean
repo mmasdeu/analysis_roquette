@@ -1,4 +1,6 @@
-import Mathlib.AlgebraicGeometry.EllipticCurve.NormalForms
+module
+
+public import Mathlib.AlgebraicGeometry.EllipticCurve.NormalForms
 
 /-!
 # Elliptic curves over an arbitrary field with the same `j`-invariant
@@ -26,6 +28,8 @@ functions over local fields*, Appendix A1):
 * `WeierstrassCurve.exists_variableChange_iff_of_j_ne`: for `j ≠ 0, 1728`, two elliptic curves
   differ by a change of variables over `K` iff they have the same `j` and equivalent `γ`.
 -/
+
+@[expose] public section
 
 namespace WeierstrassCurve
 

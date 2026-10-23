@@ -1,4 +1,6 @@
-import AnalyticTheory.ConstSubfield
+module
+
+public import AnalyticTheory.ConstSubfield
 
 /-!
 # Galois action on coordinates in `F_L(q) = ⊕ bᵢ F_K(q)`
@@ -8,6 +10,8 @@ For a finite Galois extension `L | K`, a function `h = ∑ bᵢ eᵢ ∈ M_L` (`
 valuation of each coordinate at a point `α` is at least the minimum of the valuations of `h` at
 the conjugates of `ψ(α)`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

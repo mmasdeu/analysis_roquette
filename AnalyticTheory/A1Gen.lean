@@ -1,4 +1,6 @@
-import AnalyticTheory.A1Exist
+module
+
+public import AnalyticTheory.A1Exist
 
 /-!
 # Appendix A1: generation `F = K(x, y)`
@@ -10,6 +12,8 @@ closed), hence lies in some `L(m𝔭) ⊆ K[x, y]`.
 
 Blueprint nodes: `thm:A-existence-data`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

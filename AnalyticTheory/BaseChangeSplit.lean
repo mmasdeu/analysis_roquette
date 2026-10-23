@@ -1,4 +1,6 @@
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Base change of split algebras
@@ -6,6 +8,8 @@ import Mathlib
 * `split_of_extension`: if `E ⊗_k A ≅ Mₘ(E)` then `F ⊗_k A ≅ Mₘ(F)` for every field `F ⊇ E`.
 * `split_tensor_tower`: if `F ⊗_k A ≅ Mₘ(F)` and `k ⊆ E ⊆ F` then `F ⊗_E (E ⊗_k A) ≅ Mₘ(F)`.
 -/
+
+@[expose] public section
 
 open scoped TensorProduct
 

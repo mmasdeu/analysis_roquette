@@ -1,6 +1,8 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.FrechetLaurent
-import Mathlib.Algebra.Lie.OfAssociative
-import Mathlib.Analysis.Normed.Operator.Basic
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.FrechetLaurent
+public import Mathlib.Algebra.Lie.OfAssociative
+public import Mathlib.Analysis.Normed.Operator.Basic
 
 /-!
 # Polynomials in `H_K` and division by the minimal polynomial
@@ -10,6 +12,8 @@ import Mathlib.Analysis.Normed.Operator.Basic
 `f = φ g + r` with `g ∈ H_K` and a polynomial `r` of degree `< deg φ`; consequently `f(α) = 0` implies
 `φ ∣ f` in `H_K`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

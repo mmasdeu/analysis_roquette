@@ -1,5 +1,7 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Gauss
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolFun
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Gauss
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolFun
 
 /-!
 # Laurent coefficients of holomorphic functions
@@ -9,6 +11,8 @@ element `holOfSeq` of `H_K`, every element of `H_K` has a unique coefficient seq
 (identity theorem), the coefficient sequence of a product is the convolution, the monomials
 `monoHol n` are `X ⁿ`, and the units of `H_K` are the monomials `c Xⁿ`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

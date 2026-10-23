@@ -1,5 +1,7 @@
-import AnalyticTheory.XIXSubfields
-import AnalyticTheory.Sec4Torsor
+module
+
+public import AnalyticTheory.XIXSubfields
+public import AnalyticTheory.Sec4Torsor
 
 /-!
 # §6, Theorem XIX: elliptic subfields of semi-periodic function fields
@@ -14,6 +16,8 @@ concern subfields which split over `K`; for them "period `q̄`" is the same as b
 
 Blueprint nodes: `thm:XIX`, `cor:XIXa`, `cor:XIXb`, `cor:XIXc`, `cor:XIXd`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

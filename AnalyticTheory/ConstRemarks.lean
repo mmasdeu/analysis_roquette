@@ -1,5 +1,7 @@
-import AnalyticTheory.Remarks
-import AnalyticTheory.ConstExt
+module
+
+public import AnalyticTheory.Remarks
+public import AnalyticTheory.ConstExt
 
 /-!
 # Remarks 1 and 2 of §2: extension of the field of constants
@@ -10,6 +12,8 @@ point orders of vanishing are transported along them, the analytic valuations of
 
 Blueprint nodes: `rem:S2-ext-const`, `rem:S2-galois`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

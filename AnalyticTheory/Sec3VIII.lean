@@ -1,10 +1,12 @@
-import AnalyticTheory.Delta7
-import AnalyticTheory.A1Invariance
-import AnalyticTheory.A1Determine
-import AnalyticTheory.FqHomogeneous
-import AnalyticTheory.FqOrd
-import ForMathlib.Analysis.Normed.Field.SqrtOneAddFour
-import AnalyticTheory.FqStructure
+module
+
+public import AnalyticTheory.Delta7
+public import AnalyticTheory.A1Invariance
+public import AnalyticTheory.A1Determine
+public import AnalyticTheory.FqHomogeneous
+public import AnalyticTheory.FqOrd
+public import ForMathlib.Analysis.Normed.Field.SqrtOneAddFour
+public import AnalyticTheory.FqStructure
 
 /-!
 # §3: Theorems VIII and VIIIa
@@ -15,6 +17,8 @@ invariants from the choice of datum (`A1Invariance.lean`).
 
 Blueprint nodes: `thm:VIII`, `thm:VIIIa`.
 -/
+
+@[expose] public section
 
 open Filter Topology PowerSeries
 

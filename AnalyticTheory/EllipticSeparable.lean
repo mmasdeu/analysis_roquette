@@ -1,5 +1,7 @@
-import AnalyticTheory.ConstDescent
-import Mathlib.FieldTheory.Normal.Closure
+module
+
+public import AnalyticTheory.ConstDescent
+public import Mathlib.FieldTheory.Normal.Closure
 
 /-!
 # Theorem XVIII: the separable case
@@ -10,6 +12,8 @@ Galois extension `L ⊆ Ω`. Over `L` the constant field extension `E_L` is rigi
 points of `K` (`isRigidAt_constExt`) and `π_L(a)` splits (`constExt_split`), so
 `E_L = F_L(q̄|Xᵐ)` (`eq_FqbarXm_of_split`); finally `q̄ ∈ K` and `E = F_K(q̄|Xᵐ)` by descent.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

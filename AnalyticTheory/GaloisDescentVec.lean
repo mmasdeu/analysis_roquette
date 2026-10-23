@@ -1,4 +1,6 @@
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Galois descent for vector spaces with a semilinear automorphism of finite order
@@ -7,6 +9,8 @@ If `Ïƒ` has finite order `d` as an automorphism of the field `F` and `T` is a `Ï
 endomorphism of the `F`-vector space `V` with `T^d = id`, then `V` is spanned over `F` by the
 `T`-fixed vectors (Artin's independence of characters).
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

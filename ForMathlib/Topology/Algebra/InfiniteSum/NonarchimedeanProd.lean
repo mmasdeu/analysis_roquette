@@ -1,7 +1,9 @@
-import Mathlib.Topology.Algebra.InfiniteSum.Nonarchimedean
-import Mathlib.Topology.Algebra.InfiniteSum.Constructions
-import Mathlib.Analysis.Normed.Group.Ultra
-import Mathlib.Analysis.SpecificLimits.Basic
+module
+
+public import Mathlib.Topology.Algebra.InfiniteSum.Nonarchimedean
+public import Mathlib.Topology.Algebra.InfiniteSum.Constructions
+public import Mathlib.Analysis.Normed.Group.Ultra
+public import Mathlib.Analysis.SpecificLimits.Basic
 
 /-!
 # Double series in complete nonarchimedean groups
@@ -14,6 +16,8 @@ groups, a family dominated by real numbers tending to zero is summable
 
 We also record that `s^(m+n) → 0` along the cofinite filter of `ℕ × ℕ` for `0 ≤ s < 1`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

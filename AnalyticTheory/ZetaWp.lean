@@ -1,4 +1,6 @@
-import AnalyticTheory.Sec3D
+module
+
+public import AnalyticTheory.Sec3D
 
 /-!
 # Formula (16): `℘ = −Dζ − 2 s₁`
@@ -7,6 +9,8 @@ import AnalyticTheory.Sec3D
 partial products (`D` commutes with the sums defining the product), obtaining
 `(DΘ)² − Θ·D²Θ = G` pointwise, the series for `Θ² (℘ + 2 s₁)`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

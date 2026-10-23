@@ -1,10 +1,14 @@
-import AnalyticTheory.Generation
+module
+
+public import AnalyticTheory.Generation
 
 /-!
 # The cubic relation between `℘` and `℘′`
 
 `℘′² + ℘℘′ − ℘³` lies in `L(5𝔭₁)` and is even, hence equals `A℘² + B℘ + C` with `A, B, C ∈ K`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

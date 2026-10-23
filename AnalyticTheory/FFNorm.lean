@@ -1,4 +1,6 @@
-import AnalyticTheory.FFDedekind
+module
+
+public import AnalyticTheory.FFDedekind
 
 /-!
 # The norm of a finite separable extension of function fields
@@ -10,6 +12,8 @@ degree. Consequently the pushforward of a principal divisor of `F` is the diviso
 The proof uses that the integral closure `S` of `O_Q` in `F` is a semilocal Dedekind domain, hence
 a principal ideal domain, and Mathlib's relative norm of ideals.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

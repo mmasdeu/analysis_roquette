@@ -1,4 +1,6 @@
-import AnalyticTheory.FqPlaces
+module
+
+public import AnalyticTheory.FqPlaces
 
 /-!
 # Subgroups of `K^×` commensurable with `q^ℤ`
@@ -8,6 +10,8 @@ form `U = {u | uᵐ ∈ q̄^ℤ}` for a period `q̄` which is an `m`-th power in
 primitive `m`-th root of unity and `q̄^d = qᵐ` for some `d > 0`. These are exactly the conditions
 of Theorem XVII (iv), under which `F_K(q)` is Galois over `F_K(q̄ | Xᵐ)` with group `U / q^ℤ`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,4 +1,6 @@
-import AnalyticTheory.Classes
+module
+
+public import AnalyticTheory.Classes
 
 /-!
 # The theta function `Θ_𝔪` of a periodic divisor
@@ -6,6 +8,8 @@ import AnalyticTheory.Classes
 `Θ_𝔪 = ∏_α T_α^{m_α}` over the representatives `α` of `repAnnulus` with `m_α ≠ 0`. It has divisor `𝔪`,
 and `τ_q Θ_𝔪 = a⁻¹ X^d Θ_𝔪` with `d = ∑ deg(α) m_α`, `a = ∏ φ_α(0)^{m_α}`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

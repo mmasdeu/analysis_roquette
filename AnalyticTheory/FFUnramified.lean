@@ -1,4 +1,6 @@
-import AnalyticTheory.FFNorm
+module
+
+public import AnalyticTheory.FFNorm
 
 /-!
 # Unramified primes of a finite separable extension of function fields
@@ -15,6 +17,8 @@ at every `P | Q`. Then:
 Since a nonzero function has only finitely many zeros and poles, all but finitely many `Q` have
 this property (`A5` of the plan).
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

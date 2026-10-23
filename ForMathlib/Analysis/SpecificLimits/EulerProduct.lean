@@ -1,7 +1,9 @@
-import Mathlib.Analysis.SpecificLimits.Normed
-import Mathlib.Analysis.Normed.Ring.InfiniteSum
-import Mathlib.Topology.Algebra.InfiniteSum.NatInt
-import Mathlib.Analysis.SpecialFunctions.Log.Summable
+module
+
+public import Mathlib.Analysis.SpecificLimits.Normed
+public import Mathlib.Analysis.Normed.Ring.InfiniteSum
+public import Mathlib.Topology.Algebra.InfiniteSum.NatInt
+public import Mathlib.Analysis.SpecialFunctions.Log.Summable
 
 /-!
 # Products `∏ (1 − qⁿ y)` in complete normed fields and Euler's identity
@@ -13,6 +15,8 @@ Let `𝕜` be a complete normed field and `‖q‖ < 1`.
 * `tprod_one_add_pow_succ_mul_tprod_one_sub_pow_odd`: **Euler's identity**
   `∏_{n ≥ 1} (1 + qⁿ) · ∏_{k ≥ 0} (1 − q^{2k+1}) = 1`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

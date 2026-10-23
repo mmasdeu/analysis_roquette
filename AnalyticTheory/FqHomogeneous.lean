@@ -1,5 +1,7 @@
-import AnalyticTheory.A1Transfer
-import AnalyticTheory.FqStructure
+module
+
+public import AnalyticTheory.A1Transfer
+public import AnalyticTheory.FqStructure
 
 /-!
 # The prime divisors of degree one of `F_K(q)` are permuted transitively by the translations
@@ -9,6 +11,8 @@ and `τ_a` maps `𝔭_b` to `𝔭_{ab}`.
 
 Blueprint nodes: `lem:Fq-homogeneous`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,7 +1,9 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
-import Mathlib.Topology.GDelta.MetrizableSpace
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
+public import Mathlib.Analysis.SpecialFunctions.Log.Base
+public import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+public import Mathlib.Topology.GDelta.MetrizableSpace
 
 /-!
 # Dominant terms of convergent Laurent series
@@ -10,6 +12,8 @@ Used to prove that `H_K` is a domain: for two non-zero convergent Laurent series
 radius `r` (in the value group of `Ω`) at which both have a strictly dominant term; at points
 of that radius neither series vanishes.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,4 +1,6 @@
-import AnalyticTheory.TheoremVI
+module
+
+public import AnalyticTheory.TheoremVI
 
 /-!
 # Places of `F_K(q)`
@@ -7,6 +9,8 @@ Point divisors, Riemann–Roch spaces as `K`-subspaces of `F_K(q)`, integrality 
 functions with poles in a fixed support, and the identification of all valuations of
 `F_K(q) | K` with the `w_α` (book, §2, items II, III; the Artin–Whaples step).
 -/
+
+@[expose] public section
 
 open Filter Topology
 

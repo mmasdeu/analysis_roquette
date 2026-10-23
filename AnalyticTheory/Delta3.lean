@@ -1,8 +1,12 @@
-import AnalyticTheory.Delta2
+module
+
+public import AnalyticTheory.Delta2
 
 /-!
 # The product formula (45), part 3: `℘(X) − ℘(b)` at `2`-torsion points
 -/
+
+@[expose] public section
 
 open Filter Topology
 

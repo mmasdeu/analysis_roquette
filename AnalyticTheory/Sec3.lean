@@ -1,4 +1,6 @@
-import AnalyticTheory.ConstRemarks
+module
+
+public import AnalyticTheory.ConstRemarks
 
 /-!
 # §3: the derivation `D`, formulas (16), (18), the Weierstraß form, Theorems VII, VIII, VIIIa
@@ -6,6 +8,8 @@ import AnalyticTheory.ConstRemarks
 Blueprint nodes: `def:D-operator`, `def:wp`, `def:wp-prime`, `rem:normal-form-3`, `thm:VII`,
 `rem:delta-product`, `thm:VIII`, `thm:VIIIa`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

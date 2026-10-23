@@ -1,15 +1,17 @@
-import Mathlib.FieldTheory.IsAlgClosed.Basic
-import Mathlib.Algebra.EuclideanDomain.Field
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.Normed.Group.Ultra
-import Mathlib.Analysis.Normed.Order.Lattice
-import Mathlib.Analysis.RCLike.Basic
-import Mathlib.Algebra.Order.Star.Int
-import Mathlib.RingTheory.Henselian
-import Mathlib.Topology.Algebra.Algebra
-import Mathlib.Topology.Algebra.InfiniteSum.Nonarchimedean
-import Mathlib.Topology.Connected.Separation
-import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
+module
+
+public import Mathlib.FieldTheory.IsAlgClosed.Basic
+public import Mathlib.Algebra.EuclideanDomain.Field
+public import Mathlib.Algebra.Order.Ring.Star
+public import Mathlib.Analysis.Normed.Group.Ultra
+public import Mathlib.Analysis.Normed.Order.Lattice
+public import Mathlib.Analysis.RCLike.Basic
+public import Mathlib.Algebra.Order.Star.Int
+public import Mathlib.RingTheory.Henselian
+public import Mathlib.Topology.Algebra.Algebra
+public import Mathlib.Topology.Algebra.InfiniteSum.Nonarchimedean
+public import Mathlib.Topology.Connected.Separation
+public import Mathlib.Topology.MetricSpace.Ultra.TotallySeparated
 
 /-!
 # Entire Laurent series over a complete non-archimedean field
@@ -24,6 +26,8 @@ Points are taken in a normed field `L` with `[NormedAlgebra K L] [IsUltrametricD
 `[Algebra.IsIntegral K L]` (so that every point lies in a finite, hence complete, extension of
 `K`) and `[IsAlgClosed L]`; the main example is `Ω K = AlgebraicClosure K` (`Omega.lean`).
 -/
+
+@[expose] public section
 
 open Filter Topology
 

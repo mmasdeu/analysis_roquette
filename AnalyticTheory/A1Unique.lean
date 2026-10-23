@@ -1,4 +1,6 @@
-import AnalyticTheory.A1Normal
+module
+
+public import AnalyticTheory.A1Normal
 
 /-!
 # Appendix A1: uniqueness of `F | K` from `(j, γ)`
@@ -10,6 +12,8 @@ rational function field).  Together with the classification of Weierstraß curve
 
 Blueprint nodes: `thm:A-uniqueness`.
 -/
+
+@[expose] public section
 
 open Polynomial
 

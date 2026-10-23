@@ -1,5 +1,7 @@
-import AnalyticTheory.Delta3
-import ForMathlib.Analysis.SpecificLimits.EulerProduct
+module
+
+public import AnalyticTheory.Delta3
+public import ForMathlib.Analysis.SpecificLimits.EulerProduct
 
 /-!
 # The product formula (45), part 4: theta products in `K`
@@ -8,6 +10,8 @@ Product manipulations in the complete field `K`: the theta function at `K`-point
 in `K`, the inversion and the values at the `2`-torsion points, and Euler's identity
 `∏(1 + qⁿ) ∏(1 − q²ⁿ⁻¹) = 1`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

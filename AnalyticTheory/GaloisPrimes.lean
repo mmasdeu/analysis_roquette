@@ -1,4 +1,6 @@
-import AnalyticTheory.ConormDescent
+module
+
+public import AnalyticTheory.ConormDescent
 
 /-!
 # Counting primes over a prime of the fixed field
@@ -11,6 +13,8 @@ of `F` are pairwise distinct, then the `Q^{σ i}` are *all* the prime divisors o
 This replaces transitivity of the Galois group on primes: the fundamental identity
 `∑_{Q' | P} e(Q'|P) deg Q' = [F : E] deg P` counts them.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

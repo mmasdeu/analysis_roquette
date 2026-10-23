@@ -1,8 +1,10 @@
-import AnalyticTheory.A1Gen
-import AnalyticTheory.A1Determine
-import AnalyticTheory.A1Transfer
-import AnalyticTheory.A1Invariance
-import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+module
+
+public import AnalyticTheory.A1Gen
+public import AnalyticTheory.A1Determine
+public import AnalyticTheory.A1Transfer
+public import AnalyticTheory.A1Invariance
+public import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 
 /-!
 # Appendix A1: homogeneity of the degree-one primes (translations)
@@ -14,6 +16,8 @@ constructed from the group law of Mathlib on the generic point.
 
 Blueprint nodes: `lem:A1-homogeneity`.
 -/
+
+@[expose] public section
 
 open Polynomial WeierstrassCurve Affine
 

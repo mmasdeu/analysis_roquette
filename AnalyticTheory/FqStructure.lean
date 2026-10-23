@@ -1,4 +1,6 @@
-import AnalyticTheory.ConstExt
+module
+
+public import AnalyticTheory.ConstExt
 
 /-!
 # Structure of `F_K(q)` (book, §2: items I–V, Corollaries Va, Vb)
@@ -10,6 +12,8 @@ Blueprint nodes: `thm:fq-function-field` (I), `thm:fq-valuations` (II),
 `thm:fq-residue` (III), `thm:fq-elliptic` (IV), `thm:abel-jacobi-iso` (V),
 `cor:translation-Va`, `cor:translation-Vb`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,4 +1,6 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Dominance
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Dominance
 
 /-!
 # The ring of functions on `L^×` defined by entire Laurent series
@@ -7,6 +9,8 @@ import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Dominance
 coefficients in `K`; it is an integral domain, a `K`-algebra, and has the reflection
 automorphism `f(X) ↦ f(X⁻¹)`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

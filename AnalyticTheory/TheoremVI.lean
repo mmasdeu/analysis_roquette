@@ -1,5 +1,7 @@
-import AnalyticTheory.Relation
-import AnalyticTheory.CubicCoeffs
+module
+
+public import AnalyticTheory.Relation
+public import AnalyticTheory.CubicCoeffs
 
 /-!
 # Theorem VI (book, §3)
@@ -7,6 +9,8 @@ import AnalyticTheory.CubicCoeffs
 `℘, ℘′` generate `F_K(q)`, have pole divisors `2𝔭₁`, `3𝔭₁`, satisfy the relation (32) and the
 reflection rules (20)–(21).
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

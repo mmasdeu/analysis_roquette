@@ -1,4 +1,6 @@
-import AnalyticTheory.MultTransfer
+module
+
+public import AnalyticTheory.MultTransfer
 
 /-!
 # Corollary XVIIIb: `F_K(q)` has no complex multiplication
@@ -8,6 +10,8 @@ Let `L | K` be finite and `FL | L` a constant field extension of `F_K(q)`. With 
 acts on divisors of degree `0` as multiplication by an integer (`exists_pullback_eq_zsmul`); this
 property is invariant under isomorphisms, so the ring of multiplicators of `FL | L` is `ℤ`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

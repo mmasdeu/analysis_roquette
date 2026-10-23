@@ -1,5 +1,7 @@
-import AnalyticTheory.XIXPeriod
-import AnalyticTheory.Sec4Torsor
+module
+
+public import AnalyticTheory.XIXPeriod
+public import AnalyticTheory.Sec4Torsor
 
 /-!
 # §6, Theorem XIX: descent of elliptic subfields of `F_K(𝐐)`
@@ -8,6 +10,8 @@ For an elliptic subfield `E` of `F = F_K(𝐐) ⊂ F_L(q)`, the field `EL ⊂ F_
 `L` is stable under `ρ = τ_Q σ`; by Theorem XVIII over `L` it is `F_L(q̄ | Xᵐ)`, and the stability
 forces `σ q̄ = q̄`, i.e. `q̄ ∈ K`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

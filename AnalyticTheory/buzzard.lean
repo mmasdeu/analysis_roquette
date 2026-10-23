@@ -1,8 +1,10 @@
-import AnalyticTheory.TheoremVI
-import AnalyticTheory.Sec3VII
-import ForMathlib.Algebra.Polynomial.LaurentRoots
-import ForMathlib.NumberTheory.LambertSeries
-import ForMathlib.RingTheory.PowerSeries.TsumEval
+module
+
+public import AnalyticTheory.TheoremVI
+public import AnalyticTheory.Sec3VII
+public import ForMathlib.Algebra.Polynomial.LaurentRoots
+public import ForMathlib.NumberTheory.LambertSeries
+public import ForMathlib.RingTheory.PowerSeries.TsumEval
 
 /-!
 # Buzzard's identity for the Tate curve
@@ -32,6 +34,8 @@ arbitrary complete non-archimedean field `K` (no complex analysis and no `π`).
 3. A power series over `ℤ₃` vanishing at all `q = 3ᵏ` is zero, so every coefficient of `G`
    vanishes at every `y = 3k + 2`; a Laurent polynomial with infinitely many zeros is zero.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

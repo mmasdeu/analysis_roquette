@@ -1,5 +1,7 @@
-import AnalyticTheory.Structure
-import AnalyticTheory.AppendixA1
+module
+
+public import AnalyticTheory.Structure
+public import AnalyticTheory.AppendixA1
 
 /-!
 # The Weierstraß function and the absolute invariant (book, §3)
@@ -11,6 +13,8 @@ Lemma (Hensel-type inversion) and the Theorems VI, VII, VIII, VIIIa.
 Blueprint nodes: `def:wp`, `def:wp-prime`, `def:s-k`, `lem:1`; the theorems of §3 are stated in
 `TheoremVI.lean` and `Sec3.lean`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

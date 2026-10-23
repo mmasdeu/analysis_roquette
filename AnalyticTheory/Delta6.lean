@@ -1,8 +1,12 @@
-import AnalyticTheory.Delta5
+module
+
+public import AnalyticTheory.Delta5
 
 /-!
 # The product formula (45), part 6: assembly
 -/
+
+@[expose] public section
 
 open Filter Topology
 

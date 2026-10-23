@@ -1,8 +1,12 @@
-import AnalyticTheory.Sec5Brauer
+module
+
+public import AnalyticTheory.Sec5Brauer
 
 /-!
 # §4: Theorem X (minimal splitting field) — preparations
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

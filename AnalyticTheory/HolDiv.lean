@@ -1,4 +1,6 @@
-import AnalyticTheory.Normalize
+module
+
+public import AnalyticTheory.Normalize
 
 /-!
 # The division theorem in `H_K`, in terms of the analytic valuations
@@ -7,6 +9,8 @@ If `w_α(A) ≥ w_α(B)` for all `α ∈ Ω^×`, then `B ∣ A` (`hol_dvd_of_anV
 (`EntireLaurent.hol_dvd_of_pow_dvd`, divisibility by powers of minimal polynomials) is in
 `ForMathlib/Analysis/Nonarchimedean/EntireLaurent/Division.lean`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

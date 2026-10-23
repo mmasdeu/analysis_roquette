@@ -1,4 +1,6 @@
-import AnalyticTheory.Delta6
+module
+
+public import AnalyticTheory.Delta6
 
 /-!
 # The product formula (45), part 7: integer power series and universality
@@ -7,6 +9,8 @@ import AnalyticTheory.Delta6
 agree at the infinitely many points `q = (p(1+pk))²` of `ℚ_p`, hence coincide, hence agree
 everywhere.
 -/
+
+@[expose] public section
 
 open Filter Topology PowerSeries
 

@@ -1,4 +1,6 @@
-import AnalyticTheory.Basic
+module
+
+public import AnalyticTheory.Basic
 
 /-!
 # Elliptic function fields: valuations of prime divisors and the spaces `L(n𝔭)`
@@ -10,6 +12,8 @@ Riemann–Roch-type consequences for an elliptic function field with a prime div
 
 Blueprint nodes: `lem:rr-dimension`, `lem:rr-basis`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

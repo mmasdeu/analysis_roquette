@@ -1,5 +1,7 @@
-import AnalyticTheory.FqInsep
-import AnalyticTheory.EllipticTransfer
+module
+
+public import AnalyticTheory.FqInsep
+public import AnalyticTheory.EllipticTransfer
 
 /-!
 # Theorem XVIII: existence of the period and of `m`
@@ -11,6 +13,8 @@ and `p^r = [F : E_s]`; then `K·F^{p^r} ⊆ E_s` and `K·F^{p^r} = F_K(q^{p^r} |
 along `μ_{p^r}` to a subfield of `F_K(q^{p^r})` over which it is separable reduces to the
 separable case.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

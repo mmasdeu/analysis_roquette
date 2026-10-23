@@ -1,5 +1,7 @@
-import Mathlib
-import ForMathlib.Analysis.SpecialFunctions.CircleCharacters
+module
+
+public import Mathlib
+public import ForMathlib.Analysis.SpecialFunctions.CircleCharacters
 
 /-!
 # Cyclic core of Lemma 2
@@ -10,6 +12,8 @@ For a character `χ : G → S¹` of the Galois group of a finite Galois extensio
 
 Blueprint nodes: `lem:2`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

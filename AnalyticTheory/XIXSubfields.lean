@@ -1,5 +1,7 @@
-import AnalyticTheory.XIXDescent
-import AnalyticTheory.ConstExtAbstract
+module
+
+public import AnalyticTheory.XIXDescent
+public import AnalyticTheory.ConstExtAbstract
 
 /-!
 # §6, Theorem XIX (ii): the elliptic subfields of `F_K(𝐐)` with a given period
@@ -8,6 +10,8 @@ For `q̄ ∈ K` commensurable with `q` and `m > 0` divisible by the order of `q 
 (`q̄^d = q^m`), `E_m = F ∩ F_L(q̄|Xᵐ)` is `K`-isomorphic to the descended field `E_{ζ^m}` of
 `F_L(q̄)` (`ζ` the cocycle of the triple, taken modulo `q̄`).
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

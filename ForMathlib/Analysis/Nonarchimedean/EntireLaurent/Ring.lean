@@ -1,7 +1,9 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Division
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.InfProd
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Omega
-import Mathlib.Algebra.Ring.TransferInstance
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Division
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.InfProd
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Omega
+public import Mathlib.Algebra.Ring.TransferInstance
 
 /-!
 # The ring of entire Laurent series over a complete non-archimedean field
@@ -32,6 +34,8 @@ closed (`EntireLaurent.ringEquivHol`); the main example is `L = Ω K = Algebraic
 
 The Weierstraß preparation theorem for Laurent sequences is `EntireLaurent.weierstrass_prep`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

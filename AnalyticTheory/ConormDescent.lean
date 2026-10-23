@@ -1,7 +1,9 @@
-import AnalyticTheory.FFFundamental
-import AnalyticTheory.GaloisDescent
-import AnalyticTheory.PrimeBaseChange
-import AnalyticTheory.MultTransfer
+module
+
+public import AnalyticTheory.FFFundamental
+public import AnalyticTheory.GaloisDescent
+public import AnalyticTheory.PrimeBaseChange
+public import AnalyticTheory.MultTransfer
 
 /-!
 # Riemann–Roch spaces under Galois descent
@@ -11,6 +13,8 @@ Let `L | K` be finite Galois with group `G`, `F ⊇ L` a field with a semilinear
 Then `L_E(D) = L_F(D_F) ∩ E`, `L_F(D_F)` is a `G`-stable `L`-subspace, `deg D_F = [F:E] deg D`, and
 by Speiser's lemma `dim_K L_E(D) = dim_L L_F(D_F)`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

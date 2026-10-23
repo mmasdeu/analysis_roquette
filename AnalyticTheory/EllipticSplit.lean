@@ -1,6 +1,8 @@
-import AnalyticTheory.EllipticSubfield
-import AnalyticTheory.PeriodGroup
-import AnalyticTheory.IsogenyXVII
+module
+
+public import AnalyticTheory.EllipticSubfield
+public import AnalyticTheory.PeriodGroup
+public import AnalyticTheory.IsogenyXVII
 
 /-!
 # Elliptic subfields of `F_K(q)`: the split case
@@ -14,6 +16,8 @@ The proof: the group `V = π⁻¹(π(1))` contains `q` and `V / q^ℤ` injects i
 `F_K(q̄ | Xᵐ)` with group `{τ_v | v ∈ V}`; as the `τ_v` fix `E`, `E ⊆ F_K(q̄ | Xᵐ)`, and
 `[F_K(q) : E] = #{P | π(a)} ≤ #Aut(F_K(q) | F_K(q̄|Xᵐ)) = [F_K(q) : F_K(q̄|Xᵐ)]` gives equality.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

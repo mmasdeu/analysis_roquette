@@ -1,4 +1,6 @@
-import AnalyticTheory.ThetaOrder
+module
+
+public import AnalyticTheory.ThetaOrder
 
 /-!
 # Conjugacy classes mod `q`
@@ -6,6 +8,8 @@ import AnalyticTheory.ThetaOrder
 `ConjModQ` is an equivalence relation on `Ω^×`, every class meets the annulus `|q| < |α| ≤ 1`, and
 the chosen system `repSystem` of representatives has the required property.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

@@ -1,10 +1,14 @@
-import AnalyticTheory.Theta
+module
+
+public import AnalyticTheory.Theta
 
 /-!
 # Orders of the theta functions `T_φ`
 
 `w_ξ(T_φ) = 1` if `ξ` is `K`-conjugate to `α qᵏ` for some `k` and `0` otherwise.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

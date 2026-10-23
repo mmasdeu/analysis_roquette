@@ -1,5 +1,7 @@
-import AnalyticTheory.BaseChangeSplit
-import AnalyticTheory.CyclicSplit
+module
+
+public import AnalyticTheory.BaseChangeSplit
+public import AnalyticTheory.CyclicSplit
 
 /-!
 # Specialization of split algebras
@@ -8,6 +10,8 @@ Let `B` be a finite-dimensional `L`-algebra with `F ⊗_L B ≅ Mₘ(F)` (`m > 0
 homomorphism out of `B` to a nontrivial ring is injective (`B` is simple).  If moreover `F` has a
 discrete valuation ring `O ⊇ L` with an `L`-algebra homomorphism `O → L`, then `B ≅ Mₘ(L)`.
 -/
+
+@[expose] public section
 
 open scoped TensorProduct
 

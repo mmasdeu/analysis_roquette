@@ -1,4 +1,6 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Ring
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Ring
 
 /-!
 # The substitution `X ↦ Xᵐ` for entire Laurent series
@@ -12,6 +14,8 @@ For `m > 0` every entire Laurent series has a unique decomposition
 `f = ∑_{0 ≤ i < m} X⁻ⁱ · gᵢ(Xᵐ)` (`hol_decomp`, `eq_zero_of_sum_mono_mul_holExpand`), with
 `(gᵢ)ₖ = a_{mk−i}`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

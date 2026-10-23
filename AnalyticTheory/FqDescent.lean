@@ -1,8 +1,10 @@
-import AnalyticTheory.Lemma2
-import AnalyticTheory.FqHomogeneous
-import AnalyticTheory.A1LemmaA
-import AnalyticTheory.Sec3VIII
-import ForMathlib.FieldTheory.ExtendRingEquiv
+module
+
+public import AnalyticTheory.Lemma2
+public import AnalyticTheory.FqHomogeneous
+public import AnalyticTheory.A1LemmaA
+public import AnalyticTheory.Sec3VIII
+public import ForMathlib.FieldTheory.ExtendRingEquiv
 
 /-!
 # Galois descent for `F_L(q)`: the fields `E_ζ`
@@ -14,6 +16,8 @@ with group `G`, and `E_ζ · L = F_L(q)`.
 
 Blueprint nodes: `lem:Fq-descent`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,12 +1,16 @@
-import AnalyticTheory.Sec5AJ
-import AnalyticTheory.CyclicSplit
-import AnalyticTheory.BaseChangeSplit
-import AnalyticTheory.Specialization
-import AnalyticTheory.Sec5Eval
+module
+
+public import AnalyticTheory.Sec5AJ
+public import AnalyticTheory.CyclicSplit
+public import AnalyticTheory.BaseChangeSplit
+public import AnalyticTheory.Specialization
+public import AnalyticTheory.Sec5Eval
 
 /-!
 # §5: Corollaries XVIa, XVIb (Brauer groups)
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

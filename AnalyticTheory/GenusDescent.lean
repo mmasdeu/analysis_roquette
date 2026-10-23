@@ -1,5 +1,7 @@
-import AnalyticTheory.ConormDescent
-import AnalyticTheory.FFFinite
+module
+
+public import AnalyticTheory.ConormDescent
+public import AnalyticTheory.FFFinite
 
 /-!
 # Genus and function-field axioms for a Galois descent
@@ -8,6 +10,8 @@ For `E = F^G` as in `ConormDescent.lean`:
 * `genus K E = 1` whenever `dim_L L_F(D) = deg D` for `deg D > 0` (`F | L` of genus one);
 * `E | K` is a function field whenever `F | L` is.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,5 +1,7 @@
-import AnalyticTheory.EllipticBasics
-import AnalyticTheory.FFExtension
+module
+
+public import AnalyticTheory.EllipticBasics
+public import AnalyticTheory.FFExtension
 
 /-!
 # Residue fields of a prime divisor and of its restriction
@@ -7,6 +9,8 @@ import AnalyticTheory.FFExtension
 If `P = Q ∩ E` for `Q` a prime divisor of `F | K` and `E ⊂ F` then `O_P ⊂ O_Q` is a local homomorphism
 and induces a `K`-algebra homomorphism `κ(P) → κ(Q)`, necessarily injective.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,6 +1,8 @@
-import Mathlib.Analysis.Normed.Ring.InfiniteSum
-import Mathlib.Analysis.SpecificLimits.Normed
-import Mathlib.RingTheory.PowerSeries.Basic
+module
+
+public import Mathlib.Analysis.Normed.Ring.InfiniteSum
+public import Mathlib.Analysis.SpecificLimits.Normed
+public import Mathlib.RingTheory.PowerSeries.Basic
 
 /-!
 # Evaluating power series with bounded coefficients
@@ -22,6 +24,8 @@ along a sequence of non-zero points tending to `0` is zero (`eq_zero_of_tsumEval
 * `PowerSeries.norm_tsumEval_sub_le`: `‖f(q) − φ(a₀)‖ ≤ ‖q‖ / (1 − ‖q‖)`.
 * `PowerSeries.eq_zero_of_tsumEval_eq_zero`: the identity principle.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

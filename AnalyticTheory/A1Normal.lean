@@ -1,5 +1,7 @@
-import AnalyticTheory.AppendixA1
-import ForMathlib.AlgebraicGeometry.EllipticCurve.IsomOfJTwist
+module
+
+public import AnalyticTheory.AppendixA1
+public import ForMathlib.AlgebraicGeometry.EllipticCurve.IsomOfJTwist
 
 /-!
 # Appendix A1: Weierstraß data at a fixed prime divisor
@@ -11,6 +13,8 @@ of `j` and of the Hasse invariant (A1.12), (A1.24), (A1.35).
 
 Blueprint nodes: `lem:rr-basis`, `lem:A1-same-prime`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

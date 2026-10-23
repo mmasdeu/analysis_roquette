@@ -1,5 +1,7 @@
-import AnalyticTheory.EllipticRigidity
-import AnalyticTheory.FqOrd
+module
+
+public import AnalyticTheory.EllipticRigidity
+public import AnalyticTheory.FqOrd
 
 /-!
 # Elliptic subfields of `F_K(q)`: rational points
@@ -12,6 +14,8 @@ Using the Abel–Jacobi theorem in `F_K(q)` and the norm formula, `π(ab) + π(1
 is elliptic this forces `π(ab) = π(b)` whenever `π(a) = π(1)` (rigidity), so the rational fibres of
 `π` are the cosets of a subgroup `V ⊆ K^×`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

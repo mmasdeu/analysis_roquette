@@ -1,4 +1,6 @@
-import AnalyticTheory.FFUnramified
+module
+
+public import AnalyticTheory.FFUnramified
 
 /-!
 # The fundamental identity for function fields
@@ -10,6 +12,8 @@ The residue degree is `deg P = f(P|Q) · deg Q` (`f` the inertia degree, via the
 `S/𝔪_P ≅ O_P/𝔪(O_P)`), and `∑ e f = [F : E]` follows from the norm formula applied to a uniformizer
 of `Q`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

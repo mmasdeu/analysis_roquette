@@ -1,4 +1,6 @@
-import AnalyticTheory.ThetaDiv
+module
+
+public import AnalyticTheory.ThetaDiv
 
 /-!
 # Holomorphic solutions of `G(q⁻¹X) = κ X^d G(X)`
@@ -7,6 +9,8 @@ These form a `K`-vector space of dimension `d` if `d > 0`; it is `0` if `d < 0`;
 `0` unless `κ ∈ q^ℤ`, when it has dimension `1`. The proof works with the Laurent coefficients:
 `g_n = κ qⁿ g_{n-d}`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

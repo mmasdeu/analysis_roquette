@@ -1,4 +1,6 @@
-import AnalyticTheory.Normalize
+module
+
+public import AnalyticTheory.Normalize
 
 /-!
 # Structure of `F_K(q)` (book, §2: items I–V, Corollaries Va, Vb)
@@ -9,6 +11,8 @@ Abel–Jacobi isomorphism `C⁰_K(q) ≅ K^×/q`.
 
 The statements I–V, Va, Vb are in `FqStructure.lean` (their proofs use the Weierstraß functions).
 -/
+
+@[expose] public section
 
 open Filter Topology
 

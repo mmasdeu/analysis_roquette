@@ -1,4 +1,6 @@
-import AnalyticTheory.WpConstruct
+module
+
+public import AnalyticTheory.WpConstruct
 
 /-!
 # `L(n𝔭₁)` and the generation of `F_K(q)` by `℘, ℘′`
@@ -6,6 +8,8 @@ import AnalyticTheory.WpConstruct
 The divisor `𝔭₁` (the class of `1` mod `q`), the dimension `dim L(n𝔭₁) = n`, the reduction of
 `L(n𝔭₁)` to the monomials `1, ℘, ℘′, ℘², ℘℘′, …`, and `F_K(q) = K(℘, ℘′)`.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

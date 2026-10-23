@@ -1,5 +1,7 @@
-import AnalyticTheory.Basic
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Ring
+module
+
+public import AnalyticTheory.Basic
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Ring
 
 /-!
 # Holomorphic functions over a local field (book, §2)
@@ -10,6 +12,8 @@ any complete non-archimedean field and points in any algebraic, algebraically cl
 extension) lives in `ForMathlib/Analysis/Nonarchimedean/EntireLaurent/`; this file specializes it
 to `Ω = AlgebraicClosure K` and re-exports its results under the names used in this project.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

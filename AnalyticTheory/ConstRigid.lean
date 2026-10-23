@@ -1,5 +1,7 @@
-import AnalyticTheory.ConstGalois
-import AnalyticTheory.FqResidue
+module
+
+public import AnalyticTheory.ConstGalois
+public import AnalyticTheory.FqResidue
 
 /-!
 # Rigidity of a constant field extension at rational points
@@ -9,6 +11,8 @@ Let `E ⊆ F_K(q)` be elliptic and `L | K` finite Galois. For `b ∈ K^×`, the 
 (`eᵢ ∈ E`); by the coordinate bound (`anVal_coord_ge`) every `eᵢ` lies in `L_E(π(b))`, hence is
 constant since `E` has genus one, so `h` is constant and `Q₁ = π_L(b)`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

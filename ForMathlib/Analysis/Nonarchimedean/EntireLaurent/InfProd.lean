@@ -1,4 +1,6 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
 
 /-!
 # Infinite products in `H_K`
@@ -6,6 +8,8 @@ import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
 If `gⱼ ∈ H_K` and the Gauss norms `‖gⱼ‖_ρ` tend to `0` for every `ρ > 0`, then the partial products
 `∏_{j<J}(1 + gⱼ)` converge pointwise on `Ω^×` to an element of `H_K`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

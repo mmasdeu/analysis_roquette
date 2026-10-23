@@ -1,4 +1,6 @@
-import AnalyticTheory.Basic
+module
+
+public import AnalyticTheory.Basic
 
 /-!
 # Subfields of function fields
@@ -6,6 +8,8 @@ import AnalyticTheory.Basic
 A function field `F | K` (transcendence degree one, finitely generated) is a finite extension of
 every intermediate field `E` that contains an element transcendental over `K`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

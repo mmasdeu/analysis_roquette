@@ -1,4 +1,6 @@
-import AnalyticTheory.Delta1
+module
+
+public import AnalyticTheory.Delta1
 
 /-!
 # The product formula (45), part 2: functions with double zeros on a `2`-torsion class
@@ -6,6 +8,8 @@ import AnalyticTheory.Delta1
 If `G ∈ H_K` satisfies `G(q⁻¹X) = X² G(X)` and `G`, `DG` vanish at a `2`-torsion point `b`
 (`b² = qᵏ`), then `G = c · Θ(X/b) Θ(bX)`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

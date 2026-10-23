@@ -1,10 +1,14 @@
-import AnalyticTheory.Sec5Div
-import AnalyticTheory.CycAux
-import AnalyticTheory.Hilbert90U
+module
+
+public import AnalyticTheory.Sec5Div
+public import AnalyticTheory.CycAux
+public import AnalyticTheory.Hilbert90U
 
 /-!
 # §5: the cohomology table (rows `D_L(q)`, `D⁰_L(q)`, `C⁰_L(q)`, `P_L(q)`, `F_L(q)^×`)
 -/
+
+@[expose] public section
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedVariables false

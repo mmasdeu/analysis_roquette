@@ -1,4 +1,6 @@
-import AnalyticTheory.Holomorphic
+module
+
+public import AnalyticTheory.Holomorphic
 
 /-!
 # Fields of periodic functions (book, §2)
@@ -13,6 +15,8 @@ valuations, the degree and Jacobi image, ...) are defined through `Classical.eps
 explicit formulas; their defining properties (well-definedness, additivity, ...) are stated as
 theorems.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

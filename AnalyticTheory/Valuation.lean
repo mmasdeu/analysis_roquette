@@ -1,4 +1,6 @@
-import AnalyticTheory.Analytic
+module
+
+public import AnalyticTheory.Analytic
 
 /-!
 # The analytic valuations `w_α` (book, §2)
@@ -6,6 +8,8 @@ import AnalyticTheory.Analytic
 Properties of the order of vanishing `ord_α` on `H_K` (existence of a finite order, uniqueness, additivity,
 the ultrametric inequality) and the valuation axioms for `w_α = ord_α g − ord_α h` on `M_K`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

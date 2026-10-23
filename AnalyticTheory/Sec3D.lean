@@ -1,5 +1,7 @@
-import AnalyticTheory.DOperator
-import AnalyticTheory.Sec3VII
+module
+
+public import AnalyticTheory.DOperator
+public import AnalyticTheory.Sec3VII
 
 /-!
 # Formula (18): `2℘′ = D℘ − ℘`
@@ -8,6 +10,8 @@ Termwise: with `T = Θ`, `cₙ = q⁻ⁿ`, `Rₙ = T/(X − cₙ)`, the identity
 `2 (−cₙX²Rₙ³) = T · D(cₙXRₙ²) − 2 cₙXRₙ² · DT − T · cₙXRₙ²` holds in `H_K`; summing over `n`
 (`D` commutes with sums of null families) gives `2G′ = T·DG − 2G·DT − T·G`.
 -/
+
+@[expose] public section
 
 open Filter Topology PowerSeries
 

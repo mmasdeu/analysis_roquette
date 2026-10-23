@@ -1,5 +1,7 @@
-import AnalyticTheory.EllipticSeparable
-import AnalyticTheory.FFFinite
+module
+
+public import AnalyticTheory.EllipticSeparable
+public import AnalyticTheory.FFFinite
 
 /-!
 # The inseparable part of Theorem XVIII
@@ -9,6 +11,8 @@ import AnalyticTheory.FFFinite
 `[F_K(q) : K·F_K(q)^{p^r}] ≤ p^r`, and `K·F_K(q)^{p^r} = F_K(q^{p^r} | X^{p^r})` is the unique
 subfield over which `F_K(q)` is purely inseparable of degree `p^r`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

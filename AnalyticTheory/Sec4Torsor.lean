@@ -1,4 +1,6 @@
-import AnalyticTheory.Sec4B3
+module
+
+public import AnalyticTheory.Sec4B3
 
 /-!
 # §4: elliptic fields of period `q` as forms of `F_K(q)` (Theorem IX)
@@ -13,6 +15,8 @@ The invariant version (`IsJacobianField` of Appendix A2) is not used.
 
 Blueprint nodes: `thm:IX`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

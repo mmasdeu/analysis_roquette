@@ -1,6 +1,8 @@
-import AnalyticTheory.A1Determine
-import AnalyticTheory.A1Transfer
-import ForMathlib.FieldTheory.ExtendRingEquiv
+module
+
+public import AnalyticTheory.A1Determine
+public import AnalyticTheory.A1Transfer
+public import ForMathlib.FieldTheory.ExtendRingEquiv
 
 /-!
 # Appendix A1, Lemma A: the automorphisms of `F | K` fixing the prime `𝔭`
@@ -10,6 +12,8 @@ identity and the involution `ε : (x, y) ↦ (x, −y − a₁x − a₃)`.
 
 Blueprint nodes: `lem:A`.
 -/
+
+@[expose] public section
 
 open WeierstrassCurve
 

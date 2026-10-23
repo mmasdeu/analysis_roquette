@@ -1,5 +1,7 @@
-import Mathlib.Algebra.Polynomial.Laurent
-import Mathlib.Algebra.Polynomial.Roots
+module
+
+public import Mathlib.Algebra.Polynomial.Laurent
+public import Mathlib.Algebra.Polynomial.Roots
 
 /-!
 # A Laurent polynomial with infinitely many zeros is zero
@@ -7,6 +9,8 @@ import Mathlib.Algebra.Polynomial.Roots
 If `f : R →+* S` is injective, `S` is a domain and the Laurent polynomial `p ∈ R[T;T⁻¹]` satisfies
 `eval₂ f x p = 0` for infinitely many units `x ∈ Sˣ`, then `p = 0`.
 -/
+
+@[expose] public section
 
 open Polynomial
 

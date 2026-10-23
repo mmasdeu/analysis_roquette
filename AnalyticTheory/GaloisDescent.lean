@@ -1,6 +1,8 @@
-import Mathlib.FieldTheory.Galois.Basic
-import Mathlib.FieldTheory.Fixed
-import Mathlib.RingTheory.Trace.Basic
+module
+
+public import Mathlib.FieldTheory.Galois.Basic
+public import Mathlib.FieldTheory.Fixed
+public import Mathlib.RingTheory.Trace.Basic
 
 /-!
 # Galois descent for vector spaces (Speiser's lemma)
@@ -10,6 +12,8 @@ automorphisms extending the action on `L` (a *semilinear* action). If `V ⊆ F` 
 stable under `G`, then the `G`-fixed vectors `V^G` span `V` over `L`, and `K`-linearly independent
 fixed vectors are `L`-linearly independent. Hence `dim_K V^G = dim_L V`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

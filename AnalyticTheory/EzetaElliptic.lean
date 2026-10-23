@@ -1,6 +1,8 @@
-import AnalyticTheory.FqDescent
-import AnalyticTheory.Sec3VIII
-import AnalyticTheory.GenusDescent
+module
+
+public import AnalyticTheory.FqDescent
+public import AnalyticTheory.Sec3VIII
+public import AnalyticTheory.GenusDescent
 
 /-!
 # The fields `E_ζ` are function fields of genus one
@@ -9,6 +11,8 @@ For a cocycle `ζ` the field `E_ζ = F_L(q)^G` (fixed field of the twisted actio
 field over `K` of genus one: this is the descent of Riemann–Roch spaces
 (`ConormDescent.lean`, `GenusDescent.lean`) applied to `F_L(q) | L`, which has genus one.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

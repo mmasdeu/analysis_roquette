@@ -1,6 +1,8 @@
-import AnalyticTheory.Structure
-import AnalyticTheory.AppendixA2
-import Mathlib.RingTheory.TensorProduct.Basic
+module
+
+public import AnalyticTheory.Structure
+public import AnalyticTheory.AppendixA2
+public import Mathlib.RingTheory.TensorProduct.Basic
 
 /-!
 # Semi-periodic functions (book, §4 and §5)
@@ -18,6 +20,8 @@ Blueprint nodes: `def:q-trivial`, `lem:2`, `thm:IX`, `thm:X`, `thm:XI`, `thm:XII
 `thm:XIV`, `cor:XIIIa`, `cor:XIIIb`, `thm:XV`, `cor:XVa`, `thm:XVI`, `tab:cohomology`,
 `cor:XVIa`, `cor:XVIb`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

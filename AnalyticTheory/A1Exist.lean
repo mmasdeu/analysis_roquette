@@ -1,4 +1,6 @@
-import AnalyticTheory.A1Determine
+module
+
+public import AnalyticTheory.A1Determine
 
 /-!
 # Appendix A1: construction of Weierstraß equations (existence part)
@@ -13,6 +15,8 @@ the conservativity of `F | K`).
 
 Blueprint nodes: `thm:A-existence-data`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,5 +1,7 @@
-import AnalyticTheory.Structure
-import AnalyticTheory.AppendixA1
+module
+
+public import AnalyticTheory.Structure
+public import AnalyticTheory.AppendixA1
 
 /-!
 # Appendix §A2: arbitrary elliptic function fields
@@ -16,6 +18,8 @@ defined explicitly; their properties are stated as theorems.
 Blueprint nodes: `thm:A2-absinv`, `thm:A2-51`, `def:jacobian-field`, `thm:A2-52-53`,
 `def:char-cocycle`, `thm:A2-cocycle-translation`, `prop:A2-classification`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

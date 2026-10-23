@@ -1,4 +1,6 @@
-import AnalyticTheory.FFExtension
+module
+
+public import AnalyticTheory.FFExtension
 
 /-!
 # Prime divisors over a prime divisor and Dedekind domains
@@ -9,6 +11,8 @@ and the prime divisors of `F` lying over `Q` correspond to the maximal ideals of
 (`O_P = S_𝔪`). This identifies our ramification indices and residue degrees with Mathlib's, and
 gives the fundamental identity `∑_{P | Q} e f = [F : E]`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

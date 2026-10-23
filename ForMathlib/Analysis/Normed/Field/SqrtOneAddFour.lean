@@ -1,5 +1,7 @@
-import Mathlib.Analysis.Normed.Ring.Ultra
-import Mathlib.Analysis.SpecificLimits.Normed
+module
+
+public import Mathlib.Analysis.Normed.Ring.Ultra
+public import Mathlib.Analysis.SpecificLimits.Normed
 
 /-!
 # Square roots of `1 + 4s` in complete ultrametric fields
@@ -16,6 +18,8 @@ characteristic `2`), of the statement that units congruent to `1` modulo `4` are
 
 * `IsUltrametricDist.exists_sq_eq_one_add_four_mul`: `∃ u, u² = 1 + 4s`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

@@ -1,5 +1,7 @@
-import AnalyticTheory.GaloisDescentVec
-import AnalyticTheory.SkolemNoetherMatrix
+module
+
+public import AnalyticTheory.GaloisDescentVec
+public import AnalyticTheory.SkolemNoetherMatrix
 
 /-!
 # Algebras split by a cyclic extension in which every element of the base is a norm
@@ -12,6 +14,8 @@ The proof is Galois descent: `σ ⊗ 1` induces a `σ`-semilinear automorphism o
 `Ad(u) ∘ σ` by Skolem–Noether; the norm hypothesis normalises the cocycle `u` and Galois descent
 for `Fᵐ` (Speiser's lemma) trivialises it.
 -/
+
+@[expose] public section
 
 open scoped TensorProduct
 

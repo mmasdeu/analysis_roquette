@@ -1,5 +1,7 @@
-import AnalyticTheory.Rationality
-import AnalyticTheory.Analytic
+module
+
+public import AnalyticTheory.Rationality
+public import AnalyticTheory.Analytic
 
 /-!
 # Normalized analytic valuations
@@ -9,6 +11,8 @@ The book's `w_α(f)` is the exponent of the minimal polynomial `φ_α` in `f`. W
 hence `e_α ∣ ord_α f`, so that `w_α = ord_α / e_α` is an additive valuation of `M_K`
 (`anVal_isValuation`), invariant under conjugation; the divisor `divisorOf f` is a divisor.
 -/
+
+@[expose] public section
 
 open Filter Topology Polynomial
 

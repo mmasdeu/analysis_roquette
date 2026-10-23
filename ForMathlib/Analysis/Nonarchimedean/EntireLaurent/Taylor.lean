@@ -1,9 +1,11 @@
-import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
-import Mathlib.Analysis.Normed.Ring.Ultra
-import Mathlib.Analysis.SpecificLimits.Normed
-import Mathlib.Algebra.Order.Star.Real
-import Mathlib.Topology.Algebra.Module.FiniteDimension
-import Mathlib.Topology.UniformSpace.Uniformizable
+module
+
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
+public import Mathlib.Analysis.Normed.Ring.Ultra
+public import Mathlib.Analysis.SpecificLimits.Normed
+public import Mathlib.Algebra.Order.Star.Real
+public import Mathlib.Topology.Algebra.Module.FiniteDimension
+public import Mathlib.Topology.UniformSpace.Uniformizable
 
 /-!
 # Taylor expansion of holomorphic functions at a point of `Ω^×`
@@ -11,6 +13,8 @@ import Mathlib.Topology.UniformSpace.Uniformizable
 Generalized binomial theorem for integer exponents, the expansion of a convergent Laurent series
 around `α ≠ 0`, and the consequences needed for the analytic valuations `w_α`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

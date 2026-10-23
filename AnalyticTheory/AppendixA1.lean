@@ -1,5 +1,7 @@
-import AnalyticTheory.Basic
-import AnalyticTheory.EllipticBasics
+module
+
+public import AnalyticTheory.Basic
+public import AnalyticTheory.EllipticBasics
 
 /-!
 # Appendix §A1: fields with a prime divisor of degree 1
@@ -16,6 +18,8 @@ Blueprint nodes: `def:normal-forms`, `def:absolute-invariant`, `def:hasse-invari
 `lem:A` (Lemma A), `rem:A-1`, `rem:A-2`, `rem:A-3`, `thm:A-uniqueness`,
 `thm:A-existence`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

@@ -1,7 +1,9 @@
-import AnalyticTheory.EllipticBasics
-import AnalyticTheory.ConstExt
-import Mathlib.FieldTheory.RatFunc.Valuation
-import Mathlib.RingTheory.Valuation.Discrete.Basic
+module
+
+public import AnalyticTheory.EllipticBasics
+public import AnalyticTheory.ConstExt
+public import Mathlib.FieldTheory.RatFunc.Valuation
+public import Mathlib.RingTheory.Valuation.Discrete.Basic
 
 /-!
 # The prime divisor at infinity of the rational function field `k(X)`
@@ -11,6 +13,8 @@ import Mathlib.RingTheory.Valuation.Discrete.Basic
 `k(X)` at which `X` has a pole. This is the basis of the model-prime lemma of
 `WeierstrassModel.lean`.
 -/
+
+@[expose] public section
 
 open scoped WithZero Classical
 

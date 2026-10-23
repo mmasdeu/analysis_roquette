@@ -1,4 +1,6 @@
-import AnalyticTheory.Isogeny
+module
+
+public import AnalyticTheory.Isogeny
 
 /-!
 # Theorem XVII (i): the degree of `F_K(q)` over `F_K(q̄ | Xᵐ)`
@@ -13,6 +15,8 @@ For `q̄ᵈ = qᵐ` (`d, m > 0`) we have the tower
 
 Blueprint: `thm:XVII`.
 -/
+
+@[expose] public section
 
 open Filter Topology
 

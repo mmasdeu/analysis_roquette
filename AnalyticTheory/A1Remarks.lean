@@ -1,6 +1,8 @@
-import AnalyticTheory.WeierstrassModel
-import AnalyticTheory.A1Exist
-import AnalyticTheory.A1Gen
+module
+
+public import AnalyticTheory.WeierstrassModel
+public import AnalyticTheory.A1Exist
+public import AnalyticTheory.A1Gen
 
 /-!
 # Appendix A1: the invariants in terms of normal forms, Remarks 1 and 2
@@ -13,6 +15,8 @@ closed ground fields.
 
 Blueprint nodes: `prop:absinv-weierstrass`, `prop:hasse-weierstrass`, `rem:A-1`, `rem:A-2`, `rem:A-3`, `thm:A-existence`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

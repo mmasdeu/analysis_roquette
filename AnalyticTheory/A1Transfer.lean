@@ -1,5 +1,7 @@
-import AnalyticTheory.A1Normal
-import AnalyticTheory.ConstExt
+module
+
+public import AnalyticTheory.A1Normal
+public import AnalyticTheory.ConstExt
 
 /-!
 # Appendix A1: transport of Weierstraß data along isomorphisms
@@ -12,6 +14,8 @@ the prime divisors of degree one are permuted transitively by `K`-automorphisms 
 
 Blueprint nodes: `lem:A1-independence`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 

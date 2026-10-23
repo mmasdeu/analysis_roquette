@@ -1,6 +1,8 @@
-import Mathlib.Analysis.SpecialFunctions.Complex.Circle
-import Mathlib.RingTheory.RootsOfUnity.Complex
-import Mathlib.RingTheory.IntegralDomain
+module
+
+public import Mathlib.Analysis.SpecialFunctions.Complex.Circle
+public import Mathlib.RingTheory.RootsOfUnity.Complex
+public import Mathlib.RingTheory.IntegralDomain
 
 /-!
 # Characters of finite groups with values in the circle
@@ -11,6 +13,8 @@ import Mathlib.RingTheory.IntegralDomain
 * `MonoidHom.exists_apply_eq_circle_exp`: moreover `χ(σ) = exp(2πi/n)` for some `σ ∈ G`, where
   `n` is the order of the image.
 -/
+
+@[expose] public section
 
 namespace MonoidHom
 

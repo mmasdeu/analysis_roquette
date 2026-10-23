@@ -1,8 +1,12 @@
-import AnalyticTheory.Delta4
+module
+
+public import AnalyticTheory.Delta4
 
 /-!
 # The product formula (45), part 5: the three `2`-torsion values and the discriminant
 -/
+
+@[expose] public section
 
 open Filter Topology
 

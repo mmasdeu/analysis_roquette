@@ -1,4 +1,6 @@
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Skolem–Noether for matrix algebras (semilinear form)
@@ -6,6 +8,8 @@ import Mathlib
 A ring automorphism `φ` of `Mₙ(F)` which is `σ`-semilinear over scalars (for a field automorphism
 `σ`) is of the form `a ↦ u σ(a) u⁻¹` for an invertible matrix `u`.
 -/
+
+@[expose] public section
 
 namespace AnalyticTheory
 
