@@ -214,7 +214,9 @@ cd blueprint/tools && python3 check_items.py && python3 emit.py
   through the splitting field `E_1 ≅ E`, i.e. through the independent compositum `E ⊗_K E`, which is a domain
   only for separably generated `E`: genus-change theory for conservative fields is not available), the
   characteristic cocycle and its values in the translations.
-* Not started (statements only): the Proposition on absolute integrality of `j` (§6);
+* Not started (statements only): the Proposition on absolute integrality of `j` (§6; stated for the
+  invariants `j(FL|L)` of the finite constant extensions with a prime of degree `1`, so that it does not
+  depend on Appendix §A2);
   Appendix A2 in general.
 
 * §6, **Theorem XIX and Corollaries XIXa–XIXd completely** (`XIXPeriod`, `XIXDescent`,

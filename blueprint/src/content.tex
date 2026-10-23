@@ -1908,9 +1908,9 @@ See the Lean proof of \texttt{of\_algEquiv, multiplicatorRing\_eq\_int\_of\_pull
 \begin{proposition}[Absolute integrality of $j$]
 \label{prop:abs-integral}
 \lean{AnalyticTheory.prop_cm_absolutely_integral}
-\uses{def:complex-multiplication, def:absolute-invariant-gen}
+\uses{def:complex-multiplication, def:absolute-invariant, cor:XVIIIb, thm:VIIIa}
 \leanok
-Over any field, complex multiplication forces $j$ to be absolutely integral.
+Let $K$ be an arbitrary field and $F\,|\,K$ elliptic. If $F$ has complex multiplication then its absolute invariant is absolutely integral: for every finite constant field extension $FL\,|\,L$ with a prime divisor of degree $1$, $j(FL\,|\,L)$ is a root of a monic polynomial with integer coefficients.
 \end{proposition}
 \begin{proof}
 See the Lean proof of \texttt{prop\_cm\_absolutely\_integral}.

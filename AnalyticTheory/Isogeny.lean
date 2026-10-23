@@ -296,11 +296,17 @@ end CM
 /-- Book, §6, Proposition (absolute integrality): for an arbitrary field `K` (not necessarily
 local) and an elliptic function field `F | K`, complex multiplication forces the absolute
 invariant `j` to be absolutely integral: `j` is a root of a monic polynomial with integer
-coefficients. -/
+coefficients. The absolute invariant of `F` is the common value of the invariants `j(FL | L)` of
+the constant field extensions `FL | L` that have a prime divisor of degree `1` (Appendix §A2); the
+statement is made for each of them, so that it does not depend on Appendix §A2. -/
 theorem prop_cm_absolutely_integral (K : Type u) [Field K] (F : Type u) [Field F] [Algebra K F]
-    (hF : IsEllipticOver K F) (hcm : HasComplexMultiplication K F) :
+    (_hF : IsEllipticOver K F) (_hcm : HasComplexMultiplication K F)
+    (L FL : Type u) [Field L] [Field FL] [Algebra K L] [Algebra F FL] [Algebra L FL]
+    [Algebra K FL] [IsScalarTower K F FL] [IsScalarTower K L FL]
+    (_hL : FiniteDimensional K L) (_hFL : IsConstantExtension K F L FL)
+    (hP : HasPrimeOfDegreeOne L FL) :
     ∃ p : Polynomial ℤ, p.Monic ∧
-      Polynomial.aeval (absInvGen K F hF) (p.map (Int.castRingHom K)) = 0 := by
+      Polynomial.aeval (absInv L FL hP) (p.map (Int.castRingHom L)) = 0 := by
   sorry
 
 /-! Theorem XIX and its corollaries are stated and proved in `XIX.lean`. -/

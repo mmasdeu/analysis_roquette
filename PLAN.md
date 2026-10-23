@@ -32,7 +32,11 @@ Remaining sorries and what they need:
     `F_L(q)`, and degrees are preserved (unramified constant extension).
   - G2 `L_{E_ζ}(D) ⊗ L ≅ L_{F_L}(D_L)` (Speiser's lemma), so the genera agree; conservativity as
     well.
-* **§6** `prop_cm_absolutely_integral`: needs `absInvGen` (A2) and completions of arbitrary `K`.
+* **§6** `prop_cm_absolutely_integral` (stated for the invariants `j(FL|L)` of the finite constant
+  extensions with a prime of degree `1`, independently of A2): needs a rank-one extension of a valuation
+  of `K₀(j)` to `K`, persistence of complex multiplication under the (infinite) constant extension to the
+  completed algebraic closure (functoriality of `C⁰` and of multiplicators), and genus change
+  (ellipticity of the extended field).
 * **Appendix A2**: cocycle theory over the above.
 
 ## A. Finite extensions of function fields (`FFExtension.lean`, generic)

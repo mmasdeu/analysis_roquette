@@ -561,6 +561,8 @@ _upd('cor:XIXc', text=r'There is a unique maximal subfield $F_0\subseteq F$ that
 _upd('cor:XIXd', text=r'The degree of $F$ over any elliptic subfield splitting over $K$ is divisible by $n$; the split subfields of degree $n$ correspond $1$--$1$ to the $n$-th roots of $q$ in $K$ (their periods), and $F$ is cyclic over each of them.',
      lean=['corXIXd_degree_n', 'Em_one_galois_cyclic'])
 
+_upd('prop:abs-integral', text=r'Let $K$ be an arbitrary field and $F\,|\,K$ elliptic. If $F$ has complex multiplication then its absolute invariant is absolutely integral: for every finite constant field extension $FL\,|\,L$ with a prime divisor of degree $1$, $j(FL\,|\,L)$ is a root of a monic polynomial with integer coefficients.',
+     uses=['def:complex-multiplication', 'def:absolute-invariant', 'cor:XVIIIb', 'thm:VIIIa'])
 # --- Appendix A1
 _upd('def:square-equiv', text=r'$a\sim b$ iff $a=t^2b$ for some $t\in K^\times$.')
 _upd('def:absolute-invariant', text=r'The absolute invariant $j=c_4^3/\Delta$ of $F\,|\,K$ with a prime of degree $1$, computed from any Weierstra\ss\ equation of $F$.', uses=['def:normal-forms', 'def:weierstrass-data', 'def:weierstrass-invariants'])
