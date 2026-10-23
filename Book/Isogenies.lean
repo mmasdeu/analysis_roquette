@@ -40,6 +40,9 @@ $$`\bar q^{\,d} = q^m. \qquad (71)`
 
 This condition means that $`\bar q` has finite order $`\bmod^\times q`.
 
+_Formalization note._ The normalization $`0 < |\bar q| < 1` is not part of the predicate
+`Commensurable`; it appears as separate hypotheses in every statement that needs it.
+
 > Book, §6, (71): `q̄ ∈ K` (`0 < |q̄| < 1`) is *commensurable* with `q` if `q̄^d = q^m` for some nonzero integers `d, m`.
 -/
 
@@ -54,8 +57,10 @@ $$`\mu_m\colon \bar f(X) \mapsto \bar f(X^m) \qquad (\bar f \in F_K(\bar q)).`
 
 This is a $`K`-isomorphism of $`F_K(\bar q)` into the field of meromorphic functions.
 
-In the formalization, $`\mu_m` is first defined on holomorphic functions, on their Laurent
-coefficients: $`\sum a_n X^n \mapsto \sum a_n X^{mn}`. This is a general construction of the
+_Formalization note._ In the formalization, $`\mu_m` is defined on the whole field $`M_K` (not
+only on $`F_K(\bar q)`), and $`F_K(\bar q\,|\,X^m)` is the image of $`F_K(\bar q)`. It is first
+defined on holomorphic functions, on their Laurent coefficients:
+$`\sum a_n X^n \mapsto \sum a_n X^{mn}`. This is a general construction of the
 library `EntireLaurent`, together with the decomposition of an arbitrary holomorphic function as
 $`f = \sum_{0 \le i < m} X^{-i} g_i(X^m)`.
 
@@ -74,7 +79,9 @@ $`f = \sum_{0 \le i < m} X^{-i} g_i(X^m)`.
 /-!
 
 It extends to the field of fractions $`M_K`, and it is the unique endomorphism of $`M_K` that acts
-as the substitution on $`H_K`.
+as the substitution on $`H_K`. The library's `substPow` is defined by Hilbert's choice operator as
+an endomorphism with this property, and `substPow_eq` identifies it, for $`m \ne 0`, with the
+explicit extension `meroSubst` (for $`m = 0` it is unspecified).
 
 > Book, §6: `μ` is the substitution `X ↦ Xᵐ` on `M_K`: it maps the holomorphic function `g` to the holomorphic function `g(Xᵐ)`.
 -/
@@ -119,6 +126,14 @@ $`\bar f(\bar q^{-k}X) = \bar f(X)` for every $`k`, in particular for the power
 $`\bar q^{\,k} = q^m`. Substituting $`X \mapsto X^m` we obtain
 $`\bar f(q^{-m}X^m) = \bar f(X^m)`, which says that $`\bar f(X^m)` is stable under the translation
 $`X \mapsto q^{-1}X`. That is, $`\bar f(X^m) \in F_K(q)`.
+
+_Formalization note._ The printed book states this for the $`m` of a fixed pair $`d, m` satisfying
+(71), and writes the functional equation as $`\bar f(\bar q^{-m}X) = \bar f(X)`; what the argument
+uses is that $`q^m = \bar q^{\,d}` is a power of $`\bar q`, i.e. that $`m` is a multiple of the order
+of $`q \bmod^\times \bar q`, as in (72). The formal condition `OrderDvd` is exactly this
+($`q^m = \bar q^{\,d}` for some $`d \in \mathbb Z`), and the inclusion `fq_qbar_Xm_subset` assumes
+it; the condition is also necessary, since $`\tau_u` fixes $`F_K(\bar q)` only for
+$`u \in \bar q^{\mathbb Z}`.
 
 > Book, §6: `m` is divisible by the order of `q mod^× q̄`, i.e. `q^m` is a power of `q̄`.
 -/
@@ -165,9 +180,11 @@ $`F_K(\bar q\,|\,X^m)` we may assume $`m > 0`.
 
 /-!
 
-The theorem below compares subfields of $`M_K` (rather than abstract field extensions); the
-formalization uses the following notions of degree, separability and automorphism group for a
-pair of subfields $`E \le F` of a field $`M`.
+_Formalization note._ The theorem below compares subfields of $`M_K` (rather than abstract field
+extensions); the formalization uses the following notions of degree, separability and automorphism
+group for a pair of subfields $`E \le F` of a field $`M`. The degree `relDeg` is $`0` if
+$`E \not\le F` and (being a `Module.finrank`) also if $`F\,|\,E` is infinite; the degree of
+inseparability `relInsepDeg` is the degree of $`F` over the separable closure of $`E` in $`F`.
 
 > The degree `[F : E]` of subfields `E ≤ F` of `M` (and `0` if `E ≰ F`).
 -/
@@ -230,8 +247,15 @@ order of $`q \bmod^\times \bar q`. Then:_
    following conditions are satisfied: $`m \not\equiv 0 \bmod p`; $`K` contains the $`m`-th roots
    of unity; $`\bar q` is an $`m`-th power in $`K`._
 
-(The printed text defines $`U` by $`u^m \equiv 1 \bmod^\times q`; the proof, and the formalization,
-show that $`\bmod^\times \bar q` is meant.)
+_Formalization note._ The printed text defines $`U` in (iii) by $`u^m \equiv 1 \bmod^\times q`;
+this is a misprint: the proof and Corollary XIXa show that $`\bmod^\times \bar q` is meant, and
+`Usub` is defined that way. In all four parts the hypothesis on $`m` is given as natural numbers
+$`m, d > 0` with $`\bar q^{\,d} = q^m` (equivalent, since $`|q|, |\bar q| < 1` forces $`d > 0`). In
+(ii), $`p^r` is `ringChar K ^ (m.factorization (ringChar K))` (which is $`1` in characteristic
+$`0`), and "maximal separable intermediate field" is expressed by: $`F_K(q^{p^r}\,|\,X^{p^r})` is
+separable over $`F_K(\bar q\,|\,X^m)` and $`F_K(q)` is purely inseparable over it. In (iv), "$`K`
+contains the $`m`-th roots of unity" is expressed by a primitive $`m`-th root of unity in $`K`
+(equivalent when $`p \nmid m`).
 
 > Book, §6, Theorem XVII (i): for `m > 0` a multiple of the order of `q mod^× q̄` (so that `q̄^d = q^m` with `d > 0`), `[F_K(q) : F_K(q̄|Xᵐ)] = dm`.
 -/
@@ -389,6 +413,9 @@ $`F_K(q^m\,|\,X^m)`. At the same time we have seen that
 
 $$`M_K(X^m) \cap F_K(q\,|\,X) = F_K(q^m\,|\,X^m). \qquad (78)`
 
+_Formalization note._ Only the inclusion $`\subset` of (78) is stated as a separate result
+(`mem_FqbarXm_of_mem_Sm` below, for every $`n > 0`); the reverse inclusion is immediate from (72).
+
 > `[F_K(q) : F_K(qᵐ | Xᵐ)] = m` (book, (77)–(78)).
 -/
 
@@ -452,7 +479,7 @@ $`\bar f(X^m) \in F_K(\bar q\,|\,X^m)`. It follows that $`\tau_u\colon X \mapsto
 functions in $`F_K(\bar q\,|\,X^m)` fixed. It remains to show that every automorphism of
 $`F_K(q\,|\,X)` over $`F_K(\bar q\,|\,X^m)` is such a translation $`\tau_u`.
 
-The book argues by counting: when $`K` contains the $`m`-th roots of unity and an $`m`-th root of
+_Formalization note._ The book argues by counting: when $`K` contains the $`m`-th roots of unity and an $`m`-th root of
 $`\bar q`, the group $`U/q` has order $`dm/p^r`, the separable degree of the extension; in general
 it extends the automorphism to $`F_L(q\,|\,X)` for a suitable finite extension $`L`, where it is a
 translation $`\tau_v`, and shows $`v \in K` using the basis (77).
@@ -517,7 +544,7 @@ follows from (iii). From (71), this condition is equivalent to the condition tha
 should have order $`m^2`. By definition of $`U`, this means that $`\bar q` is an $`m`-th power in
 $`K` and that the $`m`-th roots of unity are in $`K`. ∎
 
-In the formalization the count is organised through the homomorphism $`\psi\colon U \to \mathbb{Z}`
+_Formalization note._ In the formalization the count is organised through the homomorphism $`\psi\colon U \to \mathbb{Z}`
 defined by $`u^m = \bar q^{\,\psi(u)}`, whose kernel is the group of $`m`-th roots of unity in
 $`K`; this gives $`|U/q| \cdot [\mathbb{Z} : \psi(U)] = |\mu_m(K)| \cdot d`.
 
@@ -546,6 +573,10 @@ $`K`; this gives $`|U/q| \cdot [\mathbb{Z} : \psi(U)] = |\mu_m(K)| \cdot d`.
 If $`E\,|\,K` and $`F\,|\,K` are elliptic function fields then an _isogeny_ from $`E` to $`F` is
 defined to be a $`K`-isomorphism $`\mu` from $`E` into $`F`; the field degree $`[F : \mu E]` is
 called the _degree_ of $`\mu`.
+
+_Formalization note._ `IsIsogeny` only records the existence of an injective $`K`-algebra
+homomorphism $`E \to F` (the elliptic hypotheses are made separately); the degree of a concrete
+isogeny is expressed as `relDeg` of its image.
 -/
 
 #stmt IsIsogeny
@@ -557,8 +588,14 @@ into $`F_K(q)` and is an isogeny $`F_K(\bar q) \to F_K(q)` of degree $`dm`, wher
 $`\bar q^{\,d} = q^m`._
 
 Indeed, the image of $`\mu_m` is $`F_K(\bar q\,|\,X^m) \subset F_K(q\,|\,X)` by (72), and its degree
-is computed in Theorem XVII (i). (For $`m < 0` there is no $`d \ge 0` with $`\bar q^{\,d} = q^m`,
-since $`|q^m| > 1`; so only $`m > 0` occurs, and $`\mu_{-m}` is $`\mu_m` composed with the reflection.)
+is computed in Theorem XVII (i).
+
+_Formalization note._ The isogeny statement `exists_substitution_isogeny` covers every $`m \ne 0`
+with `OrderDvd`, but the degree statement `substitution_isogeny_degree` takes $`d \in \mathbb N`
+with $`\bar q^{\,d} = q^m`. For $`m < 0` no such $`d` exists (since $`|q^m| > 1`; the book's $`d`
+is then negative), so it only has content for $`m > 0`; the degree for $`m < 0` is that for
+$`-m`, because $`\mu_{-m}` is $`\mu_m` composed with the reflection and
+$`F_K(\bar q\,|\,X^{-m}) = F_K(\bar q\,|\,X^m)` (`fq_qbar_Xm_subset`).
 -/
 
 #stmt exists_substitution_isogeny
@@ -574,15 +611,21 @@ the order of $`q\bmod^\times\bar q`. Here, $`\bar q` is uniquely determined as t
 while $`m` is determined as the largest integer such that every function in $`E` can be written as
 a function in $`X^m`._
 
-The formal statement normalizes the period by $`0<|\bar q|<1`, as in the book (note that
-$`F_K(\bar q^{-1})=F_K(\bar q)`).
+_Formalization note._ "$`\bar q` is the period of $`E`" is `HasPeriod`: $`E` is $`K`-isomorphic
+to $`F_K(\bar q)` (for subfields of $`F_K(q)`, which have prime divisors of degree $`1`, this is the
+book's notion). The uniqueness of the period is stated among the $`q'` with $`0<|q'|<1`, the
+book's normalization; without it the statement would be false, since
+$`F_K(\bar q^{-1})=F_K(\bar q)`. The maximality of $`m` is stated with `IsGreatest` over the
+$`k > 0` with $`E \subset \mu_k(M_K)`.
 -/
 
 #stmt thmXVIII_subfields
 
 /-!
-_The proof._ The book uses that $`F_\Omega(q)` is Galois over $`E\Omega` with a group of
-translations. The formalization proceeds instead as follows.
+_Formalization note._ The book's proof uses, from the general algebraic theory of elliptic
+function fields, that $`F_\Omega(q)` is Galois over $`E\Omega` with a group of translations, and
+it obtains $`\bar q \in K` from $`j(\bar q) = j_E \in K` by Theorem VII. That general theory is not
+available in the library, and the formalization proceeds instead as follows.
 
 For a rational point $`a\in K^\times` let $`\pi(a)=\mathfrak p_a\cap E`. By the Abel–Jacobi
 theorem in $`F_K(q)` and the norm formula, $`\pi(ab)+\pi(1)\sim\pi(a)+\pi(b)`; since in a field of
@@ -631,6 +674,14 @@ divisor groups and hence the _multiplicator_ $`\mu^*\colon C^0(F)\to C^0(E)`. Fo
 $`\mu=\mu_m\tau_u` of $`F_K(q)` the pull-back of the prime divisor at $`\beta` is
 $`[K(\beta):K(\gamma)]` times the prime divisor at $`\gamma=u^{-1}\beta^m`, so that
 $`\Phi_q(\mu^*D)=\Phi_q(D)^m\,u^{-\deg D}`:
+
+_Formalization note._ The book's formula (81), $`\mu_m^*(a) \equiv a^m \bmod^\times \bar q` for the
+isogenies $`F_K(\bar q) \to F_K(q)`, is formalized only for endomorphisms of $`F_K(q)` (the case
+$`\bar q = q` used for Corollary XVIIIb), and on divisors instead of classes: the factor
+$`u^{-\deg D}` (written additively below) disappears on divisors of degree $`0`. The pull-back of a
+prime $`\mathfrak P` is defined as $`f\,\mathfrak Q` with $`\mathfrak Q` the prime below and
+$`f = \deg\mathfrak P/\deg\mathfrak Q` its residue degree, which is the book's
+$`\mu^{-1}N_\mu(\mathfrak P)`.
 -/
 
 #stmt psiDiv_isogenyPullback
@@ -640,6 +691,15 @@ By the Abel–Jacobi theorem the multiplicator is multiplication by $`m`, the ri
 $`\mathbf M_K(q)` is $`\mathbb Z`, and the same holds after every finite constant field extension:
 
 *Corollary XVIIIb.* _The field $`F_K(q)` does not have complex multiplication._
+
+_Formalization note._ `HasComplexMultiplication` refers to the finite constant field extensions
+$`FL\,|\,L` only (the book remarks that they suffice): $`F` has no complex multiplication if for
+each of them every element of the ring generated by the multiplicators of the endomorphisms of
+$`FL` is an integer multiple of the identity of $`C^0(FL\,|\,L)`. The Proposition that follows in
+the book (complex multiplication forces $`j` to be absolutely integral) is stated in the library
+(`prop_cm_absolutely_integral`, for the invariants $`j(FL\,|\,L)` of the finite constant field
+extensions with a prime divisor of degree $`1`, so as not to depend on Appendix §A2), but it is not
+proved and is therefore not shown here.
 -/
 
 #stmt corXVIIIb_no_cm
@@ -650,9 +710,14 @@ $`\mathbf M_K(q)` is $`\mathbb Z`, and the same holds after every finite constan
 Let $`F = F_K(\mathbf Q)` be a field of semi-periodic functions: the field of fixed elements of
 $`\tau_Q\sigma` in $`F_L(q)`, where $`\sigma` generates $`\operatorname{Gal}(L\,|\,K)` and
 $`N_{L|K}(Q) = q`. An elliptic subfield $`E\subset F` _admits the period_ $`\bar q` if its Jacobian
-function field is $`F_K(\bar q)`. In the formalization this is the torsor form of the definition
-(the footnote to (52) in Appendix §A2): $`E` is $`K`-isomorphic to the field of invariants of
+function field is $`F_K(\bar q)`.
+
+_Formalization note._ The formalization uses the torsor form of this definition (the footnote to
+(52) in Appendix §A2): $`E` is $`K`-isomorphic to the field of invariants of
 $`\rho_\sigma = \tau_{a(\sigma)}\sigma` in $`F_L(\bar q)` for some cocycle $`a`, as in Theorem IX.
+The invariant-based Jacobian field of Appendix §A2 is not used, since §A2 is not formalized. Note
+that $`E` need not be $`K`-isomorphic to $`F_K(\bar q)` (for instance $`E = F` when $`\chi \ne 1`),
+so the notion `HasPeriod` used for Theorem XVIII would be wrong here.
 -/
 
 #stmt AdmitsPeriod
@@ -673,13 +738,22 @@ integers $`m>0` divisible by the order of $`q \bmod^\times \bar q`. If $`E` belo
 $`[F:E] = dm` with $`q^m = \bar q^{\,d}`, the character invariant of $`E` is $`\chi^d`, and $`m` is
 maximal such that $`E` lies in an elliptic subfield admitting the period $`q^m`._
 
-The proof follows the book. The constant field extension $`EL` is an elliptic subfield of
-$`F_L(q)`, so $`EL = F_L(\bar q\,|\,X^m)` by Theorem XVIII over $`L`; the period $`\bar q` lies in
-$`K` because $`EL` is stable under $`\tau_Q\sigma` (this replaces the book's argument through the
-absolute invariant), and $`\tau_Q\sigma` induces $`\tau_{Q^m}\sigma` on $`F_L(\bar q\,|\,Y)`,
-$`Y = X^m`. A trace argument gives $`EL\cap F = E`, so $`E = E_m`, and $`E_m` is $`K`-isomorphic to
-the descended field $`E_{\zeta^m}` of $`F_L(\bar q)`, whence the period, the degree and the
-character invariant.
+_Formalization note._ The theorem is stated for the concrete field $`F = F_K(\mathbf Q)` of a
+triple $`\mathbf Q = (L, \sigma, Q)` (`SemiPeriodicTriple`: $`L\,|\,K` finite Galois with
+generator $`\sigma`, $`N_{L|K}(Q) = q`), not for an abstract field admitting the period $`q`; the
+book's proof starts with this identification (Theorem XI). The correspondence of (ii) is a
+bijection between the $`m > 0` with `OrderDvd` and the elliptic subfields admitting the period
+$`\bar q`, and the character clause is stated for the character $`\chi` with
+$`\chi(\sigma) = \exp(2\pi i/n)`, $`n = [L:K]`, which is the character invariant of $`F`.
+
+_Formalization note._ The proof follows the book, except for one step. The constant field extension
+$`EL` is an elliptic subfield of $`F_L(q)`, so $`EL = F_L(\bar q\,|\,X^m)` by Theorem XVIII over
+$`L`; the period $`\bar q` lies in $`K` because $`EL` is stable under $`\tau_Q\sigma`. This replaces
+the book's argument $`j(\bar q) = j_E \in K`, because the absolute invariant $`j_E` of a field
+without a prime divisor of degree $`1` belongs to Appendix §A2, which is not formalized. Then
+$`\tau_Q\sigma` induces $`\tau_{Q^m}\sigma` on $`F_L(\bar q\,|\,Y)`, $`Y = X^m`. A trace argument
+gives $`EL\cap F = E`, so $`E = E_m`, and $`E_m` is $`K`-isomorphic to the descended field
+$`E_{\zeta^m}` of $`F_L(\bar q)`, whence the period, the degree and the character invariant.
 -/
 
 #stmt thmXIX_period
@@ -693,6 +767,11 @@ $`p`-power dividing $`m`; (ii) the group of automorphisms of $`F\,|\,E` is isomo
 where $`U` consists of all $`u\in K^\times` with $`u^m \equiv 1 \bmod^\times \bar q`; (iii) $`F\,|\,E`
 is Galois if and only if $`m\not\equiv 0 \bmod p`, $`K` contains the $`m`-th roots of unity and
 $`\bar q` has an $`m`-th root in $`K`._
+
+_Formalization note._ In `corXIXa_galois`, "$`E` belongs to $`m`" is expressed through the
+characterization in Theorem XIX: $`\bar q^{\,d} = q^m` and $`m` is the largest $`k` such that $`E`
+lies in an elliptic subfield admitting the period $`q^k`. The automorphism group in (ii) is the
+group of $`E`-algebra automorphisms of $`F`.
 
 Every automorphism of $`F` over $`E` extends to $`FL = F_L(q)` over $`EL`, where by Theorem XVII it
 is a translation $`\tau_u`; it commutes with $`\tau_Q\sigma`, hence $`u\in K`. The extension uses
@@ -732,6 +811,13 @@ $`n \mid d`; a split $`E` of period $`\bar q` is then $`K`-isomorphic to $`F_K(\
 one and only one maximal elliptic subfield $`E_0` of $`F` which has period $`\bar q` and splits over
 $`K`. The degree $`[F:E_0]` is $`d_0m_0` where $`d_0` is the least common multiple of the order
 $`n` of $`\chi` and the order $`r` of $`\bar q \bmod^\times q`, and $`q^{m_0} = \bar q^{\,d_0}`._
+
+_Formalization note._ In Corollaries XIXb–XIXd, "$`E` has the period $`\bar q` and splits over
+$`K`" is expressed by `HasPeriod` ($`E` is $`K`-isomorphic to $`F_K(\bar q)`) together with a prime
+divisor of degree $`1`; for split fields this agrees with the torsor notion `AdmitsPeriod`
+(`Em_split_iff`), and in Corollary XIXc "$`K`-isomorphic to $`F_K(q)`" is `HasPeriod` for $`q`.
+"One and only one maximal subfield" is stated as the existence of a greatest element
+(`IsGreatest`), which implies it, and the order $`n` of $`\chi` is $`[L:K]`.
 -/
 
 #stmt Em_split_iff

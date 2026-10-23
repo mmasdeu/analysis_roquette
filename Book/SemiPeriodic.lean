@@ -16,8 +16,11 @@ called _semi-periodic_. The automorphism $`\tau_Q\sigma` of $`M_L` (the Galois a
 the translation by $`Q`) has order $`n` on $`F_L(q)`; its fixed field $`F_K(\mathbf Q)` is the field of
 _$`\mathbf Q`-semi-periodic functions_.
 
-_Scope of this chapter._ Everything below is completely formalized (no `sorry`). The proofs avoid the transitivity of the Galois group on primes by a counting argument
-(the fundamental identity forces the $`n` conjugates of a prime to be all primes above it).
+_Formalization note._ Scope of this chapter: everything below is completely formalized (no
+`sorry`). The proofs avoid the transitivity of the Galois group on primes by a counting argument
+(the fundamental identity forces the $`n` conjugates of a prime to be all primes above it). As in
+§4, $`L` is a fixed finite Galois extension of $`K` and $`F_K(\mathbf Q)` is defined as a fixed field
+inside $`F_L(q)`.
 
 The Lean code on this page refers to the following context.
 -/
@@ -41,9 +44,14 @@ variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 *Theorem XII.* _$`F_K(\mathbf Q)` is an elliptic function field over $`K`; its constant field
 extension by $`L` is $`F_L(q)`._
 
-The proof descends $`F_L(q)` along the twisted Galois action (Appendix A2), and shows that the
-genus and the conservativity are preserved by identifying $`E_\zeta L'` with a descended field of
-$`F_M(q)` for a Galois extension $`M\supseteq L,L'`.
+_Formalization note._ "Its constant field extension by $`L` is $`F_L(q)`" is stated as: $`F_K(\mathbf Q)`
+and $`L` generate $`F_L(q)`; the linear disjointness of $`F_K(\mathbf Q)` and $`L` over $`K` is proved
+in the library (`Ezeta_L_indep`) but is not part of the statement. The proof departs from the
+book, which appeals to the invariance of the genus and of conservativity under separable constant
+field extensions (not available in Mathlib): $`F_K(\mathbf Q)` is identified with a field
+$`E_\zeta` of §4 (Theorem XI), whose genus is computed by descending Riemann–Roch spaces
+(`Ezeta_genus`), and conservativity is shown by identifying $`E_\zeta L'` with a descended field of
+$`F_M(q)` for a Galois extension $`M\supseteq L,L'` (`Ezeta_conservative`).
 -/
 
 #stmt thmXII_elliptic
@@ -54,6 +62,16 @@ $`F_M(q)` for a Galois extension $`M\supseteq L,L'`.
 *Theorem XIII.* _The prime divisors of $`F_K(\mathbf Q)` correspond to the $`L`-conjugacy classes
 of points of $`\Omega_L^\times` modulo the permutation $`\alpha\mapsto Q\sigma'(\alpha)`; the
 residue field of the prime attached to $`\alpha` is $`L(\alpha)`._
+
+_Formalization note._ The theorem is split into three parts: (a) every $`\alpha \neq 0` gives a
+prime $`\mathfrak q_\alpha` whose valuation ring is $`\{x : w_{\alpha,L}(x) \ge 0\}` and whose degree
+is $`n\cdot[L(\alpha):L]`; (b) every prime is some $`\mathfrak q_\alpha`; (c)
+$`\mathfrak q_\alpha = \mathfrak q_\beta` if and only if $`\alpha, \beta` are $`L`-conjugate
+mod$`^\times Q\sigma` (`IsSemiConj`, with an extension $`\sigma'` of $`\sigma` to $`\Omega_L` as in
+the footnote to (63)). Primes are compared through their valuation rings; that the normalized
+valuation of $`\mathfrak q_\alpha` is induced by $`w_{\alpha,L}` is proved separately
+(`anVal_eq_ord_FKQ`). The residue field is not identified with $`L(\alpha)`: only its degree is
+stated, which is what Corollaries XIIIa and XIIIb use.
 -/
 
 #stmt thmXIII_a
@@ -72,6 +90,10 @@ residue field of the prime attached to $`\alpha` is $`L(\alpha)`._
 
 /-!
 *Corollary XIIIb.* _$`L` is a minimal algebraic splitting field of $`F_K(\mathbf Q)`._
+
+_Formalization note._ Minimality is stated as in the book's argument ("contains a $`K`-isomorphic
+image"): $`L` splits $`F_K(\mathbf Q)`, and every algebraic extension $`L'\,|\,K` that splits
+$`F_K(\mathbf Q)` admits a $`K`-embedding $`L \to L'`.
 -/
 
 #stmt corXIIIb_minimal
@@ -89,6 +111,15 @@ The group of $`\mathbf Q`-semi-periodic divisors is $`D_K(\mathbf Q)`.
 /-!
 *Theorem XIV.* _The divisor group of $`F_K(\mathbf Q)` is $`D_K(\mathbf Q)`, degrees corresponding
 to $`\deg_q`; every semi-periodic divisor is an $`N_{\mathbf Q}`-norm of a $`q`-periodic divisor._
+
+_Formalization note._ Analytic divisors are integer-valued functions on $`\Omega_L` (`Divisors`),
+and $`D_K(\mathbf Q)` consists of those in $`D_L` that are invariant under
+$`\alpha \mapsto Q\sigma'(\alpha)` for every extension $`\sigma'` of $`\sigma` to $`\Omega_L`. The
+description of the divisor group is the existence of an additive isomorphism with the properties
+`IsSemiDivIso` (degree equals $`\deg_q`, and $`\mathfrak q_\alpha` goes to the indicator of the
+class of $`\alpha`); the norm statement is written out as
+$`\mathfrak m(\alpha) = \sum_{i<n} \mathfrak m'((Q\sigma')^{-i}\alpha)` with $`\mathfrak m'`
+$`q`-periodic.
 -/
 
 #stmt thmXIV_divisors
@@ -97,6 +128,13 @@ to $`\deg_q`; every semi-periodic divisor is an $`N_{\mathbf Q}`-norm of a $`q`-
 ## The Abel–Jacobi theorem for semi-periodic functions
 
 *Theorem XV.* _The Jacobi map induces an isomorphism $`C^0_K(\mathbf Q)\cong NL^\times/q`._
+
+_Formalization note._ The theorem is stated for any identification of divisors as in Theorem XIV
+(an isomorphism `e` with `IsSemiDivIso`); $`NL^\times/q` is the image of the norm group $`NL^\times`
+in $`L^\times/q`, and the isomorphism sends the class of a degree-zero divisor $`D` to
+$`\Phi_q(e(D))`. The book's preliminary embedding $`C^0_K(\mathbf Q) \subset C^0_L(q)` (a divisor of
+$`F_K(\mathbf Q)` that is principal in $`F_L(q)` is principal) is proved in the library
+(`principal_of_Phi_zero`) but not displayed.
 -/
 
 #stmt thmXV_abel_jacobi
@@ -104,6 +142,13 @@ to $`\deg_q`; every semi-periodic divisor is an $`N_{\mathbf Q}`-norm of a $`q`-
 /-!
 *Corollary XVa.* _$`C^0_K(\mathbf Q)` embeds into $`C^0_K(q)\cong K^\times/q`, with quotient
 $`K^\times/NL^\times`._
+
+_Formalization note._ The formal statement is weaker in form: it asserts an injective homomorphism
+$`C^0_K(\mathbf Q) \to C^0_K(q)` and an isomorphism of its cokernel with $`K^\times/NL^\times`; that
+both live inside $`C^0_L(q)` and that the isomorphism is induced by $`\Phi_q` is how they are
+constructed in the proof, but is not part of the statement. The book's examples following XVa
+(discrete valuations with algebraically closed, finite or quasi-finite residue field) are not
+formalized, as they need local class field theory.
 -/
 
 #stmt corXVa_quotient
@@ -113,6 +158,12 @@ $`K^\times/NL^\times`._
 
 The key computation is formula (65): the operator $`s=\tau_Q\sigma` acts on divisors with
 $`\deg_q(sw)=\deg_q w` and $`\Phi_q(sw)=\sigma\Phi_q(w)\cdot Q^{\deg w}`.
+
+_Formalization note._ The book states (65) for divisor classes of degree $`0`, where the factor
+$`Q^{\deg w}` disappears, and derives it from the fact that $`\tau_Q` acts trivially on
+$`C^0_L(q)`; the formal version holds for every $`q`-periodic divisor $`w` and is proved directly.
+On divisors, $`s` acts by $`\mathfrak m \mapsto \mathfrak m\circ(Q\sigma')^{-1}` for an extension
+$`\sigma'` of $`\sigma` to $`\Omega_L` chosen with `Classical.epsilon` (`divAct`).
 -/
 
 #stmt degQ_PhiQ_divAct
@@ -144,10 +195,18 @@ principal divisors $`P_L(q)` ($`\hat H^0=0`, $`\hat H^1\cong K^\times/NL^\times`
 $`F_L(q)^\times` (both groups vanish: $`\hat H^0` by Theorem XVI, $`\hat H^1` by Hilbert's
 Theorem 90 for the cyclic extension $`F_L(q)\,|\,F_K(\mathbf Q)`).
 
-(Correction: the book's $`\hat H^1(D^0_L(q))\cong\mathbb Z/n` is stated here with `ZMod [L:K]`.)
+_Formalization note._ The groups are the concrete Tate groups $`\hat H^0 = A^s/NA` and
+$`\hat H^1 = \ker N/(s-1)A` of the generator $`s`, for subgroups $`A` of an ambient group. Vanishing
+is stated as `Subsingleton`, the other entries as the existence of additive isomorphisms (the
+connecting maps (68), (70a) are not part of the statement), and $`\mathbb Z/n` is written
+`ZMod [L:K]`. The row $`C^0_L(q)` is stated for $`L^\times/q` with the action of $`\sigma`, i.e.
+after the identification (69) by $`\Phi_q`; the row $`F_L(q)^\times` is the image of $`F_L(q)^\times`
+in the unit group of $`M_L`. The periodicity $`\hat H^k \cong \hat H^{k+2}` is not formalized (it is
+not needed).
 
-Hilbert's Theorem 90 is reproved for fields of arbitrary universe, and for an arbitrary
-automorphism of finite order:
+_Formalization note._ Hilbert's Theorem 90 for cyclic extensions is reproved here, for fields in an
+arbitrary universe (Mathlib's `groupCohomology.exists_div_of_norm_eq_one` is stated for fields in `Type`, while the
+fields of this library live in `Type u`), and for an arbitrary automorphism of finite order:
 -/
 
 #stmt exists_h90
@@ -160,10 +219,18 @@ automorphism of finite order:
 ## Brauer groups
 
 *Corollary XVIa.* _A central simple algebra over $`F_K(\mathbf Q)` which is split by $`F_L(q)` is
-split._ (Mathlib has no theory of cyclic algebras; the proof is by Galois descent: $`\sigma\otimes 1`
-induces a $`\sigma`-semilinear automorphism of $`M_m(F_L(q))`, which is $`\mathrm{Ad}(u)\circ\sigma` by
+split._
+
+_Formalization note._ The book states XVIa as the injectivity of
+$`\operatorname{Br}(F_K(\mathbf Q))\to\operatorname{Br}(F_L(q))`. Mathlib's `BrauerGroup` is only a
+quotient set, without group structure or base change maps, so the statement is the equivalent
+kernel form above, with "split" meaning isomorphic to a full matrix algebra. The proof departs from
+the book's (crossed products, $`\hat H^2(G,L^\times) = K^\times/NL^\times` for cyclic $`L`), since
+Mathlib has no theory of cyclic algebras: it is by Galois descent. $`\sigma\otimes 1` induces a
+$`\sigma`-semilinear automorphism of $`M_m(F_L(q))`, which is $`\mathrm{Ad}(u)\circ\sigma` by
 Skolem–Noether; the norm theorem XVI normalises the cocycle $`u`, and Speiser's lemma trivialises
-it.)
+it. This is done abstractly (`split_of_cyclic`) for an automorphism of finite order whose fixed
+field is the base field and for which every nonzero element of the base is a norm.
 -/
 
 #stmt split_of_cyclic
@@ -172,8 +239,15 @@ it.)
 
 /-!
 *Corollary XVIb.* _A central simple algebra over $`K` is split by $`F_K(\mathbf Q)` iff it is split
-by $`L`._ One direction is XVIa; the other specializes a splitting of $`A\otimes F_L(q)` at the
-rational point $`1` of $`F_L(q)` (a lattice argument over the discrete valuation ring of that point).
+by $`L`._
+
+_Formalization note._ One direction is XVIa, applied to $`A\otimes_K F_K(\mathbf Q)`. For the other
+the book uses that $`\operatorname{Br}(L)\to\operatorname{Br}(F_L(q))` is injective because
+$`F_L(q)` has a prime divisor of degree $`1` (a general fact it cites); the formalization proves this
+directly by specializing a splitting of $`A\otimes F_L(q)` at the rational point $`1` of $`F_L(q)` (a
+lattice argument over the discrete valuation ring of that point, `split_of_specialization`). The
+book's closing remark (for locally compact $`K` the algebras split by $`F_K(\mathbf Q)` form a
+cyclic group of order the index $`n`) is not formalized, as it needs local class field theory.
 -/
 
 #stmt split_of_specialization

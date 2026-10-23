@@ -4,4 +4,7 @@
 set -e -o pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 lake build Book
-lake query :literateHtml
+out="$(lake query :literateHtml | tail -n 1)"
+# Lake does not track the extra assets listed in literate.toml; refresh them explicitly.
+cp book-assets/* "$out"/
+echo "$out"

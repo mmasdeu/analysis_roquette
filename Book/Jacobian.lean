@@ -25,15 +25,24 @@ $$`L^\times/q \to T_L(q), \qquad a \mapsto \tau_a \qquad (48)`
 and hence an isomorphism $`H^1(G, L^\times/q) \to H^1(G, T_L(q))` (49), so that we may regard
 $`\zeta` as an element in $`H^1(G, L^\times/q)`.
 
-_Scope of this chapter._ The algebraic theory of §A2 (Jacobian fields of elliptic function fields
-without a rational point, and the genus of a field obtained by Galois descent) is not formalized.
-This chapter therefore presents the parts of §4 that do not depend on it: the cohomological
-Lemma 2, the fields $`E_\zeta` obtained by twisted Galois descent from $`F_L(q)`, their
-classification by characters, and the description of the fields of semi-periodic functions as such
-fields.
+_Formalization note._ Scope of this chapter: the algebraic theory of §A2 (Jacobian fields of
+elliptic function fields without a rational point, defined through the absolute and Hasse
+invariants, and the cohomological invariant in $`H^1(G, T_L(q))`) is not formalized, so the
+identification (49) is not used: cocycles are taken directly with values in $`L^\times/q`, and "$`F_K(q)`
+is the Jacobian field of $`E`" is replaced by the torsor condition explained after Theorem X. With
+this convention the chapter presents the cohomological Lemma 2, the fields $`E_\zeta` obtained by
+twisted Galois descent from $`F_L(q)` (which are proved to be elliptic, `Ezeta_isElliptic`), their
+classification by characters (Theorem IX), the minimal splitting field (Theorem X), and the
+description of the fields of semi-periodic functions as such fields (Theorem XI).
 
 The Lean code on this page refers to the following context: $`L` is a finite Galois extension of
 $`K`, with the absolute value extending that of $`K`.
+
+_Formalization note._ The book allows an arbitrary Galois extension $`L\,|\,K` in Lemma 2 and
+Theorem IX; here $`L\,|\,K` is finite (`FiniteDimensional K L`), so that only the cohomology of finite
+groups, with explicit cocycles, is needed (no profinite cohomology). This is the case used in §5 and
+§6. The absolute value of $`L` is part of the data (`NormedAlgebra K L`, complete and
+ultrametric); for a finite extension of the complete field $`K` it is the unique extension.
 -/
 
 universe u
@@ -59,6 +68,16 @@ $$`\sigma \mapsto \tau_{\zeta(\sigma)}\,\sigma`
 
 is then a monomorphism from $`G` to the automorphism group of $`F_L(q)`, and its field
 $`E_\zeta` of fixed elements satisfies our requirements.
+
+_Formalization note._ A $`1`-cocycle $`G \to L^\times/q` is represented by a map
+$`\zeta\colon G \to L^\times` satisfying the cocycle identity up to a power of $`q`
+(`IsCocycleModQ`), and $`H^1(G, L^\times/q)` is the quotient type of such maps by the coboundary
+relation (`H1Lq`); no group structure on it is formalized. The action of $`\sigma` on $`M_L` through
+the Laurent coefficients is the ring automorphism characterized by `IsGalAct` (chosen with
+`Classical.epsilon`), and $`E_\zeta` is defined as the subfield of $`F_L(q)` of elements fixed by all
+$`\tau_{\zeta(\sigma)}\sigma`. That $`\sigma \mapsto \tau_{\zeta(\sigma)}\sigma` is a monomorphism is
+`twist_faithful`; that $`E_\zeta` "satisfies our requirements" is `Ezeta_isElliptic`,
+`Ezeta_splitsOver` and `Ezeta_isFqTorsor` (the last one for the torsor notion of "Jacobian field").
 
 > The Galois group `G` of `L | K`.
 -/
@@ -156,6 +175,14 @@ $`e_q\colon H^1(G, L^\times/q) \to H^1(G, \mathbf{W})`, where
 $`H^1(G, \mathbf{W}) = \operatorname{Hom}(G, \mathbf{W}) = \widehat{G}` is the character group of
 $`G`.
 
+_Formalization note._ $`\mathbf{W}` is Mathlib's unit circle `Circle`, and
+$`e_q(a) = \operatorname{Circle.exp}(2\pi \log|a|/\log|q|)`. The character group $`\widehat{G}` is
+defined directly as $`\operatorname{Hom}(G, \mathbf{W})` (`CharGroup`), so the identification
+$`H^1(G, \mathbf{W}) = \operatorname{Hom}(G, \mathbf{W})` for the trivial action is built into the
+definitions. The map on cocycles is `charOfCocycle`; the map `eQ` on classes evaluates it on a
+representative chosen with `Classical.epsilon` (well defined, `eQ_mk`, since $`e_q` kills $`q` and
+the coboundaries $`\sigma a/a`).
+
 > Book, §4, (50): `e_q(a) = exp(2πi log|a| / log|q|)`.
 -/
 
@@ -189,6 +216,10 @@ following definitions: For $`\chi \in \widehat{G}` let $`G_\chi` denote the kern
 $`G`, and let $`K_\chi` be the field of fixed elements of $`G_\chi` in $`L`. The field extension
 $`K_\chi\,|\,K` is cyclic of degree equal to the order of $`\chi`.
 
+_Formalization note._ The last assertion is not stated as a separate theorem; the restriction map
+$`G \to G(K_\chi\,|\,K)`, its kernel $`G_\chi` and the order of the image of a generator are
+established where they are needed, for Theorem X (`resK`, `mem_ker_iff_resK`, `orderOf_resK`).
+
 > Book, §4: `K_χ`, the field of fixed elements of the kernel of `χ`.
 -/
 
@@ -211,6 +242,9 @@ be denoted by $`\widehat{G}(q)`.
 reciprocity law, with the character group of $`K^\times/NL^\times`. After this identification,
 $`q`-triviality means that $`\chi(q) = 1`; this explains the terminology.)
 
+_Formalization note._ This remark is not formalized: it needs the reciprocity law of local class
+field theory, which Mathlib does not provide.
+
 *Lemma 2.* _Let $`L\,|\,K` be a Galois extension with group $`G`. Then the homomorphism_
 
 $$`e_q\colon H^1(G, L^\times/q) \to \widehat{G} \qquad (51)`
@@ -218,6 +252,11 @@ $$`e_q\colon H^1(G, L^\times/q) \to \widehat{G} \qquad (51)`
 _defined by (50) induces an isomorphism $`H^1(G, L^\times/q) \approx \widehat{G}(q)` where
 $`\widehat{G}(q)` consists of the $`q`-trivial characters of $`G`. In particular,
 $`\widehat{G}(q)` is a subgroup of $`\widehat{G}`._
+
+_Formalization note._ Since `H1Lq` carries no group structure, the isomorphism is stated as a
+bijection: `eQ` is injective and its image is the set of $`q`-trivial characters. The consequence
+that $`\widehat{G}(q)` is a subgroup of $`\widehat{G}` is not stated separately. As explained above,
+$`L\,|\,K` is finite.
 
 > Book, §4, Lemma 2: `e_q` is injective and its image is the set of `q`-trivial characters: `H¹(G, L^×/q) ≅ Ĝ(q)`.
 -/
@@ -246,11 +285,13 @@ character of the cyclic group $`G`.
 the image of $`e_q` if and only if the map $`\mathbf{Z}/n \to K^\times/NL^\times`, $`1 \mapsto q`,
 is zero, i.e. if and only if $`q` is a norm from $`L`. ∎
 
-The formalization follows the same ideas, but works with explicit cocycles instead of the
-cohomology diagrams. Injectivity is Hilbert's theorem 90 for the cocycle $`\zeta/\zeta'`, after
-correcting it by the real-valued valuation $`v_q`. Surjectivity onto the $`q`-trivial characters
-uses a generator $`\sigma` of $`G/G_\chi` and the cocycle
-$`\sigma^i \mapsto Q\cdot\sigma Q\cdots\sigma^{i-1}Q`.
+_Formalization note._ The formal proof follows the same ideas, but works with explicit cocycles
+instead of the cohomology diagrams (52), (53). Injectivity is Hilbert's theorem 90 for the cocycle
+$`\zeta/\zeta'`, after correcting it by the real-valued valuation $`v_q`. Surjectivity onto the
+$`q`-trivial characters uses a generator $`\sigma` of $`G/G_\chi` and the cocycle
+$`\sigma^i \mapsto Q\cdot\sigma Q\cdots\sigma^{i-1}Q`. For the converse (the character of a cocycle
+is $`q`-trivial) the inflation–restriction step (ii) is replaced by showing directly that the
+cocycle is a coboundary modulo $`q` on the kernel $`G_\chi` (`exists_beta`).
 
 > Book, §4, Lemma 2 (i): the map `e_q : H¹(G, L^×/q) → Ĝ` is injective.
 -/
@@ -282,6 +323,15 @@ to the fact that an elliptic function field has the automorphism $`\varepsilon`,
 Accordingly, the character invariant is determined by $`E` up to the substitution
 $`\chi \mapsto \chi^{-1}`.
 
+_Formalization note._ In the book the character invariant of an elliptic field $`E` of period
+$`q` split by $`L` is $`e_q` of its cohomological invariant in $`H^1(G, T_L(q))`, defined in §A2.
+The formal definition `IsCharInvariant` is a relation, relative to the fixed field $`L`: $`E` is
+$`K`-isomorphic to $`E_\zeta` for some cocycle $`\zeta` with $`e_q(\zeta) = \chi`. The book's two
+observations after Theorem IX are not stated in this form: the independence of $`\chi` from the
+choice of $`L`, and the restriction of $`\chi` under a constant field extension $`K'` (its
+cocycle-level version, $`E_\zeta K' \cong E_{\operatorname{res}\zeta}` for a finite Galois extension
+$`M\,|\,K'` containing $`L`, is `Ezeta_constExt_equiv`).
+
 > Book, §4: `E | K` has *character invariant* `χ` (with respect to `L`): `E` is `K`-isomorphic to `E_ζ` for a cocycle `ζ` with `e_q ζ = χ`. By Theorem IX, `χ` is determined up to `χ ↦ χ⁻¹`.
 -/
 
@@ -293,6 +343,14 @@ Lemma 2 together with the Galois descent and Lemma A of the appendix gives the c
 contained in the book's Theorem IX: _the fields $`E_\zeta` obtained from the cocycles
 $`G \to L^\times/q` correspond $`1`–$`1`, up to $`K`-isomorphism, to the pairs $`\chi, \chi^{-1}`
 of mutually inverse $`q`-trivial characters of $`G`._
+
+_Formalization note._ The book's Theorem IX is about all elliptic function fields $`E\,|\,K` of
+period $`q` (i.e. with Jacobian field $`F_K(q)` in the sense of §A2) which are split by $`L`. The
+formalization splits it into the classification of the model fields (`Ezeta_iso_iff`,
+`thmIX_classification`: $`K`-isomorphic if and only if $`\chi' = \chi^{\pm 1}`), existence
+(`thmIX_exists`, `thmIX_realise`) and exhaustion (`thmIX_every`). In the last two, "of period $`q`
+and split by $`L`" is the torsor condition `IsFqTorsor` described after Theorem X, because the
+invariant-based Jacobian field of §A2 is not formalized.
 
 > Book, §4, Theorem IX (classification, model form): the fields `E_ζ` and `E_ζ'` are `K`-isomorphic iff `χ_ζ' = χ_ζ^{±1}`.
 -/
@@ -333,10 +391,18 @@ of mutually inverse $`q`-trivial characters of $`G`._
 $`K_\chi` of the kernel of $`\chi` is a splitting field of $`E`, and every finite Galois splitting
 field of $`E` inside $`L` contains $`K_\chi`._
 
-The formalization derives this from Theorem XIIIb: writing $`E \cong E_\zeta` with
-$`e_q(\zeta) = \chi`, the cocycle is inflated from $`G(K_\chi\,|\,K)` (`cocycleExt`), which
-identifies $`E_\zeta(L)` with $`E_{\tilde\zeta}(K_\chi)`; conversely a splitting by $`M` forces
-$`\chi` to be trivial on $`G(L\,|\,M)`. No `sorry` is involved.
+_Formalization note._ The book's Theorem X asserts that $`K_\chi` is contained in _every_
+splitting field of $`E` algebraic over $`K`; the statement above and `thmX_minimal_splitting` only
+treat the Galois splitting fields $`M` with $`K \subseteq M \subseteq L`, where "contained" is literal
+($`E` has character invariant $`\chi` in the sense of `IsCharInvariant`). For an arbitrary
+algebraic splitting field $`K'` the library gives a $`K`-embedding $`K_\chi \to K'` (Corollary XIIIb
+for the field $`F_K(\mathbf{Q}') \cong E` below), but this is not stated as a separate theorem. The
+proof departs from the book, which restricts the character invariant to $`G(LK'\,|\,K')`: it
+derives Theorem X from Corollary XIIIb of §5. Writing $`E \cong E_\zeta` with $`e_q(\zeta) = \chi`,
+the cocycle of a semi-periodic triple over $`K_\chi` is inflated to $`G` (`cocycleExt`), which
+identifies $`E` with a field $`F_K(\mathbf{Q}')` over $`K_\chi` (`exists_triple_of_isCharInvariant`).
+Corollary XIIIb then shows that $`K_\chi` splits $`E` and embeds into every algebraic splitting
+field $`M`, and normality of $`M\,|\,K` gives $`K_\chi \subseteq M`. No `sorry` is involved.
 
 > Book, §4, Theorem X: `K_χ` is the (unique) minimal Galois splitting field of `E` inside `L`.
 -/
@@ -345,16 +411,20 @@ $`\chi` to be trivial on $`G(L\,|\,M)`. No `sorry` is involved.
 
 /-!
 
-_Jacobian fields and the two bridges._ In the book, "$`F_K(q)` is the Jacobian field of $`E`" is
-defined through the absolute and Hasse invariants (Appendix A2) and characterized by the Galois
-cohomology: $`EL \cong F_L(q)` and the characteristic cocycle takes values in the translations. The
-companion uses the latter ("principal homogeneous space", the definition mentioned in the footnote to
-(52)) as the definition: $`E` is the field of invariants in $`F_L(q)` of a Galois action
-$`\rho_\sigma = \tau_{a(\sigma)}\sigma`. With it the two bridges are theorems: every $`E_\zeta` is such a form
-(`Ezeta_isFqTorsor`), and every such form is some $`E_\zeta` (`fqTorsor_descent`: the relation
-$`\rho_{\sigma\tau}=\rho_\sigma\rho_\tau` gives the cocycle relation modulo $`q` because $`\tau_c = \mathrm{id}` on
-$`F_L(q)` only for $`c \in q^{\mathbb Z}`). The equivalence with the invariant-based definition is
-Appendix A2 and is not formalized.
+_Formalization note._ (Jacobian fields and the two bridges.) In the book, "$`F_K(q)` is the
+Jacobian field of $`E`" is defined through the absolute and Hasse invariants (Appendix A2) and
+characterized by the Galois cohomology: $`EL \cong F_L(q)` and the characteristic cocycle takes
+values in the translations. The companion uses the latter ("principal homogeneous space", the
+definition mentioned in the footnote to (52)) as the definition: $`E` is the field of invariants in
+$`F_L(q)` of a Galois action $`\rho_\sigma = \tau_{a(\sigma)}\sigma` (`IsFqTorsor`; ellipticity of
+$`E` is not assumed, it follows). With it the two bridges are theorems: every $`E_\zeta` is such a
+form (`Ezeta_isFqTorsor`), and every such form is some $`E_\zeta` (`fqTorsor_descent`: the relation
+$`\rho_{\sigma\tau}=\rho_\sigma\rho_\tau` gives the cocycle relation modulo $`q` because
+$`\tau_c = \mathrm{id}` on $`F_L(q)` only for $`c \in q^{\mathbb Z}`). The equivalence with the
+invariant-based definition is Appendix A2 and is not formalized: it needs the uniqueness of the
+Hasse invariant through arbitrary splitting fields, i.e. through the compositum $`E \otimes_K E`,
+which is a domain only for separably generated $`E`, and the genus theory of constant field
+extensions this requires is not available.
 
 > Every `E_ζ` is a form of `F_K(q)` split by `L`.
 -/
@@ -399,6 +469,11 @@ with a given triple $`\mathbf{Q} = (L, \sigma, Q)` where
 * $`\sigma` a generator of the Galois group $`G` of $`L`,
 * $`Q` an element of $`L` with $`NQ = q`.
 
+_Formalization note._ $`L` is the fixed Galois extension of this page, so a triple
+(`SemiPeriodicTriple`) records only $`\sigma` and $`Q`; that $`L\,|\,K` is cyclic is expressed by
+$`\sigma` generating $`G`, $`n = [L:K]` is `Module.finrank K L`, and $`Q \neq 0` is recorded although
+it follows from $`NQ = q \neq 0`.
+
 > Book, §4: the semi-periodic data `𝐐 = (L, σ, Q)`: a generator `σ` of the cyclic group `G` and `Q ∈ L` with `N(Q) = q`.
 -/
 
@@ -433,6 +508,12 @@ $`\tau_q f = f`, i.e. $`f` is contained in $`F_L(q)`.
 *Definition.* The function $`f \in M_L` is called _semi-periodic with respect to_ $`\mathbf{Q}` if
 it satisfies the functional equation (59). These functions form a subfield $`F_K(\mathbf{Q})`.
 
+_Formalization note._ `FKQ` is defined as the field of fixed elements of $`\tau_Q\sigma` inside
+$`F_L(q)` (the characterization used in §5), not as a subfield of $`M_L`. The two agree by (61),
+which is formalized on all of $`M_L`: $`(\tau_Q\sigma)^n = \tau_q` is `tauQSigma_pow_card`, and (60)
+is `tauQSigma_pow_apply`. Here $`\tau_Q\sigma` is the Galois action `galActM` of $`\sigma` on
+$`M_L` followed by the translation $`f(X) \mapsto f(Q^{-1}X)`.
+
 > Book, §4, (59): the automorphism `τ_Q σ` of `M_L` (translation by `Q` after `σ`).
 -/
 
@@ -448,8 +529,16 @@ it satisfies the functional equation (59). These functions form a subfield $`F_K
 /-!
 
 The computation above shows that $`F_K(\mathbf{Q})` is one of the fields $`E_\zeta`, with the
-character given by (55). This is the part of the book's Theorem XI that does not depend on the
-theory of §A2.
+character given by (55).
+
+_Formalization note._ The displayed theorem gives the cocycle (56), its values (60), the equality
+$`F_K(\mathbf{Q}) = E_\zeta` and $`e_q(\zeta)(\sigma) = \exp(2\pi i/n)`. The book's Theorem XI as a
+whole is `thmXI_model` in the library (not displayed): in addition $`E_\zeta` is elliptic and split
+by $`L`; "period $`q`" and "character invariant" are meant in the sense of `IsFqTorsor` and
+`IsCharInvariant` (Theorem IX). The book's subsequent assertion that every elliptic field of period
+$`q` is $`K`-isomorphic to some $`F_K(\mathbf{Q})` with $`L = K_\chi` is
+`exists_triple_of_isCharInvariant` (also not displayed); the uniqueness of $`\sigma, Q` up to
+$`\sigma \mapsto \sigma^{\pm 1}`, $`Q \mapsto Q\,\sigma u/u` is not stated as a theorem.
 
 > The cocycle attached to a triple `(L, σ, Q)`: `ζ(σ^i) = Q · σQ ⋯ σ^{i-1}Q`.
 -/

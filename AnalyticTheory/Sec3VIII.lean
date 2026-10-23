@@ -314,8 +314,8 @@ theorem invariants_of_equiv (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {F : Type u}
 
 /-- Book, §3, Theorem VIII: the Hasse invariant of `F_K(q)` is trivial: `γ ≡ 1 mod K^{×2}`
 if `char K ≠ 2`, and `γ ≡ 0 mod π(K⁺)` if `char K = 2`. Here `F_K(q)` has a prime divisor of
-degree `1` (`fq_hasPrime`). Modulo the independence of the invariants of the choice of Weierstraß
-datum (`A1Invariance.lean`). -/
+degree `1` (`fq_hasPrime`); the invariants do not depend on the choice of the Weierstraß datum
+(`A1Invariance.lean`). -/
 theorem thmVIII_hasse (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     (hp : HasPrimeOfDegreeOne K (FqSub K q)) :
     (ringChar K ≠ 2 → SquareEquiv (hasseInv K (FqSub K q) hp) 1) ∧

@@ -26,26 +26,28 @@ included only if its Lean proof, and every lemma it depends on, is free of `sorr
 checked mechanically. Concretely, the companion contains:
 
 * the terminology of the introduction;
-* all of §2 (the fields $`F_K(q)` of periodic functions, the Abel–Jacobi and Riemann–Roch
+* §2 (the fields $`F_K(q)` of periodic functions, the Abel–Jacobi and Riemann–Roch
   theorems, the structure statements I–V and Corollaries Va, Vb, and the remarks on constant field
   extensions), together with the non-archimedean function theory that the book quotes without
   proof;
-* all of §3 (the Weierstraß function, Theorems VI, VII, VIII, VIIIa, and the product formula for
+* §3 (the Weierstraß function, Theorems VI, VII, VIII, VIIIa, and the product formula for
   $`\Delta`);
 * from §4: Lemma 2, the classification of the fields obtained by Galois descent, Theorems IX and X,
   and the description of the fields of semi-periodic functions as such fields;
-* all of §5: Theorems XII–XVI, Corollaries XIIIa, XIIIb, XVa, XVIa, XVIb and the table of Tate
+* §5: Theorems XII–XVI, Corollaries XIIIa, XIIIb, XVa, XVIa, XVIb and the table of Tate
   cohomology groups;
 * from §6: the substitution $`\mu_m`, the formulas (72), (73), Theorems XVII, XVIII, XIX and
   Corollaries XVIIIa, XVIIIb, XIXa–XIXd;
 * from Appendix §A1: the absolute and Hasse invariants, Lemma A, and the fact that an elliptic
   function field with a prime divisor of degree $`1` is determined by its invariants.
 
-Theorems IX and X appear in the torsor form of "the Jacobian of $`E` is $`F_K(q)`" (the footnote
-to (52)). Appendix §A2, the existence of the absolute and Hasse invariants for fields without a
-rational point, and the Proposition on absolute integrality of $`j` (§6) are not reproduced: their
-proofs rest on parts of the algebraic theory of function fields (genus change under inseparable
-constant extensions) that are not yet formalized.
+*Where the formalization differs from the book.* Some formal statements differ from the printed
+ones. Some correct a misprint or an inaccuracy, some add a hypothesis the book uses tacitly, and
+some are an equivalent reformulation that suits the formal setting better. Each such result is
+followed by a paragraph headed _Formalization note._ that says how the formal version differs and
+why. The parts of the book that are not formalized at all are Appendix §A2, the existence of a
+field with given invariants (§A1) and the Proposition on the absolute integrality of $`j` (§6).
+They are listed, with the reasons, in Appendix B.
 
 ## Conventions of the formalization
 

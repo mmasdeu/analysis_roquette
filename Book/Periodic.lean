@@ -59,6 +59,11 @@ $$`\lim_{|n| \to \infty} |a_n|\, r^n = 0`
 for every real number $`r > 0`. Note that, if this is the case, then $`f(\alpha)` is an element of
 the complete field $`K(\alpha)`.
 
+_Formalization note._ The coefficient condition $`|a_n|\,r^n \to 0` (for every $`r > 0`) is
+taken as the _definition_ of a convergent Laurent series. The book's starting point, convergence
+of $`f(\alpha)` at every $`\alpha \ne 0`, is not stated as an equivalent condition; only the
+implication that is needed (convergence, with sum in $`K(\alpha)`) is proved.
+
 > Book, §2, equation (∗): a formal Laurent series `∑ aₙ Xⁿ` with coefficients in `K` is *convergent* if `|aₙ| rⁿ → 0` (as `n → ±∞`) for every real `r > 0`.
 -/
 
@@ -99,6 +104,13 @@ Laurent coefficients of a holomorphic function.
 
 The holomorphic functions on $`\Omega^\times` form an integral domain, containing $`K` as the
 constant functions. This integral domain is denoted by $`H_K`.
+
+_Formalization note._ The predicate `IsHolomorphicOver` is stated for functions
+$`\Omega \to \Omega` and says nothing about the value at $`0`; $`H_K` itself is therefore a
+subring of the functions on $`\Omega^\times` (the subtype of non-zero elements), as in the book.
+An earlier version used functions on all of $`\Omega`. Then two functions differing only at
+$`0` were different elements, and $`H_K` had zero divisors (a function supported at $`0` times
+one vanishing at $`0`).
 
 > Book, §2: the holomorphic functions over `K`, `H_K`: functions on `Ω^×` that are given by convergent Laurent series with coefficients in `K` (`EntireLaurent.holSubring`). It is an integral domain (`EntireLaurent.holSubring_isDomain`).
 -/
@@ -148,9 +160,11 @@ $$`f(q^{-1}X) = f(X). \qquad (1)`
 These $`q`-periodic functions form a subfield of $`M_K` which contains $`K` and which is denoted by
 $`F_K(q)`.
 
-In the formalization the substitution $`f(X) \mapsto f(a^{-1}X)` is the _translation
+_Formalization note._ The substitution $`f(X) \mapsto f(a^{-1}X)` is the _translation
 automorphism_ $`\tau_a` of $`M_K` (it is introduced in the book later in this section), and
-$`F_K(q)` is the subfield of the elements fixed by $`\tau_q`.
+$`F_K(q)` is the subfield of the elements fixed by $`\tau_q`. The subfield is defined for every
+$`q \in K` (as the set of $`f` with $`\tau_a f = f` for every unit $`a` equal to $`q`, a condition
+that is vacuous for $`q = 0`), so that no proof of $`q \ne 0` has to be carried along.
 
 > Book, §2: the translation automorphism `τ_a : f(X) ↦ f(a⁻¹X)` of `M_K`, for `a ∈ K^×`.
 -/
@@ -190,9 +204,12 @@ _order_ of $`f` at $`\alpha` and is denoted by $`w_\alpha(f)`. We put $`w_\alpha
 and obtain an additive valuation $`f \mapsto w_\alpha(f)` on $`H_K` which extends uniquely to the
 quotient field $`M_K` of $`H_K`. This is called the _analytic valuation_ belonging to $`\alpha`.
 
-In the formalization, $`w_\alpha` is obtained from the order of vanishing of $`f` at the point
+_Formalization note._ $`w_\alpha` is not defined through the factorisation
+$`f = \varphi_\alpha^m g` and Hensel's lemma. It is the order of vanishing of $`f` at the point
 $`\alpha` (which exists by the Taylor expansion and the identity theorem), divided by the degree
-of inseparability $`e_\alpha` of $`\alpha` over $`K`.
+of inseparability $`e_\alpha` of $`\alpha` over $`K`. That this agrees with the exponent of
+$`\varphi_\alpha` is proved afterwards. The definition gives a junk value at $`\alpha = 0`, so
+the valuation property is stated for $`\alpha \ne 0` only.
 
 > Book, §2: the analytic valuation `w_α` belonging to `α ∈ Ω^×`: the exponent of the minimal polynomial `φ_α` in the factorisation `f = φ_α^m g`, `g(α) ≠ 0` (extended to `M_K`); it is the point order `anPt` divided by `e_α` (`e_α ∣ anPt α f`, see `eIdx_dvd_anPt`). `w_α(0) = +∞`. That this is an additive valuation of `M_K` is `anVal_isValuation`.
 -/
@@ -211,8 +228,16 @@ of inseparability $`e_\alpha` of $`\alpha` over $`K`.
 We have $`w_\alpha(f) \ge 0` if and only if $`f` can be written in the form $`f = g/h` with
 $`g, h \in H_K` and $`h(\alpha) \ne 0`; if this is the case, we put $`f(\alpha) = g(\alpha)/h(\alpha)`
 and say that $`f \in M_K` is _finite_ at $`\alpha`. Otherwise we put $`f(\alpha) = \infty` and say
-that $`f` has a _pole_ at $`\alpha`. We have $`w_\alpha = w_\beta` if $`\alpha` and $`\beta` are
-conjugate over $`K`:
+that $`f` has a _pole_ at $`\alpha`. The map $`f \mapsto f(\alpha)` is a place belonging to the
+valuation $`w_\alpha`; and its residue class field is $`K(\alpha)`. We have $`w_\alpha = w_\beta`
+if and only if $`\alpha` and $`\beta` are conjugate over $`K`.
+
+_Formalization note._ On $`M_K` only the direction "conjugate points give the same valuation" is
+formalized, in the form $`w_{\sigma\alpha} = w_\alpha` for $`K`-automorphisms $`\sigma` of
+$`\Omega`. The converse is formalized only on $`F_K(q)` (statement 1 below, with conjugacy
+$`\bmod^\times q`). The values $`f(\alpha)` are formalized (`meroAt` in `FqResidue.lean`) and lie
+in $`K(\alpha)`. That the residue class field is all of $`K(\alpha)` is proved only for the
+restriction of $`w_\alpha` to $`F_K(q)` (item III).
 
 > Book, §2: `w_{σα} = w_α` for every `K`-automorphism `σ` of `Ω`; conjugate points give the same analytic valuation.
 -/
@@ -237,6 +262,11 @@ additive group, with addition defined componentwise, which is denoted by $`D_K`.
 partially ordered, the ordering defined componentwise. A divisor $`\mathfrak{m} \ge 0` is called
 _integral_.
 
+_Formalization note._ A divisor is encoded as a function $`\Omega \to \mathbb{Z}` (not
+$`\Omega^\times \to \mathbb{Z}`) normalized by $`m_0 = 0`, and "$`\alpha`, $`\beta` conjugate
+over $`K`" is expressed as equality of minimal polynomials. Correspondingly the divisor $`(f)`
+is $`0` at the point $`0`, and the divisor of $`f = 0` is (as a junk value) the zero divisor.
+
 > Book, §2: a *divisor* is a collection `m = {m_α}` of integers over `Ω^×` with (i) finiteness in every annulus `0 < r ≤ |α| ≤ r'`, and (ii) rationality: `m_α = m_β` when `α`, `β` are conjugate over `K`. As the points of `Ω^×` only matter, we normalize `m_0 = 0`.
 -/
 
@@ -257,6 +287,28 @@ _integral_.
 #stmt divisorOf_mem_Divisors
 
 /-!
+
+To every divisor $`\mathfrak{m} \in D_K` there exists a function $`0 \ne f \in M_K` such that
+$`\mathfrak{m} = (f)`. In fact, such a function is given by the Weierstraß product
+
+$$`f(X) = \prod_{|\alpha| \le 1}\bigl(1 - \alpha X^{-1}\bigr)^{e_\alpha m_\alpha} \prod_{|\alpha| > 1}\bigl(1 - \alpha^{-1}X\bigr)^{e_\alpha m_\alpha}, \qquad (2)`
+
+where $`e_\alpha` denotes the degree of inseparability of $`\alpha` over $`K`. The rationality
+condition (ii) for divisors implies that this function is defined over $`K`; for a given
+$`\alpha` the partial product taken over the conjugates of $`\alpha` is equal to
+$`\bigl(X^{-n_\alpha}\varphi_\alpha(X)\bigr)^{m_\alpha}` if $`|\alpha| \le 1`, and to
+$`\bigl(a_0^{-1}\varphi_\alpha(X)\bigr)^{m_\alpha}` if $`|\alpha| > 1`, where
+$`n_\alpha = [K(\alpha):K]` and $`a_0 = N_{K(\alpha)|K}(\alpha)`. The normalizing factors
+$`X^{-n_\alpha}` and $`a_0^{-1}` render the product (2) convergent; this product is to be
+understood as the quotient of the partial product taken over those $`\alpha` with
+$`m_\alpha > 0`, by the corresponding product over the $`\alpha` with $`m_\alpha < 0`. It is
+clear by construction that the product function (2) has the divisor $`\mathfrak{m}`.
+
+_Formalization note._ The Weierstraß product (2) for an arbitrary divisor of $`D_K` is not
+formalized, because only $`q`-periodic divisors are needed. For these, the theta function
+$`\Theta_{\mathfrak{m}}` of (10) below is constructed with the same normalized polynomial factors,
+and it has divisor $`\mathfrak{m}`. The infinite products are handled by the general lemma
+`exists_infprod` of the supplement.
 
 Every function $`0 \ne f \in M_K` is determined by its divisor $`(f)` up to a function of the form
 $`cX^d` with $`c \in K^\times` and $`d \in \mathbb{Z}`; the latter functions are the units of
@@ -338,9 +390,13 @@ Obviously, the map $`\Phi_q\colon D_K(q) \to K^\times/q` thus defined is a homom
 
 /-!
 
-In the formalization, $`\deg_q` and $`\Phi_q` are _defined_ by the explicit formulas (12) below,
-over a fixed system of representatives; that these agree with the degree and multiplicator of the
-theta functions (3), and do not depend on the system of representatives, is then proved.
+_Formalization note._ $`\deg_q` and $`\Phi_q` are not defined through the theta functions (3)
+but by the explicit formulas (12) below, over a system of representatives chosen once and for
+all. It is then proved that they agree with the degree and the multiplicator of the theta
+functions (3), and that they do not depend on the system of representatives. The formulas are
+applied to arbitrary functions $`\Omega \to \mathbb{Z}` and are meaningful only for
+$`q`-periodic divisors; $`\Phi_q` takes the junk value $`1` if the product vanishes, which never
+happens for divisors.
 
 > Book, §2: the degree `deg_q(m) = ∑ [K(α):K] m_α` of a `q`-periodic divisor, formula (12), the sum over a system of representatives.
 -/
@@ -386,6 +442,13 @@ $$`\Theta(q^{-1}X) = -X\,\Theta(X). \qquad (7)`
 
 That is, the degree of $`\Theta` is $`1` and its multiplicator is $`1`.
 
+_Formalization note._ $`\Theta` is defined as a function on all of $`\Omega`, with the second
+product reindexed as $`\prod_{n \ge 0}(1 - q^{n+1}X)`. Lean sets $`0^{-1} = 0`, so this function
+takes the value $`\Theta(0) = 1`. The functional equation (7) is therefore false at $`X = 0`
+(the left side is $`1`, the right side $`0`) and is stated for $`X \ne 0` only. The same
+convention applies to $`\Theta_\alpha` below. The holomorphic functions that the proofs of this
+section actually use are the class theta functions described after (10), which lie in $`H_K`.
+
 > Book, §2: the fundamental theta function `Θ(X) = ∏_{n≥0}(1 − qⁿX⁻¹) ∏_{n<0}(1 − q^{-n}X)`, as a function on `Ω^×`.
 -/
 
@@ -425,12 +488,16 @@ condition (ii), $`\Theta_{\mathfrak{m}}` is defined over $`K`, i.e. $`\Theta_{\m
 By construction, $`w_\alpha(\Theta_{\mathfrak{m}}) = m_\alpha`, i.e. the divisor of
 $`\Theta_{\mathfrak{m}}` is $`\mathfrak{m}`.
 
-The formalization groups the factors of (10) by $`K`-conjugacy classes from the start: for each
-$`\alpha` it constructs, as a convergent infinite product of polynomials, a holomorphic function
-over $`K` whose zeros are exactly the $`K`-conjugates of $`\alpha` modulo $`q`, each of order
-one, and which satisfies the functional equation with multiplicator $`\varphi_\alpha(0)` and
-degree $`[K(\alpha):K]`. This is the product $`\prod \Theta_{\alpha'}^{e_\alpha}` over the
-conjugates $`\alpha'` of $`\alpha`.
+_Formalization note._ The formalization does not use the functions $`\Theta_\alpha`, which are
+defined only over $`K(\alpha)`. It groups the factors of (10) by $`K`-conjugacy classes from the
+start: for each $`\alpha` it constructs, as a convergent infinite product of polynomials built
+from $`\varphi_\alpha`, a holomorphic function $`T_\alpha` over $`K` whose zeros are exactly the
+$`K`-conjugates of $`\alpha` modulo $`q`, each of order one. It satisfies
+$`T_\alpha(q^{-1}X) = \varphi_\alpha(0)^{-1} X^{[K(\alpha):K]}\, T_\alpha(X)`. Mathematically,
+$`T_\alpha` is the product $`\prod \Theta_{\alpha'}^{e_\alpha}` over the distinct conjugates
+$`\alpha'` of $`\alpha`, but this identity is not stated. Then
+$`\Theta_{\mathfrak{m}} = \prod T_\alpha^{m_\alpha}`, the product over the representatives
+$`\alpha` in the annulus $`|q| < |\alpha| \le 1` with $`m_\alpha \ne 0`.
 
 > The theta function of the `K`-conjugacy class of `α` mod `^× q`: a non-zero holomorphic function over `K` with simple zeros exactly at the `K`-conjugates of `α` mod `^× q`, satisfying the functional equation with multiplicator `φ_α(0)` and degree `[K(α):K]`, and given by a convergent product of polynomials.
 -/
@@ -457,6 +524,14 @@ From (9) we infer that $`\Theta_{\mathfrak{m}}` satisfies the functional equatio
 $`\Theta_{\mathfrak{m}}(q^{-1}X) = a^{-1}(-X)^d\,\Theta_{\mathfrak{m}}(X)` where
 
 $$`d = \sum_{|q|<|\alpha|\le 1} e_\alpha m_\alpha = \deg_q(\mathfrak{m}), \qquad a = \prod_{|q|<|\alpha|\le 1} \alpha^{e_\alpha m_\alpha} \equiv \Phi_q(\mathfrak{m}) \bmod^\times q. \qquad (11)`
+
+_Formalization note._ The formal functional equation is written with $`X^d` instead of
+$`(-X)^d`: $`\Theta_{\mathfrak{m}}(q^{-1}X) = a'^{-1} X^d\,\Theta_{\mathfrak{m}}(X)` with
+$`a' = \prod' \varphi_\alpha(0)^{m_\alpha}` and $`d = \sum' [K(\alpha):K]\,m_\alpha` (sums and
+products over the representatives). Since
+$`\varphi_\alpha(0) = (-1)^{[K(\alpha):K]} N_{K(\alpha)|K}(\alpha)`, the book's multiplicator is
+$`a = (-1)^d a'`. This is why the sign
+$`(-1)^d` appears in the comparison with $`\Phi_q(\mathfrak{m})`.
 
 > Book, §2, (11): the functional equation `Θ_𝔪(q⁻¹X) = a⁻¹ X^d Θ_𝔪(X)` of the theta function of a periodic divisor.
 -/
@@ -487,6 +562,11 @@ $$`\deg_q(\mathfrak{m}) = \sum\nolimits'_{|q|<|\alpha|\le 1} [K(\alpha):K]\, m_\
 where the prime indicates that $`\alpha` ranges over a system of representatives of $`K`-conjugacy
 classes; note that $`K`-conjugate elements have the same absolute value.
 
+_Formalization note._ Since $`\deg_q` and $`\Phi_q` are defined by (12) for one fixed system of
+representatives, the content of (12) is that any other system gives the same values. The
+statement shown here is the one for $`\deg_q`. The one for $`\Phi_q` (equality in
+$`K^\times/q`) is the library lemma `degQ_eq_of_system`.
+
 > Book, §2, formula (12): `deg_q(m) = ∑ [K(α):K] m_α`, the sum over a system `R` of representatives of the `K`-conjugacy classes mod `^× q` in the annulus `|q| < |α| ≤ 1`.
 -/
 
@@ -506,6 +586,11 @@ $$`\deg_q(\mathfrak{m}) = 0, \qquad \Phi_q(\mathfrak{m}) \equiv 1 \bmod^\times q
 
 _where the degree and the Jacobi image are given by the formulas (12). If this is so, then $`f` is
 uniquely determined by $`\mathfrak{m}`, up to a factor in $`K^\times`._
+
+_Formalization note._ The formal statement contains only the equivalence, not the uniqueness
+of $`f` up to a factor in $`K^\times`. The uniqueness is the case $`\deg_q(\mathfrak{m}) = 0`,
+$`\Phi_q(\mathfrak{m}) \equiv 1` of Proposition 2 below: if $`(f) = (g) = \mathfrak{m}`, then
+$`f^{-1}` and $`g^{-1}` both lie in the space $`L_K(q\,|\,\mathfrak{m})`, which has dimension $`1`.
 
 > Book, §2, Proposition 1 (Abel–Jacobi theorem, analytic form). A `q`-periodic divisor `m` is the divisor of a `q`-periodic function iff `deg_q(m) = 0` and `Φ_q(m) ≡ 1 mod^× q`; in that case the function is unique up to a factor in `K^×`.
 -/
@@ -580,6 +665,11 @@ case $`\dim L_K(q\,|\,\mathfrak{m}) = 1`.
 *Proposition 2 (Riemann–Roch theorem).* _If $`\mathfrak{m}` is a $`q`-periodic divisor and
 $`\deg_q(\mathfrak{m}) > 0` then $`\dim L_K(q\,|\,\mathfrak{m}) = \deg_q(\mathfrak{m})`._
 
+_Formalization note._ This proposition is missing from the first LaTeX transcription of the
+book. It was read off the scan (p. 16). The formal statement also contains the cases
+$`\deg_q(\mathfrak{m}) \le 0` discussed just before it. $`L_K(q\,|\,\mathfrak{m})` is defined
+as a set of functions (containing $`0`), and its dimension is the dimension of its $`K`-span.
+
 > Book, §2, Proposition 2 (Riemann–Roch theorem) together with the remarks preceding it: for a `q`-periodic divisor `𝔪`, `L_K(q|𝔪) = 0` if `deg_q 𝔪 < 0`; if `deg_q 𝔪 = 0` it is `0` unless `Φ_q(𝔪) ≡ 1`, in which case it has dimension `1`; and `dim L_K(q|𝔪) = deg_q(𝔪)` if `deg_q 𝔪 > 0`.
 -/
 
@@ -625,6 +715,14 @@ $`w_\alpha` over $`K`, and that the following statements are true:
 (Statements 1 and 2 follow from the corollary to Proposition 1; 4 from Proposition 1 applied to the
 zero divisor; 5 says that the degree of the $`q`-periodic divisor $`(f)` is zero.)
 
+_Formalization note._ Only statements 1 and 2 are shown below as separate theorems. Statement 2
+is encoded as "some $`f \in F_K(q)` has $`w_\alpha(f) = 1`" (the values of $`w_\alpha` are
+integers by construction). Statements 3–5 are not stated separately. 3 is the evaluation
+embedding of the residue field into $`K(\alpha)` (`resEmb` in `FqResidue.lean`). 4 follows from
+the description of the functions without zeros and poles as the monomials $`cX^n`, of which only
+the constants are $`q`-periodic. 5 is the forward direction of Proposition 1. The formalization does not need these statements as an
+input to a general theorem (see the next note).
+
 > Book, §2, item II (first part): `w_α = w_β` on `F_K(q)` iff `α` and `β` are `K`-conjugate mod `^× q`.
 -/
 
@@ -641,14 +739,23 @@ zero divisor; 5 says that the degree of the $`q`-periodic divisor $`(f)` is zero
 
 Statements 1–5 show that we have precisely the situation of the well known theorem of
 Artin–Whaples which characterizes fields with those properties as function fields (in the
-algebraic sense) over $`K`. (The formalization does not use the Artin–Whaples theorem. It proves
-the statements below directly, using the Riemann–Roch spaces of Proposition 2: elements of
-$`L_K(q\,|\,n\mathfrak{p})` are integral over the valuation ring of any valuation that is
-non-negative on them, which pins down the centre of every valuation.) We conclude:
+algebraic sense) over $`K`. Applying this theorem, we conclude:
 
 *I.* _The field $`F_K(q)` is a function field over $`K` in the sense that it is finitely
 generated of degree of transcendency $`1` over $`K`, and $`K` is algebraically closed in
 $`F_K(q)`._
+
+_Formalization note._ The formalization does not use the Artin–Whaples theorem; I, II and III
+are proved directly. For I, $`F_K(q)` is generated by $`\wp, \wp'` (Theorem VI of §3, whose
+analytic proof does not depend on I). $`\wp` is transcendental since it has a pole, and $`\wp'`
+is algebraic over $`K(\wp)` by the cubic relation of Theorem VI. $`K` is algebraically closed in
+$`F_K(q)` because elements integral over $`K` have no poles, and so lie in the one-dimensional
+space $`L_K(q\,|\,\mathfrak{p}_1)` of constants (Proposition 2). For II and
+III the Riemann–Roch spaces of Proposition 2 are used: elements of
+$`L_K(q\,|\,n\mathfrak{p})` are integral over the valuation ring of any valuation that is
+non-negative on them, which pins down the centre of every valuation. "Finitely generated" in
+`IsFunctionFieldOver` means finitely generated as a _field_ extension. An earlier version asked
+for finite generation as an algebra, which fails for every function field.
 
 > Book, §2, item I: `F_K(q)` is a function field over `K`.
 -/
@@ -662,6 +769,17 @@ $`\alpha`. Thus the prime divisors $`\mathfrak{p}` of $`F_K(q)\,|\,K` (in the al
 correspond $`1`–$`1` to the classes of $`K`-conjugate elements in $`\Omega^\times \bmod^\times q`.
 If $`\mathfrak{p}` belongs to $`\alpha` in this correspondence, then $`w_\alpha` is the normalized
 valuation of $`F_K(q)` belonging to $`\mathfrak{p}`._
+
+_Formalization note._ The displayed theorem is stated for $`\mathbb{Z}`-valued additive
+valuations $`v`, and "equivalent" means "same valuation ring". It assumes that $`v` is
+non-trivial and that $`v(c) = 0` for constants $`c \ne 0`. A previous version required
+$`v(c) = 0` for all $`c \in K`, which is impossible since $`v(0) = \infty`, and omitted
+non-triviality, which made it false for the trivial valuation. Valuations with arbitrary value
+groups are covered by the library lemma `classify_mvaluation`. The $`1`–$`1` correspondence
+with prime divisors is `eq_primeAt` and `primeAt_eq_iff` (every prime divisor is some
+$`\mathfrak{p}_\alpha`, and $`\mathfrak{p}_\alpha = \mathfrak{p}_\beta` iff $`\alpha`, $`\beta`
+are $`K`-conjugate $`\bmod^\times q`). That $`w_\alpha` is the normalized valuation is statement
+2 above.
 
 > Book, §2, item I–II: every (nontrivial) valuation of `F_K(q)` over `K` is equivalent to some `w_α`, i.e. has the same valuation ring.
 -/
@@ -680,6 +798,14 @@ and conclude $`\varrho = 1`. Hence:
 *III.* _If $`\mathfrak{p}` belongs to $`\alpha` in the correspondence described in II, then the
 residue class field of $`\mathfrak{p}` is $`K`-isomorphic to $`K(\alpha)`. In particular, the
 degree of $`\mathfrak{p}` (in the algebraic sense) equals $`[K(\alpha):K]`._
+
+_Formalization note._ The constant $`\varrho` of the Artin–Whaples theorem does not occur. The
+degree $`[K(\alpha):K]` is computed directly from Proposition 2. The formal statement of III is
+the degree statement: a prime divisor is a discrete valuation ring of $`F_K(q)` containing $`K`,
+and its degree is the $`K`-dimension of its residue field. The $`K`-isomorphism of the residue
+field with $`K(\alpha)` is not stated as such. It is obtained in `FqResidue.lean`, where
+evaluation at $`\alpha` embeds the residue field into $`K(\alpha)` and, by the equality of
+degrees, onto it.
 
 > Book, §2, item III: the valuation ring `{x ∈ F_K(q) | w_α(x) ≥ 0}` of `w_α` is the ring of a prime divisor of `F_K(q) | K` whose degree (the degree of its residue field over `K`) is `[K(α):K]`.
 -/
@@ -737,6 +863,16 @@ conservative. Thus:
 *IV.* _$`F_K(q)` is an elliptic function field over $`K`. For every finite algebraic extension
 field $`L` of $`K`, we have $`F_L(q) = F_K(q) \cdot L`._
 
+_Formalization note._ $`F_L(q)` is built from its own algebraic closure $`\Omega_L` of $`L`, so it
+is not a subfield of a common field with $`F_K(q)`. The equality $`F_L(q) = F_K(q) \cdot L` is
+therefore stated as follows: every field $`FL` generated by images of $`F_K(q)` and $`L` is
+$`L`-isomorphic to $`F_L(q)`. Here $`L` carries a complete ultrametric norm extending that of
+$`K`; in the proof of ellipticity it is the spectral norm. Correspondingly, "conservative"
+(`IsConservative`) means that $`\mathrm{genus}(FL\,|\,L) = \mathrm{genus}(F\,|\,K)` for every
+finite $`L` and every field $`FL` generated by $`F` and $`L`. An earlier version quantified over
+all fields containing $`F` and $`L`. That is too strong, since such fields can be much larger
+than the compositum.
+
 > Every constant field extension of `F_K(q)` by `L` is `L`-isomorphic to `F_L(q)`.
 -/
 
@@ -766,6 +902,14 @@ Let $`D^0_K(q)` denote the subgroup of $`D_K(q)`, consisting of the divisors of 
 Proposition 1, $`D^0_K(q)` contains the group $`P_K(q)` of principal divisors, i.e. divisors of
 $`q`-periodic functions. Let us denote by $`C^0_K(q) = D^0_K(q)/P_K(q)` the group of divisor
 classes of degree $`0`.
+
+_Formalization note._ $`P_K(q)` and $`D^0_K(q)` are defined as the subgroups _generated_ by the
+divisors of non-zero $`q`-periodic functions, resp. by the $`q`-periodic divisors of degree
+$`0`. Lemmas `mem_principalDivisors_iff` and `mem_divisorsDegZero_iff` show that they consist of
+exactly these. The groups are kept analytic, that is, built from functions on $`\Omega`. The
+identification of $`D_K(q)` with the algebraic divisor group of $`F_K(q)` described above
+enters, for the genus, through the comparison of Riemann–Roch spaces (`rrSpace_eq`). It is not
+stated as an isomorphism of groups.
 
 > Book, §2: the principal divisors `P_K(q)`: the group generated by the divisors `(f)` of non-zero `q`-periodic functions `f ∈ F_K(q)` (it consists of exactly these, as `divisorOf` is additive).
 -/
@@ -824,6 +968,13 @@ therefore that $`a \mapsto \tau_a` defines a _monomorphism_ of $`K^\times/q` int
 automorphisms of $`F_K(q)\,|\,K`; its image is called the _translation group_ of $`F_K(q)` and is
 denoted by $`T_K(q)`.
 
+_Formalization note._ Only the induced automorphism $`\tau_a` of $`F_K(q)` is defined here. The
+injectivity of $`a \mapsto \tau_a` on $`K^\times/q` is proved in §6, as
+`exists_zpow_of_translation_fix`: a translation that fixes $`F_K(q)` is a power of $`q`. The
+proof uses the poles of $`\wp` (§3) instead of II. The translation group $`T_K(q)` of $`F_K(q)` is
+not introduced as a separate object. The general translation group of Appendix A2 is defined
+algebraically.
+
 > The translation `τ_a` as an automorphism of `F_K(q)`.
 -/
 
@@ -840,6 +991,14 @@ $$`\tau_a(\mathfrak{p}_b) = \mathfrak{p}_{ab}. \qquad (14)`
 This formula describes the action of $`\tau_a` on the prime divisors of degree $`1` of $`F_K(q)`.
 Since there are infinitely many prime divisors of degree $`1`, it follows that $`\tau_a` is
 _uniquely determined_, as an automorphism of $`F_K(q)\,|\,K`, by the property (14).
+
+_Formalization note._ Formula (14) itself is proved in the library as
+`transfer_translation_primeAt` (in `FqHomogeneous.lean`, where it is used for Appendix A1). The
+prime divisors of degree $`1` are exactly the $`\mathfrak{p}_b`, $`b \in K^\times`
+(`exists_pt_of_degree_one`). The uniqueness statement shown below says that two
+$`K`-automorphisms with the same values $`w_b(\tau f)` for all $`b \in K^\times` and all $`f`
+coincide. Hypothesis and conclusion are stated through the valuations $`w_b` rather than through
+an action on prime divisors.
 
 > An automorphism of `F_K(q) | K` is determined by its action on the valuations at `K`-points.
 -/
@@ -860,6 +1019,13 @@ $`\mathfrak{p}` of degree $`1` of $`F_K(q)` is given by the formula
 $`\tau_a(\mathfrak{p}) \sim \mathfrak{p} + c_a` where $`c_a \in C^0_K(q)` is the divisor class
 which corresponds to $`a` under the Jacobi isomorphism $`\Phi_q\colon C^0_K(q) \to K^\times/q`._
 
+_Formalization note._ The displayed statement records only the existence and uniqueness of the
+class $`c_a` with $`\Phi_q(c_a) \equiv a`. The action formula
+$`\tau_a(\mathfrak{p}) \sim \mathfrak{p} + c_a` is not a separate theorem. It is the content of
+(14) (`transfer_translation_primeAt`) together with Corollary Vb below, whose proof shows that
+$`\tau_a` moves $`\mathfrak{p}_\alpha` to $`\mathfrak{p}_\beta` whenever
+$`\mathfrak{p}_\beta - \mathfrak{p}_\alpha` represents $`c_a`.
+
 > Book, §2, Corollary Va: for `a ∈ K^×` there is a unique class `c_a ∈ C⁰_K(q)` with `Φ_q(c_a) = a mod^× q`; the translation `τ_a` acts on prime divisors of degree `1` by `p ↦ p + c_a`.
 -/
 
@@ -872,6 +1038,15 @@ _algebraic_ notion of translation automorphism $`\tau_c` corresponding to a clas
 $`c \in C^0_K(q)`; this is the automorphism of $`F_K(q)` which is determined by the formula
 $`\tau_c(\mathfrak{p}) \sim \mathfrak{p} + c` for every prime divisor $`\mathfrak{p}` of degree
 $`1` of $`F_K(q)`. If $`c = c_a` then Corollary Va shows that $`\tau_c = \tau_a`. Hence:
+
+_Formalization note._ $`\tau_c` is defined by `Classical.epsilon` as some $`K`-automorphism with
+the characterizing property, so it is meaningful once such an automorphism exists. Its
+existence, and with it the correctness of the definition, follows from Corollary Vb. The
+prime divisors of degree $`1` are taken in the form $`\mathfrak{p}_\alpha`, $`\alpha \in K^\times`
+(by III these are all of them). The condition $`\tau_c(\mathfrak{p}) \sim \mathfrak{p} + c` is
+read as $`\tau_c(\mathfrak{p}_\alpha) = \mathfrak{p}_\beta` whenever
+$`\mathfrak{p}_\beta - \mathfrak{p}_\alpha` represents $`c`. This is equivalent, because two
+equivalent prime divisors of degree $`1` of an elliptic field are equal (`eq_of_div_eq`).
 
 > Book, §2: the algebraic translation automorphism of `F_K(q)` attached to a divisor class `c ∈ C⁰_K(q)`: the `K`-automorphism `τ` moving the prime divisor of a point `α ∈ K^×` to that of `β ∈ K^×` whenever `c = [β] − [α]`, i.e. `w_β(τ f) = w_α(f)`.
 -/
@@ -910,6 +1085,15 @@ $`\alpha` over $`K` by the degree of inseparability of $`\alpha_i` over $`L`. Th
 $`w_{\alpha_i,L}` of $`M_L` are precisely those valuations which induce in $`M_K` a valuation
 equivalent to $`w_{\alpha,K}`; the corresponding ramification index is $`e_i(\alpha)`.
 
+_Formalization note._ $`L` is a separate complete normed field, finite over $`K`, and $`M_L`
+is built from its own algebraic closure $`\Omega_L`. The two closures are identified by a fixed
+$`K`-isomorphism $`\psi\colon \Omega_K \to \Omega_L` (an isometry). The prime decomposition (15)
+is not formalized. $`e(\alpha)` is defined directly, as the quotient of the degrees of
+inseparability of $`\alpha` over $`K` and of $`\psi\alpha` over $`L`, and it is attached to every
+point rather than to the representatives $`\alpha_i`. The formal statement says that
+$`w_{\psi\alpha,L}` restricts on $`M_K` to $`e(\alpha)\,w_{\alpha,K}`. The converse, that these
+are _all_ valuations of $`M_L` inducing $`w_{\alpha,K}`, is not stated.
+
 > Book, §2, Remark 1: the ramification index `e(α)` of `ψ α` over `α`: the quotient of the degree of inseparability of `α` over `K` by that of `ψ α` over `L` (`ψ : Ω_K ≅ Ω_L`).
 -/
 
@@ -936,6 +1120,13 @@ immediate from the definition that the degree of a $`q`-periodic divisor is pres
 imbedding; hence we are entitled to use the notation $`\deg_q` without reference to any ground
 field. A similar remark applies to $`\Phi_q`.
 
+_Formalization note._ The embedding is stated as the existence of an injective homomorphism
+$`D_K \to D_L` with $`m'_{\psi\alpha} = e(\alpha)\,m_\alpha`, which preserves periodicity,
+$`\deg_q`, and $`\Phi_q` (through $`K^\times/q \to L^\times/q`). The book's remark that the
+analytic embedding $`D_K(q) \subset D_L(q)` coincides with the algebraic one (the
+$`\mathfrak{p}_{\alpha_i,L}` being the prime divisors of $`F_L(q)` above
+$`\mathfrak{p}_{\alpha,K}`) is not stated.
+
 > Book, §2, Remark 1: there is a natural embedding `D_K ⊂ D_L`, `m'_{ψ α} = e(α) m_α`, which maps `D_K(q)` into `D_L(q)` and preserves `deg_q` and `Φ_q`.
 -/
 
@@ -958,6 +1149,13 @@ and let $`G` denote its Galois group. $`G` acts on the holomorphic functions in 
 their coefficients; therefore $`G` acts also on $`M_L`, and $`M_K` is the field of fixed elements
 of $`G` in $`M_L`. That is, $`G` becomes the Galois group of $`M_L\,|\,M_K`.
 
+_Formalization note._ The action is encoded as a relation `IsGalAct σ ρ`: a ring automorphism
+$`\rho` of $`M_L` acts by $`\sigma` on the constants and on the Laurent coefficients of
+holomorphic functions. A canonical choice (`galActM`) is made with `Classical.epsilon`. The
+fixed-field statement says that the elements of $`M_L` fixed by every such $`\rho` (for every
+$`\sigma \in G`) are exactly the image of $`M_K` under the coefficient inclusion. That $`G` is
+the full Galois group of $`M_L\,|\,M_K` is not stated beyond this.
+
 > Book, §4: `ρ` is the action of `σ ∈ G` on `M_L` through the coefficients of the Laurent series: a ring automorphism of `M_L` which maps `∑ aₙ Xⁿ` to `∑ σ(aₙ) Xⁿ`.
 -/
 
@@ -975,6 +1173,11 @@ of $`G` in $`M_L`. That is, $`G` becomes the Galois group of $`M_L\,|\,M_K`.
 We have $`(\sigma f)(\sigma\alpha) = \sigma(f(\alpha))` ($`\sigma \in G`, $`f \in M_L`); this
 relation remains true for an arbitrary element $`\alpha \in \Omega^\times` provided we extend
 $`\sigma` to an automorphism of $`\Omega\,|\,K`.
+
+_Formalization note._ The relation is stated for holomorphic $`f = g \in H_L`, with
+$`\rho g = g'`, and for every $`\alpha \in \Omega_L^\times`. Here $`\sigma'` is any ring
+automorphism of $`\Omega_L` extending $`\sigma`. The meromorphic case is not stated; it follows
+by taking quotients.
 
 > Book, §2, Remark 2: for `f ∈ M_L` and `σ ∈ G`, `(σ f)(σ α) = σ(f(α))`, where `σ` acts on the coefficients of `f` and `σ'` is any extension of `σ` to `Ω_L`.
 -/
@@ -1009,6 +1212,13 @@ $`G`-permissible, $`G` acting trivially on $`\mathbb{Z}` and naturally on $`L^\t
 follows that the Jacobi isomorphism $`\Phi_q\colon C^0_L(q) \to L^\times/q` is an isomorphism of
 $`G`-modules.
 
+_Formalization note._ The displayed lemma is the step "evident from (3)": a function with divisor
+$`\mathfrak{n}` satisfying $`G(q^{-1}X) = b^{-1}X^d G(X)` (with $`X^d` instead of $`(-X)^d`, as
+in (11)) has $`\deg_q(\mathfrak{n}) = d` and $`\Phi_q(\mathfrak{n}) \equiv (-1)^d b`. The
+equivariance itself is the library theorem `remark_galois_equivariance`, which is stated for all
+of $`D_L(q)` (the book writes $`\mathfrak{m} \in D^0_L(q)`). The resulting $`G`-equivariance of
+the isomorphism $`C^0_L(q) \approx L^\times/q` is not stated separately.
+
 > A function with divisor `n` and `G(q⁻¹X) = b⁻¹ X^d G(X)` determines `deg_q n` and `Φ_q(n)`.
 -/
 
@@ -1016,11 +1226,23 @@ $`G`-modules.
 
 /-!
 
+*3. Infinite constant field extensions.* For _every_ algebraic field extension $`L` of $`K`,
+finite or infinite, we denote by $`F_L(q)` the union of the fields $`F_{L'}(q)`, where $`L'`
+ranges over the finite subextensions of $`L`. Similarly, $`D_L(q)`, $`C^0_L(q)` etc. are defined.
+The statements I–V and those of remarks 1. and 2. remain true also in this case. Note, however,
+that $`L` is not complete in the infinite case so that $`F_L(q)` is _not_ defined independently
+without referring to the complete field $`K` over which $`L` is algebraic.
+
+_Formalization note._ Remark 3 is not formalized. It is a definitional remark. Every result of
+the formalization is stated for finite extensions $`L\,|\,K`, and the book uses the infinite
+case only through these (see Appendix B).
+
 ## Supplement: non-archimedean function theory
 
-The book quotes the facts about holomorphic functions over $`K` that it needs, referring to
-Güntzer and to Bourbaki for proofs. The formalization proves them, in the general library
-`ForMathlib.Analysis.Nonarchimedean.EntireLaurent`. There the theory is developed for an arbitrary
+_Formalization note._ The book quotes the facts about holomorphic functions over $`K` that it
+needs, referring to Güntzer and to Bourbaki for proofs. The formalization proves them, in the
+general library `ForMathlib.Analysis.Nonarchimedean.EntireLaurent`. There the theory is
+developed for an arbitrary
 complete non-archimedean field $`K` and an algebraic extension $`L` of $`K` (for instance
 $`\Omega`). Holomorphic functions are represented either by their coefficient sequences (the ring
 `EntireLaurent K`) or as functions on $`L^\times`.

@@ -60,7 +60,7 @@ noncomputable def zetaM (q : K) : MeroRing K := Dop K (thetaM K q) / thetaM K q
 noncomputable def sK (k : ℕ) (q : K) : K :=
   ∑' n : ℕ, ((∑ d ∈ n.divisors, (d : ℤ) ^ k : ℤ) : K) * q ^ n
 
-/-- Book, §3, (30) (new definition): `℘(X) = ∑_{n∈ℤ} qⁿX/(1 − qⁿX)² − 2 s₁`, the element of `M_K`
+/-- Book, §3, (29) (new definition): `℘(X) = ∑_{n∈ℤ} qⁿX/(1 − qⁿX)² − 2 s₁`, the element of `M_K`
 with these values on `Ω^×`. -/
 noncomputable def wpM (q : K) : MeroRing K :=
   Classical.epsilon fun f : MeroRing K => EvalsTo K f fun α =>
