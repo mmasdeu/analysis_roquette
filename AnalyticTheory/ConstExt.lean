@@ -140,6 +140,7 @@ theorem holCoeff_sum {α : Type*} (s : Finset α) (g : α → holSubring L) :
     funext n; rw [Finset.sum_insert ha]
 
 /-- The `i`-th coordinate of a holomorphic function over `L` with respect to the basis `b`. -/
+@[elab_without_expected_type]
 noncomputable def holComp (g : holSubring L) (i : ι) : holSubring K :=
   holOfSeq K (Omega K) (fun n => b.repr (holCoeff L g n) i) (by
     obtain ⟨C, hC0, hC⟩ := exists_coord_bound' b i

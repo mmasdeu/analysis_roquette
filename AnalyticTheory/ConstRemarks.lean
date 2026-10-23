@@ -739,6 +739,7 @@ theorem convCoeff_gal (σ : L ≃ₐ[K] L) {a b : ℤ → L} (ha : IsConvergentL
   simp
 
 /-- The coefficientwise action on holomorphic functions. -/
+@[elab_without_expected_type]
 noncomputable def holGalFun (σ : L ≃ₐ[K] L) (g : holSubring L) : holSubring L :=
   holOfSeq L (Omega L) (fun n => σ (holCoeff L g n)) (isConvergentLaurent_gal σ (holCoeff_convergent L g))
 

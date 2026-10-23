@@ -27,6 +27,7 @@ theorem isConvergentLaurent_Dseq {a : ℤ → K} (ha : IsConvergentLaurent K a) 
     _ = _ := by ring
 
 /-- `D = X d/dX` on `H_K`. -/
+@[elab_without_expected_type]
 noncomputable def holD (f : holSubring K) : holSubring K :=
   holOfSeq K (Omega K) (fun n : ℤ => (n : K) * holCoeff K f n) (isConvergentLaurent_Dseq (holCoeff_convergent K f))
 

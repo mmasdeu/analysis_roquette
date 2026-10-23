@@ -86,6 +86,7 @@ section theta1
 variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 /-- The theta function `Θ` of the point `1`. -/
+@[elab_without_expected_type]
 noncomputable def Th : holSubring K := thetaFun hq0 hq1 1
 
 theorem Th_ne_zero : Th hq0 hq1 ≠ 0 := (thetaFun_spec hq0 hq1 one_ne_zero).1
@@ -119,6 +120,7 @@ theorem Th_zero (n : ℤ) :
     exact ⟨-n, by rw [ptQ, map_zpow₀]⟩
 
 /-- The linear factor `X − q⁻ⁿ`. -/
+@[elab_without_expected_type]
 noncomputable def linF (n : ℤ) : holSubring K := polyHol K (Omega K) (X - C (q ^ (-n)))
 
 theorem exists_Rq (n : ℤ) : ∃ R : holSubring K, Th hq0 hq1 = linF (q := q) n * R := by
@@ -128,6 +130,7 @@ theorem exists_Rq (n : ℤ) : ∃ R : holSubring K, Th hq0 hq1 = linF (q := q) n
   exact h
 
 /-- `Rₙ = Θ/(X − q⁻ⁿ)`. -/
+@[elab_without_expected_type]
 noncomputable def Rq (n : ℤ) : holSubring K := Classical.choose (exists_Rq hq0 hq1 n)
 
 theorem Rq_spec (n : ℤ) : Th hq0 hq1 = linF (q := q) n * Rq hq0 hq1 n :=
@@ -237,10 +240,12 @@ theorem term_bound {ρ : ℝ} (hρ : 0 < ρ) (k p : ℕ) (hp : 2 ≤ p) (G : ℝ
 
 
 /-- The terms `q⁻ⁿ X Rₙ²` of `Θ² (℘ + 2s₁)`. -/
+@[elab_without_expected_type]
 noncomputable def tP (n : ℤ) : holSubring K :=
   algebraMap K (holSubring K) (q ^ (-n)) * monoHol K (Omega K) 1 * Rq hq0 hq1 n ^ 2
 
 /-- The terms `-q⁻ⁿ X² Rₙ³` of `Θ³ (℘′ - s₁)`. -/
+@[elab_without_expected_type]
 noncomputable def tP' (n : ℤ) : holSubring K :=
   algebraMap K (holSubring K) (-(q ^ (-n))) * monoHol K (Omega K) 2 * Rq hq0 hq1 n ^ 3
 
