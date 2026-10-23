@@ -902,6 +902,7 @@ theorem psiExp_spec (u : Usub K qbar (norm_pos_iff.mp hqb0) m) :
     ((u : Kˣ) : K) ^ m = qbar ^ psiExp hqb0 u := Classical.choose_spec u.2
 
 include hqb1 in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psiExp_eq {u : Usub K qbar (norm_pos_iff.mp hqb0) m} {k : ℤ}
     (h : ((u : Kˣ) : K) ^ m = qbar ^ k) : psiExp hqb0 u = k :=
   zpow_qbar_injective hqb0 hqb1 ((psiExp_spec hqb0 u).symm.trans h)
@@ -950,7 +951,7 @@ noncomputable abbrev qSub : Subgroup (Usub K qbar (norm_pos_iff.mp hqb0) m) :=
   (Subgroup.zpowers (Units.mk0 q (norm_pos_iff.mp hq0))).subgroupOf
     (Usub K qbar (norm_pos_iff.mp hqb0) m)
 
-include hq1 hm hqd in
+include hq1 hm in
 theorem qSub_inf_ker : qSub hq0 hqb0 (m := m) ⊓ (psiHom hqb0 hqb1 (m := m)).ker = ⊥ := by
   rw [eq_bot_iff]
   rintro ⟨u, hu⟩ hx
@@ -1024,7 +1025,7 @@ theorem card_quot_mul_index :
       rintro ⟨u, hu⟩ hH
       rw [Subgroup.mem_subgroupOf] at hH
       have : u ∈ H ⊓ ψ.ker := ⟨hH, hu⟩
-      rw [qSub_inf_ker hq0 hq1 hqb0 hqb1 hm hqd, Subgroup.mem_bot] at this
+      rw [qSub_inf_ker hq0 hq1 hqb0 hqb1 hm, Subgroup.mem_bot] at this
       rw [Subgroup.mem_bot]; exact Subtype.ext (by simp [this])]
     exact Subgroup.index_bot
   have h3 : (H ⊔ ψ.ker).index = (H.map ψ).relIndex ψ.range := by
@@ -1428,7 +1429,7 @@ theorem thmXVII_inseparability (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ <
     have hsep2 : IsRelSeparable (FqbarXm K (q ^ m) m) (FqbarXm K (q ^ P) P) := by
       have e1 : FqbarXm K (q ^ m) m = (FqbarXm K ((q ^ P) ^ m') m').map (substPow K P) := by
         rw [← FqbarXm_mul _ hm'z hPz, ← pow_mul, hmm]
-        congr 1; push_cast; rw [← hmm]; push_cast; ring
+        congr 1; rw [← hmm]; push_cast; ring
       have e2 : FqbarXm K (q ^ P) P = (FqSub K (q ^ P)).map (substPow K P) := rfl
       rw [e1, e2]
       exact isRelSeparable_map _ (isRelSeparable_upper (norm_pow_pos hq0 P)

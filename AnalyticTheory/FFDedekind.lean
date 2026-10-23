@@ -191,10 +191,12 @@ instance locOf_isLocalization (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] :
     IsLocalization.AtPrime (Q.locOf 𝔪) 𝔪 :=
   Localization.subalgebra.isLocalization_ofField F _ _
 
+omit [Algebra K F] [IsScalarTower K E F] [Algebra.IsSeparable E F] in
 theorem mem_locOf (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] {x : F} :
     x ∈ Q.locOf 𝔪 ↔ ∃ (a s : Q.intCl F) (_ : s ∈ 𝔪.primeCompl), x = (a : F) * (s : F)⁻¹ :=
   Iff.rfl
 
+omit [Algebra K F] [IsScalarTower K E F] in
 theorem locOf_isDVR (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] (h : 𝔪 ≠ ⊥) :
     IsDiscreteValuationRing (Q.locOf 𝔪) :=
   IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (Q.intCl F) h _
@@ -358,6 +360,7 @@ theorem inertiaDeg_idealOf_eq_one (P : PrimeDivisor K F) (hP : P.restrict (E := 
     (A := Q.intCl F ⧸ Q.idealOf P hP)).toLinearEquiv.finrank_eq
   rw [← e, ← hbot, Subalgebra.finrank_bot]
 
+omit [FiniteDimensional E F] in
 /-- Elements of `𝔪_P²` are divisible by `π_P²` in `O_P`. -/
 theorem mem_ring_of_mem_sq (P : PrimeDivisor K F) (hP : P.restrict (E := E) = Q)
     {x : Q.intCl F} (hx : x ∈ Q.idealOf P hP ^ 2) : (x : F) * P.uniformizer ^ (-2 : ℤ) ∈ P.ring := by
@@ -423,6 +426,7 @@ abbrev Over (Q : PrimeDivisor K E) (F : Type u) [Field F] [Algebra K F] [Algebra
     [IsScalarTower K E F] [FiniteDimensional E F] : Type u :=
   {P : PrimeDivisor K F // P.restrict (E := E) = Q}
 
+omit [Algebra K F] [IsScalarTower K E F] [FiniteDimensional E F] [Algebra.IsSeparable E F] in
 theorem primesOver_ne_bot (𝔪 : (IsLocalRing.maximalIdeal Q.ring).primesOver (Q.intCl F)) :
     𝔪.1 ≠ ⊥ := by
   intro hb

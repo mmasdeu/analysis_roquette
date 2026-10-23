@@ -1,7 +1,6 @@
 module
 
 public import AnalyticTheory.EllipticBasics
-public import AnalyticTheory.ConstExt
 
 /-!
 # Prime divisors over a tower of constant fields
@@ -52,13 +51,16 @@ def toL [Algebra.IsAlgebraic K L] (P : PrimeDivisor K F) : PrimeDivisor L F wher
 variable [Algebra.IsAlgebraic K L]
 
 @[simp] theorem toL_ring (P : PrimeDivisor K F) : (P.toL (L := L)).ring = P.ring := rfl
+omit [Algebra.IsAlgebraic K L] in
 @[simp] theorem ofL_ring (P : PrimeDivisor L F) : (P.ofL (K := K)).ring = P.ring := rfl
 
 theorem ofL_toL (P : PrimeDivisor K F) : (P.toL (L := L)).ofL = P := rfl
 theorem toL_ofL (P : PrimeDivisor L F) : (P.ofL (K := K)).toL (L := L) = P := rfl
 
+omit [Algebra.IsAlgebraic K L] in
 theorem ord_ofL (P : PrimeDivisor L F) (f : F) : (P.ofL (K := K)).ord f = P.ord f := rfl
 
+omit [Algebra.IsAlgebraic K L] in
 theorem degree_ofL [FiniteDimensional K L] (P : PrimeDivisor L F) :
     (P.ofL (K := K)).degree = Module.finrank K L * P.degree := by
   unfold PrimeDivisor.degree
@@ -90,6 +92,7 @@ variable [Algebra.IsAlgebraic K L] [FiniteDimensional K L]
 noncomputable def FFDivisor.ofL (D : FFDivisor L F) : FFDivisor K F :=
   D.equivMapDomain (PrimeDivisor.primeEquivL K)
 
+omit [FiniteDimensional K L] in
 theorem FFDivisor.ofL_apply (D : FFDivisor L F) (P : PrimeDivisor L F) :
     FFDivisor.ofL (K := K) D (P.ofL) = D P := by
   simp [FFDivisor.ofL, PrimeDivisor.primeEquivL, Finsupp.equivMapDomain_apply]

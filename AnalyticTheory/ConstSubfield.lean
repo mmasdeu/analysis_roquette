@@ -1,7 +1,6 @@
 module
 
-public import AnalyticTheory.ConstRemarks
-public import AnalyticTheory.EllipticSplit
+public import AnalyticTheory.ConstExt
 
 /-!
 # Constant field extensions of subfields of `F_K(q)`

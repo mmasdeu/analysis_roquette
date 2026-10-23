@@ -1,6 +1,8 @@
 module
 
 public import AnalyticTheory.ConstGalois
+public import AnalyticTheory.ConstSubfield
+public import AnalyticTheory.EllipticSubfield
 public import AnalyticTheory.FqResidue
 
 /-!

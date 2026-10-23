@@ -1,9 +1,9 @@
 module
 
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.ZerosFinite
 public import Mathlib.Order.BourbakiWitt
 public import Mathlib.Topology.Algebra.Polynomial
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.GaussNorm
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.ZerosFinite
 
 /-!
 # The division theorem in `H_K`

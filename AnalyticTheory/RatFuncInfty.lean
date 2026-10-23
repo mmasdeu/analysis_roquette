@@ -1,9 +1,9 @@
 module
 
-public import AnalyticTheory.EllipticBasics
-public import AnalyticTheory.ConstExt
 public import Mathlib.FieldTheory.RatFunc.Valuation
 public import Mathlib.RingTheory.Valuation.Discrete.Basic
+public import AnalyticTheory.ConstExt
+public import AnalyticTheory.EllipticBasics
 
 /-!
 # The prime divisor at infinity of the rational function field `k(X)`
@@ -232,7 +232,7 @@ theorem inftyRing_le (R : PrimeDivisor k (RatFunc k)) (hX : (RatFunc.X : RatFunc
         WithZero.exp ((n.natDegree : ℤ) - d.natDegree) ≤ WithZero.exp 0)
       exact this
     omega
-  haveI : Invertible (RatFunc.X : RatFunc k) := invertibleOfNonzero hX0
+  have : Invertible (RatFunc.X : RatFunc k) := invertibleOfNonzero hX0
   set D := d.natDegree
   have e1 := Polynomial.eval₂_reflect_mul_pow (algebraMap k (RatFunc k)) (RatFunc.X : RatFunc k) D n hdeg
   have e2 := Polynomial.eval₂_reflect_mul_pow (algebraMap k (RatFunc k)) (RatFunc.X : RatFunc k) D d le_rfl

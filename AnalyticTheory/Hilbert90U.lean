@@ -23,6 +23,7 @@ variable {K : Type u} {L : Type v} [Field K] [Field L] [Algebra K L] [FiniteDime
 /-- `x_i = x · g(x) ⋯ g^{i-1}(x)`. -/
 def h90Coef (g : L ≃ₐ[K] L) (x : L) (i : ℕ) : L := ∏ j ∈ Finset.range i, (g ^ j) x
 
+omit [FiniteDimensional K L] [IsGalois K L] in
 theorem h90Coef_succ (g : L ≃ₐ[K] L) (x : L) (i : ℕ) :
     x * g (h90Coef g x i) = h90Coef g x (i + 1) := by
   unfold h90Coef

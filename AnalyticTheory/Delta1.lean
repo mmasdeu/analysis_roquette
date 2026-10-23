@@ -1,5 +1,6 @@
 module
 
+public import AnalyticTheory.Sec3D
 public import AnalyticTheory.ZetaWp
 
 /-!

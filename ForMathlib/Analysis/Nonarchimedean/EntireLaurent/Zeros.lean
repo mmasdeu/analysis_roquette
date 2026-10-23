@@ -1,8 +1,8 @@
 module
 
+public import Mathlib.RingTheory.SimpleRing.Principal
 public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
 public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.WeierstrassPrep
-public import Mathlib.RingTheory.SimpleRing.Principal
 
 /-!
 # Existence of zeros of holomorphic functions on tie spheres

@@ -1,8 +1,8 @@
 module
 
-public import AnalyticTheory.EllipticSplit
-public import AnalyticTheory.FqResidue
+public import AnalyticTheory.EllipticSubfield
 public import AnalyticTheory.FFUnramified
+public import AnalyticTheory.FqResidue
 
 /-!
 # Good rational points of elliptic subfields

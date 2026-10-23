@@ -1,7 +1,7 @@
 module
 
-public import AnalyticTheory.A1Unique
 public import AnalyticTheory.A1Classify
+public import AnalyticTheory.A1Unique
 
 /-!
 # Appendix A1: `j` and `γ` determine `F | K`

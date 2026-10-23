@@ -1,7 +1,7 @@
 module
 
-public import AnalyticTheory.Relation
 public import AnalyticTheory.CubicCoeffs
+public import AnalyticTheory.Relation
 
 /-!
 # Theorem VI (book, §3)

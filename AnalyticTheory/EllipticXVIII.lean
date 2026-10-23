@@ -1,7 +1,9 @@
 module
 
-public import AnalyticTheory.FqInsep
+public import AnalyticTheory.EllipticSeparable
 public import AnalyticTheory.EllipticTransfer
+public import AnalyticTheory.FFFinite
+public import AnalyticTheory.FqInsep
 
 /-!
 # Theorem XVIII: existence of the period and of `m`

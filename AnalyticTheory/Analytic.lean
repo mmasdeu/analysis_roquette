@@ -1,6 +1,8 @@
 module
 
+public import AnalyticTheory.FunctionField
 public import AnalyticTheory.Holomorphic
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.HolFun
 
 /-!
 # Fields of periodic functions (book, §2)

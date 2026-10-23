@@ -1,5 +1,6 @@
 module
 
+public import Mathlib
 public import Mathlib.FieldTheory.Galois.Basic
 public import Mathlib.FieldTheory.Fixed
 public import Mathlib.RingTheory.Trace.Basic

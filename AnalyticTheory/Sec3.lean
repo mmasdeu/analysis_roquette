@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.ConstRemarks
+public import Mathlib
 
 /-!
 # §3: the derivation `D`, formulas (16), (18), the Weierstraß form, Theorems VII, VIII, VIIIa

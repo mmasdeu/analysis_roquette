@@ -1,8 +1,7 @@
 module
 
-public import AnalyticTheory.EzetaElliptic
-public import AnalyticTheory.CorXVIIIb
 public import AnalyticTheory.ConstExtAbstract
+public import AnalyticTheory.EzetaElliptic
 
 /-!
 # Constant field extensions of the descended fields `E_ζ`

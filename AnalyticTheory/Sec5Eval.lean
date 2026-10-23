@@ -1,7 +1,6 @@
 module
 
 public import AnalyticTheory.FqResidue
-public import AnalyticTheory.Specialization
 
 /-!
 # Evaluation at a rational point of `F_L(q)`

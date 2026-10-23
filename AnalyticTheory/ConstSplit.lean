@@ -1,7 +1,7 @@
 module
 
 public import AnalyticTheory.ConstRigid
-public import AnalyticTheory.EllipticGood
+public import AnalyticTheory.FFUnramified
 
 /-!
 # Splitting of a good rational point in a constant field extension

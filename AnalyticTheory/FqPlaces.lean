@@ -1,6 +1,8 @@
 module
 
-public import AnalyticTheory.TheoremVI
+public import AnalyticTheory.CubicCoeffs
+public import AnalyticTheory.Relation
+public import AnalyticTheory.Structure
 
 /-!
 # Places of `F_K(q)`
@@ -472,7 +474,7 @@ theorem exists_inverse_mod {D : Omega K → ℤ} (hD : D ∈ DivisorsPeriodic K 
   have hdegm : degQ K q m = n * degQ K q D := degQ_nsmul hq0 hq1 hD n
   have hdegm' : degQ K q m' = (n + k : ℕ) * degQ K q D := degQ_nsmul hq0 hq1 hD (n + k)
   have hpos : 0 < degQ K q (m - pointDivisor K q β) := by
-    rw [degQ_sub hq0 hq1 hmP hpt, degQ_pointDivisor hq0 hq1 hβ, hdegm]; push_cast; nlinarith
+    rw [degQ_sub hq0 hq1 hmP hpt, degQ_pointDivisor hq0 hq1 hβ, hdegm]; nlinarith
   have hpos' : 0 < degQ K q (m' - pointDivisor K q β) := by
     rw [degQ_sub hq0 hq1 hm'P hpt, degQ_pointDivisor hq0 hq1 hβ, hdegm']; push_cast; nlinarith
   have hf1 := finrank_LS_sub_pt hq0 hq1 hmP hβ hpos
@@ -762,7 +764,6 @@ theorem LS_succ_le {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
       have h2 : (Module.finrank K ↥(Y ⊓ LS q (2 • D)) : ℤ) ≤ Module.finrank K (LS q D) := by
         exact_mod_cast hinfle
       rw [hY] at h1
-      push_cast at hD1
       linarith only [h1, h2, hn1, hn2, hn3, hD1]
     exact_mod_cast this)
   rw [heq]
@@ -1251,7 +1252,6 @@ theorem isUnit_ringAt_iff {α : Omega K} (hα : α ≠ 0) (x : ringAt q hα) :
   · rintro ⟨u, rfl⟩
     have h1 := congrArg (fun y : ringAt q hα => anVal K α (((y : FqSub K q)) : MeroRing K))
       u.mul_inv
-    try simp only at h1
     change anVal K α ((((u : ringAt q hα) : FqSub K q) : MeroRing K) *
       (((u⁻¹ : (ringAt q hα)ˣ) : ringAt q hα) : FqSub K q)) = anVal K α 1 at h1
     rw [(anVal_isValuation K α hα).2.2.1, (anVal_isValuation K α hα).2.1] at h1
@@ -1299,7 +1299,6 @@ theorem ringAt_isDVR {α : Omega K} (hα : α ≠ 0) : IsDiscreteValuationRing (
   refine ⟨T, ⟨fun hu => ?_, fun a b hab => ?_⟩, fun {x} hx => ?_⟩
   · rw [isUnit_ringAt_iff, hT1] at hu; exact one_ne_zero hu
   · have h1 := congrArg (fun y : ringAt q hα => anVal K α (((y : FqSub K q)) : MeroRing K)) hab
-    try simp only at h1
     change anVal K α ((T : FqSub K q) : MeroRing K) =
       anVal K α (((a : FqSub K q) : MeroRing K) * ((b : FqSub K q) : MeroRing K)) at h1
     rw [hT1, (anVal_isValuation K α hα).2.2.1] at h1

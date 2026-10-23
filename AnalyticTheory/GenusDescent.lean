@@ -1,7 +1,7 @@
 module
 
-public import AnalyticTheory.ConormDescent
-public import AnalyticTheory.FFFinite
+public import AnalyticTheory.Basic
+public import AnalyticTheory.GaloisDescent
 
 /-!
 # Genus and function-field axioms for a Galois descent
@@ -144,7 +144,7 @@ variable {K L E F : Type u} [Field K] [Field L] [Field E] [Field F]
   (hE1 : ∀ (g : L ≃ₐ[K] L) (e : E), g • algebraMap E F e = algebraMap E F e)
   (hE2 : ∀ f : F, (∀ g : L ≃ₐ[K] L, g • f = f) → ∃ e : E, algebraMap E F e = f)
 
-include hc hE1 hE2 in
+include hc hE1 in
 /-- The descended field of a function field over `L` is a function field over `K`. -/
 theorem isFunctionFieldOver_of_descent (hF : IsFunctionFieldOver L F) : IsFunctionFieldOver K E := by
   classical

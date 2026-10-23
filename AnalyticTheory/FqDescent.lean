@@ -1,10 +1,8 @@
 module
 
-public import AnalyticTheory.Lemma2
-public import AnalyticTheory.FqHomogeneous
 public import AnalyticTheory.A1LemmaA
+public import AnalyticTheory.Lemma2
 public import AnalyticTheory.Sec3VIII
-public import ForMathlib.FieldTheory.ExtendRingEquiv
 
 /-!
 # Galois descent for `F_L(q)`: the fields `E_ζ`
@@ -596,6 +594,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 /-- The constants `K ⊂ E_ζ`. -/
 theorem kConst_mem_Ezeta (ζ : CocycleModQ K L q) (c : K) :
     kConstFq K L q c ∈ Ezeta q ζ := kConstFq_mem K L q _ c

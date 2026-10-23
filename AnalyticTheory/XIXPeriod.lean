@@ -1,8 +1,6 @@
 module
 
-public import AnalyticTheory.Isogeny
-public import AnalyticTheory.EllipticTransfer
-public import AnalyticTheory.EllipticXVIII
+public import AnalyticTheory.Basic
 
 /-!
 # §6, Theorem XIX: the constant extension of an elliptic subfield
@@ -54,10 +52,11 @@ section ffield
 variable [Algebra.IsAlgebraic K L]
 variable (ι : E →ₐ[K] F)
 
+omit [Algebra K L] [IsScalarTower K L F] [Algebra.IsAlgebraic K L] in
 theorem elSub_algClosed (hF : IsFunctionFieldOver L F) :
     letI := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
     ∀ x : elSub (L := L) ι.toRingHom, IsIntegral L x → ∃ l : L, algebraMap L _ l = x := by
-  letI := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
+  let := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
   intro x hx
   have h1 : IsIntegral L (x : F) := hx.map (subVal _ (algebraMap_mem_elSub (L := L) _))
   obtain ⟨l, hl⟩ := hF.algebraicallyClosed _ h1
@@ -69,7 +68,7 @@ theorem elSub_fg (hE : IsFunctionFieldOver K E) :
     ∃ s : Finset (elSub (L := L) ι.toRingHom),
       IntermediateField.adjoin L (s : Set (elSub (L := L) ι.toRingHom)) = ⊤ := by
   classical
-  letI := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
+  let := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
   obtain ⟨s, hs⟩ := hE.fg
   let j : E → elSub (L := L) ι.toRingHom := fun e => ⟨ι e, range_mem_elSub ι.toRingHom e⟩
   refine ⟨s.image j, ?_⟩
@@ -117,7 +116,7 @@ theorem elSub_fg (hE : IsFunctionFieldOver K E) :
 theorem elSub_isFunctionField (hE : IsFunctionFieldOver K E) (hF : IsFunctionFieldOver L F) :
     letI := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
     IsFunctionFieldOver L (elSub (L := L) ι.toRingHom) := by
-  letI := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
+  let := subAlg (elSub (L := L) ι.toRingHom) (algebraMap_mem_elSub _)
   refine ⟨elSub_fg ι hE, ?_, elSub_algClosed ι hF⟩
   obtain ⟨t, ht⟩ := hE.transcendence_degree_one
   have htr : Transcendental K t := algebraicIndependent_unique_type_iff.mp ht.1
@@ -157,7 +156,9 @@ instance : Algebra K (EL L ι) := ((algebraMap L (EL L ι)).comp (algebraMap K L
 /-- The inclusion `EL ⊂ F`. -/
 def EL.val (x : EL L ι) : F := Subtype.val (α := F) x
 
+omit [Algebra K L] [IsScalarTower K L F] [FiniteDimensional K L] in
 theorem EL_algebraMap_L (l : L) : EL.val L ι (algebraMap L (EL L ι) l) = algebraMap L F l := rfl
+omit [Algebra K L] [IsScalarTower K L F] [FiniteDimensional K L] in
 theorem EL_algebraMap_E (e : E) : EL.val L ι (algebraMap E (EL L ι) e) = ι e := rfl
 
 instance : IsScalarTower K L (EL L ι) := IsScalarTower.of_algebraMap_eq fun _ => rfl
@@ -167,6 +168,7 @@ instance : IsScalarTower K E (EL L ι) := IsScalarTower.of_algebraMap_eq fun c =
   show algebraMap L F (algebraMap K L c) = ι (algebraMap K E c)
   rw [AlgHom.commutes, IsScalarTower.algebraMap_apply K L F]
 
+omit [FiniteDimensional K L] in
 theorem EL_constExt : IsConstantExtension K E L (EL L ι) := by
   refine ⟨?_⟩
   rw [eq_top_iff]
@@ -193,13 +195,13 @@ theorem EL_genus (hE : IsEllipticOver K E) : genus L (EL L ι) = 1 := by
 
 theorem EL_conservative (hE : IsEllipticOver K E) : IsConservative L (EL L ι) := by
   intro L' _ _ hL' FL' _ _ _ _ _ _ hFL'
-  letI : Algebra K L' := ((algebraMap L L').comp (algebraMap K L)).toAlgebra
-  haveI : IsScalarTower K L L' := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  haveI : FiniteDimensional K L' := Module.Finite.trans L L'
-  letI : Algebra K FL' := ((algebraMap L' FL').comp (algebraMap K L')).toAlgebra
-  letI : Algebra E FL' := ((algebraMap (EL L ι) FL').comp (algebraMap E (EL L ι))).toAlgebra
-  haveI : IsScalarTower K L' FL' := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  haveI : IsScalarTower K E FL' := IsScalarTower.of_algebraMap_eq fun c => by
+  let : Algebra K L' := ((algebraMap L L').comp (algebraMap K L)).toAlgebra
+  have : IsScalarTower K L L' := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  have : FiniteDimensional K L' := Module.Finite.trans L L'
+  let : Algebra K FL' := ((algebraMap L' FL').comp (algebraMap K L')).toAlgebra
+  let : Algebra E FL' := ((algebraMap (EL L ι) FL').comp (algebraMap E (EL L ι))).toAlgebra
+  have : IsScalarTower K L' FL' := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  have : IsScalarTower K E FL' := IsScalarTower.of_algebraMap_eq fun c => by
     show algebraMap L' FL' (algebraMap K L' c) =
       algebraMap (EL L ι) FL' (algebraMap E (EL L ι) (algebraMap K E c))
     have h1 : algebraMap K L' c = algebraMap L L' (algebraMap K L c) := rfl

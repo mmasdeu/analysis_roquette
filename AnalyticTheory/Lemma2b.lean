@@ -37,7 +37,7 @@ variable (hσ : ∀ g : L ≃ₐ[K] L, ∃ a : ℤ, χ g = χ σ ^ a)
 /-- The field `K_χ`. -/
 noncomputable abbrev Mχ : IntermediateField K L := IntermediateField.fixedField (MonoidHom.ker χ)
 
-include hσ in
+omit [FiniteDimensional K L] [IsGalois K L] in
 theorem act_eq_pow (g : L ≃ₐ[K] L) (a : ℤ) (ha : χ g = χ σ ^ a) {x : L} (hx : x ∈ Mχ χ) :
     g x = (σ ^ a) x := by
   have hker : σ ^ (-a) * g ∈ MonoidHom.ker χ := by

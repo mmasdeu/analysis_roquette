@@ -1,6 +1,7 @@
 module
 
 public import AnalyticTheory.PeriodicSol
+public import AnalyticTheory.ThetaDiv
 
 /-!
 # The Abel–Jacobi theorem and the Riemann–Roch theorem for periodic divisors
@@ -416,6 +417,7 @@ theorem system_bijOn {q : K} (hq0 : q ≠ 0) {R R' : Set (Omega K)} (hR : IsRepS
     rw [hu (e β) ⟨(he β hβ).1, (he β hβ).2.1, conjModQ_trans hq0 hγβ (he β hβ).2.2⟩,
       hu γ ⟨hγ.1, hγ.2, conjModQ_refl q γ⟩]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem natDegree_minpoly_of_conj {q : K} (hq0 : q ≠ 0) {β γ : Omega K} (h : ConjModQ K q β γ) :
     (minpoly K γ).natDegree = (minpoly K β).natDegree := by
   obtain ⟨δ, hδ, k, hk⟩ := h
@@ -426,12 +428,14 @@ theorem natDegree_minpoly_of_conj {q : K} (hq0 : q ≠ 0) {β γ : Omega K} (h :
 /-- The norm `N_{K(α)|K}(α)`. -/
 noncomputable def normGen (α : Omega K) : K := Algebra.norm K (IntermediateField.AdjoinSimple.gen K α)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem normGen_ne_zero {α : Omega K} (hα : α ≠ 0) : normGen α ≠ 0 := by
   unfold normGen
   rw [norm_gen_eq (Algebra.IsIntegral.isIntegral α)]
   exact mul_ne_zero (pow_ne_zero _ (by norm_num))
     (minpoly.coeff_zero_ne_zero (Algebra.IsIntegral.isIntegral α) hα)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem normGen_conj {q : K} (hq0 : q ≠ 0) {β γ : Omega K} (h : ConjModQ K q β γ) :
     ∃ k : ℤ, normGen γ = normGen β * (q ^ k) ^ (minpoly K β).natDegree := by
   classical
@@ -451,6 +455,7 @@ theorem annPart_support_finite {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {
     {α | α ∈ annPart q R ∧ m α ≠ 0}.Finite :=
   (hm.1.2.1 ‖q‖ 1 hq0 hq1.le).subset (fun _α ⟨hα, hs⟩ => ⟨hα.2.1.le, hα.2.2, hs⟩)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem annPart_prod_eq {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
     (hm : m ∈ DivisorsPeriodic K q) (R : Set (Omega K)) :
     ∏ᶠ α ∈ annPart q R, normGen α ^ m α =

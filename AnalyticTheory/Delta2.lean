@@ -1,6 +1,7 @@
 module
 
 public import AnalyticTheory.Delta1
+public import AnalyticTheory.FqGenus
 
 /-!
 # The product formula (45), part 2: functions with double zeros on a `2`-torsion class
@@ -78,7 +79,6 @@ include hq0 in
 theorem FE2_val {G : holSubring K} (hG : FE2 q hq0 G) (x : K) (hx : x ≠ 0) :
     valK G (q⁻¹ * x) (mul_ne_zero (inv_ne_zero hq0) hx) = x * x * valK G x hx := by
   have h := congrArg (fun H => valK H x hx) hG
-  try simp only at h
   rw [show (Units.mk0 q hq0)⁻¹ = Units.mk0 q⁻¹ (inv_ne_zero hq0) from Units.ext rfl,
     valK_holScale, valK_mul, valK_mul, valK_monoHol, zpow_one] at h
   exact h
@@ -88,7 +88,6 @@ theorem FE2_Dval {G : holSubring K} (hG : FE2 q hq0 G) (x : K) (hx : x ≠ 0) :
     valK (holD G) (q⁻¹ * x) (mul_ne_zero (inv_ne_zero hq0) hx) =
       x * x * valK (holD G) x hx + 2 * (x * x) * valK G x hx := by
   have h := congrArg (fun H => valK (holD H) x hx) hG
-  try simp only at h
   rw [show (Units.mk0 q hq0)⁻¹ = Units.mk0 q⁻¹ (inv_ne_zero hq0) from Units.ext rfl,
     holD_holScale, valK_holScale] at h
   rw [h]

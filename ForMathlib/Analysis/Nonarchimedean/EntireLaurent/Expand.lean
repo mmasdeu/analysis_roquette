@@ -1,6 +1,10 @@
 module
 
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Ring
+public import Mathlib.Algebra.Order.Algebra
+public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+public import Mathlib.Algebra.Order.Ring.Star
+public import Mathlib.Algebra.Order.Star.Int
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Division
 
 /-!
 # The substitution `X ↦ Xᵐ` for entire Laurent series
@@ -55,6 +59,7 @@ theorem tendsto_cofinite_of_injective {f : ℤ → ℝ} {e : ℤ → ℤ} (_he :
 
 variable (K)
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem expandSeq_convergent {m : ℤ} (hm : m ≠ 0) {a : ℤ → K} (ha : IsConvergentLaurent K a) :
     IsConvergentLaurent K (expandSeq K m a) := by
   intro r hr
@@ -70,6 +75,7 @@ variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
   [Algebra.IsIntegral K L] [IsAlgClosed L]
 
 omit [IsUltrametricDist L] [Algebra.IsIntegral K L] [IsAlgClosed L] in
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem hasSum_expandSeq {m : ℤ} (hm : m ≠ 0) {a : ℤ → K} {x : L} {S : L}
     (h : HasSum (fun k : ℤ => algebraMap K L (a k) * (x ^ m) ^ k) S) :
     HasSum (fun n : ℤ => algebraMap K L (expandSeq K m a n) * x ^ n) S := by
@@ -98,6 +104,7 @@ noncomputable def holExpand (m : ℤ) (hm : m ≠ 0) : holSubring K L →+* holS
   map_zero' := Subtype.ext rfl
   map_add' _ _ := Subtype.ext rfl
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem holExpand_apply {m : ℤ} (hm : m ≠ 0) (g : holSubring K L) (α : Punct L) :
     (holExpand K L m hm g).1 α = g.1 ⟨α.1 ^ m, zpow_ne_zero m α.2⟩ := rfl
 

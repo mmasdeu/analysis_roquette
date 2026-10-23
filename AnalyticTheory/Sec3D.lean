@@ -2,6 +2,7 @@ module
 
 public import AnalyticTheory.DOperator
 public import AnalyticTheory.Sec3VII
+public import AnalyticTheory.TheoremVI
 
 /-!
 # Formula (18): `2℘′ = D℘ − ℘`
@@ -143,7 +144,7 @@ theorem wpPrime_spec : 2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
   simp only [map_mul, map_pow, map_ofNat]
   rw [← hsq] at *
   field_simp
-  simp only [map_pow] at *
+  simp only [] at *
   linear_combination hid
 
 

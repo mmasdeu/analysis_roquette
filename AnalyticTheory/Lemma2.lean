@@ -1,6 +1,5 @@
 module
 
-public import AnalyticTheory.SemiPeriodic
 public import AnalyticTheory.ConstRemarks
 public import AnalyticTheory.Lemma2b
 
@@ -39,6 +38,7 @@ theorem expq_mul (q : K) {a b : L} (ha : a ≠ 0) (hb : b ≠ 0) :
 theorem expq_gal (q : K) (σ : L ≃ₐ[K] L) (a : L) : expq K L q (σ a) = expq K L q a := by
   unfold expq; rw [gal_norm]
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem expq_inv (q : K) {a : L} (ha : a ≠ 0) : expq K L q a⁻¹ = (expq K L q a)⁻¹ := by
   have h := expq_mul q (inv_ne_zero ha) ha
   rw [inv_mul_cancel₀ ha] at h
@@ -234,7 +234,7 @@ theorem cocycleEquiv_of_char_eq (ζ ζ' : CocycleModQ K L q)
     rw [e1, e2]
     simp only [zpow_sub, map_mul, map_inv, mul_inv_rev]
     simp only [mul_assoc, mul_comm, mul_left_comm,
-      mul_one]
+      ]
   have hint : ∀ σ : L ≃ₐ[K] L, ∃ m : ℤ, vq q (ζ'.1 σ * (ζ.1 σ)⁻¹) = m := by
     intro σ
     have h1 := congrArg (fun χ : CharGroup K L => (χ σ : Circle)) h
@@ -321,7 +321,7 @@ theorem vq_Qp (σ : L ≃ₐ[K] L) (Q : Lˣ) (i : ℕ) :
     have : vq q (Units.map ((σ ^ i : L ≃ₐ[K] L) : L →* L) Q) = vq q Q := vq_gal q _ Q
     rw [this]; push_cast; ring
 
-include hq0 hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem expq_unit (x : Lˣ) : expq K L q (x : L) = Circle.exp (2 * Real.pi * vq q x) := rfl
 
 end surj
@@ -386,7 +386,7 @@ theorem exists_cocycle_of_qtrivial (χ : CharGroup K L) (hχ : IsQTrivial K L q 
     apply Units.ext
     simp only [AlgEquiv.smul_units_def, Units.coe_map, MonoidHom.coe_ofClass, hQ', Units.val_mk0]
     have h1 : (g * σ ^ l) (Q : L) = (σ ^ ((a g + l : ℤ))) (Q : L) := by
-      refine act_eq_pow χ σ hgen0 (g * σ ^ l) (a g + l) ?_ hQM
+      refine act_eq_pow χ σ (g * σ ^ l) (a g + l) ?_ hQM
       rw [map_mul, map_pow, ha g, zpow_add, zpow_natCast]
     have h2 : (σ ^ ((a g + l : ℤ))) (Q : L) = (σ ^ (i g + l)) (Q : L) := by
       have e : ((a g + l : ℤ)) = ((i g + l : ℕ) : ℤ) + n * (a g / n) := by
@@ -441,7 +441,7 @@ theorem exists_cocycle_of_qtrivial (χ : CharGroup K L) (hχ : IsQTrivial K L q 
   apply MonoidHom.ext
   intro g
   show expq K L q ((Qp σ Q' (i g) : Lˣ) : L) = χ g
-  rw [expq_unit q hq0 hq1, vq_Qp, hχi g]
+  rw [expq_unit q, vq_Qp, hχi g]
   show _ = (χ σ) ^ (i g)
   rw [show χ σ = Circle.exp (2 * Real.pi / n) from hχσ]
   have hv : vq q Q' = 1 / n := by
@@ -520,6 +520,7 @@ variable (q : K)
 omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem vq_one : vq q (1 : Lˣ) = 0 := by unfold vq; simp
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L] in
 theorem vq_inv' (x : Lˣ) : vq q x⁻¹ = - vq q x := by
   have := vq_mul q x x⁻¹
   rw [mul_inv_cancel, vq_one] at this; linarith

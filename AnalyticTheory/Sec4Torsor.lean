@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Sec4B3
+public import AnalyticTheory.Sec4
 
 /-!
 # §4: elliptic fields of period `q` as forms of `F_K(q)` (Theorem IX)
@@ -52,6 +52,7 @@ theorem Ezeta_isFqTorsor (ζ : CocycleModQ K L q) : IsFqTorsor (L := L) q (Ezeta
   · rintro ⟨g, rfl⟩; exact (mem_semiFixed_iff q ζ g.1).mp g.2
   · intro h; exact ⟨⟨f, (mem_semiFixed_iff q ζ f).mpr h⟩, rfl⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 theorem translationFq_mul (a b : Lˣ) (f : FqSub L (algebraMap K L q)) :
     translationFq (algebraMap K L q) (a * b) f =
       translationFq (algebraMap K L q) a (translationFq (algebraMap K L q) b f) :=

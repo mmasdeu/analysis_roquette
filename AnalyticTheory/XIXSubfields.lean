@@ -1,7 +1,6 @@
 module
 
 public import AnalyticTheory.XIXDescent
-public import AnalyticTheory.ConstExtAbstract
 
 /-!
 # §6, Theorem XIX (ii): the elliptic subfields of `F_K(𝐐)` with a given period
@@ -49,6 +48,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 /-- `ζ^m` is a cocycle modulo `q̄` when `q^m = q̄^d`. -/
 theorem isCocycleModQ_pow (ζ : CocycleModQ K L q) {qb : K} {m d : ℕ} (hd : qb ^ d = q ^ m) :
     IsCocycleModQ K L qb (fun σ => ζ.1 σ ^ m) := by
@@ -92,8 +92,6 @@ theorem charOfCocycle_powCocycle (ζ : CocycleModQ K L q) {qb : K} (hqb0 : 0 < �
   all_goals first
     | linear_combination (2 * Real.pi * Real.log ‖((ζ.1 σ : Lˣ) : L)‖) * hrel
     | linear_combination (-Real.log ‖((ζ.1 σ : Lˣ) : L)‖) * hrel
-    | linear_combination (-(2 * Real.pi) * Real.log ‖((ζ.1 σ : Lˣ) : L)‖) * hrel
-    | linear_combination (Real.log ‖((ζ.1 σ : Lˣ) : L)‖) * hrel
 
 end powCocycle
 
@@ -109,6 +107,7 @@ noncomputable def Em (qb : K) (m : ℕ) : Subfield (FKQ K L q T) :=
   (FqbarXm L (algebraMap K L qb) m).comap
     ((FqSub L (algebraMap K L q)).subtype.comp (FKQ K L q T).subtype)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 theorem mem_Em {qb : K} {m : ℕ} (x : FKQ K L q T) :
     x ∈ Em q T qb m ↔ (((x : FqSub L (algebraMap K L q)) : MeroRing L)) ∈
       FqbarXm L (algebraMap K L qb) m := Iff.rfl
@@ -123,6 +122,7 @@ theorem const_mem_Em (qb : K) {m : ℕ} (hm : 0 < m) (c : K) :
     rw [substPow_algebraMapK hmz]; rfl
 
 include hq0 hq1 in
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 theorem Em_hsub {qb : K} (hqb0 : 0 < ‖qb‖) (hqb1 : ‖qb‖ < 1) {m d : ℕ} (hm : 0 < m)
     (hd : qb ^ d = q ^ m) (g : FqSub L (algebraMap K L qb)) :
     substPow L m (g : MeroRing L) ∈ FqSub L (algebraMap K L q) := by
@@ -188,7 +188,7 @@ theorem Em_equiv (ζ : CocycleModQ K L q)
     {qb : K} (hqb0 : 0 < ‖qb‖) (hqb1 : ‖qb‖ < 1) {m d : ℕ} (hm : 0 < m) (hd : qb ^ d = q ^ m) :
     letI := subfieldAlgebra K (Em q T qb m) (const_mem_Em q T qb hm)
     Nonempty (Em q T qb m ≃ₐ[K] Ezeta qb (powCocycle q ζ hd)) := by
-  letI := subfieldAlgebra K (Em q T qb m) (const_mem_Em q T qb hm)
+  let := subfieldAlgebra K (Em q T qb m) (const_mem_Em q T qb hm)
   have hmz : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'
   have hmapE : ∀ g : Ezeta qb (powCocycle q ζ hd),
       (⟨_, Em_mapF q hq0 hq1 T ζ hζ hqb0 hqb1 hm hd g⟩ : FKQ K L q T) ∈ Em q T qb m := fun g =>
@@ -236,7 +236,7 @@ theorem Em_props (ζ : CocycleModQ K L q)
     letI := subfieldAlgebra K (Em q T qb m) (const_mem_Em q T qb hm)
     IsEllipticOver K (Em q T qb m) ∧ IsFqTorsor (L := L) qb (Em q T qb m) ∧
       IsCharInvariant qb hqb0 hqb1 (Em q T qb m) (charOfCocycle q hq0 hq1 ζ ^ d) := by
-  letI := subfieldAlgebra K (Em q T qb m) (const_mem_Em q T qb hm)
+  let := subfieldAlgebra K (Em q T qb m) (const_mem_Em q T qb hm)
   obtain ⟨e⟩ := Em_equiv q hq0 hq1 T ζ hζ hqb0 hqb1 hm hd
   refine ⟨(Ezeta_isElliptic qb hqb0 hqb1 _).of_algEquiv e.symm,
     IsFqTorsor.of_algEquiv e (Ezeta_isFqTorsor qb hqb0 _), ⟨powCocycle q ζ hd, ?_, ⟨e⟩⟩⟩
@@ -318,6 +318,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
 variable (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (T : SemiPeriodicTriple K L q)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [FiniteDimensional K L] [IsGalois K L] in
 /-- A subfield `S ⊂ F_L(q)` with `S = F_L(q̄|Xᵐ)` (in `M_L`) and containing `L` is `L`-isomorphic
 to `F_L(q̄)`. -/
 theorem subfield_equiv_fq (S : Subfield (FqSub L (algebraMap K L q)))
@@ -325,7 +326,7 @@ theorem subfield_equiv_fq (S : Subfield (FqSub L (algebraMap K L q)))
     (hEq : S.map (FqSub L (algebraMap K L q)).subtype = FqbarXm L qb m) :
     letI := subAlg S hL
     Nonempty (S ≃ₐ[L] FqSub L qb) := by
-  letI := subAlg S hL
+  let := subAlg S hL
   have hmz : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'
   let μ0 : FqSub L qb →+* MeroRing L := (substPow L m).comp (FqSub L qb).subtype
   have hμinj : Function.Injective μ0 := (substPow_injective hmz).comp Subtype.val_injective
@@ -359,7 +360,6 @@ theorem subfield_equiv_fq (S : Subfield (FqSub L (algebraMap K L q)))
         rw [substPow_algebraMapK hmz] }
   exact ⟨AlgEquiv.ofBijective Ψ hbij⟩
 
-include hq0 hq1 in
 /-- The period of an elliptic subfield is unique: if `EL = F_L(q̄|Xᵐ)` and `E` admits the period
 `q'`, then `q' = q̄`. -/
 theorem period_eq_of_torsor (E : Subfield (FKQ K L q T)) (h : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E)
@@ -368,10 +368,10 @@ theorem period_eq_of_torsor (E : Subfield (FKQ K L q T)) (h : ∀ c : K, algebra
     (hEq : (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype =
       FqbarXm L (algebraMap K L qK) m)
     (ht : letI := subfieldAlgebra K E h; IsFqTorsor (L := L) qb E) : qb = qK := by
-  letI := subfieldAlgebra K E h
+  let := subfieldAlgebra K E h
   obtain ⟨-, ζ1, -, ⟨e⟩⟩ := fqTorsor_descent qb hqb0 hqb1 E ht
-  letI := fqKAlgebra (L := L) q
-  haveI : IsScalarTower K L (FqSub L (algebraMap K L q)) := fqK_tower_L (L := L) q
+  let := fqKAlgebra (L := L) q
+  have : IsScalarTower K L (FqSub L (algebraMap K L q)) := fqK_tower_L (L := L) q
   let ιE : E →ₐ[K] FqSub L (algebraMap K L q) := { toRingHom := xiIota q T E, commutes' := fun _ => rfl }
   let ι' : Ezeta qb ζ1 →ₐ[K] FqSub L (algebraMap K L q) := ιE.comp e.symm.toAlgHom
   have hrange : elSub (L := L) ι'.toRingHom = elSub (L := L) (xiIota q T E) := by
@@ -385,9 +385,9 @@ theorem period_eq_of_torsor (E : Subfield (FKQ K L q T)) (h : ∀ c : K, algebra
       show ιE (e.symm (e x)) = _
       rw [e.symm_apply_apply]; rfl
   -- `EL ≅ F_L(q')`
-  letI := fqKAlgebra (L := L) qb
-  haveI : IsScalarTower K L (FqSub L (algebraMap K L qb)) := fqK_tower_L (L := L) qb
-  haveI : IsScalarTower K (Ezeta qb ζ1) (FqSub L (algebraMap K L qb)) := fqK_tower_E qb ζ1
+  let := fqKAlgebra (L := L) qb
+  have : IsScalarTower K L (FqSub L (algebraMap K L qb)) := fqK_tower_L (L := L) qb
+  have : IsScalarTower K (Ezeta qb ζ1) (FqSub L (algebraMap K L qb)) := fqK_tower_E qb ζ1
   obtain ⟨i1⟩ := @exists_algEquiv_of_basis K (Ezeta qb ζ1) L (FqSub L (algebraMap K L qb)) (EL L ι')
     _ _ _ _ _ _ _ _ (fqKAlgebra (L := L) qb) (fqK_tower_L (L := L) qb) _ _ _ _ _
     (IsScalarTower.toAlgHom K (Ezeta qb ζ1) (FqSub L (algebraMap K L qb)))
@@ -414,7 +414,7 @@ theorem eq_Em_of_torsor (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfield K 
       IsGreatest {k : ℕ | 0 < k ∧ (elSub (L := L) (xiIota q T E)).map
         (FqSub L (algebraMap K L q)).subtype ≤ (substPow L k).fieldRange} m := by
   obtain ⟨qK, m, d, hqK0, hqK1, hm, hd, hdq, hEq, hgr⟩ := exists_period_elSub q T hq0 hq1 E hE
-  have hqK : qb = qK := period_eq_of_torsor q hq0 hq1 T E hE.1 hqb0 hqb1 hqK0 hqK1 hm hEq ht
+  have hqK : qb = qK := period_eq_of_torsor q T E hE.1 hqb0 hqb1 hqK0 hqK1 hm hEq ht
   subst hqK
   obtain ⟨ζ, hζ, -⟩ := exists_cocycle_of_triple q hq0 hq1 T
   refine ⟨m, d, hm, hd, hdq, ?_, hEq, hgr⟩

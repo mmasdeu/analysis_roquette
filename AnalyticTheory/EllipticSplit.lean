@@ -1,8 +1,8 @@
 module
 
 public import AnalyticTheory.EllipticSubfield
-public import AnalyticTheory.PeriodGroup
 public import AnalyticTheory.IsogenyXVII
+public import AnalyticTheory.PeriodGroup
 
 /-!
 # Elliptic subfields of `F_K(q)`: the split case

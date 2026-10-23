@@ -1,7 +1,9 @@
 module
 
-public import AnalyticTheory.ConstDescent
 public import Mathlib.FieldTheory.Normal.Closure
+public import AnalyticTheory.ConstDescent
+public import AnalyticTheory.ConstSplit
+public import AnalyticTheory.EllipticGood
 
 /-!
 # Theorem XVIII: the separable case

@@ -1,6 +1,8 @@
 module
 
 public import AnalyticTheory.ConstExt
+public import AnalyticTheory.FqGenus
+public import AnalyticTheory.TheoremVI
 
 /-!
 # Structure of `F_K(q)` (book, §2: items I–V, Corollaries Va, Vb)

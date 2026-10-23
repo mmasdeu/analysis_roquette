@@ -1,6 +1,5 @@
 module
 
-public import AnalyticTheory.EllipticBasics
 public import AnalyticTheory.FFExtension
 
 /-!

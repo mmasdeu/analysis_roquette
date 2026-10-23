@@ -1,9 +1,7 @@
 module
 
-public import AnalyticTheory.A1Homog
-public import AnalyticTheory.RatFuncInfty
-public import AnalyticTheory.FFFundamental
 public import AnalyticTheory.ConormDescent
+public import AnalyticTheory.RatFuncInfty
 
 /-!
 # Appendix A1: the prime at infinity of a Weierstraß model
@@ -271,7 +269,7 @@ theorem delta_zero_of_two (W : WeierstrassCurve k) (h2 : (2 : k) = 0) (ha1 : W.a
 
 include hX hxy hgen in
 theorem model_separable (hΔ : W.Δ ≠ 0) : Algebra.IsSeparable (RatFunc k) F := by
-  haveI := (model_finite W hX hxy hgen).1
+  have := (model_finite W hX hxy hgen).1
   have hint := model_isIntegral W hX hxy
   have hsep : IsSeparable (RatFunc k) y := by
     by_cases hb : y ∈ Set.range (algebraMap (RatFunc k) F)
@@ -301,8 +299,8 @@ theorem model_infty_prime (hΔ : W.Δ ≠ 0) :
     ∃ P : PrimeDivisor k F, P.degree = 1 ∧ P.ord x = -2 ∧ P.ord y = -3 ∧
       ∀ P' : PrimeDivisor k F, x ∉ P'.ring → P' = P := by
   classical
-  haveI : FiniteDimensional (RatFunc k) F := (model_finite W hX hxy hgen).1
-  haveI : Algebra.IsSeparable (RatFunc k) F := model_separable W hX hxy hgen hΔ
+  have : FiniteDimensional (RatFunc k) F := (model_finite W hX hxy hgen).1
+  have : Algebra.IsSeparable (RatFunc k) F := model_separable W hX hxy hgen hΔ
   have hrank := (model_finite W hX hxy hgen).2
   set Q := inftyPrime k with hQ
   have hQdeg : Q.degree = 1 := inftyPrime_degree k
@@ -400,8 +398,8 @@ theorem exists_prime_of_model {x y : F} (W : WeierstrassCurve k) (hxy : NormalFo
     (hx : Transcendental k x) (hgen : IntermediateField.adjoin k ({x, y} : Set F) = ⊤)
     (hΔ : W.Δ ≠ 0) :
     ∃ 𝔓 : PrimeDivisor k F, 𝔓.degree = 1 ∧ PoleOrd 𝔓 x 2 ∧ PoleOrd 𝔓 y 3 := by
-  letI : Algebra (RatFunc k) F := (ratHom hx).toRingHom.toAlgebra
-  haveI : IsScalarTower k (RatFunc k) F :=
+  let : Algebra (RatFunc k) F := (ratHom hx).toRingHom.toAlgebra
+  have : IsScalarTower k (RatFunc k) F :=
     IsScalarTower.of_algebraMap_eq fun r => ((ratHom hx).commutes r).symm
   have hX : algebraMap (RatFunc k) F RatFunc.X = x := ratHom_X hx
   obtain ⟨P, hdeg, hordx, hordy, huniq⟩ := model_infty_prime W hX hxy hgen hΔ

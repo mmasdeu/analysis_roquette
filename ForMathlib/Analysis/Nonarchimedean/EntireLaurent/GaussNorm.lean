@@ -29,6 +29,7 @@ variable {K}
 theorem holCoeff_zero : holCoeff K (0 : holSubring K L) = fun _ => 0 :=
   holCoeff_eq K (fun r hr => by simp) (fun x => by simpa using hasSum_zero)
 
+omit [Algebra.IsIntegral K L] [IsAlgClosed L] in
 theorem wt_bddAbove {r : ℝ} (hr : 0 < r) (f : holSubring K L) :
     BddAbove (Set.range (fun n : ℤ => wt K r (holCoeff K f) n)) :=
   (wt_tendsto K (holCoeff_convergent K f) hr).bddAbove_range_of_cofinite

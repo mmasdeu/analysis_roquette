@@ -1,7 +1,7 @@
 module
 
 public import AnalyticTheory.A1Transfer
-public import AnalyticTheory.FqStructure
+public import AnalyticTheory.FqGenus
 
 /-!
 # The prime divisors of degree one of `F_K(q)` are permuted transitively by the translations

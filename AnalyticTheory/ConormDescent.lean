@@ -2,8 +2,8 @@ module
 
 public import AnalyticTheory.FFFundamental
 public import AnalyticTheory.GaloisDescent
-public import AnalyticTheory.PrimeBaseChange
 public import AnalyticTheory.MultTransfer
+public import AnalyticTheory.PrimeBaseChange
 
 /-!
 # Riemann–Roch spaces under Galois descent
@@ -60,16 +60,16 @@ open Classical in
 theorem conormPrime_apply (Q : PrimeDivisor K E) (P' : PrimeDivisor K F) :
     conormPrime (E := E) (F := F) Q P' = if P'.restrict (E := E) = Q then P'.ramIdx (E := E) else 0 := by
   unfold conormPrime
-  simp only [Finsupp.finset_sum_apply, Finsupp.smul_apply, Finsupp.single_apply, smul_eq_mul]
+  simp only [Finsupp.finsetSum_apply, Finsupp.smul_apply, Finsupp.single_apply, smul_eq_mul]
   by_cases h : P'.restrict (E := E) = Q
   · rw [ite_eq_left h, Finset.sum_eq_single ⟨P', h⟩]
     · simp
     · intro P _ hP
-      rw [if_neg (fun e => hP (Subtype.ext e)), mul_zero]
+      rw [ite_eq_right (fun e => hP (Subtype.ext e)), mul_zero]
     · intro hn; exact absurd (Finset.mem_univ _) hn
   · rw [ite_eq_right h]
     refine Finset.sum_eq_zero fun P _ => ?_
-    rw [if_neg (fun e : P.1 = P' => h (e ▸ P.2)), mul_zero]
+    rw [ite_eq_right (fun e : P.1 = P' => h (e ▸ P.2)), mul_zero]
 
 theorem conorm_apply (D : FFDivisor K E) (P' : PrimeDivisor K F) :
     conorm D P' = P'.ramIdx (E := E) * D (P'.restrict (E := E)) := by
@@ -82,8 +82,8 @@ theorem conorm_apply (D : FFDivisor K E) (P' : PrimeDivisor K F) :
     rw [Finsupp.liftAddHom_apply_single, zmultiplesHom_apply, Finsupp.smul_apply,
       conormPrime_apply, Finsupp.single_apply, smul_eq_mul]
     by_cases h : P'.restrict (E := E) = Q
-    · rw [if_pos h, if_pos h.symm]; ring
-    · rw [ite_eq_right h, if_neg (fun e => h e.symm)]; ring
+    · rw [ite_eq_left h, ite_eq_left h.symm]; ring
+    · rw [ite_eq_right h, ite_eq_right (fun e => h e.symm)]; ring
 
 theorem deg_conorm (D : FFDivisor K E) :
     FFDivisor.deg (conorm (E := E) (F := F) D) = Module.finrank E F * FFDivisor.deg D := by
@@ -101,9 +101,9 @@ theorem deg_conorm (D : FFDivisor K E) :
       simp only [map_zsmul, smul_eq_mul]
       rw [← Q.sum_ramIdx_mul_degree]
       refine Finset.sum_congr rfl fun P _ => ?_
-      simp [FFDivisor.degHom, Finsupp.liftAddHom_apply_single]
+      simp [FFDivisor.degHom]
     have h3 : FFDivisor.degHom (Finsupp.single Q n : FFDivisor K E) = n * Q.degree := by
-      simp [FFDivisor.degHom, Finsupp.liftAddHom_apply_single]
+      simp [FFDivisor.degHom]
     rw [h1, h3, smul_eq_mul, smul_eq_mul]
     ring
   exact congrArg (· D) this

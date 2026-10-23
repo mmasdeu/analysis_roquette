@@ -1,6 +1,7 @@
 module
 
-public import AnalyticTheory.FqGenus
+public import AnalyticTheory.AbelJacobi
+public import AnalyticTheory.Basic
 
 /-!
 # Constant field extensions of `F_K(q)`
@@ -155,6 +156,7 @@ noncomputable def holComp (g : holSubring L) (i : ι) : holSubring K :=
           mul_le_mul_of_nonneg_right (hC _) (by positivity)
       _ = C * (‖holCoeff L g n‖ * r ^ n) := by ring)
 
+omit [Fintype ι] in
 theorem holCoeff_holComp (g : holSubring L) (i : ι) :
     holCoeff K (holComp b g i) = fun n => b.repr (holCoeff L g n) i :=
   holCoeff_holOfSeq K (L := Omega K) _ _

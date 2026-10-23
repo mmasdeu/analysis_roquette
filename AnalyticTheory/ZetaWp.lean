@@ -1,6 +1,7 @@
 module
 
-public import AnalyticTheory.Sec3D
+public import AnalyticTheory.DOperator
+public import AnalyticTheory.WpConstruct
 
 /-!
 # Formula (16): `℘ = −Dζ − 2 s₁`
@@ -23,7 +24,7 @@ variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
 section thetaPt
 
-include hq0 hq1 in
+include hq0 in
 theorem thF_one (n : ℕ) (y : OmegaX K) :
     (thF q (minpoly K (1 : Omega K)) n).1 y = 1 - algebraMap K (Omega K) q ^ n * y.1⁻¹ := by
   have hq0' := norm_pos_iff.mp hq0
@@ -34,7 +35,7 @@ theorem thF_one (n : ℕ) (y : OmegaX K) :
   simp [phiOm, hd]
   field_simp
 
-include hq0 hq1 in
+include hq0 in
 theorem thG_one (n : ℕ) (y : OmegaX K) :
     (thG q (minpoly K (1 : Omega K)) n).1 y = 1 - algebraMap K (Omega K) q ^ n * y.1 := by
   have hq0' := norm_pos_iff.mp hq0
@@ -54,8 +55,8 @@ theorem Th_eq_theta (x : OmegaX K) : (Th hq0 hq1).1 x = theta K q x.1 := by
       ∏ n ∈ Finset.range J, (1 - algebraMap K (Omega K) q ^ (n + 1) * x.1) := by
     intro J
     congr 1
-    · exact Finset.prod_congr rfl (fun n _ => thF_one hq0 hq1 n x)
-    · exact Finset.prod_congr rfl (fun n _ => thG_one hq0 hq1 (n + 1) x)
+    · exact Finset.prod_congr rfl (fun n _ => thF_one hq0 n x)
+    · exact Finset.prod_congr rfl (fun n _ => thG_one hq0 (n + 1) x)
   have hm1 : Multipliable fun n : ℕ => 1 - algebraMap K (Omega K) q ^ (n + 0) * x.1⁻¹ :=
     multipliable_geom_omega K q hq1 x.1 x.1⁻¹ (IntermediateField.inv_mem _
       (IntermediateField.mem_adjoin_simple_self K x.1)) 0
@@ -271,13 +272,13 @@ section main
 include hq0 hq1 in
 theorem thF_eq_binom (n : ℕ) : thF q (minpoly K (1 : Omega K)) n = binom1 (q ^ n) (-1) := by
   refine Subtype.ext (funext fun y => ?_)
-  rw [thF_one hq0 hq1, binom1_apply, zpow_neg_one, map_pow]
+  rw [thF_one hq0, binom1_apply, zpow_neg_one, map_pow]
 
 include hq0 hq1 in
 theorem thG_eq_binom (n : ℕ) :
     thG q (minpoly K (1 : Omega K)) (n + 1) = binom1 (q ^ (n + 1)) 1 := by
   refine Subtype.ext (funext fun y => ?_)
-  rw [thG_one hq0 hq1, binom1_apply, zpow_one, map_pow]
+  rw [thG_one hq0, binom1_apply, zpow_one, map_pow]
 
 end main
 

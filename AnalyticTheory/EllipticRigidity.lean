@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.FFNorm
+public import AnalyticTheory.EllipticBasics
 
 /-!
 # Rigidity of degree-one points of elliptic function fields

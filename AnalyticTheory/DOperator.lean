@@ -1,6 +1,7 @@
 module
 
-public import AnalyticTheory.ConstRemarks
+public import AnalyticTheory.ThetaOrder
+public import AnalyticTheory.Weierstrass
 
 /-!
 # The derivation `D = X d/dX` on `H_K` and `M_K`

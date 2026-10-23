@@ -1,8 +1,5 @@
 module
 
-public import AnalyticTheory.Structure
-public import AnalyticTheory.AppendixA2
-public import AnalyticTheory.SemiPeriodic
 public import AnalyticTheory.FqDescent
 public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Expand
 

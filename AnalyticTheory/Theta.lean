@@ -1,6 +1,7 @@
 module
 
-public import AnalyticTheory.HolDiv
+public import AnalyticTheory.Analytic
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.InfProd
 
 /-!
 # The theta functions `T_φ`
@@ -64,6 +65,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psi_natDegree (q : K) (φ : Polynomial K) (k : ℤ) : (psi q φ k).natDegree = φ.natDegree :=
   Polynomial.natDegree_scaleRoots _ _
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- Coefficient bound for `ψ_n − X^N`. -/
 theorem psi_sub_coeff_bound {q : K} (hq : ‖q‖ < 1) {φ : Polynomial K} (hφ : φ.Monic) (n : ℕ)
     (j : ℕ) : ‖(psi q φ n - X ^ φ.natDegree).coeff j‖ ≤
@@ -89,6 +91,7 @@ theorem psi_sub_coeff_bound {q : K} (hq : ‖q‖ < 1) {φ : Polynomial K} (hφ 
       positivity
 
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem psi_sub_coeff_zero {q : K} {φ : Polynomial K} (hφ : φ.Monic) (k : ℤ) (j : ℕ)
     (hj : φ.natDegree ≤ j) : (psi q φ k - X ^ φ.natDegree).coeff j = 0 := by
   rw [Polynomial.coeff_sub, psi_coeff, Polynomial.coeff_X_pow]
@@ -143,6 +146,7 @@ theorem thG_sub_one (q : K) (φ : Polynomial K) (n : ℕ) :
   congr 2
   exact (Polynomial.aeval_C _ _).symm
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem thGpoly_coeff_le {q : K} (hq0 : q ≠ 0) {φ : Polynomial K} (hc0 : φ.coeff 0 ≠ 0)
     (n : ℕ) (j : ℕ) (hj : j ≤ φ.natDegree) :
     (thGpoly q φ n).coeff j = φ.coeff j / φ.coeff 0 * q ^ ((n : ℤ) * j) -
@@ -187,6 +191,7 @@ theorem thGpoly_coeff_bound {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Pol
     rw [this, norm_zero]
     positivity
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem thGpoly_coeff_zero {q : K} {φ : Polynomial K} (n : ℕ) (j : ℕ) (hj : φ.natDegree < j) :
     (thGpoly q φ n).coeff j = 0 := by
   rw [thGpoly, Polynomial.coeff_sub, Polynomial.coeff_C_mul, psi_coeff,
@@ -369,7 +374,6 @@ theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
       linear_combination key
     have key3 := mul_left_cancel₀ hφne key2
     have := congrArg (fun y => monoHol K (Omega K) (φ.natDegree : ℤ) * y) key3
-    try simp only at this
     rw [← mul_assoc, ← monoHol_add, show (φ.natDegree : ℤ) + -(φ.natDegree : ℤ) = 0 by ring,
       monoHol_zero, one_mul] at this
     rw [this]; ring

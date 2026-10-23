@@ -1,10 +1,8 @@
 module
 
-public import AnalyticTheory.TheoremVI
 public import AnalyticTheory.Sec3VII
+public import AnalyticTheory.TheoremVI
 public import ForMathlib.Algebra.Polynomial.LaurentRoots
-public import ForMathlib.NumberTheory.LambertSeries
-public import ForMathlib.RingTheory.PowerSeries.TsumEval
 
 /-!
 # Buzzard's identity for the Tate curve

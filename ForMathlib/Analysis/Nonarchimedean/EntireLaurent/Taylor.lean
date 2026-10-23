@@ -1,11 +1,11 @@
 module
 
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 public import Mathlib.Analysis.Normed.Ring.Ultra
 public import Mathlib.Analysis.SpecificLimits.Normed
 public import Mathlib.Algebra.Order.Star.Real
 public import Mathlib.Topology.Algebra.Module.FiniteDimension
 public import Mathlib.Topology.UniformSpace.Uniformizable
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 
 /-!
 # Taylor expansion of holomorphic functions at a point of `Ω^×`

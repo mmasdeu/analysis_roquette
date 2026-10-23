@@ -491,7 +491,6 @@ theorem Rq_ne_zero (n : ℤ) : Rq hq0 hq1 n ≠ 0 := by
 theorem anVal_R0_one :
     anVal K 1 (algebraMap (holSubring K) (MeroRing K) (Rq hq0 hq1 0)) = 0 := by
   have h := congrArg (fun y => anVal K 1 (algebraMap (holSubring K) (MeroRing K) y)) (Rq_spec hq0 hq1 0)
-  try simp only at h
   rw [map_mul, (anVal_isValuation K 1 one_ne_zero).2.2.1, anVal_Th_one hq0 hq1] at h
   have hl : anVal K 1 (algebraMap (holSubring K) (MeroRing K) (linF (q := q) 0)) = 1 := by
     have e : linF (q := q) 0 = polyHol K (Omega K) (minpoly K (1 : Omega K)) := by

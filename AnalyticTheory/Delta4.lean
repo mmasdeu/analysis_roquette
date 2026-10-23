@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Delta3
+public import Mathlib
 public import ForMathlib.Analysis.SpecificLimits.EulerProduct
 
 /-!

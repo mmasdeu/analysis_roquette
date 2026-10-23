@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Sec5Brauer
+public import AnalyticTheory.Sec5
 
 /-!
 # §4: Theorem X (minimal splitting field) — preparations
@@ -18,9 +18,9 @@ theorem SplitsOver.of_algEquiv {K E E' L : Type u} [Field K] [Field E] [Field E'
     [Algebra K E] [Algebra K E'] [Algebra K L] (e : E ≃ₐ[K] E') (h : SplitsOver K E L) :
     SplitsOver K E' L := by
   obtain ⟨EL, fEL, aE, aL, aK, tE, tL, hconst, hdeg⟩ := h
-  letI : Algebra E' EL := RingHom.toAlgebra ((algebraMap E EL).comp e.symm.toRingEquiv.toRingHom)
+  let : Algebra E' EL := RingHom.toAlgebra ((algebraMap E EL).comp e.symm.toRingEquiv.toRingHom)
   have hcomm : ∀ x : E', algebraMap E' EL x = algebraMap E EL (e.symm x) := fun x => rfl
-  haveI : IsScalarTower K E' EL := IsScalarTower.of_algebraMap_eq fun c => by
+  have : IsScalarTower K E' EL := IsScalarTower.of_algebraMap_eq fun c => by
     rw [hcomm, IsScalarTower.algebraMap_apply K E EL]
     congr 1
     exact (e.symm.commutes c).symm
@@ -43,6 +43,7 @@ variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [Complet
 variable [NormedAlgebra K K'] [NormedAlgebra K' L] [NormedAlgebra K L] [IsScalarTower K K' L]
 variable [FiniteDimensional K K'] [IsGalois K K'] [FiniteDimensional K L] [IsGalois K L]
 
+omit [IsScalarTower K K' L] in
 theorem holGal_holExt (σ : L ≃ₐ[K] L) (τ : K' ≃ₐ[K] K')
     (h : ∀ c : K', σ (algebraMap K' L c) = algebraMap K' L (τ c)) (g : holSubring K') :
     holGal σ (holExt (L := L) g) = holExt (holGal τ g) := by
@@ -81,6 +82,7 @@ instance kchiGalois : IsGalois K (Kchi K L χ) :=
 noncomputable def resK : (L ≃ₐ[K] L) →* (Kchi K L χ ≃ₐ[K] Kchi K L χ) :=
   AlgEquiv.restrictNormalHom (Kchi K L χ)
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] in
 theorem resK_commutes (σ : L ≃ₐ[K] L) (c : Kchi K L χ) :
     algebraMap (Kchi K L χ) L (resK χ σ c) = σ (algebraMap (Kchi K L χ) L c) :=
   AlgEquiv.restrictNormal_commutes σ (Kchi K L χ) c
@@ -105,6 +107,7 @@ theorem mem_ker_iff_resK (g : L ≃ₐ[K] L) : g ∈ MonoidHom.ker χ ↔ resK �
     rw [this] at hfix
     exact hfix
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] in
 theorem resK_surjective : Function.Surjective (resK χ) :=
   AlgEquiv.restrictNormalHom_surjective (F := K) (K₁ := Kchi K L χ) L
 
@@ -128,9 +131,11 @@ theorem orderOf_resK (σ : L ≃ₐ[K] L) : orderOf (resK χ σ) = orderOf (χ �
   intro m
   rw [← map_pow, ← map_pow, ← mem_ker_iff_resK χ, MonoidHom.mem_ker]
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] in
 theorem resHom_eq_resK (g : L ≃ₐ[K] L) :
     resHom K (Kchi K L χ) K L g = resK χ g := rfl
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem expq_algebraMap (q : K) (a : Kchi K L χ) :
     expq K L q (algebraMap (Kchi K L χ) L a) = expq K (Kchi K L χ) q a := by
   unfold expq

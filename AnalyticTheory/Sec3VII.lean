@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Sec3
+public import AnalyticTheory.Weierstrass
 public import ForMathlib.RingTheory.PowerSeries.TsumEval
 
 /-!
@@ -32,6 +32,7 @@ theorem norm_term_le (n : ℤ) (k : ℕ) : ‖(n : K) * q ^ k‖ ≤ ‖q‖ ^ k
     _ = _ := one_mul _
 
 include hq in
+omit [CompleteSpace K] in
 theorem summable_norm_eval (f : PowerSeries ℤ) :
     Summable (fun k : ℕ => ‖((coeff k f : ℤ) : K) * q ^ k‖) :=
   Summable.of_nonneg_of_le (fun _ => norm_nonneg _) (fun k => norm_term_le _ k)

@@ -1,5 +1,6 @@
 module
 
+public import AnalyticTheory.A1Normal
 public import AnalyticTheory.A1Transfer
 
 /-!

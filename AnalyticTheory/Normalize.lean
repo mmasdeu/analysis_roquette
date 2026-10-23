@@ -1,7 +1,8 @@
 module
 
 public import AnalyticTheory.Rationality
-public import AnalyticTheory.Analytic
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.PolyHol
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.ZerosFinite
 
 /-!
 # Normalized analytic valuations

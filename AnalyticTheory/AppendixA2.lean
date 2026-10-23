@@ -1,6 +1,5 @@
 module
 
-public import AnalyticTheory.Structure
 public import AnalyticTheory.AppendixA1
 
 /-!

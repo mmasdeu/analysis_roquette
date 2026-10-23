@@ -1,6 +1,5 @@
 module
 
-public import AnalyticTheory.Basic
 public import AnalyticTheory.EllipticBasics
 
 /-!

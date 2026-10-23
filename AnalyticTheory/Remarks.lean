@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.SemiPeriodic
+public import AnalyticTheory.Analytic
 
 /-!
 # Additional remarks of §2 (extension of the field of constants)

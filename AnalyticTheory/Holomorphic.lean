@@ -1,7 +1,7 @@
 module
 
 public import AnalyticTheory.Basic
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Ring
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Ring -- shake: keep (the `export` list below)
 
 /-!
 # Holomorphic functions over a local field (book, §2)

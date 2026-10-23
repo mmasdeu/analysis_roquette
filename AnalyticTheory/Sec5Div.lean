@@ -121,17 +121,17 @@ theorem trace_eq {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L T.gen σ'
     (map_ne_zero_iff _ (algebraMap K L).injective).mpr (norm_pos_iff.mp hq0)
   by_cases hβ : β = 0
   · subst hβ
-    rw [classDiv, if_neg (not_isSemiConj_zero q hq0 hq1 T hσ' hα)]
+    rw [classDiv, ite_eq_right (not_isSemiConj_zero q hq0 hq1 T hσ' hα)]
     refine Finset.sum_eq_zero fun i _ => ?_
     simp [pointDivisor, not_conjModQ_zero hq0' (primeAtK_ne_of_ne q hq0 hq1 T hα hσ' i)]
   unfold pointDivisor classDiv
   by_cases hs : IsSemiConj K L T α β
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     obtain ⟨i0, hi0, hc⟩ := exists_orbit_of_isSemiConj q hq0 hq1 T hσ' hα hβ hs
     rw [Finset.sum_eq_single i0]
-    · rw [if_pos hc]
+    · rw [ite_eq_left hc]
     · intro j hj hne
-      rw [if_neg]
+      rw [ite_eq_right]
       intro hcj
       have hfi := primeAtK_ne_of_ne q hq0 hq1 T hα hσ' i0
       have hfj := primeAtK_ne_of_ne q hq0 hq1 T hα hσ' j
@@ -146,9 +146,9 @@ theorem trace_eq {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L T.gen σ'
       have hn := orderOf_gen q T
       exact hne (pow_injOn_Iio_orderOf (by rw [hn]; exact hjn) (by rw [hn]; exact hi0) e4.symm)
     · intro h; exact absurd (Finset.mem_range.mpr hi0) h
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     refine Finset.sum_eq_zero fun i hi => ?_
-    rw [if_neg]
+    rw [ite_eq_right]
     intro hc
     obtain ⟨γ, hγ, k, hk⟩ := hc
     exact hs (isSemiConj_of_pow q (norm_pos_iff.mp hq0) T hσ' i k hγ hk)
@@ -181,8 +181,8 @@ theorem classDiv_semiPerm {α : Omega L} (hα : α ≠ 0) {σ' : Omega L ≃+* O
       refine forall_congr' fun x => ?_
       rw [anVal_semiPerm q hq0 hq1 T hσ' x hδ]
     by_cases h : IsSemiConj K L T α δ
-    · rw [if_pos (key.mpr h), if_pos h]
-    · rw [if_neg (fun h' => h (key.mp h')), if_neg h]
+    · rw [ite_eq_left (key.mpr h), ite_eq_left h]
+    · rw [ite_eq_right (fun h' => h (key.mp h')), ite_eq_right h]
 
 include hq0 hq1 in
 theorem classDiv_mem {α : Omega L} (hα : α ≠ 0) :
@@ -207,7 +207,7 @@ theorem pointDivisor_orbit {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L
       have := primeAtK_ne_of_ne q hq0 hq1 T hne hσ' i
       rw [hy] at this
       exact this rfl
-    rw [h0, if_neg (not_conjModQ_zero hq0' ha), if_neg (not_conjModQ_zero hq0' hfa)]
+    rw [h0, ite_eq_right (not_conjModQ_zero hq0' ha), ite_eq_right (not_conjModQ_zero hq0' hfa)]
   · have hyne : (((semiPerm K L T σ')⁻¹) ^ i) β ≠ 0 := by
       intro h0
       rw [h0, semiPerm_pow_apply q T hσ' i, map_zero, mul_zero] at hy
@@ -215,8 +215,8 @@ theorem pointDivisor_orbit {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L
     have := conjModQ_iff_orbit q hq0 hq1 T hσ' hi ha hyne
     rw [hy] at this
     by_cases h : ConjModQ L (algebraMap K L q) a ((((semiPerm K L T σ')⁻¹) ^ i) β)
-    · rw [if_pos h, if_pos (this.mp h)]
-    · rw [if_neg h, if_neg (fun h' => h (this.mpr h'))]
+    · rw [ite_eq_left h, ite_eq_left (this.mp h)]
+    · rw [ite_eq_right h, ite_eq_right (fun h' => h (this.mpr h'))]
 
 section iso
 
@@ -308,8 +308,8 @@ theorem divMap_apply (D : FFDivisor K (FKQ K L q T)) (P : PrimeDivisor K (FKQ K 
       · rintro rfl x
         exact hring x
     by_cases h : P' = P
-    · subst h; rw [if_pos (key.mpr rfl)]; simp
-    · rw [if_neg (fun h' => h (key.mp h'))]; simp [Finsupp.single_apply, h]
+    · subst h; rw [ite_eq_left (key.mpr rfl)]; simp
+    · rw [ite_eq_right (fun h' => h (key.mp h'))]; simp [h]
 
 include hq0 hq1 in
 theorem semiPeriodic_isSemiConj {m : Omega L → ℤ} (hm : m ∈ SemiPeriodicDivisors K L q T)
@@ -515,8 +515,8 @@ theorem thmXIV_divisors (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
     unfold classDiv
     by_cases hβ : β = 0
     · subst hβ
-      rw [if_neg (not_isSemiConj_zero q hq0 hq1 T (exists_isExtension T.gen).choose_spec
-        (alphaOf_ne hq0 hq1 P)), if_neg (not_isSemiConj_zero q hq0 hq1 T
+      rw [ite_eq_right (not_isSemiConj_zero q hq0 hq1 T (exists_isExtension T.gen).choose_spec
+        (alphaOf_ne hq0 hq1 P)), ite_eq_right (not_isSemiConj_zero q hq0 hq1 T
           (exists_isExtension T.gen).choose_spec hα)]
     · have h1 := isSemiConj_alphaOf_iff hq0 hq1 P hβ
       have h2 := thmXIII_c q hq0 hq1 T hα hβ
@@ -525,8 +525,8 @@ theorem thmXIV_divisors (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
         refine forall_congr' fun x => ?_
         rw [hring x]
       by_cases h : IsSemiConj K L T α β
-      · rw [if_pos (key.mpr h), if_pos h]
-      · rw [if_neg (fun h' => h (key.mp h')), if_neg h]
+      · rw [ite_eq_left (key.mpr h), ite_eq_left h]
+      · rw [ite_eq_right (fun h' => h (key.mp h')), ite_eq_right h]
   · intro m hm
     obtain ⟨D, hD⟩ := divMap_surjective hq0 hq1 ⟨m, hm⟩
     have hDm : divMap hq0 hq1 D = m := congrArg Subtype.val hD

@@ -1,7 +1,6 @@
 module
 
-public import AnalyticTheory.EllipticSeparable
-public import AnalyticTheory.FFFinite
+public import AnalyticTheory.IsogenyXVII
 
 /-!
 # The inseparable part of Theorem XVIII

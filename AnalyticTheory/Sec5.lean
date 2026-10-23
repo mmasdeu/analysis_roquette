@@ -1,9 +1,9 @@
 module
 
-public import AnalyticTheory.Sec4
 public import AnalyticTheory.GaloisPrimes
-public import AnalyticTheory.ZpowAux
 public import AnalyticTheory.ResidueMaps
+public import AnalyticTheory.Sec4
+public import AnalyticTheory.ZpowAux
 
 /-!
 # §5: semi-periodic function fields
@@ -100,7 +100,7 @@ theorem expq_eq_of_norm {a b : L} (ha : a ≠ 0) (hb : b ≠ 0) (k : ℤ)
 include hq0 hq1 in
 theorem primeAtK_eq_iff {α β : Omega L} (hα : α ≠ 0) (hβ : β ≠ 0) :
     primeAtK q hq0 hq1 hα = primeAtK q hq0 hq1 hβ ↔ ConjModQ L (algebraMap K L q) α β := by
-  haveI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  have : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
   rw [← primeAt_eq_iff (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1) hα hβ]
   constructor
   · intro h
@@ -174,7 +174,7 @@ include hq0 hq1 in
 /-- Every prime divisor of `F_L(q) | K` is some `𝔮_α`. -/
 theorem primeDivisor_eq_primeAtK (Q' : PrimeDivisor K (FqSub L (algebraMap K L q))) :
     ∃ (α : Omega L) (hα : α ≠ 0), Q' = primeAtK q hq0 hq1 hα := by
-  haveI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  have : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
   obtain ⟨α, hα, h⟩ := primeDivisor_classify (norm_alg_pos (L := L) q hq0)
     (norm_alg_lt (L := L) q hq1) (Q'.toL (L := L))
   refine ⟨α, hα, ?_⟩
@@ -561,7 +561,7 @@ theorem corXIIIa_index (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
       exact minpoly.natDegree_eq_one_iff.mpr ⟨1, map_one _⟩
     rw [IntermediateField.adjoin.finrank (Algebra.IsIntegral.isIntegral (1 : Omega L)), hdeg,
       mul_one] at hP
-    simp [FFDivisor.deg, FFDivisor.degHom, Finsupp.liftAddHom_apply_single, hP]
+    simp [FFDivisor.deg, FFDivisor.degHom, hP]
   · rintro d ⟨hd, D, rfl⟩
     have hdvd : ((Module.finrank K L : ℕ) : ℤ) ∣ D.deg := by
       unfold FFDivisor.deg FFDivisor.degHom
@@ -616,7 +616,7 @@ theorem corXIIIb_minimal (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   have := FKQ_tower q T
   have := FKQ_finiteDimensional q hq0 hq1 T
   have := FKQ_isSeparable q hq0 hq1 T
-  haveI : Algebra.IsAlgebraic (FKQ K L q T) EL := isAlgebraic_of_isConstantExtension hconst
+  have : Algebra.IsAlgebraic (FKQ K L q T) EL := isAlgebraic_of_isConstantExtension hconst
   let Q' : PrimeDivisor K EL := P'.ofL (K := K)
   obtain ⟨α, hα, hαP⟩ := core_surj q hq0 hq1 (FKQ K L q T) (Q'.restrict (E := FKQ K L q T))
   have hdeg : (Q'.restrict (E := FKQ K L q T)).degree = (primeAtK q hq0 hq1 hα).degree := by
@@ -629,10 +629,10 @@ theorem corXIIIb_minimal (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   let Q : PrimeDivisor K (FqSub L (algebraMap K L q)) := primeAtK q hq0 hq1 hα
   let πα : PrimeDivisor L (FqSub L (algebraMap K L q)) :=
     primeAt (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1) hα
-  letI : Algebra K (IsLocalRing.ResidueField Q.ring) := resAlg Q
-  letI : Algebra L (IsLocalRing.ResidueField Q.ring) :=
+  let : Algebra K (IsLocalRing.ResidueField Q.ring) := resAlg Q
+  let : Algebra L (IsLocalRing.ResidueField Q.ring) :=
     ((IsLocalRing.residue Q.ring).comp πα.toRing).toAlgebra
-  haveI : IsScalarTower K L (IsLocalRing.ResidueField Q.ring) :=
+  have : IsScalarTower K L (IsLocalRing.ResidueField Q.ring) :=
     IsScalarTower.of_algebraMap_eq fun c => by
       show IsLocalRing.residue Q.ring (Q.toRing c) =
         IsLocalRing.residue Q.ring (πα.toRing (algebraMap K L c))
@@ -640,9 +640,9 @@ theorem corXIIIb_minimal (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
   let lam : L →ₐ[K] IsLocalRing.ResidueField Q.ring :=
     IsScalarTower.toAlgHom K L (IsLocalRing.ResidueField Q.ring)
   -- the homomorphism `κ(Q') → L'`
-  letI : Algebra K (IsLocalRing.ResidueField Q'.ring) := resAlg Q'
-  letI : Algebra L' (IsLocalRing.ResidueField Q'.ring) := resAlg P'
-  haveI : IsScalarTower K L' (IsLocalRing.ResidueField Q'.ring) :=
+  let : Algebra K (IsLocalRing.ResidueField Q'.ring) := resAlg Q'
+  let : Algebra L' (IsLocalRing.ResidueField Q'.ring) := resAlg P'
+  have : IsScalarTower K L' (IsLocalRing.ResidueField Q'.ring) :=
     IsScalarTower.of_algebraMap_eq fun c => by
       show IsLocalRing.residue Q'.ring (Q'.toRing c) =
         IsLocalRing.residue P'.ring (P'.toRing (algebraMap K L' c))

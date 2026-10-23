@@ -1,7 +1,8 @@
 module
 
-public import AnalyticTheory.RelationCoeffs
 public import Mathlib.NumberTheory.TsumDivisorsAntidiagonal
+public import AnalyticTheory.Weierstrass
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Taylor
 public import ForMathlib.NumberTheory.LambertSeries
 public import ForMathlib.Topology.Algebra.InfiniteSum.NonarchimedeanProd
 
@@ -382,6 +383,7 @@ noncomputable def piC (q : K) (k : ℕ) : K :=
     (-((((m + 1).choose 2 : ℕ) : K) * Qn q m)) * (binomZ (-(m : ℤ)) k : K))
 
 include hq1 in
+omit [CompleteSpace K] in
 theorem norm_mQn (m : ℕ) : ‖(m : K) * Qn q m‖ ≤ ‖q‖ ^ m := by
   rw [norm_mul]
   calc ‖(m : K)‖ * ‖Qn q m‖ ≤ 1 * ‖q‖ ^ m :=
@@ -389,6 +391,7 @@ theorem norm_mQn (m : ℕ) : ‖(m : K) * Qn q m‖ ≤ ‖q‖ ^ m := by
     _ = _ := one_mul _
 
 include hq1 in
+omit [CompleteSpace K] in
 theorem norm_cQn (c : ℕ) (m : ℕ) : ‖(c : K) * Qn q m‖ ≤ ‖q‖ ^ m := by
   rw [norm_mul]
   calc ‖(c : K)‖ * ‖Qn q m‖ ≤ 1 * ‖q‖ ^ m :=

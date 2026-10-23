@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Basic
+public import AnalyticTheory.FunctionField
 
 /-!
 # Constant extensions as tensor products (abstract form)

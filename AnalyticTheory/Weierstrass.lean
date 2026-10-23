@@ -1,7 +1,6 @@
 module
 
-public import AnalyticTheory.Structure
-public import AnalyticTheory.AppendixA1
+public import AnalyticTheory.Analytic
 
 /-!
 # The Weierstraß function and the absolute invariant (book, §3)

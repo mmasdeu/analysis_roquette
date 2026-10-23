@@ -47,8 +47,7 @@ theorem split_of_extension (m : ℕ) (θ : E ⊗[k] A ≃ₐ[E] Matrix (Fin m) (
   have hsurj : Function.Surjective Θ := by
     have hsub : ∀ y : E ⊗[k] A, ιk.mapMatrix (θ y) ∈ Θ.range := by
       intro y
-      induction y using TensorProduct.induction_on with
-      | zero => simp
+      induction y using TensorProduct.inductionOn with
       | tmul e a =>
         have : (e ⊗ₜ[k] a : E ⊗[k] A) = e • (1 ⊗ₜ[k] a) := by
           rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
@@ -115,8 +114,7 @@ theorem split_tensor_tower (m : ℕ) (θ : F ⊗[k] A ≃ₐ[F] Matrix (Fin m) (
   have hsurj : Function.Surjective Θ := by
     have hsub : ∀ y : F ⊗[k] A, θ y ∈ Θ.range := by
       intro y
-      induction y using TensorProduct.induction_on with
-      | zero => simp
+      induction y using TensorProduct.inductionOn with
       | tmul c a =>
         have : (c ⊗ₜ[k] a : F ⊗[k] A) = c • (1 ⊗ₜ[k] a) := by
           rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]

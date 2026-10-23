@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Relation
+public import AnalyticTheory.WpConstruct
 
 /-!
 # The coefficients of the cubic relation

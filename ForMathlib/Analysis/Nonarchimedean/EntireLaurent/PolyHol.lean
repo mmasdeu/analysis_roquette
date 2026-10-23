@@ -1,8 +1,8 @@
 module
 
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.FrechetLaurent
 public import Mathlib.Algebra.Lie.OfAssociative
 public import Mathlib.Analysis.Normed.Operator.Basic
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.FrechetLaurent
 
 /-!
 # Polynomials in `H_K` and division by the minimal polynomial
@@ -25,11 +25,13 @@ variable (K : Type u) [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 variable {L : Type*} [NormedField L] [NormedAlgebra K L] [IsUltrametricDist L]
   [Algebra.IsIntegral K L] [IsAlgClosed L]
 
+omit [IsAlgClosed L] in
 theorem monoHol_add (n m : ℤ) : monoHol K L (n + m) = monoHol K L n * monoHol K L m :=
   Subtype.ext (funext fun x => by
     show (monoHol K L (n + m)).1 x = (monoHol K L n).1 x * (monoHol K L m).1 x
     rw [monoHol_apply, monoHol_apply, monoHol_apply, zpow_add₀ x.2])
 
+omit [IsAlgClosed L] in
 theorem monoHol_zero : monoHol K L 0 = 1 :=
   Subtype.ext (funext fun x => by
     show (monoHol K L 0).1 x = 1
@@ -59,6 +61,7 @@ variable (L) in
 /-- Polynomials as elements of `H_K`. -/
 noncomputable def polyHol : K[X] →ₐ[K] holSubring K L := Polynomial.aeval (monoHol K L 1)
 
+omit [IsAlgClosed L] in
 theorem polyHol_apply (P : K[X]) (x : Punct L) :
     (polyHol K L P).1 x = (P.map (algebraMap K L)).eval x.1 := by
   induction P using Polynomial.induction_on' with
@@ -402,7 +405,7 @@ theorem hol_phi_division {α : L} (hα : α ≠ 0) (f : holSubring K L) :
         ((polyHol K L (∑ i : Fin N, Polynomial.C (s i) * X ^ (i : ℕ))).1 x) := by
       have hpS : (polyHol K L (∑ i : Fin N, Polynomial.C (s i) * X ^ (i : ℕ))).1 x =
           ∑ i : Fin N, algebraMap K L (s i) * x.1 ^ (i : ℕ) := by
-        rw [polyHol_apply]; simp [Polynomial.eval_finsetSum]
+        rw [polyHol_apply]; simp []
       rw [hpS]
       have := hasSum_sum (s := (Finset.univ : Finset (Fin N))) (fun (i : Fin N) _ =>
         (((hs i).map (algebraMap K L : K →+* L)

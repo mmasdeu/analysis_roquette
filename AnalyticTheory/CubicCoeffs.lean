@@ -1,6 +1,8 @@
 module
 
+public import AnalyticTheory.Generation
 public import AnalyticTheory.QSeries
+public import AnalyticTheory.RelationCoeffs
 
 /-!
 # The coefficients of the cubic relation

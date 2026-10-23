@@ -1,7 +1,7 @@
 module
 
-public import AnalyticTheory.FqStructure
 public import AnalyticTheory.EllipticBasics
+public import AnalyticTheory.FqGenus
 
 /-!
 # Orders of `F_K(q)` at the prime divisors, in terms of the analytic valuations

@@ -32,8 +32,8 @@ theorem exists_poleOrd_two (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) :
   push Not at hne
   have h2 := finrank_Ln_nat hE h 2 (by norm_num)
   have h1 := finrank_Ln_nat hE h 1 le_rfl
-  haveI := finiteDimensional_Ln hE h ((2 : ℕ) : ℤ)
-  haveI := finiteDimensional_Ln hE h ((1 : ℕ) : ℤ)
+  have := finiteDimensional_Ln hE h ((2 : ℕ) : ℤ)
+  have := finiteDimensional_Ln hE h ((1 : ℕ) : ℤ)
   have hle : Ln 𝔭 (2 : ℕ) ≤ Ln 𝔭 (1 : ℕ) := by
     intro x hx
     by_contra hx1
@@ -47,8 +47,8 @@ theorem exists_poleOrd_three (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) :
   push Not at hne
   have h2 := finrank_Ln_nat hE h 3 (by norm_num)
   have h1 := finrank_Ln_nat hE h 2 (by norm_num)
-  haveI := finiteDimensional_Ln hE h ((3 : ℕ) : ℤ)
-  haveI := finiteDimensional_Ln hE h ((2 : ℕ) : ℤ)
+  have := finiteDimensional_Ln hE h ((3 : ℕ) : ℤ)
+  have := finiteDimensional_Ln hE h ((2 : ℕ) : ℤ)
   have hle : Ln 𝔭 (3 : ℕ) ≤ Ln 𝔭 (2 : ℕ) := by
     intro x hx
     by_contra hx1

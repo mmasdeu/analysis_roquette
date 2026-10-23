@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.FFUnramified
+public import AnalyticTheory.FFNorm
 
 /-!
 # The fundamental identity for function fields

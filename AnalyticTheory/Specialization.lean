@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.BaseChangeSplit
+public import Mathlib
 public import AnalyticTheory.CyclicSplit
 
 /-!
@@ -27,9 +27,9 @@ variable (B : Type u) [Ring B] [Algebra L B]
 theorem injective_of_split {m : ℕ} (hm : 0 < m) (θ : F ⊗[L] B ≃ₐ[F] Matrix (Fin m) (Fin m) F)
     {R : Type*} [Ring R] [Nontrivial R] (ρ : B →+* R) : Function.Injective ρ := by
   classical
-  haveI : Nonempty (Fin m) := ⟨⟨0, hm⟩⟩
-  haveI : IsSimpleRing (Matrix (Fin m) (Fin m) F) := inferInstance
-  haveI : IsSimpleRing (F ⊗[L] B) := IsSimpleRing.of_ringEquiv θ.toRingEquiv.symm inferInstance
+  have : Nonempty (Fin m) := ⟨⟨0, hm⟩⟩
+  have : IsSimpleRing (Matrix (Fin m) (Fin m) F) := inferInstance
+  have : IsSimpleRing (F ⊗[L] B) := IsSimpleRing.of_ringEquiv θ.toRingEquiv.symm inferInstance
   rw [injective_iff_map_eq_zero]
   intro b hb
   by_contra hb0
@@ -52,11 +52,9 @@ theorem injective_of_split {m : ℕ} (hm : 0 < m) (θ : F ⊗[L] B ≃ₐ[F] Mat
   have h1b : (1 : F) ⊗ₜ[L] b ∈ 𝔍 := by
     rw [TwoSidedIdeal.mem_mk']
     intro u v
-    induction u using TensorProduct.induction_on with
-    | zero => simp
+    induction u using TensorProduct.inductionOn with
     | tmul f β =>
-      induction v using TensorProduct.induction_on with
-      | zero => simp
+      induction v using TensorProduct.inductionOn with
       | tmul f' γ =>
         rw [Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, hΦ]
         simp [Algebra.smul_def, hb]
@@ -137,8 +135,8 @@ theorem exists_stable_lattice {m : ℕ} (θ : F ⊗[L] B ≃ₐ[F] Matrix (Fin m
     refine N.sum_mem fun s _ => ?_
     rw [hLsmul]
     exact N.smul_mem _ (Submodule.subset_span ⟨(s, j), rfl⟩)
-  haveI : Module.Finite O N := Module.Finite.span_of_finite O (Set.finite_range gens)
-  haveI : Module.Free O N := inferInstance
+  have : Module.Finite O N := Module.Finite.span_of_finite O (Set.finite_range gens)
+  have : Module.Free O N := inferInstance
   let f := Module.Free.chooseBasis O N
   have hfO : LinearIndependent O (fun i => ((f i : N) : V)) :=
     f.linearIndependent.map' N.subtype (Submodule.ker_subtype N)
@@ -187,7 +185,7 @@ theorem exists_stable_lattice {m : ℕ} (θ : F ⊗[L] B ≃ₐ[F] Matrix (Fin m
     ext i' j
     have := congrFun (hcolsum j) i'
     simp only [Matrix.mul_apply, hg, Matrix.of_apply, C]
-    simp only [Matrix.mulVec, dotProduct, Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at this
+    simp only [Matrix.mulVec, dotProduct] at this
     rw [this, Finset.sum_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Pi.smul_apply, smul_eq_mul, mul_comm]
@@ -215,7 +213,7 @@ theorem split_of_specialization {m : ℕ} (hm : 0 < m)
     (hev : ∀ l : L, ev ⟨algebraMap L F l, hLO l⟩ = l) :
     Nonempty (B ≃ₐ[L] Matrix (Fin m) (Fin m) L) := by
   classical
-  haveI : Nonempty (Fin m) := ⟨⟨0, hm⟩⟩
+  have : Nonempty (Fin m) := ⟨⟨0, hm⟩⟩
   obtain ⟨g, hg⟩ := exists_stable_lattice O B θ hLO
   let ρ0 : B →ₐ[L] Matrix (Fin m) (Fin m) F :=
     (θ.toAlgHom.restrictScalars L).comp Algebra.TensorProduct.includeRight

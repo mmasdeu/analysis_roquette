@@ -1,6 +1,8 @@
 module
 
-public import AnalyticTheory.ConstSplit
+public import AnalyticTheory.ConstGalois
+public import AnalyticTheory.ConstSubfield
+public import AnalyticTheory.EllipticSplit
 
 /-!
 # Descent from a constant field extension

@@ -81,7 +81,7 @@ theorem exists_inner_of_semilinear (σ : F ≃+* F) (φ : Matrix n n F ≃+* Mat
   -- some `U z` is nonzero
   obtain ⟨z, hz⟩ : ∃ z, U z ≠ 0 := by
     by_contra hall
-    push_neg at hall
+    push Not at hall
     have h1 : ∀ z, φ (Matrix.single i0 i0 (1 : F)) * z * Matrix.single i0 i0 1 = 0 := by
       intro z
       have := hall z
@@ -90,7 +90,7 @@ theorem exists_inner_of_semilinear (σ : F ≃+* F) (φ : Matrix n n F ≃+* Mat
         rw [Finset.sum_eq_single i0]
         · rw [mul_assoc (φ _ * z), single_mul_single_eq]; simp
         · intro i _ hi
-          rw [mul_assoc (φ _ * z), single_mul_single_eq, if_neg hi]; simp
+          rw [mul_assoc (φ _ * z), single_mul_single_eq, ite_eq_right hi]; simp
         · intro h; exact absurd (Finset.mem_univ i0) h
       rw [← h2, this, zero_mul]
     have h3 : φ (Matrix.single i0 i0 (1 : F)) = 0 := by
@@ -106,7 +106,7 @@ theorem exists_inner_of_semilinear (σ : F ≃+* F) (φ : Matrix n n F ≃+* Mat
     intro w hw
     by_contra hw0
     obtain ⟨k, hk⟩ : ∃ k, w k ≠ 0 := by
-      by_contra h; push_neg at h; exact hw0 (funext h)
+      by_contra h; push Not at h; exact hw0 (funext h)
     have hall : ∀ y, (U z).mulVec y = 0 := by
       intro y
       set a' : Matrix n n F := Matrix.vecMulVec y (Pi.single k (w k)⁻¹) with ha'

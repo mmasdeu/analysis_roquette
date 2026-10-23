@@ -1,12 +1,12 @@
 module
 
-public import AnalyticTheory.Delta7
-public import AnalyticTheory.A1Invariance
 public import AnalyticTheory.A1Determine
+public import AnalyticTheory.A1Invariance
+public import AnalyticTheory.Delta7
 public import AnalyticTheory.FqHomogeneous
 public import AnalyticTheory.FqOrd
-public import ForMathlib.Analysis.Normed.Field.SqrtOneAddFour
 public import AnalyticTheory.FqStructure
+public import ForMathlib.Analysis.Normed.Field.SqrtOneAddFour
 
 /-!
 # §3: Theorems VIII and VIIIa
@@ -81,6 +81,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem wDisc_wp (B C : K) : wDisc (1 : K) 0 0 B C = deltaPoly K B C := by
   unfold wDisc wB2 wB4 wB6 wB8 deltaPoly; ring
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem jOfData_wp (_hq1 : ‖q‖ < 1) :
     jOfData (1 : K) 0 0 (coeffB K q) (coeffC K q) = jInvQ K q := by
   rw [jOfData, jInvQ, wDisc_wp]
@@ -91,6 +92,7 @@ theorem jOfData_wp (_hq1 : ‖q‖ < 1) :
 omit [CompleteSpace K] in
 theorem natCast_norm_le (n : ℕ) : ‖(n : K)‖ ≤ 1 := IsUltrametricDist.norm_natCast_le_one K n
 
+omit [CompleteSpace K] in
 theorem norm_four_mul_lt {s : K} (hs : ‖s‖ < 1) : ‖(4 : K) * s‖ < 1 := by
   have h4 : ‖(4 : K)‖ ≤ 1 := by simpa using natCast_norm_le (K := K) 4
   rw [norm_mul]

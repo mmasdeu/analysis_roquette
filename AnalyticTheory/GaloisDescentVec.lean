@@ -37,7 +37,7 @@ theorem span_fixed_eq_top (σ : F ≃ₐ[E] F) (hfin : IsOfFinOrder σ) (T : V �
   by_contra hne
   set W := Submodule.span F {x : V | T x = x} with hW
   obtain ⟨x0, hx0⟩ : ∃ x, x ∉ W := by
-    by_contra h; push_neg at h; exact hne (eq_top_iff.mpr fun x _ => h x)
+    by_contra h; push Not at h; exact hne (eq_top_iff.mpr fun x _ => h x)
   obtain ⟨ℓ, hℓx, hℓW⟩ := Submodule.exists_dual_map_eq_bot_of_notMem hx0 inferInstance
   have hℓ : ∀ y ∈ W, ℓ y = 0 := fun y hy => by
     have h : ℓ y ∈ Submodule.map ℓ W := Submodule.mem_map_of_mem hy
@@ -73,7 +73,7 @@ theorem span_fixed_eq_top (σ : F ≃ₐ[E] F) (hfin : IsOfFinOrder σ) (T : V �
     rw [Finset.sum_range] at this
     simp only [semilinear_iterate σ T, map_sum, map_smul, smul_eq_mul] at this
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.zero_apply, AlgHom.toLinearMap_apply,
-      AlgEquiv.coe_algHom, smul_eq_mul]
+      AlgEquiv.coe_toAlgHom, smul_eq_mul]
     rw [← this]
     refine Finset.sum_congr rfl fun i _ => ?_
     ring

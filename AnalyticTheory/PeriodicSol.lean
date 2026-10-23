@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.ThetaDiv
+public import AnalyticTheory.ThetaOrder
 
 /-!
 # Holomorphic solutions of `G(q⁻¹X) = κ X^d G(X)`
@@ -130,7 +130,7 @@ theorem solSpace_eq_bot_of_neg {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {
     have h1 : ∀ j : ℕ, ‖q‖ ^ (-(n0 + (j : ℤ) * e)) = ‖q‖ ^ (-n0) * ((‖q‖⁻¹) ^ e) ^ j := by
       intro j
       rw [← zpow_natCast, ← zpow_natCast, inv_zpow', ← zpow_mul, ← zpow_add₀ hq0.ne']
-      congr 1; push_cast; ring
+      congr 1; ring
     simp_rw [h1]
     exact Tendsto.const_mul_atTop (zpow_pos hq0 _)
       (tendsto_pow_atTop_atTop_of_one_lt (one_lt_pow₀ hbase hepos.ne'))

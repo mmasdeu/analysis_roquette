@@ -1,7 +1,6 @@
 module
 
-public import AnalyticTheory.FqDescent
-public import AnalyticTheory.Sec3VIII
+public import AnalyticTheory.ConormDescent
 public import AnalyticTheory.GenusDescent
 
 /-!
@@ -76,29 +75,28 @@ theorem degree_restrict_pos {K E F : Type u} [Field K] [Field E] [Field F] [Alge
 
 include hq0 hq1 in
 theorem Ezeta_isFunctionField : IsFunctionFieldOver K (Ezeta q ζ) := by
-  letI := fqKAlgebra (L := L) q
-  haveI := fqK_tower_L (L := L) q
-  haveI := fqK_tower_E q ζ
-  letI := twistAction q hq0 ζ
-  haveI : FiniteDimensional (Ezeta q ζ) (FqSub L (algebraMap K L q)) :=
+  let := fqKAlgebra (L := L) q
+  have := fqK_tower_L (L := L) q
+  have := fqK_tower_E q ζ
+  let := twistAction q hq0 ζ
+  have : FiniteDimensional (Ezeta q ζ) (FqSub L (algebraMap K L q)) :=
     Ezeta_finiteDimensional q hq0 ζ
   refine isFunctionFieldOver_of_descent (K := K) (L := L) (E := Ezeta q ζ)
-    (F := FqSub L (algebraMap K L q)) ?_ ?_ ?_
+    (F := FqSub L (algebraMap K L q)) ?_ ?_
     (fq_is_function_field L (algebraMap K L q) (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1))
   · intro σ l; exact rhoZ_const q ζ σ l
   · intro g e; exact (mem_semiFixed_iff q ζ e).mp e.2 g
-  · intro f hf; exact ⟨⟨f, (mem_semiFixed_iff q ζ f).mpr hf⟩, rfl⟩
 
 include hq0 hq1 in
 /-- **Bridge B1, genus part**: `E_ζ` has genus one (descent of Riemann–Roch spaces). -/
 theorem Ezeta_genus : genus K (Ezeta q ζ) = 1 := by
-  letI := fqKAlgebra (L := L) q
-  haveI := fqK_tower_L (L := L) q
-  haveI := fqK_tower_E q ζ
-  letI := twistAction q hq0 ζ
-  haveI : FiniteDimensional (Ezeta q ζ) (FqSub L (algebraMap K L q)) :=
+  let := fqKAlgebra (L := L) q
+  have := fqK_tower_L (L := L) q
+  have := fqK_tower_E q ζ
+  let := twistAction q hq0 ζ
+  have : FiniteDimensional (Ezeta q ζ) (FqSub L (algebraMap K L q)) :=
     Ezeta_finiteDimensional q hq0 ζ
-  haveI := Ezeta_isSeparable q hq0 ζ
+  have := Ezeta_isSeparable q hq0 ζ
   have hc : IsSemilinear K L (FqSub L (algebraMap K L q)) := fun σ l => rhoZ_const q ζ σ l
   have hE1 : ∀ (g : L ≃ₐ[K] L) (e : Ezeta q ζ),
       g • algebraMap (Ezeta q ζ) (FqSub L (algebraMap K L q)) e =

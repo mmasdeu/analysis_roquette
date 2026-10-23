@@ -1,8 +1,8 @@
 module
 
-public import AnalyticTheory.WeierstrassModel
 public import AnalyticTheory.A1Exist
-public import AnalyticTheory.A1Gen
+public import AnalyticTheory.A1Homog
+public import AnalyticTheory.WeierstrassModel
 
 /-!
 # Appendix A1: the invariants in terms of normal forms, Remarks 1 and 2
@@ -197,7 +197,7 @@ theorem hasseInv_weierstrass (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne
   rw [hu, hv, ha1, ha2, ha3] at h1
   refine squareEquiv_trans h1 ⟨1 / 3, by norm_num [h3], ?_⟩
   unfold hasseOfData
-  rw [if_neg hchar2, if_neg hchar3, wC4_weierstrassNormal h2, wC6_weierstrassNormal h2]
+  rw [ite_eq_right hchar2, ite_eq_right hchar3, wC4_weierstrassNormal h2, wC6_weierstrassNormal h2]
   have h216 : (216 : K) ≠ 0 := by
     have : (216 : K) = 2 * 2 * 2 * 3 * 3 * 3 := by norm_num
     rw [this]; exact mul_ne_zero (mul_ne_zero (mul_ne_zero (mul_ne_zero (mul_ne_zero h2 h2) h2) h3) h3) h3
@@ -253,7 +253,7 @@ theorem remark_A2_sep_closed (hK : IsSepClosed K) (hE : IsEllipticOver K F)
     have hne : hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 0 := by
       unfold hasseOfData
       by_cases h3 : ringChar K = 3
-      · rw [ite_eq_right_iff.mpr (fun h => absurd h h2), if_pos h3]
+      · rw [ite_eq_right_iff.mpr (fun h => absurd h h2), ite_eq_left h3]
         intro h0
         apply hc4
         have h24 : (24 : K) = 0 := by
@@ -263,9 +263,9 @@ theorem remark_A2_sep_closed (hK : IsSepClosed K) (hE : IsEllipticOver K F)
         unfold wC4
         rw [h0, h24]
         ring
-      · rw [if_neg h2, if_neg h3]
+      · rw [ite_eq_right h2, ite_eq_right h3]
         exact div_ne_zero (neg_ne_zero.mpr hc4) hc6
-    haveI : NeZero ((2 : ℕ) : K) := ⟨by exact_mod_cast ne_zero_two_of_ringChar h2⟩
+    have : NeZero ((2 : ℕ) : K) := ⟨by exact_mod_cast ne_zero_two_of_ringChar h2⟩
     obtain ⟨t, ht⟩ := hK.exists_pow_nat_eq (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆) 2
     refine squareEquiv_trans h1 ⟨t, ?_, ?_⟩
     · rintro rfl; exact hne (by rw [← ht]; ring)

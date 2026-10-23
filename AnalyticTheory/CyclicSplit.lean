@@ -1,5 +1,6 @@
 module
 
+public import Mathlib
 public import AnalyticTheory.GaloisDescentVec
 public import AnalyticTheory.SkolemNoetherMatrix
 
@@ -33,8 +34,7 @@ noncomputable def tensorSigma : F ⊗[E] A ≃ₐ[E] F ⊗[E] A :=
   Algebra.TensorProduct.congr σ (AlgEquiv.refl : A ≃ₐ[E] A)
 
 theorem tensorSigma_smul (c : F) (b : F ⊗[E] A) : tensorSigma σ A (c • b) = σ c • tensorSigma σ A b := by
-  induction b using TensorProduct.induction_on with
-  | zero => simp
+  induction b using TensorProduct.inductionOn with
   | tmul x a =>
     rw [TensorProduct.smul_tmul']
     simp [tensorSigma, Algebra.TensorProduct.congr_apply, TensorProduct.smul_tmul']
@@ -64,8 +64,7 @@ theorem tensorSigma_pow_tmul (k : ℕ) (x : F) (a : A) :
 
 theorem tensorSigma_pow_card (hfin : IsOfFinOrder σ) (b : F ⊗[E] A) :
     (tensorSigma σ A ^ orderOf σ) b = b := by
-  induction b using TensorProduct.induction_on with
-  | zero => simp
+  induction b using TensorProduct.inductionOn with
   | tmul x a => rw [tensorSigma_pow_tmul, pow_orderOf_eq_one]; rfl
   | add x y hx hy => rw [map_add, hx, hy]
 

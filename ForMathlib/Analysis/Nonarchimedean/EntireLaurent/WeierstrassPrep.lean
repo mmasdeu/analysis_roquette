@@ -1,10 +1,10 @@
 module
 
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 public import Mathlib.Algebra.Order.Star.Real
 public import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 public import Mathlib.Topology.MetricSpace.Contracting
 public import Mathlib.Topology.UniformSpace.Uniformizable
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 
 /-!
 # Weierstrass preparation on the unit circle
@@ -192,6 +192,7 @@ section Bank
 variable {h : ℕ → F} {s : ℕ} (hh : ∀ j ≤ s, ‖h j‖ ≤ 1) (h0 : ‖h 0‖ = 1) (hs : ‖h s‖ = 1)
 include hh h0 hs
 
+omit h0 in
 theorem Pair_e_nat : ∀ k : ℕ, Pair h s (eSeq (k : ℤ)) := by
   classical
   intro k
@@ -254,7 +255,7 @@ theorem Pair_e : ∀ m : ℤ, Pair h s (eSeq m) := by
     induction n using Nat.strong_induction_on with
     | _ n ih =>
       rcases Nat.eq_zero_or_pos n with rfl | hn
-      · simpa using Pair_e_nat hh h0 hs 0
+      · simpa using Pair_e_nat hh hs 0
       set c0 : F := (h 0)⁻¹ with hc0
       have hcn : ‖c0‖ = 1 := by rw [hc0, norm_inv, h0, inv_one]
       have hcs : c0 * h 0 = 1 := by
@@ -293,7 +294,7 @@ theorem Pair_e : ∀ m : ℤ, Pair h s (eSeq m) := by
           rw [norm_mul, hcn, one_mul]; exact hh (j + 1) (by omega)
         refine Pair.smul ?_ hcoef
         by_cases hge : 0 ≤ m + 1 + j
-        · have := Pair_e_nat hh h0 hs (m + 1 + j).toNat
+        · have := Pair_e_nat hh hs (m + 1 + j).toNat
           rwa [Int.toNat_of_nonneg hge] at this
         · have hlt : (-(m + 1 + j)).toNat < n := by omega
           have := ih _ hlt
@@ -301,7 +302,7 @@ theorem Pair_e : ∀ m : ℤ, Pair h s (eSeq m) := by
           rwa [e] at this
   intro m
   rcases le_or_gt 0 m with hm | hm
-  · have := Pair_e_nat hh h0 hs m.toNat
+  · have := Pair_e_nat hh hs m.toNat
     rwa [Int.toNat_of_nonneg hm] at this
   · have := neg (-m).toNat
     have e : -(((-m).toNat : ℕ) : ℤ) = m := by omega

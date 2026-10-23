@@ -1,5 +1,6 @@
 module
 
+public import AnalyticTheory.HolDiv
 public import AnalyticTheory.Theta
 
 /-!

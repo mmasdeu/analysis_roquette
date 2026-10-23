@@ -1,10 +1,9 @@
 module
 
-public import AnalyticTheory.Sec5AJ
-public import AnalyticTheory.CyclicSplit
 public import AnalyticTheory.BaseChangeSplit
-public import AnalyticTheory.Specialization
 public import AnalyticTheory.Sec5Eval
+public import AnalyticTheory.Sec5Row5
+public import AnalyticTheory.Specialization
 
 /-!
 # §5: Corollaries XVIa, XVIb (Brauer groups)
@@ -144,7 +143,7 @@ theorem split_L_of_split_FKQ (A : Type u) [Ring A] [Algebra K A] [FiniteDimensio
     rw [h1, ← h2, LinearEquiv.finrank_eq θE.toLinearEquiv, Module.finrank_matrix]
     simp
   · obtain ⟨ev, hev⟩ := exists_evalAtOne hq0L hq1L
-    haveI := (primeAt hq0L hq1L (one_ne_zero (α := Omega L))).isDVR
+    have := (primeAt hq0L hq1L (one_ne_zero (α := Omega L))).isDVR
     exact ⟨m, split_of_specialization (primeAt hq0L hq1L (one_ne_zero (α := Omega L))).ring
       (TensorProduct K L A) hm θ' (fun l => (primeAt hq0L hq1L (one_ne_zero (α := Omega L))).contains l)
       ev hev⟩

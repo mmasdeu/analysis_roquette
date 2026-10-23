@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Sec5Final
+public import AnalyticTheory.Sec5Row5
 
 /-!
 # §5: Abel–Jacobi for semi-periodic functions (Theorem XV and Corollary XVa)
@@ -176,7 +176,7 @@ theorem divMap_principal {f : FKQ K L q T} (hf : f ≠ 0) (D : FFDivisor K (FKQ 
       divisorOf L ((f : FqSub L (algebraMap K L q)) : MeroRing L) γ = P.ord f := by
     intro P γ hγ hring
     have h := anVal_eq_ord_FKQ q hq0 hq1 T P hγ hring hf
-    simp only [divisorOf, if_neg hγ, h]
+    simp only [divisorOf, ite_eq_right hγ, h]
     rfl
   constructor
   · intro hD

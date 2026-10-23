@@ -1,7 +1,7 @@
 module
 
-public import AnalyticTheory.XIXPeriod
 public import AnalyticTheory.Sec4Torsor
+public import AnalyticTheory.XIXPeriod
 
 /-!
 # §6, Theorem XIX: descent of elliptic subfields of `F_K(𝐐)`
@@ -115,6 +115,7 @@ theorem gen_fixes_period (E : Subfield (FKQ K L q T)) {qb : L} (hqb0 : 0 < ‖qb
   rw [hk1, zpow_one] at hk
   exact hk.symm
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 theorem mem_K_of_gen_fixed {x : L} (h : T.gen x = x) : x ∈ Set.range (algebraMap K L) := by
   rw [IsGalois.mem_range_algebraMap_iff_fixed]
   intro f
@@ -127,6 +128,7 @@ theorem mem_K_of_gen_fixed {x : L} (h : T.gen x = x) : x ∈ Set.range (algebraM
   | succ n ih => rw [zpow_add_one, AlgEquiv.mul_apply, h, ih]
   | pred n ih => rw [zpow_sub_one, AlgEquiv.mul_apply, hinv, ih]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 /-- Elements of `EL` are `E`-linear combinations of a `K`-basis of `L`. -/
 theorem exists_sum_of_mem_elSub (E : Subfield (FKQ K L q T)) (hKE : ∀ c : K, algebraMap K (FKQ K L q T) c ∈ E)
     {x : FqSub L (algebraMap K L q)} (hx : x ∈ elSub (L := L) (xiIota q T E)) :
@@ -202,7 +204,7 @@ theorem mem_fieldRange_of_fixed (ζ : CocycleModQ K L q) (E : Subfield (FKQ K L 
     rw [← he]; exact hEfix e τ
   obtain ⟨l, hl⟩ : ∃ l : L, Algebra.trace K L l ≠ 0 := by
     by_contra h
-    push_neg at h
+    push Not at h
     exact Algebra.trace_ne_zero K L (LinearMap.ext h)
   have hconst : ∀ τ l, rhoZ q ζ τ (A l) = A (τ l) := fun τ l => rhoZ_const q ζ τ l
   set x := ∑ i, c i * A (b i) with hxdef
@@ -240,9 +242,9 @@ theorem exists_period_elSub (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfiel
       IsGreatest {k : ℕ | 0 < k ∧ (elSub (L := L) (xiIota q T E)).map
         (FqSub L (algebraMap K L q)).subtype ≤ (substPow L k).fieldRange} m := by
   obtain ⟨h, hE'⟩ := hE
-  letI := subfieldAlgebra K E h
-  letI := fqKAlgebra (L := L) q
-  haveI := fqK_tower_L (L := L) q
+  let := subfieldAlgebra K E h
+  let := fqKAlgebra (L := L) q
+  have := fqK_tower_L (L := L) q
   let ι : E →ₐ[K] FqSub L (algebraMap K L q) :=
     { toRingHom := xiIota q T E, commutes' := fun _ => rfl }
   have hF : IsFunctionFieldOver L (FqSub L (algebraMap K L q)) :=
@@ -258,7 +260,7 @@ theorem exists_period_elSub (E : Subfield (FKQ K L q T)) (hE : IsEllipticSubfiel
   -- `d > 0`
   have hdpos : 0 < d := by
     by_contra hle
-    push_neg at hle
+    push Not at hle
     have h1 := congrArg norm hd
     rw [norm_zpow, norm_zpow, norm_algebraMap', norm_algebraMap'] at h1
     have h2 : 1 ≤ ‖qK‖ ^ d := one_le_zpow_of_nonpos₀ hqb0 hqb1.le hle
@@ -281,7 +283,7 @@ theorem isFqTorsor_of_period (ζ : CocycleModQ K L q)
     (hEq : (elSub (L := L) (xiIota q T E)).map (FqSub L (algebraMap K L q)).subtype =
       FqbarXm L (algebraMap K L qK) m) :
     letI := subfieldAlgebra K E h; IsFqTorsor (L := L) qK E := by
-  letI := subfieldAlgebra K E h
+  let := subfieldAlgebra K E h
   have hmz : (m : ℤ) ≠ 0 := by exact_mod_cast hm.ne'
   set qb := algebraMap K L qK with hqb
   have hqb0 : qb ≠ 0 := (map_ne_zero_iff _ (algebraMap K L).injective).mpr (norm_pos_iff.mp hqK0)

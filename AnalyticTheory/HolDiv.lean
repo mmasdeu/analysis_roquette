@@ -1,6 +1,7 @@
 module
 
 public import AnalyticTheory.Normalize
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Division
 
 /-!
 # The division theorem in `H_K`, in terms of the analytic valuations

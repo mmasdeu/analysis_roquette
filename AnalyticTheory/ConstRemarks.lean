@@ -1,7 +1,8 @@
 module
 
-public import AnalyticTheory.Remarks
 public import AnalyticTheory.ConstExt
+public import AnalyticTheory.Remarks
+public import AnalyticTheory.SemiPeriodic
 
 /-!
 # Remarks 1 and 2 of §2: extension of the field of constants
@@ -307,6 +308,7 @@ theorem holExt_monoHol (n : ℤ) : holExt (L := L) (monoHol K (Omega K) n) = mon
   rw [holCoeff_monoHol, holCoeff_monoHol]
   split_ifs <;> simp
 
+omit [FiniteDimensional K L] in
 theorem meroExt_Xm (n : ℤ) : meroExt (L := L) (Xm (K := K) n) = Xm n := by
   unfold Xm; rw [meroExt_alg, holExt_monoHol]
 
@@ -400,6 +402,7 @@ theorem divExtFun_add (m n : Omega K → ℤ) :
     divExtFun ψ (m + n) = divExtFun ψ m + divExtFun ψ n := by
   funext β; unfold divExtFun; by_cases h : β = 0 <;> simp [h, mul_add]
 
+omit [FiniteDimensional K L] in
 theorem ramIndex_conj {β β' : Omega L} (hβ : β ≠ 0) (h : minpoly L β = minpoly L β') :
     ramIndex K L ψ (ψ.symm β) = ramIndex K L ψ (ψ.symm β') ∧
       minpoly K (ψ.symm β) = minpoly K (ψ.symm β') := by
@@ -722,6 +725,7 @@ theorem normL_eq_spectral (x : L) : ‖x‖ = spectralNorm K L x := by
       add_le' := norm_add_le }
   exact spectralNorm_unique_field_norm_ext (f := f) (fun c => norm_algebraMap' L c) x
 
+omit [IsUltrametricDist L] [CompleteSpace L] [IsGalois K L] in
 theorem gal_norm (σ : L ≃ₐ[K] L) (x : L) : ‖σ x‖ = ‖x‖ := by
   rw [normL_eq_spectral (K := K), normL_eq_spectral (K := K) x, ← spectralNorm_eq_of_equiv σ x]
 
@@ -935,6 +939,7 @@ theorem hol_descend {g : holSubring L} (hg : ∀ σ : L ≃ₐ[K] L, holGal σ g
 
 end descent
 
+omit [IsGalois K L] in
 /-- Book, §2, Remark 2: for `f ∈ M_L` and `σ ∈ G`, `(σ f)(σ α) = σ(f(α))`, where `σ` acts on the
 coefficients of `f` and `σ'` is any extension of `σ` to `Ω_L`. -/
 theorem remark_galois_action_eval (σ : GalGroup K L) (ρ : MeroRing L ≃+* MeroRing L)

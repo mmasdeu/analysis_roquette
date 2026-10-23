@@ -1,9 +1,9 @@
 module
 
+public import Mathlib.Algebra.Ring.TransferInstance
 public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Division
 public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.InfProd
 public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Omega
-public import Mathlib.Algebra.Ring.TransferInstance
 
 /-!
 # The ring of entire Laurent series over a complete non-archimedean field

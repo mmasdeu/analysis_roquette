@@ -1,8 +1,8 @@
 module
 
-public import AnalyticTheory.Structure
-public import AnalyticTheory.AppendixA2
 public import Mathlib.RingTheory.TensorProduct.Basic
+public import AnalyticTheory.Analytic
+public import AnalyticTheory.AppendixA2
 
 /-!
 # Semi-periodic functions (book, §4 and §5)

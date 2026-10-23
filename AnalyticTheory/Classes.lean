@@ -23,6 +23,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_refl (q : K) (α : Omega K) : ConjModQ K q α α :=
   ⟨α, rfl, 0, by simp⟩
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_symm {q : K} (hq0 : q ≠ 0) {α β : Omega K} (h : ConjModQ K q α β) :
     ConjModQ K q β α := by
   rw [conjModQ_iff_chi] at h ⊢
@@ -42,6 +43,7 @@ theorem conjModQ_symm {q : K} (hq0 : q ≠ 0) {α β : Omega K} (h : ConjModQ K 
     simp
   rw [← hα, minpoly.algEquiv_eq]
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem conjModQ_trans {q : K} (hq0 : q ≠ 0) {α β δ : Omega K} (h1 : ConjModQ K q α β)
     (h2 : ConjModQ K q β δ) : ConjModQ K q α δ := by
   rw [conjModQ_iff_chi] at h1 h2 ⊢

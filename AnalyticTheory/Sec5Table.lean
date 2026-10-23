@@ -1,8 +1,8 @@
 module
 
-public import AnalyticTheory.Sec5Div
 public import AnalyticTheory.CycAux
 public import AnalyticTheory.Hilbert90U
+public import AnalyticTheory.Sec5Div
 
 /-!
 # §5: the cohomology table (rows `D_L(q)`, `D⁰_L(q)`, `C⁰_L(q)`, `P_L(q)`, `F_L(q)^×`)
@@ -167,7 +167,7 @@ theorem fundSet_conj {y y' : Omega L} (h : minpoly L y = minpoly L y') :
       have : Polynomial.aeval y (minpoly L (0 : Omega L)) = 0 := by rw [← h]; exact minpoly.aeval L y
       rw [minpoly.zero, Polynomial.aeval_X] at this; exact this
   unfold fundSet
-  simp only [Set.mem_setOf_eq, hr]
+  simp only [Set.mem_ofPred_eq, hr]
   constructor
   · rintro ⟨h0, γ, hγ, hk⟩
     exact ⟨fun h' => h0 (hy.mpr h'), γ, hγ.trans h, hk⟩
@@ -186,7 +186,7 @@ theorem fundSet_mul_q {y : Omega L} (hy : y ≠ 0) (j : ℤ) :
   have hne : algebraMap L (Omega L) (algebraMap K L q) ^ j * y ≠ 0 := mul_ne_zero (zpow_ne_zero _ hq) hy
   have hqL : algebraMap K L q ≠ 0 := norm_pos_iff.mp (norm_alg_pos (L := L) q hq0)
   unfold fundSet
-  simp only [Set.mem_setOf_eq, hr, ne_eq, hne, hy, not_false_eq_true, true_and]
+  simp only [Set.mem_ofPred_eq, hr, ne_eq, hne, hy, not_false_eq_true, true_and]
   have hc : ConjModQ L (algebraMap K L q) y (algebraMap L (Omega L) (algebraMap K L q) ^ j * y) := by
     have := conjModQ_of_shift (algebraMap K L q) y j
     rwa [mul_comm] at this
@@ -331,28 +331,28 @@ theorem fundProj_mem {m : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algeb
     fundProj q T m ∈ DivisorsPeriodic L (algebraMap K L q) := by
   classical
   have h0 : (0 : Omega L) ∉ fundSet q T := fun h => h.1 rfl
-  refine ⟨⟨by rw [fundProj_apply, if_neg h0], fun r r' hr hrr' => ?_, fun x x' hx => ?_⟩, fun x => ?_⟩
+  refine ⟨⟨by rw [fundProj_apply, ite_eq_right h0], fun r r' hr hrr' => ?_, fun x x' hx => ?_⟩, fun x => ?_⟩
   · refine (hm.1.2.1 r r' hr hrr').subset fun x ⟨h1, h2, h3⟩ => ?_
     refine ⟨h1, h2, ?_⟩
     intro h
     apply h3
     rw [fundProj_apply]
     by_cases hx : x ∈ fundSet q T
-    · rw [if_pos hx]; exact h
-    · rw [if_neg hx]
+    · rw [ite_eq_left hx]; exact h
+    · rw [ite_eq_right hx]
   · rw [fundProj_apply, fundProj_apply]
     have := fundSet_conj q hq0 hq1 T hx
     by_cases h : x ∈ fundSet q T
-    · rw [if_pos h, if_pos (this.mp h), hm.1.2.2 x x' hx]
-    · rw [if_neg h, if_neg (fun h' => h (this.mpr h'))]
+    · rw [ite_eq_left h, ite_eq_left (this.mp h), hm.1.2.2 x x' hx]
+    · rw [ite_eq_right h, ite_eq_right (fun h' => h (this.mpr h'))]
   · rw [fundProj_apply, fundProj_apply]
     by_cases hx : x = 0
     · subst hx; simp
     · have := fundSet_mul_q q hq0 hq1 T hx 1
       rw [zpow_one] at this
       by_cases h : x ∈ fundSet q T
-      · rw [if_pos (this.mpr h), if_pos h, hm.2]
-      · rw [if_neg (fun h' => h (this.mp h')), if_neg h]
+      · rw [ite_eq_left (this.mpr h), ite_eq_left h, hm.2]
+      · rw [ite_eq_right (fun h' => h (this.mp h')), ite_eq_right h]
 
 include hq0 hq1 in
 theorem fund_split {m : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algebraMap K L q)) :
@@ -406,7 +406,7 @@ theorem fund_split {m : Omega L → ℤ} (hm : m ∈ DivisorsPeriodic L (algebra
     have hs2 : ∑ i ∈ Finset.range (Module.finrank K L),
         pointDivisor L (algebraMap K L q) r (((f⁻¹) ^ i) x) = 1 := by
       rw [Finset.sum_congr rfl fun i hi => (pointDivisor_orbit q hq0 hq1 T hσ
-        (Finset.mem_range.mp hi) hrne x), hs1, classDiv, if_pos hrx]
+        (Finset.mem_range.mp hi) hrne x), hs1, classDiv, ite_eq_left hrx]
     unfold pointDivisor at hs2
     have : ∑ i ∈ Finset.range (Module.finrank K L),
         (if ConjModQ L (algebraMap K L q) r (((f⁻¹) ^ i) x) then m x else 0) =
@@ -801,7 +801,7 @@ theorem sigma_prod_Qp (hQn : Qp T.gen (Units.mk0 T.Q T.Q_ne) (Module.finrank K L
     rw [h0, hq0', mul_one] at this
     exact this
   rw [h2, hQn]
-  simp only [inv_pow, zpow_neg, zpow_natCast, mul_assoc, mul_comm, mul_left_comm]
+  simp only [inv_pow, mul_comm, mul_left_comm]
 
 theorem normL_Q : normL K L (Units.mk0 T.Q T.Q_ne) = Units.mk0 (algebraMap K L q) hqL := by
   apply Units.ext
@@ -815,7 +815,7 @@ theorem normL_qU : normL K L (Units.mk0 (algebraMap K L q) hqL) =
 theorem normL_gen (v : Lˣ) :
     normL K L (Units.map ((T.gen : L →+* L) : L →* L) v) = normL K L v := by
   apply Units.ext
-  simp only [normL, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_coe]
+  simp only [normL, MonoidHom.comp_apply, Units.coe_map, MonoidHom.coe_ofClass]
   show algebraMap K L (Algebra.norm K (T.gen (v : L))) = algebraMap K L (Algebra.norm K (v : L))
   rw [Algebra.norm_eq_of_algEquiv]
 
@@ -879,7 +879,7 @@ theorem row3_gen_elem (a : Additive (LQ q hqL))
     apply Units.ext
     have h0 : (T.gen (y : L)) ≠ 0 := (map_ne_zero T.gen).mpr y.ne_zero
     rw [← hy]
-    simp only [Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_coe,
+    simp only [Units.val_mul, Units.val_inv_eq_inv_val, Units.coe_map, MonoidHom.coe_ofClass,
       RingHom.coe_coe]
     field_simp
   have h2 : cls q hqL u - j • cls q hqL Qu = cls q hqL (u * Qu ^ (-j)) := by

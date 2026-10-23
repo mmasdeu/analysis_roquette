@@ -1,6 +1,6 @@
 module
 
-public import AnalyticTheory.Basic
+public import Mathlib
 
 /-!
 # Powers of a "twisted multiplication"

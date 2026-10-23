@@ -1,6 +1,7 @@
 module
 
-public import AnalyticTheory.ConstSubfield
+public import AnalyticTheory.ConstRemarks
+public import AnalyticTheory.FqPlaces
 
 /-!
 # Galois action on coordinates in `F_L(q) = ⊕ bᵢ F_K(q)`

@@ -272,7 +272,7 @@ theorem periodic_const_of_divisor_zero (hqL : algebraMap K L q ≠ 0)
     intro ξ hξ
     obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top L hξ h0)
     have := congrFun hd ξ
-    simp only [divisorOf, if_neg hξ, Pi.zero_apply, ← hv] at this
+    simp only [divisorOf, ite_eq_right hξ, Pi.zero_apply, ← hv] at this
     rw [← hv]; simp at this ⊢; exact_mod_cast this
   obtain ⟨c, n, hc, hcn⟩ := mero_unit_of_anVal_zero h0 hz
   have hper := (mem_Fq_iff hqL h).mp hh

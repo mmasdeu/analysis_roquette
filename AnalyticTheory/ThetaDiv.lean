@@ -65,6 +65,7 @@ theorem periodic_zpow {q : K} (hq0 : q ≠ 0) {m : Omega K → ℤ} (hm : m ∈ 
     rw [this, hm.2] at ih
     exact ih
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem periodic_conj {q : K} (hq0 : q ≠ 0) {m : Omega K → ℤ} (hm : m ∈ DivisorsPeriodic K q)
     {α ξ : Omega K} (h : ConjModQ K q α ξ) : m α = m ξ := by
   obtain ⟨γ, hγ, k, hk⟩ := h
@@ -129,6 +130,7 @@ variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ} (
 /-- The finite set of representatives in the support of `m`. -/
 noncomputable def thetaS : Finset (Omega K) := (repAnnulus_support_finite hq0 hq1 hm).toFinset
 
+omit [IsUltrametricDist K] [CompleteSpace K] in
 theorem mem_thetaS {α : Omega K} : α ∈ thetaS hq0 hq1 hm ↔ α ∈ repAnnulus K q ∧ m α ≠ 0 := by
   unfold thetaS; rw [Set.Finite.mem_toFinset]; rfl
 

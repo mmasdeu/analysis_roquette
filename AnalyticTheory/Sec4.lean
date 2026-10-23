@@ -1,6 +1,5 @@
 module
 
-public import AnalyticTheory.FqDescent
 public import AnalyticTheory.ConstExtDescent
 
 /-!
@@ -175,6 +174,7 @@ theorem gen_zpow (T : SemiPeriodicTriple K L q) (g : L ≃ₐ[K] L) : ∃ a : �
   rw [Subgroup.mem_closure_singleton] at this
   exact this
 
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
 theorem orderOf_gen (T : SemiPeriodicTriple K L q) :
     orderOf T.gen = Module.finrank K L := by
   rw [← IsGalois.card_aut_eq_finrank K L]
@@ -351,7 +351,7 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
       rw [h2] at h1; exact h1.symm
     have hn0 : (n : ℝ) ≠ 0 := by exact_mod_cast hnpos.ne'
     show expq K L q (Q' : L) = _
-    rw [expq_unit q hq0 hq1]
+    rw [expq_unit q]
     congr 1
     field_simp
     linarith

@@ -1,6 +1,7 @@
 module
 
 public import AnalyticTheory.Analytic
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Identity
 
 /-!
 # The analytic valuations `w_α` (book, §2)

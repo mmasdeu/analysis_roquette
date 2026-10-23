@@ -28,6 +28,7 @@ namespace PrimeDivisor
 
 variable (Q : PrimeDivisor K E)
 
+omit [Algebra K F] [IsScalarTower K E F] [FiniteDimensional E F] [Algebra.IsSeparable E F] in
 /-- Every maximal ideal of `S` lies over the maximal ideal of `O_Q`. -/
 theorem mem_primesOver_of_isMaximal (𝔪 : Ideal (Q.intCl F)) [h𝔪 : 𝔪.IsMaximal] :
     𝔪 ∈ (IsLocalRing.maximalIdeal Q.ring).primesOver (Q.intCl F) := by
@@ -123,6 +124,7 @@ omit [Algebra.IsSeparable E F] in
 theorem norm_zpow' (x : F) (k : ℤ) : Algebra.norm E (x ^ k) = (Algebra.norm E x) ^ k :=
   map_zpow' (Algebra.norm E : F →* E) norm_inv' x k
 
+omit [Algebra K F] [IsScalarTower K E F] in
 theorem algebraMap_intNorm' (x : Q.intCl F) :
     algebraMap Q.ring E (Algebra.intNorm Q.ring (Q.intCl F) x) = Algebra.norm E (x : F) :=
   Algebra.algebraMap_intNorm (K := E) (L := F) x

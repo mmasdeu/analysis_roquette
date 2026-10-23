@@ -39,7 +39,7 @@ theorem laurent_summable {a : ℤ → K} (ha : IsConvergentLaurent K a) {α : L}
   have ht : Tendsto (fun n : ℤ => algebraMap K L (a n) * α ^ n) cofinite (𝓝 0) := by
     rw [tendsto_zero_iff_norm_tendsto_zero]
     refine (ha ‖α‖ hr).congr (fun n => ?_)
-    simp [norm_algebraMap_omega]
+    simp []
   obtain ⟨s, -, hs⟩ := omega_hasSum_mem K S hmem ht
   exact ⟨s, hs⟩
 
@@ -111,6 +111,7 @@ theorem holCoeff_hasSum (f : holSubring K L) (α : Punct L) :
     HasSum (fun n : ℤ => algebraMap K L (holCoeff K f n) * α.1 ^ n) (f.1 α) :=
   (Classical.choose_spec (hol_rep_seq K f)).2 α
 
+omit [Algebra.IsIntegral K L] in
 theorem holCoeff_eq {f : holSubring K L} {a : ℤ → K} (ha : IsConvergentLaurent K a)
     (h : ∀ α : Punct L, HasSum (fun n : ℤ => algebraMap K L (a n) * α.1 ^ n) (f.1 α)) :
     holCoeff K f = a := by
@@ -120,6 +121,7 @@ theorem holCoeff_eq {f : holSubring K L} {a : ℤ → K} (ha : IsConvergentLaure
   · simpa [hx] using holCoeff_hasSum K f ⟨x, hx⟩
   · simpa [hx] using h ⟨x, hx⟩
 
+omit [IsAlgClosed L] in
 theorem holOfSeq_holCoeff (f : holSubring K L) :
     holOfSeq K L (holCoeff K f) (holCoeff_convergent K f) = f := by
   refine Subtype.ext (funext fun α => ?_)

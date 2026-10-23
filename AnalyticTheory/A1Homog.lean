@@ -1,10 +1,8 @@
 module
 
-public import AnalyticTheory.A1Gen
-public import AnalyticTheory.A1Determine
-public import AnalyticTheory.A1Transfer
-public import AnalyticTheory.A1Invariance
 public import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+public import AnalyticTheory.A1Invariance
+public import AnalyticTheory.A1Unique
 
 /-!
 # Appendix A1: homogeneity of the degree-one primes (translations)
@@ -207,6 +205,7 @@ theorem nonsingular_of_normalForm {x y : F} (h : NormalForm W x y) :
   rw [← Affine.equation_iff_nonsingular, Affine.equation_iff]
   simpa [NormalForm, WeierstrassCurve.baseChange, WeierstrassCurve.map] using h
 
+omit [W.IsElliptic] in
 theorem normalForm_of_nonsingular {x y : F} (h : (W.baseChange F).toAffine.Nonsingular x y) :
     NormalForm W x y := by
   have := ((Affine.equation_iff _ _).mp h.1)
@@ -487,7 +486,7 @@ theorem WeierstrassData.exists_aut (hE : IsEllipticOver K F) (d : WeierstrassDat
   by_cases hPP : P' = d.𝔭
   · exact ⟨AlgEquiv.refl, by rw [PrimeDivisor.transfer_refl, hPP]⟩
   have hK := hE.functionField.algebraicallyClosed
-  haveI : d.curve.IsElliptic := by
+  have : d.curve.IsElliptic := by
     refine ⟨isUnit_iff_ne_zero.mpr ?_⟩
     have := d.disc
     rwa [WeierstrassData.curve, ← wDisc_eq]

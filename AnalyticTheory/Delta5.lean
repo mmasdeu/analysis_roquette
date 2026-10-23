@@ -1,5 +1,6 @@
 module
 
+public import AnalyticTheory.Delta3
 public import AnalyticTheory.Delta4
 
 /-!
@@ -86,7 +87,7 @@ theorem R0_one_value : (Rq hq0 hq1 0).1 oneX = algebraMap K (Omega K) (Pc q) ^ 2
     simp
   have hth0 : thF q φ 0 = monoHol K (Omega K) (-1) * linF (q := q) (0 : ℤ) := by
     refine Subtype.ext (funext fun x => ?_)
-    rw [mul_apply_hol, linF_apply, monoHol_apply, hφdef, thF_one hq0 hq1]
+    rw [mul_apply_hol, linF_apply, monoHol_apply, hφdef, thF_one hq0]
     have hx := x.2
     simp only [pow_zero, one_mul, zpow_neg_one, neg_zero, zpow_zero, map_one]
     field_simp
@@ -109,11 +110,11 @@ theorem R0_one_value : (Rq hq0 hq1 0).1 oneX = algebraMap K (Omega K) (Pc q) ^ 2
   have hPF1 : PF.1 oneX = algebraMap K (Omega K) (Pc q) := by
     refine tendsto_nhds_unique (hF' oneX) (hPcΩ.congr (fun J => ?_))
     refine Finset.prod_congr rfl (fun j _ => ?_)
-    rw [thF_one hq0 hq1]; simp [oneX]
+    rw [thF_one hq0]; simp [oneX]
   have hPG1 : PG.1 oneX = algebraMap K (Omega K) (Pc q) := by
     refine tendsto_nhds_unique (hG' oneX) (hPcΩ.congr (fun J => ?_))
     refine Finset.prod_congr rfl (fun j _ => ?_)
-    rw [thG_one hq0 hq1]; simp [oneX]
+    rw [thG_one hq0]; simp [oneX]
   rw [hR0, mul_apply_hol, mul_apply_hol, hPF1, hPG1, monoHol_apply]
   simp [oneX]; ring
 
@@ -192,7 +193,6 @@ theorem ev_sub {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK 
     evK hq0 hq1 a ha - evK hq0 hq1 b hb =
       (-(Pc q ^ 4) / (b * thK q b ^ 2)) * thK q (b⁻¹ * a) * thK q (b * a) / thK q a ^ 2 := by
   have h := congrArg (fun H => valK H a ha) (Nb_eq_const hq0 hq1 hb hbm hT)
-  try simp only at h
   unfold Nb at h
   rw [valK_sub, valK_mul, valK_pow_aux, valK_const, valK_mul, valK_const,
     valK_Mb hq0 hq1 hb a ha, valK_Th_eq hq0 hq1 a ha] at h
@@ -255,7 +255,6 @@ include hq0 hq1 in
 theorem thK_shift {x : K} (hx : x ≠ 0) : thK q (q⁻¹ * x) = -x * thK q x := by
   have hq0' := norm_pos_iff.mp hq0
   have h := congrArg (fun H => valK H x hx) (Th_FE hq0 hq1)
-  try simp only at h
   rw [show (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ = Units.mk0 q⁻¹ (inv_ne_zero hq0') from Units.ext rfl,
     valK_holScale, valK_neg, valK_mul, valK_monoHol, zpow_one, valK_Th_eq hq0 hq1,
     valK_Th_eq hq0 hq1] at h

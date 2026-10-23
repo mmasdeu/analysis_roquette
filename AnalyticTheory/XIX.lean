@@ -1,7 +1,6 @@
 module
 
 public import AnalyticTheory.XIXSubfields
-public import AnalyticTheory.Sec4Torsor
 
 /-!
 # §6, Theorem XIX: elliptic subfields of semi-periodic function fields
@@ -60,7 +59,7 @@ theorem exists_nat_of_orderDvd {q qb : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1
   obtain ⟨d, hd⟩ := h
   have hdpos : 0 < d := by
     by_contra hle
-    push_neg at hle
+    push Not at hle
     have h1 := congrArg norm hd
     rw [norm_zpow, norm_zpow] at h1
     have h2 : 1 ≤ ‖qb‖ ^ d := one_le_zpow_of_nonpos₀ hqb0 hqb1.le hle

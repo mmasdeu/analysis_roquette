@@ -1,6 +1,7 @@
 module
 
 public import AnalyticTheory.EllipticRigidity
+public import AnalyticTheory.FFNorm
 public import AnalyticTheory.FqOrd
 
 /-!

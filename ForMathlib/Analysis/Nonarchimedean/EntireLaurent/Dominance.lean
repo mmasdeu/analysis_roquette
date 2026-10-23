@@ -1,9 +1,9 @@
 module
 
-public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 public import Mathlib.Analysis.SpecialFunctions.Log.Base
 public import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 public import Mathlib.Topology.GDelta.MetrizableSpace
+public import ForMathlib.Analysis.Nonarchimedean.EntireLaurent.Basic
 
 /-!
 # Dominant terms of convergent Laurent series

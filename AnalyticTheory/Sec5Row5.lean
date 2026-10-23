@@ -1,7 +1,7 @@
 module
 
-public import AnalyticTheory.Sec5Norm
 public import AnalyticTheory.Hilbert90Fixed
+public import AnalyticTheory.Sec5Norm
 
 /-!
 # §5: the row `F_L(q)^×` of the cohomology table
