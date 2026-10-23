@@ -16,6 +16,14 @@ namespace AnalyticTheory
 
 universe u
 
+/-- A vector space over a division ring is free (`Module.Free.of_divisionRing`). Declared again with
+a high priority so that instance search finds it first: for vector spaces such as subfields of
+subfields (`E_m ⊂ F_K(𝐐)`) or intermediate fields `K⟮γ⟯ ⊂ K⟮β⟯`, the other `Module.Free`
+instances are tried first and each of them unfolds the carrier types, which costs seconds. -/
+instance (priority := 1100) moduleFree_of_divisionRing_fast (R V : Type*) [DivisionRing R]
+    [AddCommGroup V] [Module R V] : Module.Free R V :=
+  Module.Free.of_divisionRing R V
+
 /-- Book, Introduction/§A1: a *prime divisor* of the function field `F | K`: a discrete
 valuation ring of `F` (with fraction field `F`) containing `K`. -/
 structure PrimeDivisor (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F] where

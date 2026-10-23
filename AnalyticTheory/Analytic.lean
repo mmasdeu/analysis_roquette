@@ -50,6 +50,18 @@ noncomputable instance : Algebra (holSubring K) (MeroRing K) :=
 instance : IsFractionRing (holSubring K) (MeroRing K) :=
   inferInstanceAs (IsFractionRing (holSubring K) (FractionRing (holSubring K)))
 
+/-! Instances of `H_K` that instance search otherwise finds only after unfolding `holSubring` and
+trying many paths (several seconds per search); they are declared directly. -/
+
+instance holSubring_nontrivial : Nontrivial (holSubring K) :=
+  (inferInstance : IsDomain (holSubring K)).toNontrivial
+
+instance holSubring_noZeroDivisors : NoZeroDivisors (holSubring K) :=
+  IsDomain.to_noZeroDivisors _
+
+instance holSubring_faithfulSMul : FaithfulSMul (holSubring K) (MeroRing K) :=
+  (faithfulSMul_iff_algebraMap_injective _ _).mpr (IsFractionRing.injective _ _)
+
 /-- Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`. -/
 noncomputable def reflectionM : MeroRing K ≃+* MeroRing K :=
   IsFractionRing.ringEquivOfRingEquiv (holReflectHom K (Omega K))

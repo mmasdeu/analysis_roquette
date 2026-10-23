@@ -716,10 +716,10 @@ theorem LS_succ_le {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
     rwa [show D + n • D = (n + 1) • D by rw [succ_nsmul, add_comm]] at this
   have hL2le : LS q (2 • D) ≤ LS q ((n + 1) • D) := LS_mono (fun α => by
     simp only [Pi.smul_apply, nsmul_eq_mul]
-    have := hD0 α
-    have : (2 : ℤ) ≤ ((n + 1 : ℕ) : ℤ) := by exact_mod_cast (by omega : 2 ≤ n + 1)
-    push_cast at this ⊢
-    nlinarith)
+    have h0 := hD0 α
+    have h2 : (2 : ℤ) ≤ ((n + 1 : ℕ) : ℤ) := by exact_mod_cast (by omega : 2 ≤ n + 1)
+    push_cast at h2 ⊢
+    nlinarith only [h0, h2])
   have hinf : Y ⊓ LS q (2 • D) ≤ (LS q D).map (LinearMap.mulLeft K y) := by
     rintro g ⟨⟨h, hh, rfl⟩, hg⟩
     refine ⟨h, fun α hα => ?_, rfl⟩
