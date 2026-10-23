@@ -956,7 +956,8 @@ theorem row3_H1 :
   have hcN : cycNorm (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L) (cls q hqL Qu) = 0 := by
     rw [cycNorm_cls_eq q T hqL, hQu, normL_Q q T hqL, cls_eq_zero_iff]
     exact Subgroup.mem_zpowers _
-  have key := cycH1_top_equiv_of_gen (sigmaOnQuot K L q hqL T.gen) (Module.finrank K L)
+  have key := cycH1_top_equiv_of_gen (Amb := Additive (LQ q hqL)) (sigmaOnQuot K L q hqL T.gen)
+    (Module.finrank K L)
     (cls q hqL Qu) hcN (fun a ha => row3_gen_elem q hq0 hq1 T hqL a ha)
     (fun k => row3_ord q hq0 hq1 T hqL k)
   exact key

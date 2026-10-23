@@ -758,7 +758,8 @@ theorem LS_succ_le {y : FqSub K q} (hy0 : y ≠ 0) {D : Omega K → ℤ}
       have h2 : (Module.finrank K ↥(Y ⊓ LS q (2 • D)) : ℤ) ≤ Module.finrank K (LS q D) := by
         exact_mod_cast hinfle
       rw [hY] at h1
-      nlinarith
+      push_cast at hD1
+      linarith only [h1, h2, hn1, hn2, hn3, hD1]
     exact_mod_cast this)
   rw [heq]
 
