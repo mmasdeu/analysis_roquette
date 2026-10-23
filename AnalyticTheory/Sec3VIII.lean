@@ -9,9 +9,9 @@ import AnalyticTheory.FqStructure
 /-!
 # §3: Theorems VIII and VIIIa
 
-The Weierstraß datum of `F_K(q)` given by `x = ℘`, `y = ℘′`, `u = 1`, `v = 0`, `a₁ = 0`, `a₂ = B`,
-`a₃ = C` (equation (39)); the Hasse invariant is computed from it, using the independence of the
-invariants from the choice of datum (`A1Invariance.lean`, not yet proved).
+The Weierstraß datum of `F_K(q)` given by `x = ℘`, `y = ℘′`, `a₁ = 1`, `a₃ = 0`, `a₂ = 0`, `a₄ = B`,
+`a₆ = C` (equation (39)); the Hasse invariant is computed from it, using the independence of the
+invariants from the choice of datum (`A1Invariance.lean`).
 
 Blueprint nodes: `thm:VIII`, `thm:VIIIa`.
 -/
@@ -242,11 +242,11 @@ noncomputable def wpData : WeierstrassData K (FqSub K q) where
     simpa using Polynomial.natDegree_X_sub_C (1 : K)
   x := ⟨wpM K q, wpM_mem_Fq hq0 hq1⟩
   y := ⟨wpPrimeM K q, wpPrimeM_mem_Fq hq0 hq1⟩
-  u := 1
-  v := 0
-  a₁ := 0
-  a₂ := coeffB K q
-  a₃ := coeffC K q
+  a₁ := 1
+  a₃ := 0
+  a₂ := 0
+  a₄ := coeffB K q
+  a₆ := coeffC K q
   eq := by
     have hr := thmVI_relation (K := K) q hq0 hq1
     have hc : ∀ c : K, ((algebraMap K (FqSub K q) c : FqSub K q) : MeroRing K) =
@@ -303,7 +303,7 @@ theorem invariants_of_equiv (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {F : Type u}
       (ringChar K ≠ 2 → SquareEquiv (hasseInv K F hF) 1) ∧
       (ringChar K = 2 → PiEquiv (hasseInv K F hF) 0) := by
   set d := (wpData hq0 hq1).transfer e with hd
-  have hjd : jOfData d.u d.v d.a₁ d.a₂ d.a₃ = jInvQ K q := jOfData_wp hq1
+  have hjd : jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ = jInvQ K q := jOfData_wp hq1
   have hom : DegOneHomogeneous K F := (fq_homogeneous hq0 hq1).of_equiv e
   obtain ⟨h1, h2⟩ := hasseInv_eq_of_data K F hE hom hF d
   obtain ⟨t1, t2⟩ := hasse_wp_trivial (K := K) hq1

@@ -566,10 +566,10 @@ _upd('prop:abs-integral', text=r'Let $K$ be an arbitrary field and $F\,|\,K$ ell
 # --- Appendix A1
 _upd('def:square-equiv', text=r'$a\sim b$ iff $a=t^2b$ for some $t\in K^\times$.')
 _upd('def:absolute-invariant', text=r'The absolute invariant $j=c_4^3/\Delta$ of $F\,|\,K$ with a prime of degree $1$, computed from any Weierstra\ss\ equation of $F$.', uses=['def:normal-forms', 'def:weierstrass-data', 'def:weierstrass-invariants'])
-_upd('def:hasse-invariant', text=r'The Hasse invariant $\gamma$ (a representative in $K$): $-c_4/c_6$ if $\operatorname{char}K\ne2,3$, $b_2$ if $\operatorname{char}K=3$, $A^{\prime}$ (i.e.\ $a_1/u^2+v/u^3$) if $\operatorname{char}K=2$, computed from any Weierstra\ss\ equation.', uses=['def:normal-forms', 'def:square-equiv', 'def:pi-equiv', 'def:weierstrass-data', 'def:weierstrass-invariants'])
+_upd('def:hasse-invariant', text=r'The Hasse invariant $\gamma$ (a representative in $K$): $-c_4/c_6$ if $\operatorname{char}K\ne2,3$, $b_2$ if $\operatorname{char}K=3$, $A^{\prime}$ (i.e.\ $a_2/a_1^2+a_3/a_1^3$) if $\operatorname{char}K=2$, computed from any Weierstra\ss\ equation.', uses=['def:normal-forms', 'def:square-equiv', 'def:pi-equiv', 'def:weierstrass-data', 'def:weierstrass-invariants'])
 add('definition', 'def:weierstrass-invariants', 'Invariants of a Weierstra\\ss\\ equation',
     ['wB2', 'wB4', 'wB6', 'wB8', 'wC4', 'wC6', 'wDisc', 'jOfData', 'hasseOfData'], ['def:normal-forms'], False,
-    r'The quantities $b_2,b_4,b_6,b_8,c_4,c_6,\Delta$ of the equation $y^2+(ux+v)y=x^3+a_1x^2+a_2x+a_3$, valid in every characteristic; $j=c_4^3/\Delta$.')
+    r'The quantities $b_2,b_4,b_6,b_8,c_4,c_6,\Delta$ of the long Weierstra\ss\ equation $y^2+(a_1x+a_3)y=x^3+a_2x^2+a_4x+a_6$ (Tate's notation, as in Mathlib; the book writes $u,v,a_1,a_2,a_3$ for $a_1,a_3,a_2,a_4,a_6$), valid in every characteristic; $j=c_4^3/\Delta$.')
 add('definition', 'def:weierstrass-data', 'Weierstra\\ss\\ data', ['WeierstrassData'], ['def:normal-forms', 'def:weierstrass-invariants'], False,
     r'Generators $x,y$ of $F\,|\,K$ satisfying a Weierstra\ss\ equation of nonzero discriminant.')
 _upd('lem:A', text=r'For $j\ne 0,12^3$ and a prime divisor $\mathfrak p$ of degree $1$ there is exactly one nontrivial $K$-automorphism $\varepsilon$ of $F$ fixing $\mathfrak p$.', uses=['def:absolute-invariant', 'def:aut-action-divisors'])

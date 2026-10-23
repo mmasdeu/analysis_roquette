@@ -202,35 +202,35 @@ def NormalForm (W : WeierstrassCurve K) (x y : F) : Prop :=
   y ^ 2 + algebraMap K F W.a₁ * x * y + algebraMap K F W.a₃ * y =
     x ^ 3 + algebraMap K F W.a₂ * x ^ 2 + algebraMap K F W.a₄ * x + algebraMap K F W.a₆
 
-/-- The Mathlib curve of a (long form) Weierstraß datum `y² + (ux+v)y = x³ + a₁x² + a₂x + a₃`. -/
-def dataCurve (u v a₁ a₂ a₃ : K) : WeierstrassCurve K := ⟨u, a₁, v, a₂, a₃⟩
+/-- The Mathlib curve of a (long form) Weierstraß datum `y² + (a₁x + a₃)y = x³ + a₂x² + a₄x + a₆`. -/
+def dataCurve (a₁ a₃ a₂ a₄ a₆ : K) : WeierstrassCurve K := ⟨a₁, a₂, a₃, a₄, a₆⟩
 
-theorem isNormalFormA1_iff {x y : F} {u v a₁ a₂ a₃ : K} :
-    IsNormalFormA1 x y u v a₁ a₂ a₃ ↔ NormalForm (dataCurve u v a₁ a₂ a₃) x y := by
+theorem isNormalFormA1_iff {x y : F} {a₁ a₃ a₂ a₄ a₆ : K} :
+    IsNormalFormA1 x y a₁ a₃ a₂ a₄ a₆ ↔ NormalForm (dataCurve a₁ a₃ a₂ a₄ a₆) x y := by
   unfold IsNormalFormA1 NormalForm dataCurve
   constructor <;> intro h <;> linear_combination h
 
-theorem wB2_eq (u v a₁ a₂ a₃ : K) : wB2 u a₁ = (dataCurve u v a₁ a₂ a₃).b₂ := by
+theorem wB2_eq (a₁ a₃ a₂ a₄ a₆ : K) : wB2 a₁ a₂ = (dataCurve a₁ a₃ a₂ a₄ a₆).b₂ := by
   simp [wB2, dataCurve, WeierstrassCurve.b₂]
 
-theorem wB4_eq (u v a₁ a₂ a₃ : K) : wB4 u v a₂ = (dataCurve u v a₁ a₂ a₃).b₄ := by
+theorem wB4_eq (a₁ a₃ a₂ a₄ a₆ : K) : wB4 a₁ a₃ a₄ = (dataCurve a₁ a₃ a₂ a₄ a₆).b₄ := by
   simp [wB4, dataCurve, WeierstrassCurve.b₄]
 
-theorem wB6_eq (u v a₁ a₂ a₃ : K) : wB6 v a₃ = (dataCurve u v a₁ a₂ a₃).b₆ := by
+theorem wB6_eq (a₁ a₃ a₂ a₄ a₆ : K) : wB6 a₃ a₆ = (dataCurve a₁ a₃ a₂ a₄ a₆).b₆ := by
   simp [wB6, dataCurve, WeierstrassCurve.b₆]
 
-theorem wB8_eq (u v a₁ a₂ a₃ : K) : wB8 u v a₁ a₂ a₃ = (dataCurve u v a₁ a₂ a₃).b₈ := by
+theorem wB8_eq (a₁ a₃ a₂ a₄ a₆ : K) : wB8 a₁ a₃ a₂ a₄ a₆ = (dataCurve a₁ a₃ a₂ a₄ a₆).b₈ := by
   simp [wB8, dataCurve, WeierstrassCurve.b₈]
 
-theorem wC4_eq (u v a₁ a₂ a₃ : K) : wC4 u v a₁ a₂ = (dataCurve u v a₁ a₂ a₃).c₄ := by
-  rw [wC4, WeierstrassCurve.c₄, wB2_eq u v a₁ a₂ a₃, wB4_eq u v a₁ a₂ a₃]
+theorem wC4_eq (a₁ a₃ a₂ a₄ a₆ : K) : wC4 a₁ a₃ a₂ a₄ = (dataCurve a₁ a₃ a₂ a₄ a₆).c₄ := by
+  rw [wC4, WeierstrassCurve.c₄, wB2_eq a₁ a₃ a₂ a₄ a₆, wB4_eq a₁ a₃ a₂ a₄ a₆]
 
-theorem wC6_eq (u v a₁ a₂ a₃ : K) : wC6 u v a₁ a₂ a₃ = (dataCurve u v a₁ a₂ a₃).c₆ := by
-  rw [wC6, WeierstrassCurve.c₆, wB2_eq u v a₁ a₂ a₃, wB4_eq u v a₁ a₂ a₃, wB6_eq u v a₁ a₂ a₃]
+theorem wC6_eq (a₁ a₃ a₂ a₄ a₆ : K) : wC6 a₁ a₃ a₂ a₄ a₆ = (dataCurve a₁ a₃ a₂ a₄ a₆).c₆ := by
+  rw [wC6, WeierstrassCurve.c₆, wB2_eq a₁ a₃ a₂ a₄ a₆, wB4_eq a₁ a₃ a₂ a₄ a₆, wB6_eq a₁ a₃ a₂ a₄ a₆]
 
-theorem wDisc_eq (u v a₁ a₂ a₃ : K) : wDisc u v a₁ a₂ a₃ = (dataCurve u v a₁ a₂ a₃).Δ := by
-  rw [wDisc, WeierstrassCurve.Δ, wB2_eq u v a₁ a₂ a₃, wB4_eq u v a₁ a₂ a₃, wB6_eq u v a₁ a₂ a₃,
-    wB8_eq u v a₁ a₂ a₃]
+theorem wDisc_eq (a₁ a₃ a₂ a₄ a₆ : K) : wDisc a₁ a₃ a₂ a₄ a₆ = (dataCurve a₁ a₃ a₂ a₄ a₆).Δ := by
+  rw [wDisc, WeierstrassCurve.Δ, wB2_eq a₁ a₃ a₂ a₄ a₆, wB4_eq a₁ a₃ a₂ a₄ a₆, wB6_eq a₁ a₃ a₂ a₄ a₆,
+    wB8_eq a₁ a₃ a₂ a₄ a₆]
 
 end curve
 
@@ -271,7 +271,7 @@ variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 
 /-- The Mathlib curve underlying a Weierstraß datum. -/
 def WeierstrassData.curve (d : WeierstrassData K F) : WeierstrassCurve K :=
-  dataCurve d.u d.v d.a₁ d.a₂ d.a₃
+  dataCurve d.a₁ d.a₃ d.a₂ d.a₄ d.a₆
 
 theorem WeierstrassData.normalForm (d : WeierstrassData K F) : NormalForm d.curve d.x d.y :=
   isNormalFormA1_iff.mp d.eq
@@ -315,15 +315,15 @@ theorem affine_change (hE : IsEllipticOver K F) (d d' : WeierstrassData K F) (h�
   unfold NormalForm WeierstrassData.curve dataCurve at e e'
   dsimp only at e e'
   rw [hxa, hyb] at e'
-  set u := d.u; set v := d.v; set a₁ := d.a₁; set a₂ := d.a₂; set a₃ := d.a₃
-  set u' := d'.u; set v' := d'.v; set a₁' := d'.a₁; set a₂' := d'.a₂; set a₃' := d'.a₃
+  set a₁ := d.a₁; set a₃ := d.a₃; set a₂ := d.a₂; set a₄ := d.a₄; set a₆ := d.a₆
+  set a₁' := d'.a₁; set a₃' := d'.a₃; set a₂' := d'.a₂; set a₄' := d'.a₄; set a₆' := d'.a₆
   set c : ℕ → K := fun i => [
-    b ^ 2 * a₃ + b'' ^ 2 + u' * a' * b'' + v' * b'' - a' ^ 3 - a₁' * a' ^ 2 - a₂' * a' - a₃',
-    b ^ 2 * a₂ + 2 * b' * b'' + u' * (a * b'' + a' * b') + v' * b' - 3 * a * a' ^ 2 -
-      2 * a₁' * a * a' - a₂' * a,
-    2 * b * b'' + u' * a' * b + v' * b - b ^ 2 * v,
-    b ^ 2 * a₁ + b' ^ 2 + u' * a * b' - a₁' * a ^ 2 - 3 * a ^ 2 * a',
-    2 * b * b' + u' * a * b - b ^ 2 * u,
+    b ^ 2 * a₆ + b'' ^ 2 + a₁' * a' * b'' + a₃' * b'' - a' ^ 3 - a₂' * a' ^ 2 - a₄' * a' - a₆',
+    b ^ 2 * a₄ + 2 * b' * b'' + a₁' * (a * b'' + a' * b') + a₃' * b' - 3 * a * a' ^ 2 -
+      2 * a₂' * a * a' - a₄' * a,
+    2 * b * b'' + a₁' * a' * b + a₃' * b - b ^ 2 * a₃,
+    b ^ 2 * a₂ + b' ^ 2 + a₁' * a * b' - a₂' * a ^ 2 - 3 * a ^ 2 * a',
+    2 * b * b' + a₁' * a * b - b ^ 2 * a₁,
     b ^ 2 - a ^ 3].getD i 0 with hc
   have hz := triangular_indep (𝔭 := d.𝔭) (bas d.x d.y) mbas mbas_strictMono
     (poleOrd_bas hx hy) 6 c (by
@@ -419,7 +419,7 @@ section invariance
 variable {K : Type u} [Field K]
 
 omit [Field K] in
-/-- The curve with parameters `(u, v, a₁, a₂, a₃)` has them as coefficients. -/
+/-- The curve with parameters `(a₁, a₃, a₂, a₄, a₆)` has them as coefficients. -/
 theorem dataCurve_eq (W : WeierstrassCurve K) : dataCurve W.a₁ W.a₃ W.a₂ W.a₄ W.a₆ = W := rfl
 
 theorem jOfData_curve (W : WeierstrassCurve K) :
@@ -476,17 +476,17 @@ variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 (A1.12), (A1.24), (A1.35). -/
 theorem same_prime_invariants (hE : IsEllipticOver K F) (d d' : WeierstrassData K F)
     (h𝔭 : d'.𝔭 = d.𝔭) :
-    jOfData d'.u d'.v d'.a₁ d'.a₂ d'.a₃ = jOfData d.u d.v d.a₁ d.a₂ d.a₃ ∧
-    (ringChar K ≠ 2 → SquareEquiv (hasseOfData d'.u d'.v d'.a₁ d'.a₂ d'.a₃)
-      (hasseOfData d.u d.v d.a₁ d.a₂ d.a₃)) ∧
-    (ringChar K = 2 → PiEquiv (hasseOfData d'.u d'.v d'.a₁ d'.a₂ d'.a₃)
-      (hasseOfData d.u d.v d.a₁ d.a₂ d.a₃)) := by
+    jOfData d'.a₁ d'.a₃ d'.a₂ d'.a₄ d'.a₆ = jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ∧
+    (ringChar K ≠ 2 → SquareEquiv (hasseOfData d'.a₁ d'.a₃ d'.a₂ d'.a₄ d'.a₆)
+      (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆)) ∧
+    (ringChar K = 2 → PiEquiv (hasseOfData d'.a₁ d'.a₃ d'.a₂ d'.a₄ d'.a₆)
+      (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆)) := by
   obtain ⟨C, hC⟩ := exists_variableChange hE d d' h𝔭
-  have e1 : d'.u = (C • d.curve).a₁ := by rw [← hC]; rfl
-  have e2 : d'.a₁ = (C • d.curve).a₂ := by rw [← hC]; rfl
-  have e3 : d'.v = (C • d.curve).a₃ := by rw [← hC]; rfl
-  have e4 : d'.a₂ = (C • d.curve).a₄ := by rw [← hC]; rfl
-  have e5 : d'.a₃ = (C • d.curve).a₆ := by rw [← hC]; rfl
+  have e1 : d'.a₁ = (C • d.curve).a₁ := by rw [← hC]; rfl
+  have e2 : d'.a₂ = (C • d.curve).a₂ := by rw [← hC]; rfl
+  have e3 : d'.a₃ = (C • d.curve).a₃ := by rw [← hC]; rfl
+  have e4 : d'.a₄ = (C • d.curve).a₄ := by rw [← hC]; rfl
+  have e5 : d'.a₆ = (C • d.curve).a₆ := by rw [← hC]; rfl
   rw [e1, e2, e3, e4, e5]
   exact ⟨jOfData_smul d.curve C, fun h => hasse_smul_ne_two d.curve C h,
     fun h => hasse_smul_two d.curve C h⟩

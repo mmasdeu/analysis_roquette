@@ -21,15 +21,15 @@ section independence
 variable (K : Type u) (F : Type u) [Field K] [Field F] [Algebra K F]
 
 theorem exists_transfer_at (hom : DegOneHomogeneous K F) (d d₀ : WeierstrassData K F) :
-    ∃ d' : WeierstrassData K F, d'.𝔭 = d₀.𝔭 ∧ d'.u = d.u ∧ d'.v = d.v ∧ d'.a₁ = d.a₁ ∧
-      d'.a₂ = d.a₂ ∧ d'.a₃ = d.a₃ := by
+    ∃ d' : WeierstrassData K F, d'.𝔭 = d₀.𝔭 ∧ d'.a₁ = d.a₁ ∧ d'.a₃ = d.a₃ ∧ d'.a₂ = d.a₂ ∧
+      d'.a₄ = d.a₄ ∧ d'.a₆ = d.a₆ := by
   obtain ⟨σ, hσ⟩ := hom d.𝔭 d₀.𝔭 d.deg_one d₀.deg_one
   exact ⟨d.transfer σ, hσ, rfl, rfl, rfl, rfl, rfl⟩
 
 /-- Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv`. -/
 theorem absInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K F)
     (hF : HasPrimeOfDegreeOne K F) (d : WeierstrassData K F) :
-    absInv K F hF = jOfData d.u d.v d.a₁ d.a₂ d.a₃ := by
+    absInv K F hF = jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ := by
   have hne : Nonempty (WeierstrassData K F) := ⟨d⟩
   set d₀ := Classical.choice hne
   obtain ⟨d', h𝔭, hu, hv, ha1, ha2, ha3⟩ := exists_transfer_at K F hom d d₀
@@ -44,8 +44,8 @@ theorem absInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K F
 theorem hasseInv_eq_of_data (hE : IsEllipticOver K F) (hom : DegOneHomogeneous K F)
     (hF : HasPrimeOfDegreeOne K F) (d : WeierstrassData K F) :
     (ringChar K ≠ 2 →
-      SquareEquiv (hasseInv K F hF) (hasseOfData d.u d.v d.a₁ d.a₂ d.a₃)) ∧
-    (ringChar K = 2 → PiEquiv (hasseInv K F hF) (hasseOfData d.u d.v d.a₁ d.a₂ d.a₃)) := by
+      SquareEquiv (hasseInv K F hF) (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆)) ∧
+    (ringChar K = 2 → PiEquiv (hasseInv K F hF) (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆)) := by
   have hne : Nonempty (WeierstrassData K F) := ⟨d⟩
   set d₀ := Classical.choice hne
   obtain ⟨d', h𝔭, hu, hv, ha1, ha2, ha3⟩ := exists_transfer_at K F hom d d₀

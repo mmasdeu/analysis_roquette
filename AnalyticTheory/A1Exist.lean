@@ -80,7 +80,7 @@ theorem exists_weierstrass_relation (hE : IsEllipticOver K F) (h : 𝔭.degree =
 /-- Weierstraß equation (A1.1) with leading coefficients `1` for functions with pole divisors
 `2𝔭`, `3𝔭`. -/
 theorem exists_normalForm (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) :
-    ∃ (x y : F) (u v a₁ a₂ a₃ : K), PoleOrd 𝔭 x 2 ∧ PoleOrd 𝔭 y 3 ∧ IsNormalFormA1 x y u v a₁ a₂ a₃ := by
+    ∃ (x y : F) (a₁ a₃ a₂ a₄ a₆ : K), PoleOrd 𝔭 x 2 ∧ PoleOrd 𝔭 y 3 ∧ IsNormalFormA1 x y a₁ a₃ a₂ a₄ a₆ := by
   obtain ⟨x, hx⟩ := exists_poleOrd_two hE h
   obtain ⟨y, hy⟩ := exists_poleOrd_three hE h
   obtain ⟨c₀, c₁, c₂, c₃, c₄, c₅, hc5, hrel⟩ := exists_weierstrass_relation hE h hx hy
@@ -96,30 +96,30 @@ theorem exists_normalForm (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) :
     linear_combination (σ c₅) ^ 2 * hrel
 
 /-- `1728 Δ = c₄³ − c₆²`. -/
-theorem wDisc_mul_1728 (u v a₁ a₂ a₃ : K) :
-    1728 * wDisc u v a₁ a₂ a₃ = wC4 u v a₁ a₂ ^ 3 - wC6 u v a₁ a₂ a₃ ^ 2 := by
+theorem wDisc_mul_1728 (a₁ a₃ a₂ a₄ a₆ : K) :
+    1728 * wDisc a₁ a₃ a₂ a₄ a₆ = wC4 a₁ a₃ a₂ a₄ ^ 3 - wC6 a₁ a₃ a₂ a₄ a₆ ^ 2 := by
   unfold wDisc wC4 wC6 wB2 wB4 wB6 wB8
   ring
 
-theorem wC4_map {R : Type*} [Field R] (σ : K →+* R) (u v a₁ a₂ : K) :
-    σ (wC4 u v a₁ a₂) = wC4 (σ u) (σ v) (σ a₁) (σ a₂) := by
+theorem wC4_map {R : Type*} [Field R] (σ : K →+* R) (a₁ a₃ a₂ a₄ : K) :
+    σ (wC4 a₁ a₃ a₂ a₄) = wC4 (σ a₁) (σ a₃) (σ a₂) (σ a₄) := by
   simp only [wC4, wB2, wB4, map_sub, map_add, map_mul, map_pow, map_ofNat]
 
-theorem wC6_map {R : Type*} [Field R] (σ : K →+* R) (u v a₁ a₂ a₃ : K) :
-    σ (wC6 u v a₁ a₂ a₃) = wC6 (σ u) (σ v) (σ a₁) (σ a₂) (σ a₃) := by
+theorem wC6_map {R : Type*} [Field R] (σ : K →+* R) (a₁ a₃ a₂ a₄ a₆ : K) :
+    σ (wC6 a₁ a₃ a₂ a₄ a₆) = wC6 (σ a₁) (σ a₃) (σ a₂) (σ a₄) (σ a₆) := by
   simp only [wC6, wB2, wB4, wB6, map_sub, map_add, map_mul, map_pow, map_neg, map_ofNat]
 
 /-- In characteristic `≠ 2, 3` the discriminant of a Weierstraß equation for functions with pole
 divisors `2𝔭`, `3𝔭` does not vanish (otherwise `y/(x − e)` would be a nonconstant element of
 `L(𝔭)`). -/
-theorem wDisc_ne_zero (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {x y : F} {u v a₁ a₂ a₃ : K}
-    (hx : PoleOrd 𝔭 x 2) (hy : PoleOrd 𝔭 y 3) (hnf : IsNormalFormA1 x y u v a₁ a₂ a₃)
-    (h2 : (2 : K) ≠ 0) (h3 : (3 : K) ≠ 0) : wDisc u v a₁ a₂ a₃ ≠ 0 := by
+theorem wDisc_ne_zero (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {x y : F} {a₁ a₃ a₂ a₄ a₆ : K}
+    (hx : PoleOrd 𝔭 x 2) (hy : PoleOrd 𝔭 y 3) (hnf : IsNormalFormA1 x y a₁ a₃ a₂ a₄ a₆)
+    (h2 : (2 : K) ≠ 0) (h3 : (3 : K) ≠ 0) : wDisc a₁ a₃ a₂ a₄ a₆ ≠ 0 := by
   intro hd
   set σ := algebraMap K F with hσ
   have hinj : Function.Injective σ := (algebraMap K F).injective
-  set c4 := wC4 u v a₁ a₂ with hc4
-  set c6 := wC6 u v a₁ a₂ a₃ with hc6
+  set c4 := wC4 a₁ a₃ a₂ a₄ with hc4
+  set c6 := wC6 a₁ a₃ a₂ a₄ a₆ with hc6
   have hkey : c4 ^ 3 = c6 ^ 2 := by
     have h0 : c4 ^ 3 - c6 ^ 2 = 0 := by rw [← wDisc_mul_1728, hd, mul_zero]
     exact sub_eq_zero.mp h0
@@ -162,20 +162,20 @@ theorem wDisc_ne_zero (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {x y : F} 
   have hσ12 : (12 : F) ≠ 0 := by
     have h := (map_ne_zero_iff σ hinj).mpr h12
     rwa [map_ofNat σ 12] at h
-  have hmapC4 : σ c4 = wC4 (σ u) (σ v) (σ a₁) (σ a₂) := by rw [hc4]; exact wC4_map σ _ _ _ _
-  have hmapC6 : σ c6 = wC6 (σ u) (σ v) (σ a₁) (σ a₂) (σ a₃) := by rw [hc6]; exact wC6_map σ _ _ _ _ _
-  have hG2 : σ g2 = wC4 (σ u) (σ v) (σ a₁) (σ a₂) / 12 := by
+  have hmapC4 : σ c4 = wC4 (σ a₁) (σ a₃) (σ a₂) (σ a₄) := by rw [hc4]; exact wC4_map σ _ _ _ _
+  have hmapC6 : σ c6 = wC6 (σ a₁) (σ a₃) (σ a₂) (σ a₄) (σ a₆) := by rw [hc6]; exact wC6_map σ _ _ _ _ _
+  have hG2 : σ g2 = wC4 (σ a₁) (σ a₃) (σ a₂) (σ a₄) / 12 := by
     rw [hg2, map_div₀, hmapC4, map_ofNat σ 12]
-  have hG3 : σ g3 = wC6 (σ u) (σ v) (σ a₁) (σ a₂) (σ a₃) / 216 := by
+  have hG3 : σ g3 = wC6 (σ a₁) (σ a₃) (σ a₂) (σ a₄) (σ a₆) / 216 := by
     rw [hg3, map_div₀, hmapC6, map_ofNat σ 216]
   have hσ216 : (216 : F) ≠ 0 := by
     have h := (map_ne_zero_iff σ hinj).mpr h216
     rwa [map_ofNat σ 216] at h
-  set U := σ u with hU
-  set V := σ v with hV
-  set A1 := σ a₁
-  set A2 := σ a₂
-  set A3 := σ a₃
+  set U := σ a₁ with hU
+  set V := σ a₃ with hV
+  set A1 := σ a₂
+  set A2 := σ a₄
+  set A3 := σ a₆
   set S : F := wB2 U A1 / 12 with hS
   set X : F := x + S with hX
   set Y : F := 2 * y + U * x + V with hY
@@ -206,7 +206,7 @@ theorem wDisc_ne_zero (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {x y : F} 
     ring
   -- the function `t = Y / (X − Z)` lies in `L(𝔭)` and is not constant
   have hXpole : PoleOrd 𝔭 X 2 := by
-    have := hx.affine2 (a := (1 : K)) one_ne_zero (wB2 u a₁ / 12)
+    have := hx.affine2 (a := (1 : K)) one_ne_zero (wB2 a₁ a₂ / 12)
     simpa [hX, hS, wB2, map_div₀, map_ofNat] using this
   have hXZ : X - Z ≠ 0 := by
     intro h0
@@ -219,8 +219,8 @@ theorem wDisc_ne_zero (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {x y : F} 
     rw [ht, div_pow, hcubic, map_ofNat σ 4]
     field_simp
   have hW : PoleOrd 𝔭 (X + 2 * Z) 2 := by
-    have := hx.affine2 (a := (1 : K)) one_ne_zero (wB2 u a₁ / 12 + 2 * z₀)
-    have e : X + 2 * Z = σ 1 * x + σ (wB2 u a₁ / 12 + 2 * z₀) := by
+    have := hx.affine2 (a := (1 : K)) one_ne_zero (wB2 a₁ a₂ / 12 + 2 * z₀)
+    have e : X + 2 * Z = σ 1 * x + σ (wB2 a₁ a₂ / 12 + 2 * z₀) := by
       rw [hX, hS, hZ, map_add, map_mul, map_div₀, map_ofNat σ 12, map_ofNat σ 2, map_one]
       simp only [wB2, map_add, map_mul, map_pow, map_ofNat]
       ring

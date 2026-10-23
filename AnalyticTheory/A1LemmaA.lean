@@ -212,7 +212,7 @@ theorem PoleOrd.transfer {F' : Type u} [Field F'] [Algebra K F'] {𝔭 : PrimeDi
   ⟨(mem_Ln_transfer σ 𝔭 m f).mpr h.1, fun h' => h.2 ((mem_Ln_transfer σ 𝔭 (m - 1) f).mp h')⟩
 
 /-- Lemma A in terms of a Weierstraß datum `(x, y)` at `𝔭`: the non-trivial automorphism fixing `𝔭`
-is `x ↦ x`, `y ↦ −y − ux − v`. -/
+is `x ↦ x`, `y ↦ −y − a₁x − a₃`. -/
 theorem lemmaA_data (hE : IsEllipticOver K F) (d : WeierstrassData K F) (hc4 : d.curve.c₄ ≠ 0)
     (hc6 : d.curve.c₆ ≠ 0) :
     ∃ ε : F ≃ₐ[K] F, ε ≠ AlgEquiv.refl ∧ d.𝔭.transfer ε = d.𝔭 ∧
@@ -320,12 +320,12 @@ variable {K F : Type u} [Field K] [Field F] [Algebra K F]
 
 /-- If `j ≠ 0, 12³` then the Weierstraß curve of a datum has `c₄ ≠ 0` and `c₆ ≠ 0`. -/
 theorem curve_c_ne_zero (d : WeierstrassData K F)
-    (hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3) :
+    (hj : jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 0 ∧ jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 12 ^ 3) :
     d.curve.c₄ ≠ 0 ∧ d.curve.c₆ ≠ 0 := by
   have hΔ : d.curve.Δ ≠ 0 := by
     have := d.disc
     rwa [wDisc_eq] at this
-  have hjc : jc d.curve = jOfData d.u d.v d.a₁ d.a₂ d.a₃ := rfl
+  have hjc : jc d.curve = jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ := rfl
   refine ⟨?_, ?_⟩
   · intro h0; apply hj.1; rw [← hjc, jc_eq, h0]; simp
   · intro h0; apply hj.2
@@ -337,7 +337,7 @@ theorem curve_c_ne_zero (d : WeierstrassData K F)
 /-- Book, Appendix §A1, Lemma A: if `j ≠ 0, 12³`, there is exactly one non-trivial automorphism `ε`
 of `F | K` fixing a given prime divisor `𝔭` of degree `1`. -/
 theorem lemmaA (hE : IsEllipticOver K F) (d : WeierstrassData K F)
-    (hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3) :
+    (hj : jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 0 ∧ jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 12 ^ 3) :
     ∃ ε : F ≃ₐ[K] F, ε ≠ AlgEquiv.refl ∧ d.𝔭.transfer ε = d.𝔭 ∧
       ∀ σ : F ≃ₐ[K] F, d.𝔭.transfer σ = d.𝔭 → σ = AlgEquiv.refl ∨ σ = ε := by
   obtain ⟨hc4, hc6⟩ := curve_c_ne_zero d hj

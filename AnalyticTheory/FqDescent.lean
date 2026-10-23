@@ -509,8 +509,8 @@ theorem reflAlg_eq_eps :
   set d := wpData hq0 hq1 with hd
   have hE := fq_is_elliptic L q hq0 hq1
   have hfacts := jInvQ_facts hq0 hq1
-  have hj : jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 ∧ jOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 12 ^ 3 := by
-    have : jOfData d.u d.v d.a₁ d.a₂ d.a₃ = jInvQ L q := jOfData_wp hq1
+  have hj : jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 0 ∧ jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 12 ^ 3 := by
+    have : jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ = jInvQ L q := jOfData_wp hq1
     rw [this]; exact ⟨hfacts.2.1, hfacts.2.2.1⟩
   obtain ⟨hc4, hc6⟩ := curve_c_ne_zero d hj
   obtain ⟨ε, hne, hfix, hεx, hεy, huniq⟩ := lemmaA_data hE d hc4 hc6

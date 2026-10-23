@@ -244,8 +244,8 @@ reason is given.
   a specific function field. In these characteristics the results of §A1 therefore assume a
   Weierstraß datum.
 * _The case-by-case normal forms_ (A1.14)–(A1.37). They are replaced by Mathlib's universal
-  Weierstraß equations and the invariants $`c_4^3/\Delta` and $`-c_4/c_6` (resp. the book's $`b_1` and $`A'` in
-  characteristic $`3` and $`2`), which hold in every characteristic. The individual formulas and
+  Weierstraß equations and the invariants $`c_4^3/\Delta` and $`-c_4/c_6` (resp. $`b_2` in characteristic $`3` and
+  $`a_2/a_1^2 + a_3/a_1^3` in characteristic $`2`), which hold in every characteristic. The individual formulas and
   substitution rules of the book are subsumed and not stated separately.
 * _Remark 1_: the Hasse invariant (44) of $`F_K(q)` in terms of $`B, C`. _Remark 2_: the
   exceptional normal forms (45) and "$`j` alone determines $`F`". _Remark 3_: the criterion for two

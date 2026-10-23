@@ -539,7 +539,7 @@ theorem degOneHomogeneous_of_data (hE : IsEllipticOver K F) (d : WeierstrassData
 (no homogeneity hypothesis: it is now a theorem, `degOneHomogeneous_of_data`). -/
 theorem absInv_eq_jOfData (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F)
     (d : WeierstrassData K F) :
-    absInv K F hF = jOfData d.u d.v d.a₁ d.a₂ d.a₃ :=
+    absInv K F hF = jOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ :=
   absInv_eq_of_data K F hE (degOneHomogeneous_of_data hE d) hF d
 
 /-- Book, §A1: the Hasse invariant computed from *any* Weierstraß datum is equivalent to
@@ -547,8 +547,8 @@ theorem absInv_eq_jOfData (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K 
 theorem hasseInv_eq_hasseOfData (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K F)
     (d : WeierstrassData K F) :
     (ringChar K ≠ 2 →
-      SquareEquiv (hasseInv K F hF) (hasseOfData d.u d.v d.a₁ d.a₂ d.a₃)) ∧
-    (ringChar K = 2 → PiEquiv (hasseInv K F hF) (hasseOfData d.u d.v d.a₁ d.a₂ d.a₃)) :=
+      SquareEquiv (hasseInv K F hF) (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆)) ∧
+    (ringChar K = 2 → PiEquiv (hasseInv K F hF) (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆)) :=
   hasseInv_eq_of_data K F hE (degOneHomogeneous_of_data hE d) hF d
 
 end main

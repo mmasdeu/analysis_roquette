@@ -39,11 +39,11 @@ noncomputable def WeierstrassData.transfer (σ : F ≃ₐ[K] F') (d : Weierstras
   deg_one := (PrimeDivisor.transfer_degree σ d.𝔭).trans d.deg_one
   x := σ d.x
   y := σ d.y
-  u := d.u
-  v := d.v
   a₁ := d.a₁
-  a₂ := d.a₂
   a₃ := d.a₃
+  a₂ := d.a₂
+  a₄ := d.a₄
+  a₆ := d.a₆
   eq := by
     have := congrArg σ d.eq
     simpa [IsNormalFormA1, map_add, map_mul, map_pow, σ.commutes] using this

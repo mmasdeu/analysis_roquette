@@ -42,17 +42,17 @@ theorem transcendental_of_generators (hF : IsFunctionFieldOver K F) (W : Weierst
   exact htr (he ▸ isAlgebraic_algebraMap e)
 
 /-- A Weierstraß equation of non-zero discriminant for generators `x, y` gives a datum. -/
-theorem exists_data_of_model (hF : IsFunctionFieldOver K F) (u v a₁ a₂ a₃ : K) {x y : F}
-    (hrel : IsNormalFormA1 x y u v a₁ a₂ a₃)
+theorem exists_data_of_model (hF : IsFunctionFieldOver K F) (a₁ a₃ a₂ a₄ a₆ : K) {x y : F}
+    (hrel : IsNormalFormA1 x y a₁ a₃ a₂ a₄ a₆)
     (hgen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤)
-    (hdisc : wDisc u v a₁ a₂ a₃ ≠ 0) :
-    ∃ d : WeierstrassData K F, d.x = x ∧ d.y = y ∧ d.u = u ∧ d.v = v ∧ d.a₁ = a₁ ∧
-      d.a₂ = a₂ ∧ d.a₃ = a₃ := by
-  have hnf : NormalForm (dataCurve u v a₁ a₂ a₃) x y := isNormalFormA1_iff.mp hrel
-  have hΔ : (dataCurve u v a₁ a₂ a₃).Δ ≠ 0 := by rwa [← wDisc_eq]
-  obtain ⟨𝔓, hdeg, hx, hy⟩ := exists_prime_of_model (dataCurve u v a₁ a₂ a₃) hnf
+    (hdisc : wDisc a₁ a₃ a₂ a₄ a₆ ≠ 0) :
+    ∃ d : WeierstrassData K F, d.x = x ∧ d.y = y ∧ d.a₁ = a₁ ∧ d.a₃ = a₃ ∧ d.a₂ = a₂ ∧
+      d.a₄ = a₄ ∧ d.a₆ = a₆ := by
+  have hnf : NormalForm (dataCurve a₁ a₃ a₂ a₄ a₆) x y := isNormalFormA1_iff.mp hrel
+  have hΔ : (dataCurve a₁ a₃ a₂ a₄ a₆).Δ ≠ 0 := by rwa [← wDisc_eq]
+  obtain ⟨𝔓, hdeg, hx, hy⟩ := exists_prime_of_model (dataCurve a₁ a₃ a₂ a₄ a₆) hnf
     (transcendental_of_generators hF _ hnf hgen) hgen hΔ
-  exact ⟨⟨𝔓, hdeg, x, y, u, v, a₁, a₂, a₃, hrel, hgen, hdisc, ⟨hx.1, by simpa using hx.2⟩,
+  exact ⟨⟨𝔓, hdeg, x, y, a₁, a₃, a₂, a₄, a₆, hrel, hgen, hdisc, ⟨hx.1, by simpa using hx.2⟩,
     ⟨hy.1, by simpa using hy.2⟩⟩, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 theorem ne_zero_two_of_ringChar (h2 : ringChar K ≠ 2) : (2 : K) ≠ 0 := by
@@ -113,7 +113,7 @@ theorem exists_data_of_weierstrassNormal (hF : IsFunctionFieldOver K F) (x y : F
     (hgen : IntermediateField.adjoin K ({x, y} : Set F) = ⊤)
     (hnf : IsWeierstrassNormal x y g₂ g₃) (h2 : (2 : K) ≠ 0)
     (hΔ : g₂ ^ 3 - 27 * g₃ ^ 2 ≠ 0) :
-    ∃ d : WeierstrassData K F, d.u = 0 ∧ d.v = 0 ∧ d.a₁ = 0 ∧ d.a₂ = -g₂ / 4 ∧ d.a₃ = -g₃ / 4 := by
+    ∃ d : WeierstrassData K F, d.a₁ = 0 ∧ d.a₃ = 0 ∧ d.a₂ = 0 ∧ d.a₄ = -g₂ / 4 ∧ d.a₆ = -g₃ / 4 := by
   have h2F : (2 : F) ≠ 0 := by
     intro h; apply h2; apply (algebraMap K F).injective
     rw [map_ofNat, map_zero]; exact h
@@ -170,8 +170,8 @@ theorem absInv_weierstrass (hE : IsEllipticOver K F) (hF : HasPrimeOfDegreeOne K
   rw [jOfData, wC4_weierstrassNormal h2, wDisc_weierstrassNormal h2]
   ring
 
-theorem wC6_weierstrassNormal (h2 : (2 : K) ≠ 0) (g₃ : K) (a₂ : K) :
-    wC6 0 0 0 a₂ (-g₃ / 4) = 216 * g₃ := by
+theorem wC6_weierstrassNormal (h2 : (2 : K) ≠ 0) (g₃ : K) (a₄ : K) :
+    wC6 0 0 0 a₄ (-g₃ / 4) = 216 * g₃ := by
   have h4 : (4 : K) ≠ 0 := by
     have : (4 : K) = 2 * 2 := by norm_num
     rw [this]; exact mul_ne_zero h2 h2
@@ -231,22 +231,22 @@ theorem remark_A2_sep_closed (hK : IsSepClosed K) (hE : IsEllipticOver K F)
   obtain ⟨d⟩ := hd
   have hjd := absInv_eq_jOfData hE hF d
   have hΔ := d.disc
-  have hc4 : wC4 d.u d.v d.a₁ d.a₂ ≠ 0 := by
+  have hc4 : wC4 d.a₁ d.a₃ d.a₂ d.a₄ ≠ 0 := by
     intro h0
     apply hj.1
     rw [hjd, jOfData, h0]; simp
-  have hc6 : wC6 d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 := by
+  have hc6 : wC6 d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 0 := by
     intro h0
     apply hj.2
     rw [hjd, jOfData]
-    have := wDisc_mul_1728 d.u d.v d.a₁ d.a₂ d.a₃
+    have := wDisc_mul_1728 d.a₁ d.a₃ d.a₂ d.a₄ d.a₆
     rw [h0] at this
     rw [div_eq_iff hΔ]
     linear_combination (-1) * this
   refine ⟨fun h2 => ?_, fun h2 => ?_⟩
   · obtain ⟨hs, -⟩ := hasseInv_eq_hasseOfData hE hF d
     have h1 := (hasseInv_eq_hasseOfData hE hF d).1 h2
-    have hne : hasseOfData d.u d.v d.a₁ d.a₂ d.a₃ ≠ 0 := by
+    have hne : hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆ ≠ 0 := by
       unfold hasseOfData
       by_cases h3 : ringChar K = 3
       · rw [ite_eq_right_iff.mpr (fun h => absurd h h2), if_pos h3]
@@ -262,23 +262,23 @@ theorem remark_A2_sep_closed (hK : IsSepClosed K) (hE : IsEllipticOver K F)
       · rw [if_neg h2, if_neg h3]
         exact div_ne_zero (neg_ne_zero.mpr hc4) hc6
     haveI : NeZero ((2 : ℕ) : K) := ⟨by exact_mod_cast ne_zero_two_of_ringChar h2⟩
-    obtain ⟨t, ht⟩ := hK.exists_pow_nat_eq (hasseOfData d.u d.v d.a₁ d.a₂ d.a₃) 2
+    obtain ⟨t, ht⟩ := hK.exists_pow_nat_eq (hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆) 2
     refine squareEquiv_trans h1 ⟨t, ?_, ?_⟩
     · rintro rfl; exact hne (by rw [← ht]; ring)
     · rw [mul_one, ht]
   · have h1 := (hasseInv_eq_hasseOfData hE hF d).2 h2
     have hz : (2 : K) = 0 := two_eq_zero_of_ringChar h2
-    obtain ⟨z, hz'⟩ : ∃ z : K, 1 * z ^ 2 + 1 * z + (1 - hasseOfData d.u d.v d.a₁ d.a₂ d.a₃) = 0 :=
+    obtain ⟨z, hz'⟩ : ∃ z : K, 1 * z ^ 2 + 1 * z + (1 - hasseOfData d.a₁ d.a₃ d.a₂ d.a₄ d.a₆) = 0 :=
       hK.exists_root_C_mul_X_pow_add_C_mul_X_add_C 1 1 _ (by exact_mod_cast hz) le_rfl one_ne_zero
     refine piEquiv_trans hz h1 ⟨z, ?_⟩
     linear_combination (-1) * hz'
 
-theorem wDisc_map {R : Type*} [Field R] (σ : K →+* R) (u v a₁ a₂ a₃ : K) :
-    σ (wDisc u v a₁ a₂ a₃) = wDisc (σ u) (σ v) (σ a₁) (σ a₂) (σ a₃) := by
+theorem wDisc_map {R : Type*} [Field R] (σ : K →+* R) (a₁ a₃ a₂ a₄ a₆ : K) :
+    σ (wDisc a₁ a₃ a₂ a₄ a₆) = wDisc (σ a₁) (σ a₃) (σ a₂) (σ a₄) (σ a₆) := by
   simp only [wDisc, wB2, wB4, wB6, wB8, map_sub, map_add, map_mul, map_pow, map_neg, map_ofNat]
 
-theorem jOfData_map {R : Type*} [Field R] (σ : K →+* R) (u v a₁ a₂ a₃ : K) :
-    σ (jOfData u v a₁ a₂ a₃) = jOfData (σ u) (σ v) (σ a₁) (σ a₂) (σ a₃) := by
+theorem jOfData_map {R : Type*} [Field R] (σ : K →+* R) (a₁ a₃ a₂ a₄ a₆ : K) :
+    σ (jOfData a₁ a₃ a₂ a₄ a₆) = jOfData (σ a₁) (σ a₃) (σ a₂) (σ a₄) (σ a₆) := by
   rw [jOfData, jOfData, map_div₀, map_pow, wC4_map, wDisc_map]
 
 theorem ringChar_eq_of_hom {R : Type*} [Field R] (σ : K →+* R) : ringChar R = ringChar K := by
@@ -293,8 +293,8 @@ theorem ringChar_eq_of_hom {R : Type*} [Field R] (σ : K →+* R) : ringChar R =
       rw [map_natCast, map_zero]; exact h0
     exact (ringChar.spec K _).mp this
 
-theorem hasseOfData_map {R : Type*} [Field R] (σ : K →+* R) (u v a₁ a₂ a₃ : K) :
-    σ (hasseOfData u v a₁ a₂ a₃) = hasseOfData (σ u) (σ v) (σ a₁) (σ a₂) (σ a₃) := by
+theorem hasseOfData_map {R : Type*} [Field R] (σ : K →+* R) (a₁ a₃ a₂ a₄ a₆ : K) :
+    σ (hasseOfData a₁ a₃ a₂ a₄ a₆) = hasseOfData (σ a₁) (σ a₃) (σ a₂) (σ a₄) (σ a₆) := by
   unfold hasseOfData
   rw [ringChar_eq_of_hom σ]
   split_ifs
@@ -357,17 +357,17 @@ theorem remark_A3 [FiniteDimensional K L] (hE : IsEllipticOver K F) (hEL : IsEll
   set φ := algebraMap F FL with hφ
   have hc1 : ∀ c : K, φ (algebraMap K F c) = algebraMap L FL (ι c) := fun c => by
     rw [hφ, hι, ← IsScalarTower.algebraMap_apply K F FL, ← IsScalarTower.algebraMap_apply K L FL]
-  have hrel : IsNormalFormA1 (φ d.x) (φ d.y) (ι d.u) (ι d.v) (ι d.a₁) (ι d.a₂) (ι d.a₃) := by
+  have hrel : IsNormalFormA1 (φ d.x) (φ d.y) (ι d.a₁) (ι d.a₃) (ι d.a₂) (ι d.a₄) (ι d.a₆) := by
     have := congrArg φ d.eq
     unfold IsNormalFormA1 at this ⊢
     simp only [map_add, map_mul, map_pow, hc1] at this
     exact this
   have hgen := adjoin_const_ext hconst d.gen
-  have hdisc : wDisc (ι d.u) (ι d.v) (ι d.a₁) (ι d.a₂) (ι d.a₃) ≠ 0 := by
+  have hdisc : wDisc (ι d.a₁) (ι d.a₃) (ι d.a₂) (ι d.a₄) (ι d.a₆) ≠ 0 := by
     rw [← wDisc_map]
     exact (map_ne_zero_iff ι ι.injective).mpr d.disc
-  obtain ⟨d', -, -, hu, hv, ha1, ha2, ha3⟩ := exists_data_of_model hEL.functionField (ι d.u) (ι d.v)
-    (ι d.a₁) (ι d.a₂) (ι d.a₃) hrel hgen hdisc
+  obtain ⟨d', -, -, hu, hv, ha1, ha2, ha3⟩ := exists_data_of_model hEL.functionField (ι d.a₁) (ι d.a₃)
+    (ι d.a₂) (ι d.a₄) (ι d.a₆) hrel hgen hdisc
   have hj : absInv L FL hFL = algebraMap K L (absInv K F hF) := by
     rw [absInv_eq_jOfData hEL hFL d', absInv_eq_jOfData hE hF d, hu, hv, ha1, ha2, ha3,
       ← jOfData_map]

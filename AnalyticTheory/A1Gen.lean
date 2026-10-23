@@ -142,8 +142,8 @@ theorem adjoin_xy_eq_top (hE : IsEllipticOver K F) (h : 𝔭.degree = 1) {x y : 
 at every prime divisor of degree `1`. -/
 theorem exists_weierstrassData (hE : IsEllipticOver K F) (𝔭 : PrimeDivisor K F) (h : 𝔭.degree = 1)
     (h2 : (2 : K) ≠ 0) (h3 : (3 : K) ≠ 0) : ∃ d : WeierstrassData K F, d.𝔭 = 𝔭 := by
-  obtain ⟨x, y, u, v, a₁, a₂, a₃, hx, hy, hnf⟩ := exists_normalForm hE h
-  exact ⟨{ 𝔭 := 𝔭, deg_one := h, x := x, y := y, u := u, v := v, a₁ := a₁, a₂ := a₂, a₃ := a₃,
+  obtain ⟨x, y, a₁, a₃, a₂, a₄, a₆, hx, hy, hnf⟩ := exists_normalForm hE h
+  exact ⟨{ 𝔭 := 𝔭, deg_one := h, x := x, y := y, a₁ := a₁, a₃ := a₃, a₂ := a₂, a₄ := a₄, a₆ := a₆,
            eq := hnf, gen := adjoin_xy_eq_top hE h hx hy,
            disc := wDisc_ne_zero hE h hx hy hnf h2 h3,
            hx := ⟨hx.1, by simpa using hx.2⟩, hy := ⟨hy.1, by simpa using hy.2⟩ }, rfl⟩

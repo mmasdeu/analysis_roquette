@@ -41,9 +41,14 @@ leanblueprint pdf                # builds blueprint/print/print.pdf
 Verso's literate-Lean format: the text of Roquette's monograph, chapter by chapter, is written in
 Verso docstrings (`/-! … -/`) and the Lean declarations of each definition and result are shown
 next to it with `#print` / `#check`, so the displayed statements are the ones the library actually
-proves. Only completely formalized parts appear (results whose proofs and dependencies are free of
-`sorry`); Appendix §A2, `absolute_hasse_exists` and the Proposition on absolute integrality of `j`
-are left out. The site is configured by `literate.toml`.
+proves. The chapters contain only completely formalized parts (results whose proofs and
+dependencies are free of `sorry`). Where a formal statement differs from the printed one, a
+paragraph headed _Formalization note._ explains how and why. Appendix B (`Book/NotFormalized.lean`)
+lists everything that is not formalized, with the reasons, and shows the statements of the twelve
+unproved results. Weierstraß equations use Tate's (Mathlib's) notation `a₁, …, a₆, b₂, …, c₄, c₆`
+throughout; the §A1 chapter has a remark on the book's different notation. The Lean layer of the
+pages can be folded away (`book-assets/fold.js`, `fold.css`, loaded through `extra_js`/`extra_css`
+in `literate.toml`). The site is configured by `literate.toml`.
 
 ```
 ./build-book.sh                  # builds the pages, prints the output directory

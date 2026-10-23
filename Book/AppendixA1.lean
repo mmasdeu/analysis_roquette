@@ -46,9 +46,18 @@ its pole divisor, and an element $`y \in F` having $`3\mathfrak{p}` as its pole 
 The $`7` elements $`1, x, y, x^2, xy, x^3, y^2` are $`K`-linearly dependent since their pole
 divisors divide $`6\mathfrak{p}`. Hence there is a relation of the form
 
-$$`y^2 + (ux+v)y = a_0x^3 + a_1x^2 + a_2x + a_3 \qquad (A1.1)`
+$$`y^2 + (a_1x+a_3)y = a_0x^3 + a_2x^2 + a_4x + a_6 \qquad (A1.1)`
 
-with coefficients $`u, v, \dots, a_3 \in K`. The elements $`x, y` are determined by our conditions
+with coefficients $`a_0, a_1, \dots, a_6 \in K`.
+
+_Notation._ Roquette writes this relation as $`y^2 + (ux+v)y = a_0x^3 + a_1x^2 + a_2x + a_3`, and
+accordingly uses $`b_1, b_2, b_3` for the coefficients of (A1.3) below. This companion uses the
+notation of Tate, which is universally accepted and is the one of Mathlib's Weierstraß curves.
+The book's $`u, v, a_1, a_2, a_3` are our $`a_1, a_3, a_2, a_4, a_6`, and its $`b_1, b_2, b_3` are
+our $`b_2, 2b_4, b_6`. All formulas of this appendix are rewritten accordingly; equation numbers are
+the book's.
+
+The elements $`x, y` are determined by our conditions
 up to the substitutions
 
 $$`x \mapsto \alpha x + \alpha', \qquad y \mapsto \beta y + \beta'x + \beta'' \qquad (A1.2)`
@@ -56,9 +65,9 @@ $$`x \mapsto \alpha x + \alpha', \qquad y \mapsto \beta y + \beta'x + \beta'' \q
 with coefficients in $`K` and $`\alpha, \beta \ne 0`. Since $`a_0 \ne 0`, we may apply the
 substitution $`x \mapsto a_0x`, $`y \mapsto a_0y` and thus assume that $`a_0 = 1`:
 
-$$`y^2 + (ux+v)y = x^3 + a_1x^2 + a_2x + a_3. \qquad (A1.26)`
+$$`y^2 + (a_1x+a_3)y = x^3 + a_2x^2 + a_4x + a_6. \qquad (A1.26)`
 
-> Book, §A1, equation (A1.1)/(A1.26) (with `a₀ = 1`): `y² + (ux + v)y = x³ + a₁x² + a₂x + a₃`.
+> Book, §A1, equation (A1.1)/(A1.26) (with `a₀ = 1`), in Mathlib's notation: `y² + (a₁x + a₃)y = x³ + a₂x² + a₄x + a₆`. The book writes `u, v, a₁, a₂, a₃` for `a₁, a₃, a₂, a₄, a₆`; the arguments are in the order in which they occur in the equation.
 -/
 
 #stmt IsNormalFormA1
@@ -80,18 +89,25 @@ open, and the results below that need one assume it.
 
 /-!
 
-If $`\operatorname{char}(K) \ne 2` we may apply the substitution $`y \mapsto 2y + (ux+v)` and
-thus transform the equation into the form $`y^2 = 4x^3 + b_1x^2 + b_2x + b_3` (A1.3). If,
+If $`\operatorname{char}(K) \ne 2` we may apply the substitution $`y \mapsto 2y + (a_1x+a_3)` and
+thus transform the equation into the form
+
+$$`y^2 = 4x^3 + b_2x^2 + 2b_4x + b_6 \qquad (A1.3)`
+
+where $`b_2 = a_1^2 + 4a_2`, $`b_4 = 2a_4 + a_1a_3`, $`b_6 = a_3^2 + 4a_6` (A1.4). If,
 furthermore, $`\operatorname{char}(K) \ne 3` we may apply the substitution
-$`x \mapsto x + \frac{1}{12}b_1` and thus transform the equation into _Weierstraß normal form_
+$`x \mapsto x + \frac{1}{12}b_2` and thus transform the equation into _Weierstraß normal form_
 
-$$`y^2 = 4x^3 - g_2x - g_3. \qquad (A1.6)`
+$$`y^2 = 4x^3 - g_2x - g_3, \qquad (A1.6)`
 
-In characteristic $`3` (with $`j \ne 0`) the form $`y^2 = x^3 + b_1x^2 + b_3'` (A1.21), and in
+where $`g_2 = c_4/12` and $`g_3 = c_6/216` with $`c_4 = b_2^2 - 24b_4` and
+$`c_6 = -b_2^3 + 36b_2b_4 - 216b_6` (A1.7).
+
+In characteristic $`3` (with $`j \ne 0`) the form $`y^2 = x^3 + b_2x^2 + b_6'` (A1.21), and in
 characteristic $`2` (with $`j \ne 0`) the form $`y^2 + xy = x^3 + A'x^2 + C'` (A1.32), serve as
 substitutes of the Weierstraß normal form.
 
-> Book, §A1, equation (A1.3): `y² = 4x³ + b₁x² + b₂x + b₃` over `F`.
+> Book, §A1, equation (A1.3), in Mathlib's notation: `y² = 4x³ + b₂x² + 2b₄x + b₆` over `F` (the book writes `b₁, b₂, b₃` for `b₂, 2b₄, b₆`).
 -/
 
 #stmt IsNormalFormA3
@@ -164,22 +180,22 @@ $$`\gamma \equiv -\frac{1}{2}\,\frac{g_2}{g_3} \bmod K^{\times 2} \qquad (\opera
 The factor $`-\frac{1}{2}` is chosen such that the analytic fields discussed in this paper have
 Hasse invariant $`1`.
 
-In characteristic $`3` one defines $`j` by $`j = -b_1^3/b_3'` (A1.23) and $`\gamma \equiv b_1 \bmod
+In characteristic $`3` one defines $`j` by $`j = -b_2^3/b_6'` (A1.23) and $`\gamma \equiv b_2 \bmod
 K^{\times 2}` (A1.25); in characteristic $`2` one defines $`j = 1/C'` and
 $`\gamma \equiv A' \bmod \pi(K^+)` (A1.36), where $`\pi(z) = z^2 + z`. As the book explains, the
 absolute invariant is in fact given _universally for every characteristic_ by a rational function
-of $`u, v, a_1, a_2, a_3` with integer coefficients.
+of $`a_1, a_2, a_3, a_4, a_6` with integer coefficients.
 
 _Formalization note._ The formalization uses this universal description, in the classical
 notation $`j = c_4^3/\Delta` of Mathlib's Weierstraß curves. The Hasse invariant is represented by
 an element of $`K`, to be read modulo squares (resp. modulo $`\pi(K^+)` in characteristic $`2`):
 `hasseOfData` is $`-c_4/c_6` for $`\operatorname{char}(K) \ne 2, 3` (it agrees with
-$`-\frac12 g_2/g_3` modulo squares, see `hasseInv_weierstrass`), the book's $`b_1` of (A1.4) in
-characteristic $`3`, and the coefficient $`A = A'` of (A1.29), (A1.32) in characteristic $`2`. `SquareEquiv` requires the
+$`-\frac12 g_2/g_3` modulo squares, see `hasseInv_weierstrass`), $`b_2` in characteristic $`3`, and
+$`a_2/a_1^2 + a_3/a_1^3`, the coefficient $`A = A'` of (A1.29), (A1.32), in characteristic $`2`. `SquareEquiv` requires the
 factor $`t` in $`a = t^2 b` to be non-zero: otherwise $`0 = 0^2 b` would make every $`b` equivalent
 to $`0`.
 
-> Book, §A1: `u ∈ K` and `v ∈ K` with `a` and `b` in the same class modulo squares, i.e. `a = t² b` for some `t ∈ K^×`.
+> Book, §A1: `a ∈ K` and `b ∈ K` are in the same class modulo squares, i.e. `a = t² b` for some `t ∈ K^×`.
 -/
 
 #stmt SquareEquiv
@@ -214,7 +230,7 @@ to $`0`.
 
 /-!
 
-> The Hasse invariant (as a representative in `K`) of a Weierstraß equation, following (A1.13) (characteristic `≠ 2, 3`: `−c₄/c₆`, equivalent to `−½ g₂/g₃` modulo squares), (A1.25) (characteristic `3`: `b₂`) and (A1.36) (characteristic `2`: `a₁/u² + v/u³`, the class of `A′` modulo `π(K⁺)`).
+> The Hasse invariant (as a representative in `K`) of a Weierstraß equation, following (A1.13) (characteristic `≠ 2, 3`: `−c₄/c₆`, equivalent to `−½ g₂/g₃` modulo squares), (A1.25) (characteristic `3`: `b₂`) and (A1.36) (characteristic `2`: `a₂/a₁² + a₃/a₁³`, the class of `A′` modulo `π(K⁺)`).
 -/
 
 #stmt hasseOfData
@@ -443,7 +459,7 @@ $$`g_3 = \frac{-1}{8\gamma^3}\cdot\frac{27j}{j - 12^3}. \qquad (A1.15)`
 
 This shows that we can find a Weierstraß normal form for $`F\,|\,K` in which the coefficients
 $`g_2, g_3` are universally expressible in terms of $`j` and $`\gamma`. Similar normalisations
-exist in characteristic $`3` ($`\gamma = b_1`, $`b_3' = -\gamma^3/j`) and in characteristic $`2`
+exist in characteristic $`3` ($`\gamma = b_2`, $`b_6' = -\gamma^3/j`) and in characteristic $`2`
 ($`A' = \gamma`, $`C' = 1/j`). Hence $`F\,|\,K` is uniquely determined, up to $`K`-isomorphisms, by
 its absolute invariant $`j` and its Hasse invariant $`\gamma`.
 
@@ -509,7 +525,7 @@ substitution $`x \mapsto \varepsilon(x)`, $`y \mapsto \varepsilon(y)` is of the 
 $`x \mapsto \lambda^2 x`, $`y \mapsto \lambda^3 y`, and that $`g_2 = \lambda^4g_2`,
 $`g_3 = \lambda^6g_3`. Since $`j \ne 0, 12^3` we have $`g_2, g_3 \ne 0` and it follows
 $`\lambda^2 = \alpha = 1`, hence $`\varepsilon(x) = x` (A1.47). If $`\operatorname{char}(K) = 3`
-we have $`b_1 = \lambda^2b_1` and since $`b_1 \ne 0` (because $`j \ne 0`) it follows again
+we have $`b_2 = \lambda^2b_2` and since $`b_2 \ne 0` (because $`j \ne 0`) it follows again
 $`\lambda^2 = 1`. If $`\operatorname{char}(K) = 2` then the substitution is of the form
 $`x \mapsto x`, $`y \mapsto y + \beta'x` and we have (A1.47) again.
 
@@ -520,11 +536,11 @@ $`\varepsilon(y) = y + x` if $`\operatorname{char}(K) = 2`. ∎
 
 _Formalization note._ The formalization proves the lemma uniformly in all characteristics, using
 the long Weierstraß form (A1.26) instead of the three normal forms: the non-trivial automorphism is
-$`x \mapsto x`, $`y \mapsto -y - ux - v`. The hypothesis $`j \ne 0, 12^3` appears as
+$`x \mapsto x`, $`y \mapsto -y - a_1x - a_3`. The hypothesis $`j \ne 0, 12^3` appears as
 $`c_4 \ne 0`, $`c_6 \ne 0`, which is equivalent since $`j = c_4^3/\Delta` and
 $`j - 12^3 = c_6^2/\Delta`.
 
-> Lemma A in terms of a Weierstraß datum `(x, y)` at `𝔭`: the non-trivial automorphism fixing `𝔭` is `x ↦ x`, `y ↦ −y − ux − v`.
+> Lemma A in terms of a Weierstraß datum `(x, y)` at `𝔭`: the non-trivial automorphism fixing `𝔭` is `x ↦ x`, `y ↦ −y − a₁x − a₃`.
 -/
 
 #stmt lemmaA_data
