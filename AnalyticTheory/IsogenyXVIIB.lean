@@ -1,0 +1,467 @@
+module
+
+public import AnalyticTheory.IsogenyXVIIA
+
+@[expose] public section
+
+open Filter Topology
+
+namespace AnalyticTheory
+universe u
+
+variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
+
+/-! Instance shortcuts for the generic `map_*` lemmas applied to ring homomorphisms and ring
+equivalences (`H_K → M_K`, `K → H_K`, automorphisms of `M_K`, …): otherwise each use searches
+through failing paths such as `Module ℚ≥0 H_K` or `CharZero M_K`, which takes seconds. -/
+
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R →+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R →+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidHomClass (R →+* S) R S := RingHomClass.toMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddHomClass (R →+* S) R S := AddMonoidHomClass.toAddHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    ZeroHomClass (R →+* S) R S := AddMonoidHomClass.toZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R →+* S) R S := MonoidHomClass.toMulHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    OneHomClass (R →+* S) R S := MonoidHomClass.toOneHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R ≃+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R ≃+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R ≃+* S) R S := MonoidHomClass.toMulHomClass
+local instance : NeZero (1 : Omega K) := NeZero.one
+
+section upper
+variable (K)
+
+variable {K}
+
+
+theorem inv_alg_mem_Vm {m : ℕ} (hm : 0 < m) {b : holSubring K} (hb : b ≠ 0) :
+    (algebraMap (holSubring K) (MeroRing K) b)⁻¹ ∈ Vm (K := K) m := by
+  set B := algebraMap (holSubring K) (MeroRing K) b
+  have hB0 : B ≠ 0 := alg_hol_ne_zero hb
+  let : Module (Sm K m) (Vm (K := K) m) := Submodule.module _
+  let φ : Vm (K := K) m →ₗ[Sm K m] Vm (K := K) m :=
+    { toFun := fun v => ⟨B * v, mul_mem_Vm hm (alg_mem_Vm hm b) v.2⟩
+      map_add' := fun v w => Subtype.ext (mul_add _ _ _)
+      map_smul' := fun c v => Subtype.ext (mul_smul_comm c B (v : MeroRing K)) }
+  have hinj : Function.Injective φ := fun v w h =>
+    Subtype.ext (mul_left_cancel₀ hB0 (show B * v = B * w from congrArg Subtype.val h))
+  have : FiniteDimensional (Sm K m) (Vm (K := K) m) :=
+    FiniteDimensional.span_of_finite _ (Set.finite_range _)
+  obtain ⟨v, hv⟩ := (LinearMap.injective_iff_surjective.mp hinj)
+    ⟨1, by simpa using tX_pow_mem_Vm (K := K) hm 0⟩
+  have h1 : B * v = 1 := congrArg Subtype.val hv
+  rw [inv_eq_of_mul_eq_one_right h1]
+  exact v.2
+
+/-- `1, X⁻¹, …, X^{-(m-1)}` span `M_K` over `μ_m(M_K)`. -/
+theorem span_tX_pow {m : ℕ} (hm : 0 < m) : Vm (K := K) m = ⊤ := by
+  rw [eq_top_iff]
+  intro x _
+  obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := holSubring K) x
+  rw [div_eq_mul_inv]
+  exact mul_mem_Vm hm (alg_mem_Vm hm a) (inv_alg_mem_Vm hm (nonZeroDivisors.ne_zero hb))
+
+/-- The basis `1, X⁻¹, …, X^{-(m-1)}` of `M_K` over `μ_m(M_K)`. -/
+noncomputable def basisTX {m : ℕ} (hm : 0 < m) : Module.Basis (Fin m) (Sm K m) (MeroRing K) :=
+  Module.Basis.mk (tX_pow_linearIndependent hm) (span_tX_pow (K := K) hm).ge
+
+/-- `[M_K : μ_m(M_K)] = m`. -/
+theorem finrank_Sm {m : ℕ} (hm : 0 < m) : Module.finrank (Sm K m) (MeroRing K) = m := by
+  rw [Module.finrank_eq_card_basis (basisTX (K := K) hm), Fintype.card_fin]
+
+/-! ### The upper step, part 2: the theta quotients `uᵢ` -/
+
+theorem algebraMapK_eq (c : K) :
+    algebraMap K (MeroRing K) c =
+      algebraMap (holSubring K) (MeroRing K) (algebraMap K (holSubring K) c) := rfl
+
+theorem translation_tX (a : Kˣ) :
+    translation K a (tX K) = algebraMap K (MeroRing K) (a : K) * tX K := by
+  rw [translation_alg, algebraMapK_eq, ← map_mul]
+  congr 1
+  refine Subtype.ext (funext fun x => ?_)
+  rw [mul_apply_hol, algebraMap_apply_hol, monoHol_apply]
+  show (monoHol K (Omega K) (-1)).1 (scalePt K a⁻¹ x) = _
+  rw [monoHol_apply]
+  simp only [scalePt, zpow_neg, zpow_one, mul_inv, inv_inv, Units.val_inv_eq_inv_val, map_inv₀]
+
+theorem tX_inv_eq : (tX K)⁻¹ = algebraMap (holSubring K) (MeroRing K) (monoHol K (Omega K) 1) := by
+  apply inv_eq_of_mul_eq_one_left
+  rw [← map_mul, ← monoHol_add, add_neg_cancel, monoHol_zero, map_one]
+
+theorem translation_tX_inv (a : Kˣ) :
+    translation K a (tX K)⁻¹ = algebraMap K (MeroRing K) (a : K)⁻¹ * (tX K)⁻¹ := by
+  rw [map_inv₀, translation_tX, mul_inv, map_inv₀]
+
+theorem substPow_algebraMapK {m : ℤ} (hm : m ≠ 0) (c : K) :
+    substPow K m (algebraMap K (MeroRing K) c) = algebraMap K (MeroRing K) c := by
+  rw [algebraMapK_eq, substPow_alg hm]
+  rfl
+
+section theta
+
+variable {Q : K} (hQ0 : 0 < ‖Q‖) (hQ1 : ‖Q‖ < 1)
+
+/-- The theta function of period `Q`, viewed in `M_K`. -/
+noncomputable abbrev ThM : MeroRing K :=
+  algebraMap (holSubring K) (MeroRing K) (thetaFun hQ0 hQ1 (1 : Omega K))
+
+theorem ThM_ne_zero : ThM hQ0 hQ1 ≠ 0 :=
+  alg_hol_ne_zero (thetaFun_spec hQ0 hQ1 one_ne_zero).1
+
+/-- `Θ(Q⁻¹X) = −X Θ(X)`. -/
+theorem translation_ThM :
+    translation K (Units.mk0 Q (norm_pos_iff.mp hQ0)) (ThM hQ0 hQ1) =
+      -(tX K)⁻¹ * ThM hQ0 hQ1 := by
+  have h := (thetaFun_spec hQ0 hQ1 (one_ne_zero (α := Omega K))).2.1
+  have hmin : minpoly K (1 : Omega K) = Polynomial.X - Polynomial.C 1 := by
+    rw [← map_one (algebraMap K (Omega K)), minpoly.eq_X_sub_C (Omega K) (1 : K)]
+  rw [hmin, Polynomial.natDegree_X_sub_C] at h
+  simp only [Polynomial.coeff_sub, Polynomial.coeff_X_zero, Polynomial.coeff_C_zero,
+    zero_sub] at h
+  rw [translation_alg, h]
+  simp only [Nat.cast_one, map_mul, ← tX_inv_eq, inv_neg, inv_one, map_neg,
+    map_one]
+  ring
+
+/-- `wᵢ = Θ(q⁻ⁱX)/Θ(X)`. -/
+noncomputable def wq (a : Kˣ) (i : ℕ) : MeroRing K :=
+  translation K (a ^ i) (ThM hQ0 hQ1) / ThM hQ0 hQ1
+
+theorem wq_ne_zero (a : Kˣ) (i : ℕ) : wq hQ0 hQ1 a i ≠ 0 := by
+  refine div_ne_zero ?_ (ThM_ne_zero hQ0 hQ1)
+  rw [Ne, map_eq_zero_iff _ (translation K _).injective]
+  exact ThM_ne_zero hQ0 hQ1
+
+/-- `wᵢ(Q⁻¹X) = q⁻ⁱ wᵢ(X)`. -/
+theorem translation_wq (a : Kˣ) (i : ℕ) :
+    translation K (Units.mk0 Q (norm_pos_iff.mp hQ0)) (wq hQ0 hQ1 a i) =
+      algebraMap K (MeroRing K) ((a : K) ^ i)⁻¹ * wq hQ0 hQ1 a i := by
+  have hT := ThM_ne_zero hQ0 hQ1
+  have htX := tX_ne_zero (K := K)
+  have ha : (a : K) ≠ 0 := a.ne_zero
+  unfold wq
+  rw [map_div₀, translation_comm, translation_ThM, map_mul, map_neg, translation_tX_inv]
+  rw [Units.val_pow_eq_pow_val]
+  have hTa : translation K (a ^ i) (ThM hQ0 hQ1) ≠ 0 := by
+    rw [Ne, map_eq_zero_iff _ (translation K _).injective]; exact hT
+  have hc : algebraMap K (MeroRing K) ((a : K) ^ i) ≠ 0 :=
+    (map_ne_zero _).mpr (pow_ne_zero _ ha)
+  rw [map_inv₀]
+  field_simp
+
+end theta
+
+section basisU
+
+omit [IsUltrametricDist K] [CompleteSpace K] in
+theorem norm_pow_pos {q : K} (hq0 : 0 < ‖q‖) (m : ℕ) : 0 < ‖q ^ m‖ := by
+  rw [norm_pow]; exact pow_pos hq0 m
+
+omit [IsUltrametricDist K] [CompleteSpace K] in
+theorem norm_pow_lt_one {q : K} (hq1 : ‖q‖ < 1) {m : ℕ} (hm : 0 < m) : ‖q ^ m‖ < 1 := by
+  rw [norm_pow]; exact pow_lt_one₀ (norm_nonneg _) hq1 hm.ne'
+
+/-- The unit `q`. -/
+noncomputable abbrev qU {q : K} (hq0 : 0 < ‖q‖) : Kˣ := Units.mk0 q (norm_pos_iff.mp hq0)
+
+/-- `uᵢ = X⁻ⁱ μ_m(Θ(q^{-i}Xᵐ)/Θ(Xᵐ))`, `Θ` of period `qᵐ` (book, (77)). -/
+noncomputable def uq {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : ℕ} (hm : 0 < m) (i : ℕ) :
+    MeroRing K :=
+  tX K ^ i * substPow K m (wq (norm_pow_pos hq0 m) (norm_pow_lt_one hq1 hm) (qU hq0) i)
+
+/-- Book, §6, (77): the functions `uᵢ` are `q`-periodic. -/
+theorem uq_mem {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : ℕ} (hm : 0 < m) (i : ℕ) :
+    uq hq0 hq1 hm i ∈ FqSub K q := by
+  intro a ha
+  have haq : a = qU hq0 := Units.ext ha
+  subst haq
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hQ : qU hq0 ^ (m : ℤ) = Units.mk0 (q ^ m) (norm_pos_iff.mp (norm_pow_pos hq0 m)) :=
+    Units.ext (by simp)
+  unfold uq
+  rw [map_mul, map_pow, translation_tX, ← substPow_translation hmz, hQ, translation_wq,
+    map_mul, substPow_algebraMapK hmz]
+  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
+  have hc : algebraMap K (MeroRing K) q ≠ 0 := (map_ne_zero _).mpr hq0'
+  simp only [Units.val_mk0, map_inv₀, map_pow]
+  field_simp
+  ring
+
+end basisU
+
+section degreeUpper
+
+variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : ℕ} (hm : 0 < m)
+
+/-- `sᵢ = μ_m(wᵢ)`, so that `uᵢ = X⁻ⁱ sᵢ`. -/
+noncomputable abbrev sw (i : ℕ) : MeroRing K :=
+  substPow K m (wq (norm_pow_pos hq0 m) (norm_pow_lt_one hq1 hm) (qU hq0) i)
+
+theorem sw_mem (i : ℕ) : sw hq0 hq1 hm i ∈ Sm K m := ⟨_, rfl⟩
+
+theorem sw_ne_zero (i : ℕ) : sw hq0 hq1 hm i ≠ 0 :=
+  (map_ne_zero _).mpr (wq_ne_zero _ _ _ i)
+
+theorem smul_Sm (a : Sm K (m : ℤ)) (x : MeroRing K) : a • x = (a : MeroRing K) * x := rfl
+
+/-- Book, §6, (77): the functions `u₀, …, u_{m−1}` are linearly independent over `μ_m(M_K)`. -/
+theorem uq_linearIndependent :
+    LinearIndependent (Sm K m) (fun i : Fin m => uq hq0 hq1 hm i) := by
+  rw [Fintype.linearIndependent_iff]
+  intro g hg i
+  have h := Fintype.linearIndependent_iff.mp (tX_pow_linearIndependent (K := K) hm)
+    (fun j => g j * ⟨sw hq0 hq1 hm j, sw_mem hq0 hq1 hm j⟩) (by
+      rw [← hg]
+      refine Finset.sum_congr rfl (fun j _ => ?_)
+      rw [smul_Sm, smul_Sm]
+      simp only [Subfield.coe_mul, uq]
+      ring) i
+  exact (mul_eq_zero.mp h).resolve_right (fun h0 => sw_ne_zero hq0 hq1 hm i (congrArg Subtype.val h0))
+
+theorem exists_uq_coeffs (x : MeroRing K) :
+    ∃ e : Fin m → Sm K m, ∑ j, e j • uq hq0 hq1 hm j = x := by
+  have hx : x ∈ Vm (K := K) m := by rw [span_tX_pow hm]; trivial
+  obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun _).mp hx
+  refine ⟨fun j => c j * (⟨sw hq0 hq1 hm j, sw_mem hq0 hq1 hm j⟩ : Sm K m)⁻¹, ?_⟩
+  rw [← hc]
+  refine Finset.sum_congr rfl (fun j _ => ?_)
+  rw [smul_Sm, smul_Sm]
+  have h0 := sw_ne_zero hq0 hq1 hm j
+  simp only [Subfield.coe_mul, Subfield.coe_inv, uq]
+  rw [mul_assoc, mul_comm (tX K ^ (j : ℕ)), inv_mul_cancel_left₀ h0]
+
+include hq0 hq1 hm in
+/-- `[F_K(q) : F_K(qᵐ | Xᵐ)] = m` (book, (77)–(78)). -/
+theorem relDeg_upper :
+    relDeg (FqbarXm K (q ^ m) m) (FqSub K q) = m := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have h0 : FqbarXm K (q ^ m) m ≤ FqSub K q :=
+    (fq_qbar_Xm_subset K q (q ^ m) hq0 hq1 (norm_pow_pos hq0 m) (norm_pow_lt_one hq1 hm) m
+      hmz ⟨1, by simp⟩).1
+  have hF0S : ∀ x ∈ FqbarXm K (q ^ m) m, x ∈ Sm K m := fun _ ⟨y, _, hy⟩ => ⟨y, hy⟩
+  rw [relDeg_eq h0]
+  let iA : Algebra (FqbarXm K (q ^ m) m) (FqSub K q) := (Subfield.inclusion h0).toAlgebra
+  let : SMul (FqbarXm K (q ^ m) m) (FqSub K q) := iA.toSMul
+  let : Module (FqbarXm K (q ^ m) m) (FqSub K q) := iA.toModule
+  let v : Fin m → FqSub K q := fun i => ⟨uq hq0 hq1 hm i, uq_mem hq0 hq1 hm i⟩
+  have hcoe : ∀ (g : FqbarXm K (q ^ m) m) (y : FqSub K q),
+      ((g • y : FqSub K q) : MeroRing K) = (g : MeroRing K) * y := fun _ _ => rfl
+  have hli : LinearIndependent (FqbarXm K (q ^ m) m) v := by
+    rw [Fintype.linearIndependent_iff]
+    intro g hg i
+    have h := Fintype.linearIndependent_iff.mp (uq_linearIndependent hq0 hq1 hm)
+      (fun j => ⟨(g j : MeroRing K), hF0S _ (g j).2⟩) (by
+        have := congrArg (fun z : FqSub K q => (z : MeroRing K)) hg
+        simp only [AddSubmonoidClass.coe_finsetSum, hcoe, ZeroMemClass.coe_zero] at this
+        rw [← this]
+        rfl) i
+    have h' : ((g i : FqbarXm K (q ^ m) m) : MeroRing K) = 0 := by
+      have := congrArg (fun z : Sm K m => (z : MeroRing K)) h
+      simpa using this
+    exact Subtype.ext h'
+  have hsp : ⊤ ≤ Submodule.span (FqbarXm K (q ^ m) m) (Set.range v) := by
+    intro f _
+    obtain ⟨e, he⟩ := exists_uq_coeffs hq0 hq1 hm (f : MeroRing K)
+    -- the coefficients are fixed by `τ_q`
+    set τ := translation K (qU hq0)
+    have hτS : ∀ j, τ (e j : MeroRing K) ∈ Sm K m := by
+      intro j
+      obtain ⟨y, hy⟩ := (e j).2
+      refine ⟨translation K (qU hq0 ^ (m : ℤ)) y, ?_⟩
+      rw [substPow_translation hmz, hy]
+    have hfix : ∀ j, τ (e j : MeroRing K) = e j := by
+      have h1 : ∑ j, (⟨τ (e j : MeroRing K), hτS j⟩ - e j : Sm K m) • uq hq0 hq1 hm j = 0 := by
+        simp only [sub_smul, Finset.sum_sub_distrib, he]
+        rw [sub_eq_zero]
+        have := congrArg τ he
+        rw [(f.2 (qU hq0) rfl)] at this
+        rw [← this, map_sum]
+        refine Finset.sum_congr rfl (fun j _ => ?_)
+        rw [smul_Sm, smul_Sm, map_mul, uq_mem hq0 hq1 hm j (qU hq0) rfl]
+      intro j
+      have := Fintype.linearIndependent_iff.mp (uq_linearIndependent hq0 hq1 hm) _ h1 j
+      exact sub_eq_zero.mp (congrArg Subtype.val this)
+    have hmemF0 : ∀ j, (e j : MeroRing K) ∈ FqbarXm K (q ^ m) m := by
+      intro j
+      obtain ⟨y, hy⟩ := (e j).2
+      refine ⟨y, fun a ha => ?_, hy⟩
+      have ha' : a = qU hq0 ^ (m : ℤ) := Units.ext (by simp [ha])
+      rw [ha']
+      apply substPow_injective hmz
+      rw [substPow_translation hmz, hy]
+      exact hfix j
+    rw [Submodule.mem_span_range_iff_exists_fun]
+    refine ⟨fun j => ⟨e j, hmemF0 j⟩, Subtype.ext ?_⟩
+    simp only [AddSubmonoidClass.coe_finsetSum, hcoe]
+    rw [← he]
+    rfl
+  rw [Module.finrank_eq_card_basis (Module.Basis.mk hli hsp), Fintype.card_fin]
+
+end degreeUpper
+
+/-- **Theorem XVII (i)**: for `q̄ᵈ = qᵐ` (`d, m > 0`), `[F_K(q) : F_K(q̄ | Xᵐ)] = d m`. -/
+theorem relDeg_FqbarXm {q qbar : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qbar‖)
+    (hqb1 : ‖qbar‖ < 1) {m d : ℕ} (hm : 0 < m) (hd : 0 < d) (hqd : qbar ^ d = q ^ m) :
+    relDeg (FqbarXm K qbar m) (FqSub K q) = d * m := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hle1 : FqbarXm K qbar m ≤ FqbarXm K (q ^ m) m := by
+    rintro _ ⟨y, hy, rfl⟩
+    exact ⟨y, FqSub_bar_le hd hqd hy, rfl⟩
+  have hle2 : FqbarXm K (q ^ m) m ≤ FqSub K q :=
+    (fq_qbar_Xm_subset K q (q ^ m) hq0 hq1 (norm_pow_pos hq0 m) (norm_pow_lt_one hq1 hm) m
+      hmz ⟨1, by simp⟩).1
+  rw [relDeg_mul hle1 hle2, relDeg_upper hq0 hq1 hm]
+  congr 1
+  exact (relDeg_map (substPow K m) (FqSub_bar_le hd hqd)).trans
+    (relDeg_FqSub_bar (norm_pow_pos hq0 m) (norm_pow_lt_one hq1 hm) hqb0 hqb1 hd hqd)
+
+variable (K) in
+/-- Book, §6, Theorem XVII (i): for `m > 0` a multiple of the order of `q mod^× q̄` (so that
+`q̄^d = q^m` with `d > 0`), `[F_K(q) : F_K(q̄|Xᵐ)] = dm`. -/
+theorem thmXVII_degree (q qbar : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
+    (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1) (m d : ℕ) (hm : 0 < m) (hd : 0 < d)
+    (hqd : qbar ^ d = q ^ m) :
+    relDeg (FqbarXm K qbar m) (FqSub K q) = d * m :=
+  relDeg_FqbarXm hq0 hq1 hqb0 hqb1 hm hd hqd
+
+
+/-! ### Theorem XVII (iii): the automorphisms -/
+
+section autos
+
+/-- The reflection commutes with `μ_m`. -/
+theorem reflectionM_substPow {m : ℤ} (hm : m ≠ 0) (f : MeroRing K) :
+    reflectionM K (substPow K m f) = substPow K m (reflectionM K f) := by
+  have key : (reflectionM K : MeroRing K →+* MeroRing K).comp (substPow K m) =
+      (substPow K m).comp (reflectionM K : MeroRing K →+* MeroRing K) := by
+    apply IsLocalization.ringHom_ext (nonZeroDivisors (holSubring K))
+    ext g
+    simp only [RingHom.comp_apply, RingEquiv.coe_toRingHom]
+    rw [substPow_alg hm, reflectionM_alg, reflectionM_alg, substPow_alg hm]
+    congr 1
+    refine Subtype.ext (funext fun α => ?_)
+    refine congrArg g.1 (Subtype.ext ?_)
+    show (α.1⁻¹) ^ m = (α.1 ^ m)⁻¹
+    rw [inv_zpow]
+  exact congrArg (fun φ : MeroRing K →+* MeroRing K => φ f) key
+
+/-- If `τ_c ℘ = ℘` for the Weierstraß function of period `Q`, then `c ∈ Q^ℤ`. -/
+theorem exists_zpow_of_translation_wp {Q : K} (hQ0 : 0 < ‖Q‖) (hQ1 : ‖Q‖ < 1) (c : Kˣ)
+    (hwp : translation K c (wpAlg hQ0 hQ1) = wpAlg hQ0 hQ1) : ∃ k : ℤ, (c : K) = Q ^ k := by
+  have hc0 : (c : K) ≠ 0 := c.ne_zero
+  have h1 := anVal_translation_shift (q := (c : K)) hc0 (one_ne_zero (α := Omega K))
+    (wpAlg hQ0 hQ1)
+  rw [mul_one, show Units.mk0 (c : K) hc0 = c from Units.ext rfl, hwp, anVal_wpAlg_one] at h1
+  have hcΩ : algebraMap K (Omega K) (c : K) ≠ 0 := (map_ne_zero _).mpr hc0
+  by_contra hno
+  push Not at hno
+  have hnc : ¬ ConjModQ K Q 1 (algebraMap K (Omega K) (c : K)) := by
+    rw [conjModQ_one_iff (norm_pos_iff.mp hQ0)]
+    rintro ⟨k, hk⟩
+    exact hno k ((algebraMap K (Omega K)).injective (by rw [hk, map_zpow₀]))
+  have h2 := anVal_quot_nonneg hQ0 hQ1 hcΩ hnc (Gw hQ0 hQ1) 2
+  rw [← wpAlg_eq_Gw, h1] at h2
+  exact absurd h2 (by decide)
+
+variable {q qbar : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hqb0 : 0 < ‖qbar‖) (hqb1 : ‖qbar‖ < 1)
+  {m d : ℕ} (hm : 0 < m) (hd : 0 < d) (hqd : qbar ^ d = q ^ m)
+
+include hqb0 hqb1 hm in
+/-- `τ_u` fixes `F_K(q̄ | Xᵐ)` iff `u ∈ U`, i.e. `uᵐ ∈ q̄^ℤ`. -/
+theorem translation_fixes_iff (u : Kˣ) :
+    (∀ x ∈ FqbarXm K qbar m, translation K u x = x) ↔
+      u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0
+  constructor
+  · intro h
+    have hfix : ∀ g ∈ FqSub K qbar, translation K (u ^ (m : ℤ)) g = g := by
+      intro g hg
+      apply substPow_injective hmz
+      rw [substPow_translation hmz]
+      exact h _ ⟨g, hg, rfl⟩
+    obtain ⟨k, hk⟩ := exists_zpow_of_translation_fix hqb0 hqb1 _ hfix
+    exact ⟨k, by rw [← hk, Units.val_zpow_eq_zpow_val, zpow_natCast]⟩
+  · rintro ⟨k, hk⟩ _ ⟨g, hg, rfl⟩
+    rw [← substPow_translation hmz]
+    congr 1
+    have hu : u ^ (m : ℤ) = Units.mk0 qbar hqb0' ^ k :=
+      Units.ext (by rw [Units.val_zpow_eq_zpow_val, Units.val_zpow_eq_zpow_val, zpow_natCast,
+        hk, Units.val_mk0])
+    rw [hu]
+    exact translation_zpow_of_periodic rfl hg k
+
+include hqb0 hqb1 hm in
+/-- A reflected translation `τ_a ε` never fixes `F_K(q̄ | Xᵐ)`. -/
+theorem not_translation_refl_fixes (a : Kˣ)
+    (h : ∀ x ∈ FqbarXm K qbar m, translation K a (reflectionM K x) = x) : False := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hqb0' : qbar ≠ 0 := norm_pos_iff.mp hqb0
+  -- `τ_{aᵐ}` fixes `℘` of period `q̄`, hence `aᵐ ∈ q̄^ℤ`
+  have hwp := h _ ⟨wpAlg hqb0 hqb1, wpAlg_mem_Fq hqb0 hqb1, rfl⟩
+  rw [reflectionM_substPow hmz, refl_wpAlg, ← substPow_translation hmz] at hwp
+  obtain ⟨k, hk⟩ := exists_zpow_of_translation_wp hqb0 hqb1 _ (substPow_injective hmz hwp)
+  have hak : a ^ (m : ℤ) = Units.mk0 qbar hqb0' ^ k :=
+    Units.ext (by rw [hk, Units.val_zpow_eq_zpow_val, Units.val_mk0])
+  -- hence `ε` is trivial on `F_K(q̄)`
+  obtain ⟨ε, hεR, hne, -⟩ := reflAlg_eq_eps hqb0 hqb1
+  apply hne
+  rw [hεR]
+  ext g
+  have hg := h _ ⟨g, g.2, rfl⟩
+  rw [reflectionM_substPow hmz, ← substPow_translation hmz, hak] at hg
+  have hrg : reflectionM K (g : MeroRing K) ∈ FqSub K qbar := reflFq_mem qbar g
+  rw [translation_zpow_of_periodic rfl hrg k] at hg
+  exact substPow_injective hmz hg
+
+include hq0 hq1 hqb0 hqb1 hm hqd in
+/-- Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are exactly the
+translations `τ_u` with `u ∈ U`. -/
+theorem mem_autFixing_iff (φ : FqSub K q ≃+* FqSub K q) :
+    φ ∈ autFixing (FqbarXm K qbar m) (FqSub K q) ↔
+      ∃ u : Kˣ, u ∈ Usub K qbar (norm_pos_iff.mp hqb0) m ∧
+        ∀ x : FqSub K q, (φ x : MeroRing K) = translation K u (x : MeroRing K) := by
+  have hmz := EntireLaurent.mHol_ne_zero hm
+  have hle : FqbarXm K qbar m ≤ FqSub K q :=
+    (fq_qbar_Xm_subset K q qbar hq0 hq1 hqb0 hqb1 m hmz
+      ⟨d, by rw [zpow_natCast, zpow_natCast]; exact hqd⟩).1
+  constructor
+  · intro hφ
+    have hK : ∀ c : K, algebraMap K (MeroRing K) c ∈ FqbarXm K qbar m := fun c =>
+      ⟨algebraMap K (MeroRing K) c, fun a _ => translation_algebraMap K a c,
+        substPow_algebraMapK hmz c⟩
+    let Φ : FqSub K q ≃ₐ[K] FqSub K q :=
+      AlgEquiv.ofRingEquiv (f := φ) (fun c => hφ (algebraMap K (FqSub K q) c) (hK c))
+    obtain ⟨a, ha | ha⟩ := aut_structure hq0 hq1 Φ
+    · refine ⟨a, (translation_fixes_iff hqb0 hqb1 hm a).mp ?_,
+        fun x => congrArg Subtype.val (ha x)⟩
+      intro x hx
+      calc translation K a x = ((translationAlg q a ⟨x, hle hx⟩ : FqSub K q) : MeroRing K) := rfl
+        _ = (Φ ⟨x, hle hx⟩ : MeroRing K) := (congrArg Subtype.val (ha _)).symm
+        _ = x := congrArg Subtype.val (hφ ⟨x, hle hx⟩ hx)
+    · exfalso
+      refine not_translation_refl_fixes hqb0 hqb1 hm a (fun x hx => ?_)
+      calc translation K a (reflectionM K x) =
+            ((translationAlg q a (reflAlg q ⟨x, hle hx⟩) : FqSub K q) : MeroRing K) := rfl
+        _ = (Φ ⟨x, hle hx⟩ : MeroRing K) := (congrArg Subtype.val (ha _)).symm
+        _ = x := congrArg Subtype.val (hφ ⟨x, hle hx⟩ hx)
+  · rintro ⟨u, hu, hφ⟩ x hx
+    apply Subtype.ext
+    rw [hφ]
+    exact (translation_fixes_iff hqb0 hqb1 hm u).mpr hu _ hx
+
+end autos
+
+
+end upper
+end AnalyticTheory
