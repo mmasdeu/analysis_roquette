@@ -42,7 +42,7 @@ theorem holCoeff_holD (f : holSubring K) :
 theorem holD_add (f g : holSubring K) : holD (f + g) = holD f + holD g := by
   apply holCoeff_injective K
   rw [holCoeff_add, holCoeff_holD, holCoeff_holD, holCoeff_holD, holCoeff_add]
-  funext n; simp [mul_add]
+  exact funext fun n => mul_add _ _ _
 
 theorem holD_leibniz (f g : holSubring K) : holD (f * g) = f * holD g + g * holD f := by
   apply holCoeff_injective K
@@ -71,7 +71,7 @@ theorem holD_const (c : K) : holD (algebraMap K (holSubring K) c) = 0 := by
 
 theorem holD_zero : holD (0 : holSubring K) = 0 := by
   have := holD_const (K := K) 0
-  rwa [map_zero] at this
+  rwa [RingHom.map_zero] at this
 
 theorem holD_monoHol (n : ℤ) : holD (monoHol K (Omega K) n) = algebraMap K (holSubring K) (n : K) * monoHol K (Omega K) n := by
   apply holCoeff_injective K
@@ -116,16 +116,16 @@ theorem Dquot_congr {g h g' h' : holSubring K} (hh : h ≠ 0) (hh' : h' ≠ 0)
   have hA' := alg_hol_ne_zero hh'
   have e' : g * h' = g' * h := by
     apply IsFractionRing.injective (holSubring K) (MeroRing K)
-    rw [map_mul, map_mul]
+    rw [RingHom.map_mul, RingHom.map_mul]
     field_simp at e
     linear_combination e
   have hD := congrArg (fun x => algebraMap (holSubring K) (MeroRing K) (holD x)) e'
-  simp only [holD_leibniz, map_add, map_mul] at hD
+  simp only [holD_leibniz, RingHom.map_add, RingHom.map_mul] at hD
   unfold Dquot DM
   rw [div_eq_div_iff (pow_ne_zero 2 hA) (pow_ne_zero 2 hA')]
   have e2 : algebraMap (holSubring K) (MeroRing K) g * algebraMap (holSubring K) (MeroRing K) h' =
       algebraMap (holSubring K) (MeroRing K) g' * algebraMap (holSubring K) (MeroRing K) h := by
-    rw [← map_mul, ← map_mul, e']
+    rw [← RingHom.map_mul, ← RingHom.map_mul, e']
   linear_combination (algebraMap (holSubring K) (MeroRing K) h * algebraMap (holSubring K) (MeroRing K) h') * hD
     - (algebraMap (holSubring K) (MeroRing K) h' * algebraMap (holSubring K) (MeroRing K) (holD h) +
       algebraMap (holSubring K) (MeroRing K) h * algebraMap (holSubring K) (MeroRing K) (holD h')) * e2
@@ -151,13 +151,14 @@ theorem Dop_eq (g h : holSubring K) (hh : h ≠ 0) :
 
 
 theorem Dop_alg (g : holSubring K) : Dop K (algebraMap (holSubring K) (MeroRing K) g) = DM g := by
-  have := Dop_eq g 1 one_ne_zero
-  rw [map_one, div_one] at this
+  -- `NeZero.one` given explicitly: the search for `NeZero (1 : H_K)` is slow
+  have := Dop_eq g 1 (NeZero.one (M₀ := holSubring K)).out
+  rw [RingHom.map_one, div_one] at this
   rw [this]
   have h1 : holD (1 : holSubring K) = 0 := by
-    have := holD_const (K := K) 1; rwa [map_one] at this
+    have := holD_const (K := K) 1; rwa [RingHom.map_one] at this
   unfold Dquot DM
-  rw [h1, map_one, map_zero]
+  rw [h1, RingHom.map_one, RingHom.map_zero]
   ring
 
 
@@ -181,20 +182,20 @@ theorem Dop_derivation : ∀ f g : MeroRing K, Dop K (f + g) = Dop K f + Dop K g
         algebraMap (holSubring K) (MeroRing K) g' / algebraMap (holSubring K) (MeroRing K) h' =
         algebraMap (holSubring K) (MeroRing K) (g * h' + g' * h) /
           algebraMap (holSubring K) (MeroRing K) (h * h') := by
-      simp only [map_add, map_mul]; field_simp
+      simp only [RingHom.map_add, RingHom.map_mul]; field_simp
     rw [e, Dop_eq _ _ hhh, hf, hf']
     unfold Dquot DM
-    simp only [holD_add, holD_leibniz, map_add, map_mul]
+    simp only [holD_add, holD_leibniz, RingHom.map_add, RingHom.map_mul]
     field_simp
     ring
   · have e : algebraMap (holSubring K) (MeroRing K) g / algebraMap (holSubring K) (MeroRing K) h *
         (algebraMap (holSubring K) (MeroRing K) g' / algebraMap (holSubring K) (MeroRing K) h') =
         algebraMap (holSubring K) (MeroRing K) (g * g') /
           algebraMap (holSubring K) (MeroRing K) (h * h') := by
-      simp only [map_mul]; field_simp
+      simp only [RingHom.map_mul]; field_simp
     rw [e, Dop_eq _ _ hhh, hf, hf']
     unfold Dquot DM
-    simp only [holD_leibniz, map_add, map_mul]
+    simp only [holD_leibniz, RingHom.map_add, RingHom.map_mul]
     field_simp
     ring
 

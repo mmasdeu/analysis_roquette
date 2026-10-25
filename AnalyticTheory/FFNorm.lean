@@ -28,6 +28,12 @@ namespace PrimeDivisor
 
 variable (Q : PrimeDivisor K E)
 
+omit [Algebra K F] [IsScalarTower K E F] in
+/-- `S` is a torsion-free `O_Q`-module. Stated explicitly since instance search only finds it after
+a long detour. -/
+instance intCl_isTorsionFree : Module.IsTorsionFree Q.ring (Q.intCl F) :=
+  FaithfulSMul.to_isTorsionFree Q.ring (Q.intCl F)
+
 omit [Algebra K F] [IsScalarTower K E F] [FiniteDimensional E F] [Algebra.IsSeparable E F] in
 /-- Every maximal ideal of `S` lies over the maximal ideal of `O_Q`. -/
 theorem mem_primesOver_of_isMaximal (𝔪 : Ideal (Q.intCl F)) [h𝔪 : 𝔪.IsMaximal] :
@@ -143,6 +149,22 @@ theorem ord_norm_of_unit {u : F} (hu : u ∈ Q.intCl F) (hu' : u⁻¹ ∈ Q.intC
   rw [← Q.algebraMap_intNorm' ⟨u, hu⟩]
   exact Q.ord_unit w
 
+omit [Algebra K F] [IsScalarTower K E F] [FiniteDimensional E F] [Algebra.IsSeparable E F] in
+/-- Instance search finds this only after a long failing detour through valuation subrings. -/
+instance faithfulSMul_fractionRing_intCl [FaithfulSMul Q.ring (Q.intCl F)] :
+    FaithfulSMul Q.ring (FractionRing (Q.intCl F)) :=
+  inferInstanceAs (FaithfulSMul Q.ring (FractionRing (Q.intCl F)))
+
+attribute [local instance] FractionRing.liftAlgebra in
+omit [Algebra K F] [IsScalarTower K E F] in
+/-- The extension `Frac(S) | Frac(O_Q)` of fraction fields is separable. -/
+theorem isSeparable_fractionRing_intCl :
+    Algebra.IsSeparable (FractionRing Q.ring) (FractionRing (Q.intCl F)) :=
+  Algebra.IsSeparable.of_equiv_equiv (FractionRing.algEquiv Q.ring E).symm.toRingEquiv
+    (FractionRing.algEquiv (Q.intCl F) F).symm.toRingEquiv <| RingHom.ext fun x =>
+      IsFractionRing.algEquiv_commutes (A := Q.ring) (B := Q.intCl F)
+        (FractionRing.algEquiv Q.ring E).symm (FractionRing.algEquiv (Q.intCl F) F).symm x
+
 attribute [local instance] FractionRing.liftAlgebra in
 /-- The norm of a generator of `𝔪_P` has order the inertia degree of `P`. -/
 theorem ord_norm_generator (P : Q.Over F) (t : Q.intCl F) (ht : Ideal.span {t} = Q.idealOf P.1 P.2) :
@@ -150,14 +172,9 @@ theorem ord_norm_generator (P : Q.Over F) (t : Q.intCl F) (ht : Ideal.span {t} =
   have := Q.isDVR
   have := Q.idealOf_liesOver P.1 P.2
   have := Q.idealOf_isMaximal P.1 P.2
-  have : Algebra.IsSeparable (FractionRing Q.ring) (FractionRing (Q.intCl F)) := by
-    refine Algebra.IsSeparable.of_equiv_equiv (FractionRing.algEquiv Q.ring E).symm.toRingEquiv
-      (FractionRing.algEquiv (Q.intCl F) F).symm.toRingEquiv ?_
-    ext _
-    exact IsFractionRing.algEquiv_commutes (FractionRing.algEquiv Q.ring E).symm
-      (FractionRing.algEquiv (Q.intCl F) F).symm _
-  have hrel := Ideal.relNorm_eq_pow_of_isMaximal (R := Q.ring) (Q.idealOf P.1 P.2)
-    (IsLocalRing.maximalIdeal Q.ring)
+  have := Q.isSeparable_fractionRing_intCl (F := F)
+  have hrel := Ideal.relNorm_eq_pow_of_isMaximal (R := Q.ring) (S := Q.intCl F)
+    (Q.idealOf P.1 P.2) (IsLocalRing.maximalIdeal Q.ring)
   set f := (Q.idealOf P.1 P.2).inertiaDeg Q.ring
   conv_lhs at hrel => rw [← ht]
   rw [Ideal.relNorm_singleton] at hrel

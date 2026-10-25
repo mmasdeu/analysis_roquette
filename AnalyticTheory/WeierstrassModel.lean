@@ -53,7 +53,7 @@ theorem model_val_mem (P : PrimeDivisor K F) (W : WeierstrassCurve K) {x y : F}
   have h1 : v (y ^ 2) ≤ v y := by
     rw [model_eq W hxy]
     refine (Valuation.map_add _ _ _).trans (max_le ?_ (hc1.trans hy1.le))
-    rw [map_mul, Valuation.map_neg]
+    rw [Valuation.map_mul, Valuation.map_neg]
     calc v (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * v y ≤ 1 * v y := by gcongr
       _ = v y := one_mul _
   rw [map_pow, pow_two] at h1
@@ -78,12 +78,13 @@ theorem model_val_pole (P : PrimeDivisor K F) (W : WeierstrassCurve K) {x y : F}
   -- bound for the lower terms of the cubic
   have hlow : v (algebraMap K F W.a₂ * x ^ 2 + algebraMap K F W.a₄ * x + algebraMap K F W.a₆) < v x ^ 3 := by
     have e1 : v (algebraMap K F W.a₂ * x ^ 2) ≤ v x ^ 2 := by
-      rw [map_mul, map_pow]
-      calc v (algebraMap K F W.a₂) * v x ^ 2 ≤ 1 * v x ^ 2 := by gcongr; exact hc _
+      rw [Valuation.map_mul, Valuation.map_pow]
+      calc v (algebraMap K F W.a₂) * v x ^ 2 ≤ 1 * v x ^ 2 :=
+          mul_le_mul_left (hc _) _
         _ = v x ^ 2 := one_mul _
     have e2 : v (algebraMap K F W.a₄ * x) ≤ v x ^ 2 := by
-      rw [map_mul]
-      calc v (algebraMap K F W.a₄) * v x ≤ 1 * v x := by gcongr; exact hc _
+      rw [Valuation.map_mul]
+      calc v (algebraMap K F W.a₄) * v x ≤ 1 * v x := mul_le_mul_left (hc _) _
         _ = v x := one_mul _
         _ ≤ v x ^ 2 := hx2
     have e3 : v (algebraMap K F W.a₆) ≤ v x ^ 2 := (hc _).trans h12
@@ -94,11 +95,11 @@ theorem model_val_pole (P : PrimeDivisor K F) (W : WeierstrassCurve K) {x y : F}
       v x ^ 3 := by
     have e : x ^ 3 + algebraMap K F W.a₂ * x ^ 2 + algebraMap K F W.a₄ * x + algebraMap K F W.a₆ =
         x ^ 3 + (algebraMap K F W.a₂ * x ^ 2 + algebraMap K F W.a₄ * x + algebraMap K F W.a₆) := by ring
-    rw [e, Valuation.map_add_eq_of_lt_left v (by rw [map_pow]; exact hlow), map_pow]
+    rw [e, Valuation.map_add_eq_of_lt_left v (by rw [Valuation.map_pow]; exact hlow), Valuation.map_pow]
   have hwle : v (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) ≤ v x := by
     refine (Valuation.map_add _ _ _).trans (max_le ?_ ((hc _).trans ha.le))
-    rw [map_mul]
-    calc v (algebraMap K F W.a₁) * v x ≤ 1 * v x := by gcongr; exact hc _
+    rw [Valuation.map_mul]
+    calc v (algebraMap K F W.a₁) * v x ≤ 1 * v x := mul_le_mul_left (hc _) _
       _ = v x := one_mul _
   have hsum : v (y ^ 2 + (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * y) = v x ^ 3 := by
     have : y ^ 2 + (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * y =
@@ -110,8 +111,8 @@ theorem model_val_pole (P : PrimeDivisor K F) (W : WeierstrassCurve K) {x y : F}
     have h' := not_lt.mp h
     have : v (y ^ 2 + (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * y) ≤ v x := by
       refine (Valuation.map_add _ _ _).trans (max_le ?_ ?_)
-      · rw [map_pow]; exact (pow_le_one₀ zero_le h').trans ha.le
-      · rw [map_mul]
+      · rw [Valuation.map_pow]; exact (pow_le_one₀ zero_le h').trans ha.le
+      · rw [Valuation.map_mul]
         calc v (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * v y ≤ v x * 1 := by gcongr
           _ = v x := mul_one _
     rw [hsum] at this
@@ -122,17 +123,18 @@ theorem model_val_pole (P : PrimeDivisor K F) (W : WeierstrassCurve K) {x y : F}
     have h' := not_lt.mp h
     have : v (y ^ 2 + (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * y) ≤ v x ^ 2 := by
       refine (Valuation.map_add _ _ _).trans (max_le ?_ ?_)
-      · rw [map_pow]; gcongr
-      · rw [map_mul, pow_two]
+      · rw [Valuation.map_pow]; gcongr
+      · rw [Valuation.map_mul, pow_two]
         gcongr
     rw [hsum] at this
     exact absurd this (not_le.mpr h23)
   refine ⟨ha, hy1, ?_⟩
   have hlt : v ((algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * y) < v (y ^ 2) := by
-    rw [map_mul, map_pow, pow_two]
-    calc v (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * v y ≤ v x * v y := by gcongr
+    rw [Valuation.map_mul, Valuation.map_pow, pow_two]
+    calc v (algebraMap K F W.a₁ * x + algebraMap K F W.a₃) * v y ≤ v x * v y :=
+        mul_le_mul_left hwle _
       _ < v y * v y := by gcongr
-  rw [Valuation.map_add_eq_of_lt_left v hlt, map_pow] at hsum
+  rw [Valuation.map_add_eq_of_lt_left v hlt, Valuation.map_pow] at hsum
   exact hsum
 
 theorem model_ord_pole (P : PrimeDivisor K F) (W : WeierstrassCurve K) {x y : F}
@@ -238,7 +240,8 @@ theorem derivative_weierPoly (t : RatFunc k) (W : WeierstrassCurve k) :
   unfold weierPoly
   simp only [derivative_sub, derivative_add, derivative_X_pow, derivative_mul, derivative_C,
     derivative_X]
-  simp [map_ofNat]
+  simp only [Nat.cast_ofNat, map_ofNat, Nat.add_one_sub_one, pow_one, zero_mul,
+    RatFunc.algebraMap_eq_C, C_add, C_mul, mul_one, zero_add, sub_zero]
 
 theorem two_eq_zero_of_derivative (W : WeierstrassCurve k)
     (h : derivative (weierPoly (RatFunc.X : RatFunc k) W) = 0) :
@@ -246,17 +249,21 @@ theorem two_eq_zero_of_derivative (W : WeierstrassCurve k)
   rw [derivative_weierPoly] at h
   have h1 := congrArg (fun p => p.coeff 1) h
   have h0 := congrArg (fun p => p.coeff 0) h
-  simp at h1 h0
+  simp only [RatFunc.algebraMap_eq_C, C_add, C_mul, coeff_add, coeff_mul_X, coeff_C_zero,
+    coeff_mul_C, coeff_C_succ, zero_mul, add_zero, coeff_zero, mul_coeff_zero, coeff_X_zero, mul_zero,
+    zero_add] at h1 h0
   refine ⟨?_, ?_⟩
   · apply (algebraMap k (RatFunc k)).injective
-    rw [map_ofNat, map_zero]; exact h1
+    rw [map_ofNat, RingHom.map_zero]; exact h1
   have hp : (Polynomial.C W.a₁ * Polynomial.X + Polynomial.C W.a₃ : k[X]) = 0 := by
     apply (IsFractionRing.injective k[X] (RatFunc k))
-    rw [map_zero, map_add, map_mul, RatFunc.algebraMap_C, RatFunc.algebraMap_X, RatFunc.algebraMap_C]
+    rw [RingHom.map_zero, RingHom.map_add, RingHom.map_mul, RatFunc.algebraMap_C, RatFunc.algebraMap_X,
+      RatFunc.algebraMap_C]
     exact h0
   have p1 := congrArg (fun p => p.coeff 1) hp
   have p0 := congrArg (fun p => p.coeff 0) hp
-  simp at p1 p0
+  simp only [coeff_add, coeff_mul_X, coeff_C_zero, coeff_C_succ, add_zero, coeff_zero,
+    mul_coeff_zero, coeff_X_zero, mul_zero, zero_add] at p1 p0
   exact ⟨p1, p0⟩
 
 omit [Algebra (RatFunc k) F] [IsScalarTower k (RatFunc k) F] in
@@ -332,8 +339,8 @@ theorem model_infty_prime (hΔ : W.Δ ≠ 0) :
       rw [hQdeg, mul_one] at h1
       have := Q.idealOf_liesOver P.1 P.2
       have := Q.idealOf_isMaximal P.1 P.2
-      have h2 := Ideal.inertiaDeg_pos (Q.idealOf P.1 P.2) Q.ring
-      omega
+      have h2 := Ideal.inertiaDeg_pos (S := Q.intCl F) (Q.idealOf P.1 P.2) Q.ring
+      exact h1 ▸ h2
     refine ⟨hxP, hord, by omega, by omega, hdeg⟩
   obtain ⟨P₁, hP₁⟩ := PrimeDivisor.exists_prime_over (E := RatFunc k) (F := F) Q
   set P₁' : Q.Over F := ⟨P₁, hP₁⟩ with hP₁'
@@ -348,7 +355,7 @@ theorem model_infty_prime (hΔ : W.Δ ≠ 0) :
     intro P
     obtain ⟨-, -, he, -, hd⟩ := hdata P
     have hd' : (1 : ℤ) ≤ P.1.degree := by exact_mod_cast hd
-    nlinarith
+    nlinarith only [he, hd']
   have huniq : ∀ P₂ : Q.Over F, P₂ = P₁' := by
     intro P₂
     by_contra hne
@@ -368,7 +375,7 @@ theorem model_infty_prime (hΔ : W.Δ ≠ 0) :
   have he' : 2 ≤ P₁.ramIdx (E := RatFunc k) := he
   have hd' : (1 : ℤ) ≤ P₁.degree := by exact_mod_cast hd
   have hdeg1 : P₁.degree = 1 := by
-    have : (P₁.degree : ℤ) = 1 := by nlinarith
+    have : (P₁.degree : ℤ) = 1 := by nlinarith only [hle, he', hd']
     exact_mod_cast this
   have hram : P₁.ramIdx (E := RatFunc k) = 2 := by
     have : (P₁.degree : ℤ) = 1 := by exact_mod_cast hdeg1
@@ -386,7 +393,8 @@ theorem model_y_ne_zero {x y : F} (W : WeierstrassCurve k) (hxy : NormalForm W x
   refine ⟨X ^ 3 + C W.a₂ * X ^ 2 + C W.a₄ * X + C W.a₆, ?_, ?_⟩
   · intro h
     have := congrArg (fun p => p.coeff 3) h
-    simp at this
+    simp only [coeff_add, coeff_X_pow, ↓reduceIte, coeff_C_mul, Nat.succ_ne_self, mul_zero, add_zero,
+      coeff_mul_X, coeff_C_succ, coeff_zero, one_ne_zero] at this
   · unfold NormalForm at hxy
     simp only [map_add, map_mul, map_pow, aeval_X, aeval_C]
     linear_combination -hxy

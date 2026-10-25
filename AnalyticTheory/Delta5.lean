@@ -99,7 +99,7 @@ theorem R0_one_value : (Rq hq0 hq1 0).1 oneX = algebraMap K (Omega K) (Pc q) ^ 2
     have h1 := Rq_spec hq0 hq1 0
     rw [hThEq, hth0] at h1
     apply mul_left_cancel₀ hlin0
-    linear_combination -h1
+    rw [← h1, mul_comm (monoHol K (Omega K) (-1)) (linF (q := q) (0 : ℤ)), mul_assoc]
   have hPc : Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 - q ^ (j + 1))) atTop (𝓝 (Pc q)) :=
     (mult_geom hq1 1 1 |>.congr (fun n => by ring) |>.hasProd).tendsto_prod_nat
   have hPcΩ : Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 - algebraMap K (Omega K) q ^ (j + 1)))
@@ -231,7 +231,7 @@ theorem ev_root {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) (hT : thK
   have hT' := valK_spec (Th hq0 hq1) b hb
   have hv := valK_Th_ne_zero hq0 hq1 hb hTh
   apply (algebraMap K (Omega K)).injective
-  simp only [map_add, map_mul, map_pow, map_ofNat, map_zero]
+  simp only [RingHom.map_add, RingHom.map_mul, RingHom.map_pow, map_ofNat, RingHom.map_zero]
   unfold evK
   rw [map_div₀, map_pow, ← hGw, ← hT']
   rw [map_zero, zero_mul, add_zero] at hp

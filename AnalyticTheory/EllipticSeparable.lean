@@ -37,6 +37,11 @@ variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [Complet
 
 end omegaSub
 
+/-- Shortcut for the generic `map_*` lemmas on ring homomorphisms (e.g. `K →+* L`): the generic
+search first tries failing paths through linear-map classes. -/
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddHomClass (R →+* S) R S := AddMonoidHomClass.toAddHomClass
+
 section separable
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
@@ -71,12 +76,16 @@ theorem eq_FqbarXm_of_separable (hE : IsEllipticOver K E) :
   have : Algebra.IsSeparable K M :=
     (IntermediateField.isSeparable_adjoin_iff_isSeparable K (Omega K)).mpr hTsep
   set L := IntermediateField.normalClosure K M (Omega K)
+  have : IsGalois K L := inferInstance
   -- the normed structure of `L`
   let : NontriviallyNormedField L := omegaSubNNF L
   have : CompleteSpace L := FiniteDimensional.complete K L
   -- `ψ : Ω_K ≅ Ω_L`, the identity on `L`
   have : Algebra.IsAlgebraic L (Omega K) := Algebra.IsAlgebraic.tower_top (K := K) L
+  have : Module.IsTorsionFree L (Omega K) := DivisionSemiring.to_moduleIsTorsionFree
+  have : Module.IsTorsionFree L (Omega L) := DivisionSemiring.to_moduleIsTorsionFree
   have : IsAlgClosure L (Omega K) := ⟨inferInstance, inferInstance⟩
+  have : IsAlgClosure L (Omega L) := AlgebraicClosure.instIsAlgClosure L
   let ψL : Omega K ≃ₐ[L] Omega L := IsAlgClosure.equiv L (Omega K) (Omega L)
   let ψ : Omega K ≃ₐ[K] Omega L := ψL.restrictScalars K
   have hψL : ∀ x : L, ψ (x : Omega K) = algebraMap L (Omega L) x := fun x =>

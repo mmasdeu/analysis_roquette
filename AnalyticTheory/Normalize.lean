@@ -79,7 +79,7 @@ theorem exists_phi_factor {α : Omega K} (hα : α ≠ 0) :
       have h3 : (n : ℤ) = (eIdx K α : ℤ) + (k : ℤ) := by exact_mod_cast h2
       have hepos := eIdx_pos K (α := α)
       obtain ⟨m, g, hmg, hg⟩ := ih k (by omega) f' hf'0 (by rw [hord'])
-      exact ⟨m + 1, g, by rw [hf', hmg, pow_succ]; ring, hg⟩
+      exact ⟨m + 1, g, by rw [hf', hmg, pow_succ', mul_assoc], hg⟩
     · exact ⟨0, f, by simp, h0⟩
 
 theorem anOrdHol_pow_minpoly {α : Omega K} (hα : α ≠ 0) (m : ℕ) :
@@ -180,7 +180,7 @@ theorem anVal_isValuation (α : Omega K) (hα : α ≠ 0) :
 
 theorem eIdx_aut (σ : Omega K ≃ₐ[K] Omega K) {α : Omega K} (hα : α ≠ 0) :
     eIdx K (σ α) = eIdx K α := by
-  have hσ : σ α ≠ 0 := (map_ne_zero σ).mpr hα
+  have hσ : σ α ≠ 0 := (_root_.map_ne_zero σ).mpr hα
   have h1 := anOrdHol_minpoly K hσ
   rw [minpoly.algEquiv_eq, anOrdHol_aut K σ hα, anOrdHol_minpoly K hα] at h1
   exact_mod_cast h1.symm
@@ -204,7 +204,7 @@ theorem divisorOf_rational (f : MeroRing K) {α β : Omega K} (h : minpoly K α 
     simp [divisorOf, hα, hβ]
   · have hroot : Polynomial.aeval α (minpoly K β) = 0 := by rw [← h]; exact minpoly.aeval K α
     obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root (Algebra.IsAlgebraic.isAlgebraic β) hroot
-    have hβ : β ≠ 0 := by rw [← hσ]; exact (map_ne_zero σ).mpr hα
+    have hβ : β ≠ 0 := by rw [← hσ]; exact (_root_.map_ne_zero σ).mpr hα
     simp only [divisorOf, ite_eq_right hα, ite_eq_right hβ]
     rw [← hσ, anVal_aut K σ hα]
 

@@ -21,6 +21,14 @@ namespace AnalyticTheory
 
 universe u
 
+/-- `map_sum` for ring homomorphisms. Stated once with a `RingHomClass` hypothesis (found at once),
+so that the uses below do not search for an additive morphism class on `H_K`, `M_K`, `F_K(q)`,
+which is slow. -/
+private theorem ringHomClass_map_sum {F R S α : Type*} [Semiring R] [Semiring S] [FunLike F R S]
+    [RingHomClass F R S] (f : F) (g : α → R) (s : Finset α) :
+    f (∑ a ∈ s, g a) = ∑ a ∈ s, f (g a) :=
+  map_sum f g s
+
 section ext
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
@@ -31,7 +39,7 @@ omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpac
 theorem isConvergentLaurent_map {a : ℤ → K} (ha : IsConvergentLaurent K a) :
     IsConvergentLaurent L (fun n => algebraMap K L (a n)) := by
   intro r hr
-  simpa [norm_algebraMap'] using ha r hr
+  simpa only [norm_algebraMap'] using ha r hr
 
 /-- The coefficient inclusion on holomorphic functions. -/
 noncomputable def holExtFun (g : holSubring K) : holSubring L :=
@@ -47,27 +55,45 @@ theorem convCoeff_map {a b : ℤ → K} (ha : IsConvergentLaurent K a) (hb : IsC
     (fun n => algebraMap K L (convCoeff K a b n)) =
       convCoeff L (fun n => algebraMap K L (a n)) (fun n => algebraMap K L (b n)) := by
   funext n
-  unfold convCoeff
-  have h := (summable_convolution K ha hb n).hasSum.map (algebraMap K L : K →+* L)
-    (algebraMap_isometry K L).continuous
-  rw [← h.tsum_eq]
-  refine tsum_congr (fun k => ?_)
-  simp
+  have h := ((summable_convolution K ha hb n).hasSum.map (algebraMap K L).toAddMonoidHom
+    (algebraMap_isometry K L).continuous).tsum_eq
+  exact h.symm.trans (tsum_congr fun k => RingHom.map_mul _ _ _)
+
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] in
+theorem algebraMap_deltaSeq (n : ℤ) : algebraMap K L (deltaSeq K n) = deltaSeq L n := by
+  unfold deltaSeq
+  split_ifs
+  exacts [RingHom.map_one _, RingHom.map_zero _]
+
+theorem holExtFun_one : holExtFun (L := L) (1 : holSubring K) = 1 :=
+  holCoeff_injective L (by
+    rw [holCoeff_holExtFun, holCoeff_one, holCoeff_one]
+    exact funext algebraMap_deltaSeq)
+
+theorem holExtFun_mul (f g : holSubring K) :
+    holExtFun (L := L) (f * g) = holExtFun f * holExtFun g :=
+  holCoeff_injective L (by
+    rw [holCoeff_mul, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_mul,
+      convCoeff_map (holCoeff_convergent K f) (holCoeff_convergent K g)])
+
+theorem holExtFun_zero : holExtFun (L := L) (0 : holSubring K) = 0 :=
+  holCoeff_injective L (by
+    rw [holCoeff_holExtFun, holCoeff_zero, holCoeff_zero]
+    exact funext fun _ => RingHom.map_zero _)
+
+theorem holExtFun_add (f g : holSubring K) :
+    holExtFun (L := L) (f + g) = holExtFun f + holExtFun g :=
+  holCoeff_injective L (by
+    rw [holCoeff_add, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_add]
+    exact funext fun _ => RingHom.map_add _ _ _)
 
 /-- `H_K → H_L` as a ring homomorphism. -/
 noncomputable def holExt : holSubring K →+* holSubring L where
   toFun := holExtFun
-  map_one' := holCoeff_injective L (by
-    rw [holCoeff_holExtFun, holCoeff_one, holCoeff_one]
-    funext n; simp only [deltaSeq]; split_ifs <;> simp)
-  map_mul' f g := holCoeff_injective L (by
-    rw [holCoeff_mul, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_mul,
-      convCoeff_map (holCoeff_convergent K f) (holCoeff_convergent K g)])
-  map_zero' := holCoeff_injective L (by
-    rw [holCoeff_holExtFun, holCoeff_zero, holCoeff_zero]; funext n; simp)
-  map_add' f g := holCoeff_injective L (by
-    rw [holCoeff_add, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_holExtFun, holCoeff_add]
-    funext n; simp)
+  map_one' := holExtFun_one
+  map_mul' := holExtFun_mul
+  map_zero' := holExtFun_zero
+  map_add' := holExtFun_add
 
 theorem holCoeff_holExt (g : holSubring K) :
     holCoeff L (holExt (L := L) g) = fun n => algebraMap K L (holCoeff K g n) :=
@@ -86,12 +112,17 @@ theorem holExt_holScale (c : Kˣ) (g : holSubring K) :
   apply holCoeff_injective L
   rw [holCoeff_holExt, holCoeff_holScale, holCoeff_holScale, holCoeff_holExt]
   funext n
-  simp [map_zpow₀]
+  simp only [RingHom.map_mul, map_zpow₀, Units.coe_map, MonoidHom.coe_ofClass]
+
+theorem algebraMap_comp_holExt_injective :
+    Function.Injective ((algebraMap (holSubring L) (MeroRing L)).comp (holExt (K := K))) := by
+  rw [RingHom.coe_comp]
+  exact (IsFractionRing.injective (holSubring L) (MeroRing L)).comp holExt_injective
 
 /-- `M_K → M_L`. -/
 noncomputable def meroExt : MeroRing K →+* MeroRing L :=
   IsFractionRing.lift (A := holSubring K) (g := (algebraMap (holSubring L) (MeroRing L)).comp holExt)
-    ((IsFractionRing.injective (holSubring L) (MeroRing L)).comp holExt_injective)
+    algebraMap_comp_holExt_injective
 
 theorem meroExt_alg (g : holSubring K) :
     meroExt (L := L) (algebraMap (holSubring K) (MeroRing K) g) =
@@ -101,17 +132,14 @@ theorem meroExt_alg (g : holSubring K) :
 theorem meroExt_algebraMap (c : K) :
     meroExt (L := L) (algebraMap K (MeroRing K) c) = algebraMap L (MeroRing L) (algebraMap K L c) := by
   rw [← algebraMap_hol_mero, meroExt_alg, ← algebraMap_hol_mero (K := L)]
-  congr 1
-  apply holCoeff_injective L
-  rw [holCoeff_holExt]
+  refine congrArg _ (holCoeff_injective L ?_)
   have h1 := holCoeff_algebraMap_mul K (L := Omega K) c 1
   rw [mul_one, holCoeff_one] at h1
   have h2 := holCoeff_algebraMap_mul L (L := Omega L) (algebraMap K L c) 1
   rw [mul_one, holCoeff_one] at h2
-  rw [h1, h2]
-  funext n
-  simp only [deltaSeq]
-  split_ifs <;> simp
+  rw [holCoeff_holExt, h1, h2]
+  exact funext fun n => (RingHom.map_mul _ _ _).trans
+    (congrArg (algebraMap K L c * ·) (algebraMap_deltaSeq n))
 
 theorem meroExt_translation (c : Kˣ) (f : MeroRing K) :
     meroExt (L := L) (translation K c f) =
@@ -139,7 +167,7 @@ theorem holCoeff_sum {α : Type*} (s : Finset α) (g : α → holSubring L) :
     holCoeff L (∑ a ∈ s, g a) = fun n => ∑ a ∈ s, holCoeff L (g a) n := by
   classical
   induction s using Finset.induction_on with
-  | empty => rw [Finset.sum_empty, holCoeff_zero]; funext n; simp
+  | empty => rw [Finset.sum_empty, holCoeff_zero]; exact funext fun _ => Finset.sum_empty.symm
   | insert a s ha ih =>
     rw [Finset.sum_insert ha, holCoeff_add, ih]
     funext n; rw [Finset.sum_insert ha]
@@ -191,7 +219,7 @@ theorem combo_eq_zero {g : ι → holSubring K}
   rw [← holComp_combo b g j, h]
   apply holCoeff_injective K
   rw [holCoeff_holComp, holCoeff_zero, holCoeff_zero]
-  funext n; simp
+  exact funext fun _ => DFunLike.congr_fun (LinearEquiv.map_zero b.repr) j
 
 end basis
 
@@ -224,20 +252,21 @@ theorem mcombo_eq_zero {e : ι → MeroRing K} (h : mcombo b e = 0) (i : ι) : e
     have : meroExt (L := L) (algebraMap (holSubring K) (MeroRing K) y) * mcombo b e = 0 := by
       rw [h, mul_zero]
     rw [mcombo, Finset.mul_sum] at this
-    rw [map_sum, ← this]
+    rw [ringHomClass_map_sum, ← this]
     refine Finset.sum_congr rfl (fun j _ => ?_)
-    rw [map_mul, ← meroExt_alg, hx', map_mul, alg_L_eq]
-    ring
-  have h0 := (IsFractionRing.injective (holSubring L) (MeroRing L)) (hsum.trans (map_zero _).symm)
+    rw [RingHom.map_mul, ← meroExt_alg, hx', RingHom.map_mul, alg_L_eq]
+    exact mul_left_comm _ _ _
+  have h0 := (IsFractionRing.injective (holSubring L) (MeroRing L))
+    (hsum.trans (RingHom.map_zero _).symm)
   have hxi := combo_eq_zero b h0 i
   have := hx' i
-  rw [hxi, map_zero] at this
+  rw [hxi, RingHom.map_zero] at this
   exact (mul_eq_zero.mp this.symm).resolve_left (alg_hol_ne_zero hy0)
 
 omit [FiniteDimensional K L] in
 theorem mcombo_add (e e' : ι → MeroRing K) :
     mcombo b (e + e') = mcombo b e + mcombo b e' := by
-  simp only [mcombo, Pi.add_apply, map_add, mul_add, Finset.sum_add_distrib]
+  simp only [mcombo, Pi.add_apply, RingHom.map_add, mul_add, Finset.sum_add_distrib]
 
 theorem mcombo_injective : Function.Injective (mcombo (L := L) b) := by
   intro e e' h
@@ -270,9 +299,9 @@ theorem mero_decomp (f : MeroRing L) : ∃ e : ι → MeroRing K, f = mcombo b e
     rw [hmemV]
     refine ⟨fun i => algebraMap K (MeroRing K) (b.repr c i), ?_⟩
     conv_lhs => rw [← b.sum_repr c]
-    rw [map_sum, mcombo]
+    rw [ringHomClass_map_sum, mcombo]
     refine Finset.sum_congr rfl (fun i _ => ?_)
-    rw [meroExt_algebraMap, Algebra.smul_def, map_mul, mul_comm]
+    rw [meroExt_algebraMap, Algebra.smul_def, RingHom.map_mul, mul_comm]
   have hmul : ∀ y z : MeroRing L, y ∈ V → z ∈ V → y * z ∈ V := by
     intro y z hy hz
     induction hy using Submodule.span_induction with
@@ -281,7 +310,7 @@ theorem mero_decomp (f : MeroRing L) : ∃ e : ι → MeroRing K, f = mcombo b e
       induction hz using Submodule.span_induction with
       | mem z hz =>
         obtain ⟨j, rfl⟩ := hz
-        rw [← map_mul]; exact hconst _
+        rw [← RingHom.map_mul]; exact hconst _
       | zero => rw [mul_zero]; exact V.zero_mem
       | add z w _ _ hz hw => rw [mul_add]; exact V.add_mem hz hw
       | smul c z _ hz =>
@@ -295,7 +324,7 @@ theorem mero_decomp (f : MeroRing L) : ∃ e : ι → MeroRing K, f = mcombo b e
       add_mem' := fun {y z} hy hz => V.add_mem hy hz
       algebraMap_mem' := fun c => by
         rw [Algebra.algebraMap_eq_smul_one]
-        exact V.smul_mem c (by simpa using hconst 1) }
+        exact V.smul_mem c (RingHom.map_one (algebraMap L (MeroRing L)) ▸ hconst 1) }
   have hAfg : A.toSubmodule.FG := ⟨(Finset.univ.image fun i => algebraMap L (MeroRing L) (b i)), by
     show Submodule.span _ _ = V
     rw [hV, Finset.coe_image, Finset.coe_univ, Set.image_univ]⟩
@@ -308,9 +337,9 @@ theorem mero_decomp (f : MeroRing L) : ∃ e : ι → MeroRing K, f = mcombo b e
     rw [hmemV]
     refine ⟨fun i => algebraMap (holSubring K) (MeroRing K) (holComp b g i), ?_⟩
     conv_lhs => rw [hol_decomp b g]
-    rw [map_sum, mcombo]
+    rw [ringHomClass_map_sum, mcombo]
     refine Finset.sum_congr rfl (fun i _ => ?_)
-    rw [map_mul, meroExt_alg, alg_L_eq]
+    rw [RingHom.map_mul, meroExt_alg, alg_L_eq]
   obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := holSubring L) f
   have hfA : algebraMap (holSubring L) (MeroRing L) x / algebraMap (holSubring L) (MeroRing L) y ∈ A := by
     rw [div_eq_mul_inv]; exact A.mul_mem (hhol x) (hinv _ (hhol y))
@@ -341,14 +370,33 @@ theorem fq_decomp {q : K} (hq0 : q ≠ 0) (f : FqSub L (algebraMap K L q)) :
     ∃ e : ι → FqSub K q, (f : MeroRing L) = mcombo b (fun i => (e i : MeroRing K)) := by
   obtain ⟨e, he⟩ := mero_decomp b (f : MeroRing L)
   set Q := Units.map (algebraMap K L : K →* L) (Units.mk0 q hq0)
-  have hfQ : translation L Q f = f := f.2 Q (by simp [Q])
+  have hfQ : translation L Q f = f := f.2 Q rfl
   have htr : translation L Q (mcombo b e) =
       mcombo b (fun i => translation K (Units.mk0 q hq0) (e i)) := by
-    simp only [mcombo, map_sum, map_mul, translation_algebraMap, meroExt_translation, Q]
+    simp only [mcombo, RingEquiv.map_sum, RingEquiv.map_mul, translation_algebraMap,
+      meroExt_translation, Q]
   have heq : mcombo b e = mcombo b (fun i => translation K (Units.mk0 q hq0) (e i)) := by
     rw [← htr, ← he, hfQ]
   have := mcombo_injective b heq
   exact ⟨fun i => ⟨e i, (mem_Fq_iff hq0 _).mpr (congrFun this i).symm⟩, he⟩
+
+omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L]
+  [FiniteDimensional K L] in
+/-- Every element of `L ⊗_K M` is `∑ bᵢ ⊗ mᵢ` for a basis `(bᵢ)` of `L | K`. -/
+theorem exists_eq_sum_basis_tmul {M : Type*} [AddCommGroup M] [Module K M] (t : L ⊗[K] M) :
+    ∃ e : ι → M, t = ∑ i, b i ⊗ₜ e i := by
+  induction t with
+  | tmul l f =>
+    refine ⟨fun i => b.repr l i • f, ?_⟩
+    conv_lhs => rw [← b.sum_repr l]
+    rw [TensorProduct.sum_tmul]
+    exact Finset.sum_congr rfl fun i _ => TensorProduct.smul_tmul _ _ _
+  | add x y hx hy =>
+    obtain ⟨e, rfl⟩ := hx
+    obtain ⟨e', rfl⟩ := hy
+    refine ⟨e + e', ?_⟩
+    rw [← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun i _ => (TensorProduct.tmul_add _ _ _).symm
 
 omit b in
 /-- Every constant field extension of `F_K(q)` by `L` is `L`-isomorphic to `F_L(q)`. -/
@@ -368,25 +416,11 @@ theorem exists_algEquiv_constExt {q : K} (hq0 : q ≠ 0) (FL : Type u) [Field FL
         exact meroExt_algebraMap c) }
   let φ : L ⊗[K] FqSub K q →ₐ[L] FqSub L (algebraMap K L q) :=
     Algebra.TensorProduct.lift (Algebra.ofId L _) ιF (fun _ _ => Commute.all _ _)
-  have hdec : ∀ t : L ⊗[K] FqSub K q, ∃ e : Fin (Module.finrank K L) → FqSub K q,
-      t = ∑ i, b i ⊗ₜ e i := by
-    intro t
-    induction t with
-    | tmul l f =>
-      refine ⟨fun i => b.repr l i • f, ?_⟩
-      conv_lhs => rw [← b.sum_repr l]
-      rw [TensorProduct.sum_tmul]
-      refine Finset.sum_congr rfl (fun i _ => ?_)
-      rw [TensorProduct.smul_tmul]
-    | add x y hx hy =>
-      obtain ⟨e, rfl⟩ := hx
-      obtain ⟨e', rfl⟩ := hy
-      exact ⟨e + e', by simp [TensorProduct.tmul_add, Finset.sum_add_distrib]⟩
   have hφ : ∀ e : Fin (Module.finrank K L) → FqSub K q,
       ((φ (∑ i, b i ⊗ₜ e i) : FqSub L (algebraMap K L q)) : MeroRing L) =
         mcombo b (fun i => (e i : MeroRing K)) := by
     intro e
-    rw [map_sum, mcombo]
+    rw [ringHomClass_map_sum, mcombo]
     push_cast
     refine Finset.sum_congr rfl (fun i _ => ?_)
     rw [Algebra.TensorProduct.lift_tmul]
@@ -394,11 +428,11 @@ theorem exists_algEquiv_constExt {q : K} (hq0 : q ≠ 0) (FL : Type u) [Field FL
   have hinj : Function.Injective φ := by
     rw [injective_iff_map_eq_zero]
     intro t ht
-    obtain ⟨e, rfl⟩ := hdec t
+    obtain ⟨e, rfl⟩ := exists_eq_sum_basis_tmul b t
     have h0 : mcombo b (fun i => (e i : MeroRing K)) = 0 := by
       rw [← hφ, ht]; rfl
-    have : ∀ i, e i = 0 := fun i => Subtype.ext (mcombo_eq_zero b h0 i)
-    simp [this]
+    exact Finset.sum_eq_zero fun i _ => by
+      rw [show e i = 0 from Subtype.ext (mcombo_eq_zero b h0 i), TensorProduct.tmul_zero]
   have hsurj : Function.Surjective φ := by
     intro f
     obtain ⟨e, he⟩ := fq_decomp b hq0 f
@@ -443,12 +477,13 @@ theorem PrimeDivisor.ext_ring {F : Type u} [Field F] [Algebra k F] {P P' : Prime
 /-- `σ` restricted to a valuation ring and its image. -/
 def ringTransfer (σ : E ≃ₐ[k] E') (A : ValuationSubring E) :
     A ≃+* (A.comap (σ.symm : E' →+* E)) where
-  toFun y := ⟨σ y.1, by rw [ValuationSubring.mem_comap]; simp⟩
+  toFun y := ⟨σ y.1, ValuationSubring.mem_comap.mpr (by
+    rw [RingHom.coe_coe, σ.symm_apply_apply]; exact y.2)⟩
   invFun x := ⟨σ.symm x.1, ValuationSubring.mem_comap.mp x.2⟩
-  left_inv y := Subtype.ext (by simp)
-  right_inv x := Subtype.ext (by simp)
-  map_mul' x y := Subtype.ext (by simp)
-  map_add' x y := Subtype.ext (by simp)
+  left_inv y := Subtype.ext (σ.symm_apply_apply y.1)
+  right_inv x := Subtype.ext (σ.apply_symm_apply x.1)
+  map_mul' x y := Subtype.ext (σ.toRingEquiv.map_mul x.1 y.1)
+  map_add' x y := Subtype.ext (σ.toRingEquiv.map_add x.1 y.1)
 
 /-- Transport of a prime divisor along `σ`. -/
 def PrimeDivisor.transfer (σ : E ≃ₐ[k] E') (P : PrimeDivisor k E) : PrimeDivisor k E' where

@@ -65,7 +65,7 @@ theorem toResidue_surjective (P : Q.Over F) : Function.Surjective (Q.toResidue P
   have h2 : x - Q.toRingOf P.1 P.2 (a * s') ∈ maximalIdeal P.1.ring := by
     rw [h1]; exact Ideal.mul_mem_left _ _ hi
   show residue P.1.ring (Q.toRingOf P.1 P.2 (a * s')) = residue P.1.ring x
-  rw [← sub_eq_zero, ← map_sub, residue_eq_zero_iff, ← neg_sub]
+  rw [← sub_eq_zero, ← RingHom.map_sub, residue_eq_zero_iff, ← neg_sub]
   exact neg_mem h2
 
 /-- `S/𝔪_P ≅ κ(P)`. -/
@@ -78,6 +78,16 @@ theorem resEquiv_mk (P : Q.Over F) (x : Q.intCl F) :
     Q.resEquiv P (Ideal.Quotient.mk _ x) = Q.toResidue P x := by
   simp [resEquiv, Ideal.quotEquivOfEq_mk]
 
+omit [Algebra E F] [IsScalarTower K E F] [FiniteDimensional E F] [Algebra.IsSeparable E F] in
+/-- Tower law `[C : K] = [B : A] · [A : K]` for fields `K → A → B ≅ C`. -/
+private theorem finrank_mul_finrank_of_ringEquiv {A B C : Type*} [Field A] [Field B] [Field C]
+    [Algebra K A] [Algebra A B] [Algebra K C] (ε : B ≃+* C)
+    (hε : ∀ c : K, ε (algebraMap A B (algebraMap K A c)) = algebraMap K C c) :
+    Module.finrank A B * Module.finrank K A = Module.finrank K C := by
+  let : Algebra K B := ((algebraMap A B).comp (algebraMap K A)).toAlgebra
+  have : IsScalarTower K A B := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  rw [mul_comm, Module.finrank_mul_finrank, (AlgEquiv.ofRingEquiv (f := ε) hε).toLinearEquiv.finrank_eq]
+
 /-- `f(P|Q) · deg Q = deg P`. -/
 theorem inertiaDeg_mul_degree (P : Q.Over F) :
     (Q.idealOf P.1 P.2).inertiaDeg Q.ring * Q.degree = P.1.degree := by
@@ -88,36 +98,15 @@ theorem inertiaDeg_mul_degree (P : Q.Over F) :
   let : Field (Q.intCl F ⧸ Q.idealOf P.1 P.2) := Ideal.Quotient.field _
   let : Algebra K (Q.ring ⧸ maximalIdeal Q.ring) := resAlg Q
   let : Algebra K (ResidueField P.1.ring) := resAlg P.1
-  -- the `K`-algebra structure on `S/𝔪_P` through `κ(Q)`
-  let : Algebra K (Q.intCl F ⧸ Q.idealOf P.1 P.2) :=
-    RingHom.toAlgebra' ((algebraMap (Q.ring ⧸ maximalIdeal Q.ring)
-      (Q.intCl F ⧸ Q.idealOf P.1 P.2)).comp (algebraMap K (Q.ring ⧸ maximalIdeal Q.ring)))
-      (fun c x => mul_comm _ _)
-  have hT : IsScalarTower K (Q.ring ⧸ maximalIdeal Q.ring) (Q.intCl F ⧸ Q.idealOf P.1 P.2) :=
-    IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have h1 := Module.finrank_mul_finrank K (Q.ring ⧸ maximalIdeal Q.ring)
-    (Q.intCl F ⧸ Q.idealOf P.1 P.2)
-  -- compare with `κ(P)`
-  let ε : (Q.intCl F ⧸ Q.idealOf P.1 P.2) ≃ₐ[K] ResidueField P.1.ring :=
-    AlgEquiv.ofRingEquiv (f := Q.resEquiv P) fun c => by
-      show Q.resEquiv P (algebraMap (Q.ring ⧸ maximalIdeal Q.ring) _
-          (algebraMap K (Q.ring ⧸ maximalIdeal Q.ring) c)) = algebraMap K _ c
-      have e1 : algebraMap K (Q.ring ⧸ maximalIdeal Q.ring) c =
-          Ideal.Quotient.mk _ (Q.toRing c) := rfl
-      rw [e1, Ideal.Quotient.algebraMap_mk_of_liesOver]
-      show Q.resEquiv P (Ideal.Quotient.mk _ (algebraMap Q.ring (Q.intCl F) (Q.toRing c))) = _
-      rw [resEquiv_mk]
-      show residue P.1.ring (Q.toRingOf P.1 P.2 (algebraMap Q.ring (Q.intCl F) (Q.toRing c))) =
-        residue P.1.ring (P.1.toRing c)
-      congr 1
-      apply Subtype.ext
-      show algebraMap E F (algebraMap K E c) = algebraMap K F c
-      rw [← IsScalarTower.algebraMap_apply]
-  have h2 : Module.finrank K (ResidueField P.1.ring) =
-      Module.finrank K (Q.intCl F ⧸ Q.idealOf P.1 P.2) := (ε.toLinearEquiv.finrank_eq).symm
-  show _ = Module.finrank K (ResidueField P.1.ring)
-  rw [h2, ← h1, mul_comm]
-  rfl
+  refine finrank_mul_finrank_of_ringEquiv (Q.resEquiv P) fun c => ?_
+  have e1 : algebraMap K (Q.ring ⧸ maximalIdeal Q.ring) c = Ideal.Quotient.mk _ (Q.toRing c) := rfl
+  rw [e1, Ideal.Quotient.algebraMap_mk_of_liesOver, resEquiv_mk]
+  show residue P.1.ring (Q.toRingOf P.1 P.2 (algebraMap Q.ring (Q.intCl F) (Q.toRing c))) =
+    residue P.1.ring (P.1.toRing c)
+  congr 1
+  apply Subtype.ext
+  show algebraMap E F (algebraMap K E c) = algebraMap K F c
+  rw [← IsScalarTower.algebraMap_apply]
 
 /-- **Fundamental identity**: `∑_{P|Q} e(P|Q) deg P = [F:E] deg Q`. -/
 theorem sum_ramIdx_mul_degree :

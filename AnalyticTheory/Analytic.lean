@@ -137,13 +137,13 @@ noncomputable def holScale (c : Kˣ) : holSubring K ≃+* holSubring K where
     show f.1 (scalePt K c (scalePt K c⁻¹ α)) = f.1 α
     have h : scalePt K c (scalePt K c⁻¹ α) = α := Subtype.ext (by
       show algebraMap K (Omega K) (c : K) * (algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * α.1) = α.1
-      rw [← mul_assoc, ← map_mul, Units.mul_inv, map_one, one_mul])
+      rw [← mul_assoc, ← RingHom.map_mul, Units.mul_inv, RingHom.map_one, one_mul])
     rw [h])
   right_inv f := Subtype.ext (funext fun α => by
     show f.1 (scalePt K c⁻¹ (scalePt K c α)) = f.1 α
     have h : scalePt K c⁻¹ (scalePt K c α) = α := Subtype.ext (by
       show algebraMap K (Omega K) ((c⁻¹ : Kˣ) : K) * (algebraMap K (Omega K) (c : K) * α.1) = α.1
-      rw [← mul_assoc, ← map_mul, Units.inv_mul, map_one, one_mul])
+      rw [← mul_assoc, ← RingHom.map_mul, Units.inv_mul, RingHom.map_one, one_mul])
     rw [h])
 
 /-- Book, §2: the meromorphic functions `M_K`, the quotient field of `H_K`. -/
@@ -159,13 +159,13 @@ noncomputable def translation (a : Kˣ) : MeroRing K ≃+* MeroRing K :=
 noncomputable def FqSub (q : K) : Subfield (MeroRing K) where
   carrier := {f | ∀ a : Kˣ, (a : K) = q → translation K a f = f}
   mul_mem' := fun {f g} hf hg a ha => by
-    simp only [map_mul, hf a ha, hg a ha]
-  one_mem' := fun a _ => map_one _
+    simp only [RingEquiv.map_mul, hf a ha, hg a ha]
+  one_mem' := fun a _ => RingEquiv.map_one _
   add_mem' := fun {f g} hf hg a ha => by
-    simp only [map_add, hf a ha, hg a ha]
-  zero_mem' := fun a _ => map_zero _
+    simp only [RingEquiv.map_add, hf a ha, hg a ha]
+  zero_mem' := fun a _ => RingEquiv.map_zero _
   neg_mem' := fun {f} hf a ha => by
-    simp only [map_neg, hf a ha]
+    simp only [RingEquiv.map_neg, hf a ha]
   inv_mem' := fun {f} hf a ha => by
     simp only [map_inv₀, hf a ha]
 
@@ -185,10 +185,10 @@ theorem translation_algebraMap (a : Kˣ) (c : K) :
 /-- The constants `K → F_K(q)`. -/
 noncomputable def FqHom (q : K) : K →+* FqSub K q where
   toFun c := ⟨algebraMap K (MeroRing K) c, fun a _ => translation_algebraMap K a c⟩
-  map_one' := Subtype.ext (map_one _)
-  map_mul' _c _d := Subtype.ext (map_mul _ _ _)
-  map_zero' := Subtype.ext (map_zero _)
-  map_add' _c _d := Subtype.ext (map_add _ _ _)
+  map_one' := Subtype.ext (RingHom.map_one _)
+  map_mul' _c _d := Subtype.ext (RingHom.map_mul _ _ _)
+  map_zero' := Subtype.ext (RingHom.map_zero _)
+  map_add' _c _d := Subtype.ext (RingHom.map_add _ _ _)
 
 /-- The `K`-algebra structure on `F_K(q)`. -/
 noncomputable instance FqAlgebra (q : K) : Algebra K (FqSub K q) :=

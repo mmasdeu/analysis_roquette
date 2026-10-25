@@ -207,6 +207,32 @@ theorem prod_aut_eq_prod_pow (T : SemiPeriodicTriple K L q) (x : L) :
       conv_rhs => rw [← this]
       rw [zpow_add, zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow, mul_one]
 
+/-- Exponents with respect to a generator `σ` of order `n`, reduced modulo `n`. -/
+private theorem exists_index {G : Type*} [Group G] {σ : G} {n : ℕ} (hn : orderOf σ = n)
+    (hnpos : 0 < n) (hgen : ∀ g : G, ∃ a : ℤ, σ ^ a = g) :
+    ∃ i : G → ℕ, (∀ g, g = σ ^ i g) ∧ (∀ g g', i (g * g') = (i g + i g') % n) ∧
+      i σ = 1 % n ∧ ∀ j : ℕ, j < n → i (σ ^ j) = j := by
+  choose a ha using hgen
+  let i : G → ℕ := fun g => (a g % (n : ℤ)).toNat
+  have hi : ∀ g, ((i g : ℕ) : ℤ) = a g % (n : ℤ) := fun g =>
+    Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hnpos.ne'))
+  have hlt : ∀ g, i g < n := fun g => by
+    have := Int.emod_lt_of_pos (a g) (by exact_mod_cast hnpos : (0 : ℤ) < n)
+    have := hi g; omega
+  have hσn : σ ^ n = 1 := by rw [← hn]; exact pow_orderOf_eq_one σ
+  have hgi : ∀ g, g = σ ^ (i g) := by
+    intro g
+    rw [← zpow_natCast, hi g]
+    have := Int.emod_add_mul_ediv (a g) n
+    conv_lhs => rw [← ha g, ← this]
+    rw [zpow_add, zpow_mul, zpow_natCast, hσn, one_zpow, mul_one]
+  have hmod : ∀ g j, σ ^ i g = σ ^ j → i g = j % n := fun g j h => by
+    have h2 : i g ≡ j [MOD n] := by rw [← hn]; exact pow_eq_pow_iff_modEq.mp h
+    rw [← Nat.mod_eq_of_lt (hlt g)]; exact h2
+  refine ⟨i, hgi, fun g g' => hmod _ _ ?_, hmod _ _ ((hgi σ).symm.trans (pow_one σ).symm),
+    fun j hj => (hmod _ _ (hgi _).symm).trans (Nat.mod_eq_of_lt hj)⟩
+  rw [← hgi (g * g'), pow_add, ← hgi g, ← hgi g']
+
 /-- The cocycle attached to a triple `(L, σ, Q)`: `ζ(σ^i) = Q · σQ ⋯ σ^{i-1}Q`. -/
 theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
     ∃ ζ : CocycleModQ K L q, (∀ f : FqSub L (algebraMap K L q),
@@ -234,27 +260,7 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
     rw [← prod_aut_eq_prod_pow q T, ← Algebra.norm_eq_prod_automorphisms, T.norm_eq]
     rfl
   -- indices
-  choose a ha using gen_zpow q T
-  let i : (L ≃ₐ[K] L) → ℕ := fun g => (a g % (n : ℤ)).toNat
-  have hi : ∀ g, ((i g : ℕ) : ℤ) = a g % (n : ℤ) := fun g =>
-    Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hnpos.ne'))
-  have hσn : σ ^ n = 1 := by rw [← hn]; exact pow_orderOf_eq_one σ
-  have hgi : ∀ g, g = σ ^ (i g) := by
-    intro g
-    rw [← zpow_natCast, hi g]
-    have := Int.emod_add_mul_ediv (a g) n
-    conv_lhs => rw [← ha g, ← this]
-    rw [zpow_add, zpow_mul, zpow_natCast, hσn, one_zpow, mul_one]
-  have hr : ∀ g g' : L ≃ₐ[K] L, i (g * g') = (i g + i g') % n := by
-    intro g g'
-    have h1 : σ ^ (i (g * g')) = σ ^ (i g + i g') := by
-      rw [← hgi (g * g'), pow_add, ← hgi g, ← hgi g']
-    have h2 : i (g * g') ≡ i g + i g' [MOD n] := by
-      rw [← hn]; exact pow_eq_pow_iff_modEq.mp h1
-    have h3 : i (g * g') < n := by
-      have := Int.emod_lt_of_pos (a (g * g')) (by exact_mod_cast hnpos : (0 : ℤ) < n)
-      have := hi (g * g'); omega
-    rw [← Nat.mod_eq_of_lt h3]; exact h2
+  obtain ⟨i, hgi, hr, hiσ, hi_pow⟩ := exists_index hn hnpos (gen_zpow q T)
   have hactQ : ∀ (g : L ≃ₐ[K] L) (m : ℕ), g • Qp σ Q' m = (σ ^ i g) • Qp σ Q' m := by
     intro g m; rw [← hgi g]
   let ζU : (L ≃ₐ[K] L) → Lˣ := fun g => Qp σ Q' (i g)
@@ -274,14 +280,6 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
     have h4 := congrArg (fun u : Lˣ => (u : L)) h3
     simpa [hqU, qUnit, AlgEquiv.smul_units_def] using h4
   -- the value at the generator
-  have hiσ : i σ = 1 % n := by
-    have h1 : σ ^ ((a σ) - 1) = 1 := by rw [zpow_sub_one, ha σ, mul_inv_cancel]
-    have h2 : (n : ℤ) ∣ a σ - 1 := by
-      rw [← hn]; exact orderOf_dvd_iff_zpow_eq_one.mpr h1
-    have h3 : a σ % (n : ℤ) = 1 % (n : ℤ) :=
-      Int.emod_eq_emod_iff_emod_sub_eq_zero.mpr (Int.emod_eq_zero_of_dvd h2)
-    have h4 : ((i σ : ℕ) : ℤ) = ((1 % n : ℕ) : ℤ) := by rw [hi σ, h3]; push_cast; rfl
-    exact_mod_cast h4
   have hQp1 : Qp σ Q' 1 = Q' := by simp [Qp]; ext; simp
   have hζσ : ∃ k : ℤ, ζU σ = Q' * qU ^ k := by
     by_cases hn1 : n = 1
@@ -297,14 +295,6 @@ theorem exists_cocycle_of_triple (T : SemiPeriodicTriple K L q) :
   obtain ⟨k0, hk0⟩ := hζσ
   have hcast0 : (((ζU σ : Lˣ)) : L) = (Q' : L) * (algebraMap K L q) ^ k0 := by
     rw [hk0]; simp [hqU, qUnit]
-  have hi_pow : ∀ j : ℕ, j < n → i (σ ^ j) = j := by
-    intro j hj
-    have h1 : σ ^ (i (σ ^ j)) = σ ^ j := (hgi (σ ^ j)).symm
-    have h2 : i (σ ^ j) ≡ j [MOD n] := by rw [← hn]; exact pow_eq_pow_iff_modEq.mp h1
-    have h3 : i (σ ^ j) < n := by
-      have := Int.emod_lt_of_pos (a (σ ^ j)) (by exact_mod_cast hnpos : (0 : ℤ) < n)
-      have := hi (σ ^ j); omega
-    exact Nat.ModEq.eq_of_lt_of_lt h2 h3 hj
   have hpow : ∀ j : ℕ, j < n →
       ((ζU (σ ^ j) : Lˣ) : L) = ∏ l ∈ Finset.range j, (σ ^ l) T.Q := by
     intro j hj

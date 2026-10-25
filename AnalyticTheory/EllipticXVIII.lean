@@ -80,31 +80,34 @@ theorem finiteDimensional_of_elliptic (E : Subfield (FqSub K q))
   exact finiteDimensional_of_transcendental (fq_is_function_field K q hq0 hq1) E hKE t.2
     ((transcendental_algebraMap_iff (algebraMap E (FqSub K q)).injective).mpr htE)
 
+/-- An algebraic extension which is not separable lives in characteristic `p > 0`. -/
+theorem exists_prime_charP_of_not_isSeparable {K E F : Type*} [Field K] [Field E] [Field F]
+    [Algebra K E] [Algebra E F] [Algebra.IsAlgebraic E F] (h : ¬ Algebra.IsSeparable E F) :
+    ∃ p, p.Prime ∧ CharP K p := by
+  rcases CharP.char_is_prime_or_zero K (ringChar K) with h' | h'
+  · exact ⟨_, h', ringChar.charP K⟩
+  · exfalso; apply h
+    have : CharP K 0 := ringChar.of_eq h'
+    have : CharZero K := CharP.charP_to_charZero K
+    have : CharZero E := (RingHom.charZero_iff (algebraMap K E).injective).mp inferInstance
+    exact Algebra.IsAlgebraic.isSeparable_of_perfectField
+
 include hq0 hq1 in
-/-- **Theorem XVIII (existence)**: every elliptic subfield of `F_K(q)` is `F_K(q̄ | Xᵐ)`. -/
-theorem eq_FqbarXm_of_elliptic (E : Subfield (FqSub K q))
-    (hKE : ∀ c : K, algebraMap K (FqSub K q) c ∈ E)
-    (hE : letI := subfieldAlgebra K E hKE; IsEllipticOver K E) :
-    ∃ (qbar : K) (m d : ℕ), 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ 0 < m ∧ 0 < d ∧ qbar ^ d = q ^ m ∧
-      E.map (FqSub K q).subtype = FqbarXm K qbar m := by
-  classical
+/-- In characteristic `p`, the separable closure `E_s` of a subfield `E` in `F = F_K(q)` is
+`F_K(q^{p^r} | X^{p^r})`, where `p^r = [F : E_s]`. -/
+theorem imageSub_separableClosure_eq (E : Subfield (FqSub K q))
+    (hKE : ∀ c : K, algebraMap K (FqSub K q) c ∈ E) [FiniteDimensional E (FqSub K q)]
+    (p : ℕ) [hp : Fact p.Prime] [CharP K p] :
+    ∃ r : ℕ, imageSub q (separableClosure E (FqSub K q)) =
+      FqbarXm K (q ^ p ^ r) ((p ^ r : ℕ) : ℤ) := by
   let := subfieldAlgebra K E hKE
-  have : IsScalarTower K E (FqSub K q) := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have hfin := finiteDimensional_of_elliptic hq0 hq1 E hKE hE
-  by_cases hsep : Algebra.IsSeparable E (FqSub K q)
-  · exact eq_FqbarXm_of_separable_sub hq0 hq1 E hKE hE
-  -- characteristic `p`
-  obtain ⟨p, hpP, hcp⟩ : ∃ p, p.Prime ∧ CharP K p := by
-    rcases CharP.char_is_prime_or_zero K (ringChar K) with h | h
-    · exact ⟨_, h, ringChar.charP K⟩
-    · exfalso; apply hsep
-      have : CharP K 0 := ringChar.of_eq h
-      have : CharZero K := CharP.charP_to_charZero K
-      have : CharZero E := (RingHom.charZero_iff (algebraMap K E).injective).mp inferInstance
-      exact Algebra.IsAlgebraic.isSeparable_of_perfectField
-  have : Fact p.Prime := ⟨hpP⟩
+  have hpP := hp.out
+  have : Algebra.IsAlgebraic E (FqSub K q) := Algebra.IsAlgebraic.of_finite _ _
   have : CharP E p := charP_of_injective_algebraMap (algebraMap K E).injective p
   set Es := separableClosure E (FqSub K q)
+  -- the instances on `E_s`, given explicitly (instance search finds them only slowly)
+  let : Algebra E Es := Es.algebra
+  have : IsPurelyInseparable Es (FqSub K q) := separableClosure.isPurelyInseparable E (FqSub K q)
   have : CharP Es p := charP_of_injective_algebraMap (algebraMap E Es).injective p
   have : ExpChar Es p := ExpChar.prime hpP
   obtain ⟨r, hr⟩ := IsPurelyInseparable.finrank_eq_pow Es (FqSub K q) p
@@ -146,6 +149,37 @@ theorem eq_FqbarXm_of_elliptic (E : Subfield (FqSub K q))
       have : relDeg G Es' * p ^ r = 1 * p ^ r := by rw [← h, one_mul]
       exact Nat.eq_of_mul_eq_mul_right hn this
     exact (eq_of_relDeg_eq_one hGEs h1).symm
+  exact ⟨r, hEsG⟩
+
+include hq0 hq1 in
+/-- **Theorem XVIII (existence)**: every elliptic subfield of `F_K(q)` is `F_K(q̄ | Xᵐ)`. -/
+theorem eq_FqbarXm_of_elliptic (E : Subfield (FqSub K q))
+    (hKE : ∀ c : K, algebraMap K (FqSub K q) c ∈ E)
+    (hE : letI := subfieldAlgebra K E hKE; IsEllipticOver K E) :
+    ∃ (qbar : K) (m d : ℕ), 0 < ‖qbar‖ ∧ ‖qbar‖ < 1 ∧ 0 < m ∧ 0 < d ∧ qbar ^ d = q ^ m ∧
+      E.map (FqSub K q).subtype = FqbarXm K qbar m := by
+  classical
+  let := subfieldAlgebra K E hKE
+  have : IsScalarTower K E (FqSub K q) := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  have hfin := finiteDimensional_of_elliptic hq0 hq1 E hKE hE
+  have : Algebra.IsAlgebraic E (FqSub K q) := Algebra.IsAlgebraic.of_finite _ _
+  by_cases hsep : Algebra.IsSeparable E (FqSub K q)
+  · exact eq_FqbarXm_of_separable_sub hq0 hq1 E hKE hE
+  -- characteristic `p`
+  obtain ⟨p, hpP, hcp⟩ := exists_prime_charP_of_not_isSeparable (K := K) hsep
+  have : Fact p.Prime := ⟨hpP⟩
+  obtain ⟨r, hEsG⟩ := imageSub_separableClosure_eq hq0 hq1 E hKE p
+  set Es := separableClosure E (FqSub K q)
+  let : Algebra E Es := Es.algebra
+  have hn : 0 < p ^ r := pow_pos hpP.pos r
+  have hnz : ((p ^ r : ℕ) : ℤ) ≠ 0 := by exact_mod_cast hn.ne'
+  set Q := q ^ (p ^ r)
+  have hQ0 : 0 < ‖Q‖ := norm_pow_pos hq0 _
+  have hQ1 : ‖Q‖ < 1 := norm_pow_lt_one hq1 hn
+  set G := FqbarXm K Q ((p ^ r : ℕ) : ℤ)
+  set Es' := imageSub q Es
+  have hGF : G ≤ FqSub K q :=
+    (fq_qbar_Xm_subset K q Q hq0 hq1 hQ0 hQ1 _ hnz ⟨1, by rw [zpow_one, zpow_natCast]⟩).1
   -- `E ⊆ G`
   set E₀ := E.map (FqSub K q).subtype
   have hE₀G : E₀ ≤ G := by
@@ -170,10 +204,10 @@ theorem eq_FqbarXm_of_elliptic (E : Subfield (FqSub K q))
     rw [← this]; exact he
   let ψ : E'' →+* E :=
     { toFun := fun f => ⟨⟨μ f, hμF f f.1.2⟩, hpre f f.2⟩
-      map_one' := Subtype.ext (Subtype.ext (map_one μ))
-      map_mul' := fun a b => Subtype.ext (Subtype.ext (map_mul μ _ _))
-      map_zero' := Subtype.ext (Subtype.ext (map_zero μ))
-      map_add' := fun a b => Subtype.ext (Subtype.ext (map_add μ _ _)) }
+      map_one' := Subtype.ext (Subtype.ext μ.map_one)
+      map_mul' := fun a b => Subtype.ext (Subtype.ext (μ.map_mul _ _))
+      map_zero' := Subtype.ext (Subtype.ext μ.map_zero)
+      map_add' := fun a b => Subtype.ext (Subtype.ext (μ.map_add _ _)) }
   have hψsurj : Function.Surjective ψ := by
     rintro ⟨e, he⟩
     obtain ⟨f, hf, hfe⟩ := hE₀G ⟨e, he, rfl⟩
@@ -194,10 +228,10 @@ theorem eq_FqbarXm_of_elliptic (E : Subfield (FqSub K q))
     rw [← this]; exact z.2
   let j : FqSub K Q →+* Es :=
     { toFun := fun f => ⟨⟨μ f, hμF f f.2⟩, hjmem f⟩
-      map_one' := Subtype.ext (Subtype.ext (map_one μ))
-      map_mul' := fun a b => Subtype.ext (Subtype.ext (map_mul μ _ _))
-      map_zero' := Subtype.ext (Subtype.ext (map_zero μ))
-      map_add' := fun a b => Subtype.ext (Subtype.ext (map_add μ _ _)) }
+      map_one' := Subtype.ext (Subtype.ext μ.map_one)
+      map_mul' := fun a b => Subtype.ext (Subtype.ext (μ.map_mul _ _))
+      map_zero' := Subtype.ext (Subtype.ext μ.map_zero)
+      map_add' := fun a b => Subtype.ext (Subtype.ext (μ.map_add _ _)) }
   have hjsurj : Function.Surjective j := by
     intro z
     have h1 : ((z : FqSub K q) : MeroRing K) ∈ G := by
@@ -301,10 +335,10 @@ theorem exists_transport (E : Subfield (FqSub K q)) (hKE : ∀ c : K, algebraMap
     rw [← this]; exact he
   let ψ : E'' →+* E :=
     { toFun := fun f => ⟨⟨μ f, hμF f f.1.2⟩, hpre f f.2⟩
-      map_one' := Subtype.ext (Subtype.ext (map_one μ))
-      map_mul' := fun a b => Subtype.ext (Subtype.ext (map_mul μ _ _))
-      map_zero' := Subtype.ext (Subtype.ext (map_zero μ))
-      map_add' := fun a b => Subtype.ext (Subtype.ext (map_add μ _ _)) }
+      map_one' := Subtype.ext (Subtype.ext μ.map_one)
+      map_mul' := fun a b => Subtype.ext (Subtype.ext (μ.map_mul _ _))
+      map_zero' := Subtype.ext (Subtype.ext μ.map_zero)
+      map_add' := fun a b => Subtype.ext (Subtype.ext (μ.map_add _ _)) }
   have hψsurj : Function.Surjective ψ := by
     rintro ⟨e, he⟩
     obtain ⟨f, hf, hfe⟩ := hle ⟨e, he, rfl⟩

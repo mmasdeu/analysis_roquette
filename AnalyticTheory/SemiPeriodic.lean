@@ -108,13 +108,13 @@ def semiFixed (q : L) (S : Set (GalGroup K L × Lˣ)) : Subfield (FqSub L q) whe
   carrier := {f | ∀ p ∈ S, ∀ ρ : MeroRing L ≃+* MeroRing L, IsGalAct K L p.1 ρ →
     translation L p.2 (ρ (f : MeroRing L)) = (f : MeroRing L)}
   mul_mem' := fun {f g} hf hg p hp ρ hρ => by
-    simp only [Subfield.coe_mul, map_mul, hf p hp ρ hρ, hg p hp ρ hρ]
-  one_mem' := fun p hp ρ hρ => by simp
+    simp only [Subfield.coe_mul, RingEquiv.map_mul, hf p hp ρ hρ, hg p hp ρ hρ]
+  one_mem' := fun p hp ρ hρ => by simp only [Subfield.coe_one, RingEquiv.map_one]
   add_mem' := fun {f g} hf hg p hp ρ hρ => by
-    simp only [Subfield.coe_add, map_add, hf p hp ρ hρ, hg p hp ρ hρ]
-  zero_mem' := fun p hp ρ hρ => by simp
+    simp only [Subfield.coe_add, RingEquiv.map_add, hf p hp ρ hρ, hg p hp ρ hρ]
+  zero_mem' := fun p hp ρ hρ => by simp only [Subfield.coe_zero, RingEquiv.map_zero]
   neg_mem' := fun {f} hf p hp ρ hρ => by
-    simp only [Subfield.coe_neg, map_neg, hf p hp ρ hρ]
+    simp only [Subfield.coe_neg, RingEquiv.map_neg, hf p hp ρ hρ]
   inv_mem' := fun {f} hf p hp ρ hρ => by
     simp only [Subfield.coe_inv, map_inv₀, hf p hp ρ hρ]
 
@@ -136,10 +136,10 @@ noncomputable instance semiFixedAlgebra (q : K) (S : Set (GalGroup K L × Lˣ)) 
     Algebra K (semiFixed K L (algebraMap K L q) S) :=
   RingHom.toAlgebra
     { toFun := fun c => ⟨kConstFq K L q c, kConstFq_mem K L q S c⟩
-      map_one' := Subtype.ext (map_one _)
-      map_mul' := fun _c _d => Subtype.ext (map_mul _ _ _)
-      map_zero' := Subtype.ext (map_zero _)
-      map_add' := fun _c _d => Subtype.ext (map_add _ _ _) }
+      map_one' := Subtype.ext (RingHom.map_one _)
+      map_mul' := fun _c _d => Subtype.ext (RingHom.map_mul _ _ _)
+      map_zero' := Subtype.ext (RingHom.map_zero _)
+      map_add' := fun _c _d => Subtype.ext (RingHom.map_add _ _ _) }
 
 /-! #### Cocycles with values in `L^×/q` and the map `e_q` -/
 

@@ -22,6 +22,32 @@ universe u
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
+/-! Instance shortcuts for the generic `map_*` lemmas applied to ring homomorphisms and ring
+equivalences (`H_K → M_K`, `K → H_K`, automorphisms of `M_K`, …): otherwise each use searches
+through failing paths such as `Module ℚ≥0 H_K` or `CharZero M_K`, which takes seconds. -/
+
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R →+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R →+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidHomClass (R →+* S) R S := RingHomClass.toMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddHomClass (R →+* S) R S := AddMonoidHomClass.toAddHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    ZeroHomClass (R →+* S) R S := AddMonoidHomClass.toZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R →+* S) R S := MonoidHomClass.toMulHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    OneHomClass (R →+* S) R S := MonoidHomClass.toOneHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R ≃+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R ≃+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R ≃+* S) R S := MonoidHomClass.toMulHomClass
+local instance : NeZero (1 : Omega K) := NeZero.one
+
 /-- Infinitely many points of norm `1`. -/
 theorem sphere_infinite {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) :
     {x : Omega K | x ≠ 0 ∧ 1 ≤ ‖x‖ ∧ ‖x‖ ≤ 1}.Infinite := by
@@ -231,7 +257,7 @@ theorem term_bound {ρ : ℝ} (hρ : 0 < ρ) (k p : ℕ) (hp : 2 ≤ p) (G : ℝ
     calc _ ≤ _ := h1
       _ = _ := h2
       _ ≤ ρ ^ k * G ^ p * ‖q‖ ^ m := mul_le_mul_of_nonneg_left h3 hA
-      _ ≤ _ := by nlinarith [pow_nonneg hq0'.le m]
+      _ ≤ _ := mul_le_mul_of_nonneg_right (le_add_of_nonneg_right hB) (pow_nonneg hq0'.le m)
   · obtain ⟨m, hm⟩ : ∃ m : ℕ, n = -(m : ℤ) := ⟨(-n).toNat, by omega⟩
     subst hm
     have hnat : (-(m : ℤ)).natAbs = m := by omega
@@ -241,7 +267,7 @@ theorem term_bound {ρ : ℝ} (hρ : 0 < ρ) (k p : ℕ) (hp : 2 ≤ p) (G : ℝ
       gcongr
     calc _ ≤ _ := h1
       _ = G ^ p * ρ ^ k / ρ ^ p * ‖q‖ ^ m := by ring
-      _ ≤ _ := by nlinarith [pow_nonneg hq0'.le m]
+      _ ≤ _ := mul_le_mul_of_nonneg_right (le_add_of_nonneg_left hA) (pow_nonneg hq0'.le m)
 
 
 /-- The terms `q⁻ⁿ X Rₙ²` of `Θ² (℘ + 2s₁)`. -/
@@ -537,8 +563,9 @@ theorem GP'_one : (GP' hq0 hq1).1 oneX = -(Rq hq0 hq1 0).1 oneX ^ 3 := by
   have h := GP'_hasSum hq0 hq1 oneX
   have h2 := hasSum_single (f := fun n => (tP' hq0 hq1 n).1 oneX) 0 (fun n hn => by
     simp only [tP', mul_apply_hol, pow_apply_hol, Rq_one hq0 hq1 hn]; ring)
-  rw [h.unique h2]
-  simp [tP', monoHol_apply, oneX]
+  rw [h.unique h2, tP', mul_apply_hol, mul_apply_hol, algebraMap_apply_hol, monoHol_apply,
+    pow_apply_hol]
+  simp only [oneX, neg_zero, zpow_zero, map_neg, map_one, one_zpow, mul_one, neg_one_mul]
 
 theorem anVal_GP_one : anVal K 1 (algebraMap (holSubring K) (MeroRing K) (GP hq0 hq1)) = 0 := by
   have hne : (GP hq0 hq1).1 oneX ≠ 0 := by
@@ -612,7 +639,7 @@ theorem evalsTo_unique' {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {f f' : 
 theorem evalsTo_reflection {f : MeroRing K} {F : OmegaX K → Omega K} (hf : EvalsTo K f F) :
     EvalsTo K (reflectionM K f) (fun α => F ⟨α.1⁻¹, inv_ne_zero α.2⟩) := by
   obtain ⟨g, h, hh, rfl, hgh⟩ := hf
-  refine ⟨holReflectHom K (Omega K) g, holReflectHom K (Omega K) h, (map_ne_zero_iff _ (holReflectHom K (Omega K)).injective).mpr hh, ?_, fun α hα => ?_⟩
+  refine ⟨holReflectHom K (Omega K) g, holReflectHom K (Omega K) h, (_root_.map_ne_zero_iff _ (holReflectHom K (Omega K)).injective).mpr hh, ?_, fun α hα => ?_⟩
   · unfold reflectionM
     rw [map_div₀, IsFractionRing.ringEquivOfRingEquiv_algebraMap,
       IsFractionRing.ringEquivOfRingEquiv_algebraMap]
@@ -665,7 +692,7 @@ theorem anVal_holScale_shift {ξ : Omega K} (hξ : ξ ≠ 0) {g : holSubring K} 
   have hQ : algebraMap K (Omega K) q ≠ 0 := (_root_.map_ne_zero _).mpr hq0
   have hξ' : algebraMap K (Omega K) q * ξ ≠ 0 := mul_ne_zero hQ hξ
   set S := holScale K (Units.mk0 q hq0)⁻¹ with hS
-  have hSg : S g ≠ 0 := (map_ne_zero_iff _ S.injective).mpr hg
+  have hSg : S g ≠ 0 := (_root_.map_ne_zero_iff _ S.injective).mpr hg
   obtain ⟨m, hm1, hm2, hm3⟩ := exists_exact_pow K hξ hg
   obtain ⟨m', hm1', hm2', hm3'⟩ := exists_exact_pow K hξ' hSg
   rw [hm3, hm3']
@@ -693,7 +720,7 @@ theorem anVal_translation_shift {ξ : Omega K} (hξ : ξ ≠ 0) (f : MeroRing K)
     (anVal_isValuation K _ hξ').2.2.1, (anVal_isValuation K _ hξ).2.2.1,
     anVal_holScale_shift hq0 hξ hx0]
   obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top K hξ (alg_hol_ne_zero hy0))
-  rw [anVal_inv_of hξ' (alg_hol_ne_zero ((map_ne_zero_iff _ (holScale K _).injective).mpr hy0))
+  rw [anVal_inv_of hξ' (alg_hol_ne_zero ((_root_.map_ne_zero_iff _ (holScale K _).injective).mpr hy0))
       ((anVal_holScale_shift hq0 hξ hy0).trans hv.symm),
     anVal_inv_of hξ (alg_hol_ne_zero hy0) hv.symm]
 
@@ -725,7 +752,7 @@ end transport
 theorem evalsTo_translation (u : Kˣ) {f : MeroRing K} {F : OmegaX K → Omega K}
     (hf : EvalsTo K f F) : EvalsTo K (translation K u f) (fun x => F (scalePt K u⁻¹ x)) := by
   obtain ⟨g, h, hh, rfl, hgh⟩ := hf
-  refine ⟨holScale K u⁻¹ g, holScale K u⁻¹ h, (map_ne_zero_iff _ (holScale K _).injective).mpr hh,
+  refine ⟨holScale K u⁻¹ g, holScale K u⁻¹ h, (_root_.map_ne_zero_iff _ (holScale K _).injective).mpr hh,
     ?_, fun x hx => hgh _ hx⟩
   rw [map_div₀, translation_alg, translation_alg]
 

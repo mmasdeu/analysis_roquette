@@ -26,61 +26,61 @@ attribute [local instance 10] fqKAlgebra
 attribute [-instance] fqSubfieldAlgebra fqSubfieldSMul
 attribute [local instance] resAlg
 
+private theorem coe_unit_mul_zpow (Q : PrimeDivisor K (FqSub L (algebraMap K L q))) (u : Q.ringˣ)
+    (n : ℤ) :
+    ((((u : Q.ring) : FqSub L (algebraMap K L q)) * Q.uniformizer ^ n : FqSub L (algebraMap K L q)) :
+      MeroRing L) = (((u : Q.ring) : FqSub L (algebraMap K L q)) : MeroRing L) *
+        ((Q.uniformizer : FqSub L (algebraMap K L q)) : MeroRing L) ^ n :=
+  (map_mul (fqVal (algebraMap K L q)) _ _).trans
+    (congrArg (_ * ·) (map_zpow₀ (fqVal (algebraMap K L q)) _ n))
+
+/-- Units of the valuation ring `O_Q = {w_γ ≥ 0}` have valuation `0`. -/
+private theorem anVal_unit_eq_zero (Q : PrimeDivisor K (FqSub L (algebraMap K L q))) {γ : Omega L}
+    (hγ : γ ≠ 0)
+    (hring : ∀ x : FqSub L (algebraMap K L q), x ∈ Q.ring ↔ 0 ≤ anVal L γ (x : MeroRing L))
+    (u : Q.ringˣ) : anVal L γ ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) = 0 := by
+  have hu0' : (((u : Q.ring) : FqSub L (algebraMap K L q)) : MeroRing L) ≠ 0 := fun h =>
+    u.ne_zero (Subtype.ext (Subtype.ext h))
+  have hu1 : 0 ≤ anVal L γ ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) :=
+    (hring _).mp (u : Q.ring).2
+  have hinv : (((u⁻¹ : Q.ringˣ) : Q.ring) : FqSub L (algebraMap K L q)) =
+      (((u : Q.ring) : FqSub L (algebraMap K L q)))⁻¹ :=
+    eq_inv_of_mul_eq_one_left (congrArg Subtype.val u.inv_mul)
+  have hu2 : 0 ≤ anVal L γ (((((u⁻¹ : Q.ringˣ) : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) :=
+    (hring _).mp (u⁻¹ : Q.ringˣ).1.2
+  obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top L hγ hu0')
+  have hinvm : (((((u⁻¹ : Q.ringˣ) : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) =
+      ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L)⁻¹ := by
+    rw [hinv]; exact map_inv₀ (fqVal (algebraMap K L q)) _
+  rw [hinvm, anVal_inv_of hγ hu0' hv.symm] at hu2
+  rw [← hv] at hu1 ⊢
+  have h1' : (0 : ℤ) ≤ v := by exact_mod_cast hu1
+  have h2' : (0 : ℤ) ≤ -v := by exact_mod_cast hu2
+  rw [show v = 0 by omega]
+  rfl
+
 include hq0 hq1 in
 /-- For a prime divisor `Q` of `F_L(q)` and a point `γ` with `O_Q = {w_γ ≥ 0}`, `w_γ = ord_Q`. -/
 theorem anVal_eq_ord (Q : PrimeDivisor K (FqSub L (algebraMap K L q))) {γ : Omega L} (hγ : γ ≠ 0)
     (hring : ∀ x : FqSub L (algebraMap K L q), x ∈ Q.ring ↔ 0 ≤ anVal L γ (x : MeroRing L))
     {f : FqSub L (algebraMap K L q)} (hf : f ≠ 0) :
     anVal L γ (f : MeroRing L) = ((Q.ord f : ℤ) : WithTop ℤ) := by
-  have hq0L := norm_alg_pos (L := L) q hq0
-  have hq1L := norm_alg_lt (L := L) q hq1
-  have hπ0 : Q.uniformizer ≠ 0 := Q.uniformizer_ne_zero
   have hπ0' : ((Q.uniformizer : FqSub L (algebraMap K L q)) : MeroRing L) ≠ 0 :=
-    fun h => hπ0 (Subtype.ext h)
-  -- units have valuation `0`
-  have hunit : ∀ u : Q.ringˣ, anVal L γ ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) = 0 := by
-    intro u
-    have hu0 : ((u : Q.ring) : FqSub L (algebraMap K L q)) ≠ 0 := fun h => u.ne_zero (Subtype.ext h)
-    have hu0' : (((u : Q.ring) : FqSub L (algebraMap K L q)) : MeroRing L) ≠ 0 := fun h => hu0 (Subtype.ext h)
-    have hu1 : 0 ≤ anVal L γ ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) :=
-      (hring _).mp (u : Q.ring).2
-    have hinv : (((u⁻¹ : Q.ringˣ) : Q.ring) : FqSub L (algebraMap K L q)) =
-        (((u : Q.ring) : FqSub L (algebraMap K L q)))⁻¹ :=
-      eq_inv_of_mul_eq_one_left (congrArg Subtype.val u.inv_mul)
-    have hu2 : 0 ≤ anVal L γ (((((u⁻¹ : Q.ringˣ) : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) :=
-      (hring _).mp (u⁻¹ : Q.ringˣ).1.2
-    obtain ⟨v, hv⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top L hγ hu0')
-    have hinvm : (((((u⁻¹ : Q.ringˣ) : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) =
-        ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L)⁻¹ := by
-      rw [hinv]; exact map_inv₀ (fqVal (algebraMap K L q)) _
-    rw [hinvm, anVal_inv_of hγ hu0' hv.symm] at hu2
-    rw [← hv] at hu1 ⊢
-    have h1' : (0 : ℤ) ≤ v := by exact_mod_cast hu1
-    have h2' : (0 : ℤ) ≤ -v := by exact_mod_cast hu2
-    have : v = 0 := by omega
-    rw [this]; rfl
+    fun h => Q.uniformizer_ne_zero (Subtype.ext h)
   -- the uniformizer has valuation `1`
   have hπ : anVal L γ ((Q.uniformizer : FqSub L (algebraMap K L q)) : MeroRing L) = 1 := by
-    obtain ⟨h, hirr⟩ := uniformizer_spec Q
-    obtain ⟨f1, hf1, hv1⟩ := (exists_periodic_function_with_valuation L (algebraMap K L q) hq0L hq1L γ hγ).1
+    obtain ⟨f1, hf1, hv1⟩ := (exists_periodic_function_with_valuation L (algebraMap K L q)
+      (norm_alg_pos (L := L) q hq0) (norm_alg_lt (L := L) q hq1) γ hγ).1
     have hf10 : f1 ≠ 0 := by rintro rfl; rw [anVal_zero L γ hγ] at hv1; exact absurd hv1 (by simp)
     obtain ⟨u, n, hu⟩ := Q.exists_unit_zpow (f := (⟨f1, hf1⟩ : FqSub L (algebraMap K L q)))
       (fun h => hf10 (congrArg Subtype.val h))
-    have hu0' : ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) ≠ 0 := fun h0 =>
-      u.ne_zero (Subtype.ext (Subtype.ext h0))
     have hπnn : 0 ≤ anVal L γ ((Q.uniformizer : FqSub L (algebraMap K L q)) : MeroRing L) :=
-      (hring _).mp h
+      (hring _).mp (uniformizer_spec Q).1
     obtain ⟨m, hm⟩ := WithTop.ne_top_iff_exists.mp (anVal_ne_top L hγ hπ0')
     have hf1' : f1 = ((((u : Q.ring) : FqSub L (algebraMap K L q))) : MeroRing L) *
-        ((Q.uniformizer : FqSub L (algebraMap K L q)) : MeroRing L) ^ n := by
-      have := congrArg (fun x : FqSub L (algebraMap K L q) => (x : MeroRing L)) hu
-      simp only at this
-      rw [this]
-      have := map_mul (fqVal (algebraMap K L q)) ((u : Q.ring) : FqSub L (algebraMap K L q))
-        (Q.uniformizer ^ n)
-      rw [map_zpow₀] at this
-      exact this
-    rw [hf1', (anVal_isValuation L γ hγ).2.2.1, hunit u, zero_add,
+        ((Q.uniformizer : FqSub L (algebraMap K L q)) : MeroRing L) ^ n :=
+      (congrArg Subtype.val hu).trans (coe_unit_mul_zpow q Q u n)
+    rw [hf1', (anVal_isValuation L γ hγ).2.2.1, anVal_unit_eq_zero q Q hγ hring u, zero_add,
       anVal_zpow_of hγ hπ0' hm.symm] at hv1
     rw [← hm] at hπnn ⊢
     have h1 : n * m = 1 := by exact_mod_cast hv1
@@ -91,15 +91,8 @@ theorem anVal_eq_ord (Q : PrimeDivisor K (FqSub L (algebraMap K L q))) {γ : Ome
       · omega
     rw [this]; rfl
   obtain ⟨u, n, hu⟩ := Q.exists_unit_zpow hf
-  rw [Q.ord_eq hu]
-  have hf' : (f : MeroRing L) = (((u : Q.ring) : FqSub L (algebraMap K L q)) : MeroRing L) *
-      ((Q.uniformizer : FqSub L (algebraMap K L q)) : MeroRing L) ^ n := by
-    rw [hu]
-    have := map_mul (fqVal (algebraMap K L q)) ((u : Q.ring) : FqSub L (algebraMap K L q))
-      (Q.uniformizer ^ n)
-    rw [map_zpow₀] at this
-    exact this
-  rw [hf', (anVal_isValuation L γ hγ).2.2.1, hunit u, zero_add, anVal_zpow_of hγ hπ0' hπ n]
+  rw [Q.ord_eq hu, hu, coe_unit_mul_zpow q Q u n, (anVal_isValuation L γ hγ).2.2.1,
+    anVal_unit_eq_zero q Q hγ hring u, zero_add, anVal_zpow_of hγ hπ0' hπ n]
   simp
 
 include hq0 hq1 in
@@ -369,6 +362,45 @@ theorem mulEquiv_of_addHom {C : Type*} [AddCommGroup C] (N : AddSubgroup C) {G :
       exact ⟨Multiplicative.ofAdd (QuotientAddGroup.mk c), Subtype.ext ((hval c).trans hc)⟩
   exact ⟨MulEquiv.ofBijective ψ1 hbij, fun c => hval c⟩
 
+/-- The map `D ↦ Φ(div D)` from the divisors of `F_K(𝐐)` to `L^×/q^ℤ`. -/
+private noncomputable def phiDiv : FFDivisor K (FKQ K L q T) →+ Additive (LQ q hqL) :=
+  AddMonoidHom.mk' (fun D => PhiA q hqL (divMap hq0 hq1 D)) fun D D' => by
+    rw [map_add]
+    exact PhiA_add q hq0 hq1 hqL (divMap_mem_periodic hq0 hq1 D) (divMap_mem_periodic hq0 hq1 D')
+
+private theorem phiDiv_apply (D : FFDivisor K (FKQ K L q T)) :
+    phiDiv q hq0 hq1 T hqL D = PhiA q hqL (divMap hq0 hq1 D) := rfl
+
+private theorem principal_le_ker_phiDiv :
+    FFDivisor.principal K (FKQ K L q T) ≤ (phiDiv q hq0 hq1 T hqL).ker := by
+  rw [FFDivisor.principal]
+  refine (AddSubgroup.closure_le _).mpr ?_
+  rintro D ⟨f, hf0, hD⟩
+  rw [SetLike.mem_coe, AddMonoidHom.mem_ker, phiDiv_apply,
+    (divMap_principal q hq0 hq1 T hf0 D).mp hD]
+  have hf0' : ((f : FqSub L (algebraMap K L q)) : MeroRing L) ≠ 0 := fun h =>
+    hf0 (Subtype.ext (Subtype.ext h))
+  have hmem := (mem_principalDivisors_iff L _ _).mpr
+    ⟨((f : FqSub L (algebraMap K L q)) : MeroRing L), (f : FqSub L (algebraMap K L q)).2, hf0', rfl⟩
+  exact ((mem_principal_iff q hq0 hq1 hqL _).mp hmem).2.2
+
+private theorem phiDiv_mem_normGroup {D : FFDivisor K (FKQ K L q T)} (hD : D.deg = 0) :
+    Additive.toMul (phiDiv q hq0 hq1 T hqL D) ∈
+      (normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL))) := by
+  obtain ⟨y, hy⟩ := Phi_divMap_degZero q hq0 hq1 T hqL hD
+  refine Subgroup.mem_map.mpr ⟨normL K L y, ⟨y, rfl⟩, ?_⟩
+  rw [phiDiv_apply, hy]
+  rfl
+
+private theorem exists_phiDiv_eq {x : LQ q hqL}
+    (hx : x ∈ (normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL)))) :
+    ∃ D : FFDivisor K (FKQ K L q T), D.deg = 0 ∧ Additive.toMul (phiDiv q hq0 hq1 T hqL D) = x := by
+  obtain ⟨z, ⟨y, rfl⟩, rfl⟩ := Subgroup.mem_map.mp hx
+  obtain ⟨D, hD, hΦ⟩ := exists_div_normL q hq0 hq1 T hqL y
+  refine ⟨D, hD, ?_⟩
+  rw [phiDiv_apply]
+  exact congrArg Additive.toMul hΦ
+
 include hq0 hq1 in
 /-- Book, §5, Theorem XV (Abel–Jacobi for semi-periodic functions). -/
 theorem thmXV_abel_jacobi
@@ -379,61 +411,20 @@ theorem thmXV_abel_jacobi
         (ψ (Multiplicative.ofAdd (QuotientAddGroup.mk D)) : Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL)) =
           PhiQ L (algebraMap K L q) hqL (e (D : FFDivisor K (FKQ K L q T)) : Omega L → ℤ) := by
   classical
-  have hq0L := norm_alg_pos (L := L) q hq0
-  have hq1L := norm_alg_lt (L := L) q hq1
-  let Φt : FFDivisor K (FKQ K L q T) →+ Additive (LQ q hqL) :=
-    AddMonoidHom.mk' (fun D => PhiA q hqL (divMap hq0 hq1 D)) (fun D D' => by
-      rw [map_add]
-      exact PhiA_add q hq0 hq1 hqL (divMap_mem_periodic hq0 hq1 D) (divMap_mem_periodic hq0 hq1 D'))
-  have hker : FFDivisor.principal K (FKQ K L q T) ≤ Φt.ker := by
-    rw [FFDivisor.principal]
-    refine (AddSubgroup.closure_le _).mpr ?_
-    rintro D ⟨f, hf0, hD⟩
-    rw [SetLike.mem_coe, AddMonoidHom.mem_ker]
-    show PhiA q hqL (divMap hq0 hq1 D) = 0
-    have hdiv := (divMap_principal q hq0 hq1 T hf0 D).mp hD
-    rw [hdiv]
-    have hf0' : ((f : FqSub L (algebraMap K L q)) : MeroRing L) ≠ 0 := fun h =>
-      hf0 (Subtype.ext (Subtype.ext h))
-    have hmem := (mem_principalDivisors_iff L _ _).mpr
-      ⟨((f : FqSub L (algebraMap K L q)) : MeroRing L), (f : FqSub L (algebraMap K L q)).2, hf0', rfl⟩
-    exact ((mem_principal_iff q hq0 hq1 hqL _).mp hmem).2.2
   let φ0 : FFDivisor.degZero K (FKQ K L q T) →+ Additive (LQ q hqL) :=
-    Φt.comp (FFDivisor.degZero K (FKQ K L q T)).subtype
-  have hker0 : (FFDivisor.principal K (FKQ K L q T)).addSubgroupOf (FFDivisor.degZero K (FKQ K L q T)) ≤
-      φ0.ker := fun x hx => hker hx
-  have hφ0 : ∀ D : FFDivisor.degZero K (FKQ K L q T),
-      φ0 D = PhiA q hqL (divMap hq0 hq1 (D : FFDivisor K (FKQ K L q T))) := fun D => rfl
-  have hmem : ∀ c : FFDivisor.degZero K (FKQ K L q T), Additive.toMul (φ0 c) ∈
-      (normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL))) := by
-    intro D
-    have hD : (D : FFDivisor K (FKQ K L q T)).deg = 0 := D.2
-    obtain ⟨y, hy⟩ := Phi_divMap_degZero q hq0 hq1 T hqL hD
-    refine Subgroup.mem_map.mpr ⟨normL K L y, ⟨y, rfl⟩, ?_⟩
-    rw [hφ0, hy]; rfl
-  have hinj : ∀ c : FFDivisor.degZero K (FKQ K L q T), φ0 c = 0 →
-      c ∈ (FFDivisor.principal K (FKQ K L q T)).addSubgroupOf (FFDivisor.degZero K (FKQ K L q T)) := by
-    intro D hD0
-    have hD : (D : FFDivisor K (FKQ K L q T)).deg = 0 := D.2
-    rw [hφ0] at hD0
-    exact principal_of_Phi_zero q hq0 hq1 T hqL hD hD0
-  have hsurj : ∀ x ∈ (normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL))),
-      ∃ c : FFDivisor.degZero K (FKQ K L q T), Additive.toMul (φ0 c) = x := by
-    intro x hx
-    obtain ⟨z, hz, rfl⟩ := Subgroup.mem_map.mp hx
-    obtain ⟨y, rfl⟩ := hz
-    obtain ⟨D, hD, hΦ⟩ := exists_div_normL q hq0 hq1 T hqL y
-    refine ⟨⟨D, hD⟩, ?_⟩
-    rw [hφ0]
-    exact congrArg Additive.toMul hΦ
-  have key := mulEquiv_of_addHom
+    (phiDiv q hq0 hq1 T hqL).comp (FFDivisor.degZero K (FKQ K L q T)).subtype
+  -- elaborate the lemma head first, so that its `CommGroup` instance is known before `φ0` is
+  -- unified against its argument type
+  refine ((mulEquiv_of_addHom
     ((FFDivisor.principal K (FKQ K L q T)).addSubgroupOf (FFDivisor.degZero K (FKQ K L q T)))
-    (G := LQ q hqL) φ0
+    (G := LQ q hqL)) φ0
     ((normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL))))
-    hker0 hmem hinj hsurj
-  obtain ⟨ψ, hψ⟩ := key
-  refine ⟨ψ, fun D => ?_⟩
-  rw [hψ, hφ0, e_eq_divMap q hq0 hq1 T he]
+    (fun _ hx => principal_le_ker_phiDiv q hq0 hq1 T hqL hx)
+    (fun D => phiDiv_mem_normGroup q hq0 hq1 T hqL D.2)
+    (fun D hD0 => principal_of_Phi_zero q hq0 hq1 T hqL D.2 hD0)
+    (fun _ hx => (exists_phiDiv_eq q hq0 hq1 T hqL hx).elim fun D hD => ⟨⟨D, hD.1⟩, hD.2⟩)).elim
+    fun ψ hψ => ⟨ψ, fun D => ?_⟩
+  rw [hψ, e_eq_divMap q hq0 hq1 T he]
   rfl
 
 theorem exists_iota {A G0 Q : Type*} [Group A] [Group G0] [Group Q] (ε : G0 →* Q)
@@ -457,100 +448,114 @@ theorem exists_iota {A G0 Q : Type*} [Group A] [Group G0] [Group Q] (ε : G0 →
       refine ⟨a, hε ?_⟩
       rw [hι, ha]
 
+/-- The map `K^×/q^ℤ → L^×/q^ℤ` induced by `K ⊂ L`. -/
+private noncomputable def unitsQuotMap (hq0' : q ≠ 0) :
+    Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq0') →* Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL) :=
+  QuotientGroup.map _ _ (Units.map (algebraMap K L : K →* L)) (Subgroup.zpowers_le.mpr ⟨1, by ext; simp⟩)
+
+private theorem unitsQuotMap_mk (hq0' : q ≠ 0) (c : Kˣ) :
+    unitsQuotMap q hqL hq0' (c : Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq0')) =
+      (Units.map (algebraMap K L : K →* L) c : Lˣ ⧸ Subgroup.zpowers (Units.mk0 _ hqL)) := rfl
+
+private theorem unitsQuotMap_injective (hq0' : q ≠ 0) : Function.Injective (unitsQuotMap q hqL hq0') := by
+  rw [injective_iff_map_eq_one]
+  intro x hx
+  obtain ⟨c, rfl⟩ := QuotientGroup.mk_surjective x
+  rw [unitsQuotMap_mk, QuotientGroup.eq_one_iff] at hx
+  obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp hx
+  have : c = (Units.mk0 q hq0') ^ j := by
+    apply Units.map_injective (algebraMap K L).injective
+    rw [map_zpow]; refine Eq.trans hj.symm ?_; ext; simp
+  rw [QuotientGroup.eq_one_iff, this]
+  exact Subgroup.zpow_mem_zpowers _ j
+
+private theorem normGroup_map_le_range (hq0' : q ≠ 0) :
+    ∀ h ∈ (normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL))),
+      h ∈ (unitsQuotMap q hqL hq0').range := by
+  intro h hh
+  obtain ⟨z, ⟨y, rfl⟩, rfl⟩ := Subgroup.mem_map.mp hh
+  exact ⟨QuotientGroup.mk (Units.map (Algebra.norm K : L →* K) y), rfl⟩
+
+include T in
+private theorem comap_unitsQuotMap (hq0' : q ≠ 0) :
+    ((normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL)))).comap
+        (unitsQuotMap q hqL hq0') =
+      (normGroupK K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 q hq0'))) := by
+  have hSN : Subgroup.zpowers (Units.mk0 q hq0') ≤ normGroupK K L :=
+    Subgroup.zpowers_le.mpr ⟨Units.mk0 T.Q T.Q_ne, by ext; simp [T.norm_eq]⟩
+  ext x
+  obtain ⟨c, rfl⟩ := QuotientGroup.mk_surjective x
+  rw [Subgroup.mem_comap]
+  constructor
+  · intro hx
+    rw [unitsQuotMap_mk] at hx
+    obtain ⟨z, ⟨y, rfl⟩, hz⟩ := Subgroup.mem_map.mp hx
+    have h1 : (QuotientGroup.mk (Units.map (algebraMap K L : K →* L) c) : LQ q hqL) =
+        QuotientGroup.mk (Units.map (algebraMap K L : K →* L)
+          (Units.map (Algebra.norm K : L →* K) y)) := hz.symm
+    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp ((QuotientGroup.eq (s := Subgroup.zpowers
+      (Units.mk0 _ hqL))).mp h1)
+    have hc : c = Units.map (Algebra.norm K : L →* K) y * (Units.mk0 q hq0') ^ (-j) := by
+      apply Units.map_injective (algebraMap K L).injective
+      have e : Units.map (algebraMap K L : K →* L) (Units.mk0 q hq0') =
+          Units.mk0 (algebraMap K L q) hqL :=
+        Units.ext (by simp)
+      rw [map_mul, map_zpow]
+      erw [e]
+      rw [zpow_neg]
+      erw [hj]
+      simp
+    refine Subgroup.mem_map.mpr ⟨c, ?_, rfl⟩
+    rw [hc]
+    exact Subgroup.mul_mem _ ⟨y, rfl⟩ (hSN (Subgroup.zpow_mem_zpowers _ (-j)))
+  · rintro ⟨n, ⟨y, rfl⟩, hn⟩
+    rw [← hn]
+    exact Subgroup.mem_map.mpr
+      ⟨Units.map (algebraMap K L : K →* L) (Units.map (Algebra.norm K : L →* K) y), ⟨y, rfl⟩, rfl⟩
+
+/-- Corollary XVa from the isomorphisms of Theorem XV and of the Abel–Jacobi theorem over `K`. -/
+private theorem corXVa_of_iso (hq0' : q ≠ 0)
+    (ψ : Multiplicative (FFClassGroupDegZero K (FKQ K L q T)) ≃*
+      ↥((normGroup K L).map (QuotientGroup.mk' (Subgroup.zpowers (Units.mk0 _ hqL)))))
+    (κ : Multiplicative (classGroupDegZero K q) ≃* (Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq0'))) :
+    ∃ ι : Multiplicative (FFClassGroupDegZero K (FKQ K L q T)) →*
+        Multiplicative (classGroupDegZero K q),
+      Function.Injective ι ∧
+        Nonempty ((Multiplicative (classGroupDegZero K q) ⧸ ι.range) ≃* (Kˣ ⧸ normGroupK K L)) := by
+  classical
+  refine (exists_iota _ (unitsQuotMap_injective q hqL hq0') _ ψ
+    (normGroup_map_le_range q hqL hq0')).elim fun ι0 hι0 => ?_
+  let ι := κ.symm.toMonoidHom.comp ι0
+  refine ⟨ι, κ.symm.injective.comp hι0.1, ?_⟩
+  have hrange : ι.range.map κ.toMonoidHom = ι0.range := by
+    ext x
+    constructor
+    · rintro ⟨_, ⟨a, rfl⟩, rfl⟩
+      exact ⟨a, (κ.apply_symm_apply (ι0 a)).symm⟩
+    · rintro ⟨a, rfl⟩
+      exact ⟨κ.symm (ι0 a), ⟨a, rfl⟩, κ.apply_symm_apply (ι0 a)⟩
+  have hSN : Subgroup.zpowers (Units.mk0 q hq0') ≤ normGroupK K L :=
+    Subgroup.zpowers_le.mpr ⟨Units.mk0 T.Q T.Q_ne, by ext; simp [T.norm_eq]⟩
+  have hcomm : IsMulCommutative (Kˣ ⧸ Subgroup.zpowers (Units.mk0 q hq0')) := ⟨⟨fun a b => by
+    obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective a
+    obtain ⟨b, rfl⟩ := QuotientGroup.mk_surjective b
+    rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, mul_comm]⟩⟩
+  have hn0 : ι0.range.Normal := Subgroup.normal_of_isMulCommutative _
+  exact ⟨(QuotientGroup.congr _ _ κ hrange).trans
+    ((QuotientGroup.quotientMulEquivOfEq (by rw [hι0.2, comap_unitsQuotMap q T hqL hq0'])).trans
+      (QuotientGroup.quotientQuotientEquivQuotient _ (normGroupK K L) hSN))⟩
+
 include hq0 hq1 in
 /-- Book, §5, Corollary XVa. -/
 theorem corXVa_quotient :
     ∃ ι : Multiplicative (FFClassGroupDegZero K (FKQ K L q T)) →*
         Multiplicative (classGroupDegZero K q),
       Function.Injective ι ∧
-        Nonempty ((Multiplicative (classGroupDegZero K q) ⧸ ι.range) ≃* (Kˣ ⧸ normGroupK K L)) := by
-  classical
-  have hq0L := norm_alg_pos (L := L) q hq0
-  have hqL : algebraMap K L q ≠ 0 := norm_pos_iff.mp hq0L
-  have hq0' : q ≠ 0 := norm_pos_iff.mp hq0
-  obtain ⟨e, he⟩ := (thmXIV_divisors q hq0 hq1 T).1
-  obtain ⟨ψ, -⟩ := thmXV_abel_jacobi q hq0 hq1 T hqL e he
-  obtain ⟨κ, -⟩ := abel_jacobi_iso K q hq0 hq1
-  set S : Subgroup Kˣ := Subgroup.zpowers (Units.mk0 q hq0') with hS
-  set SL : Subgroup Lˣ := Subgroup.zpowers (Units.mk0 (algebraMap K L q) hqL) with hSL
-  have hSn : S.Normal := Subgroup.normal_of_isMulCommutative _
-  have hSLn : SL.Normal := Subgroup.normal_of_isMulCommutative _
-  have hSle : S ≤ SL.comap (Units.map (algebraMap K L : K →* L)) := by
-    rw [hS, Subgroup.zpowers_le]
-    exact ⟨1, by ext; simp⟩
-  let ε : Kˣ ⧸ S →* Lˣ ⧸ SL := QuotientGroup.map S SL (Units.map (algebraMap K L : K →* L)) hSle
-  have hε : Function.Injective ε := by
-    rw [injective_iff_map_eq_one]
-    intro x hx
-    obtain ⟨c, rfl⟩ := QuotientGroup.mk_surjective x
-    have h1 : (QuotientGroup.mk (Units.map (algebraMap K L : K →* L) c) : Lˣ ⧸ SL) = 1 := hx
-    obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp ((QuotientGroup.eq_one_iff _).mp h1)
-    have : c = (Units.mk0 q hq0') ^ j := by
-      apply Units.map_injective (algebraMap K L).injective
-      rw [map_zpow]; refine Eq.trans hj.symm ?_; ext; simp
-    rw [QuotientGroup.eq_one_iff, this]
-    exact Subgroup.zpow_mem_zpowers _ j
-  set H : Subgroup (Lˣ ⧸ SL) := (normGroup K L).map (QuotientGroup.mk' SL) with hH
-  have hHr : ∀ h ∈ H, h ∈ ε.range := by
-    intro h hh
-    obtain ⟨z, ⟨y, rfl⟩, rfl⟩ := Subgroup.mem_map.mp hh
-    exact ⟨QuotientGroup.mk (Units.map (Algebra.norm K : L →* K) y), rfl⟩
-  have ψ' : Multiplicative (FFClassGroupDegZero K (FKQ K L q T)) ≃* H := ψ
-  obtain ⟨ι0, hι0, hr⟩ := exists_iota ε hε H ψ' hHr
-  let ι : Multiplicative (FFClassGroupDegZero K (FKQ K L q T)) →* Multiplicative (classGroupDegZero K q) :=
-    (κ.symm : Kˣ ⧸ S →* Multiplicative (classGroupDegZero K q)).comp ι0
-  refine ⟨ι, κ.symm.injective.comp hι0, ?_⟩
-  have hSN : S ≤ normGroupK K L := by
-    rw [hS, Subgroup.zpowers_le]
-    exact ⟨Units.mk0 T.Q T.Q_ne, by ext; simp [T.norm_eq]⟩
-  have hcomap : H.comap ε = (normGroupK K L).map (QuotientGroup.mk' S) := by
-    ext x
-    obtain ⟨c, rfl⟩ := QuotientGroup.mk_surjective x
-    constructor
-    · intro hx
-      obtain ⟨z, ⟨y, rfl⟩, hz⟩ := Subgroup.mem_map.mp hx
-      have h1 : (QuotientGroup.mk (Units.map (algebraMap K L : K →* L) c) : Lˣ ⧸ SL) =
-          QuotientGroup.mk (Units.map (algebraMap K L : K →* L)
-            (Units.map (Algebra.norm K : L →* K) y)) := hz.symm
-      obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp ((QuotientGroup.eq (s := SL)).mp h1)
-      have hc : c = Units.map (Algebra.norm K : L →* K) y * (Units.mk0 q hq0') ^ (-j) := by
-        apply Units.map_injective (algebraMap K L).injective
-        have e : Units.map (algebraMap K L : K →* L) (Units.mk0 q hq0') = Units.mk0 (algebraMap K L q) hqL :=
-          Units.ext (by simp)
-        rw [map_mul, map_zpow]
-        erw [e]
-        rw [zpow_neg]
-        erw [hj]
-        simp
-      refine Subgroup.mem_map.mpr ⟨c, ?_, rfl⟩
-      rw [hc]
-      exact Subgroup.mul_mem _ ⟨y, rfl⟩ (hSN (Subgroup.zpow_mem_zpowers _ (-j)))
-    · rintro ⟨n, ⟨y, rfl⟩, hn⟩
-      show ε (QuotientGroup.mk c) ∈ H
-      rw [← hn]
-      exact Subgroup.mem_map.mpr ⟨Units.map (algebraMap K L : K →* L) (Units.map (Algebra.norm K : L →* K) y),
-        ⟨y, rfl⟩, rfl⟩
-  have hrange : ι.range.map (κ : Multiplicative (classGroupDegZero K q) ≃* Kˣ ⧸ S).toMonoidHom = ι0.range := by
-    ext x
-    constructor
-    · rintro ⟨_, ⟨a, rfl⟩, rfl⟩
-      exact ⟨a, by
-        show ι0 a = _
-        exact (MulEquiv.apply_symm_apply κ (ι0 a)).symm⟩
-    · rintro ⟨a, rfl⟩
-      exact ⟨κ.symm (ι0 a), ⟨a, rfl⟩, MulEquiv.apply_symm_apply κ (ι0 a)⟩
-  have hcomm : IsMulCommutative (Kˣ ⧸ S) := ⟨⟨fun a b => by
-    obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective a
-    obtain ⟨b, rfl⟩ := QuotientGroup.mk_surjective b
-    rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, mul_comm]⟩⟩
-  have hn0 : ι0.range.Normal := Subgroup.normal_of_isMulCommutative _
-  have hn1 : ι.range.Normal := Subgroup.normal_of_isMulCommutative _
-  have hn2 : (H.comap ε).Normal := Subgroup.normal_of_isMulCommutative _
-  have hn3 : ((normGroupK K L).map (QuotientGroup.mk' S)).Normal := Subgroup.normal_of_isMulCommutative _
-  have hn4 : (normGroupK K L).Normal := Subgroup.normal_of_isMulCommutative _
-  refine ⟨(QuotientGroup.congr ι.range ι0.range κ hrange).trans
-    ((QuotientGroup.quotientMulEquivOfEq (by rw [hr, hcomap])).trans
-      (QuotientGroup.quotientQuotientEquivQuotient S (normGroupK K L) hSN))⟩
+        Nonempty ((Multiplicative (classGroupDegZero K q) ⧸ ι.range) ≃* (Kˣ ⧸ normGroupK K L)) :=
+  have hqL : algebraMap K L q ≠ 0 := norm_pos_iff.mp (norm_alg_pos (L := L) q hq0)
+  (thmXIV_divisors q hq0 hq1 T).1.elim fun e he =>
+    (thmXV_abel_jacobi q hq0 hq1 T hqL e he).elim fun ψ _ =>
+      (abel_jacobi_iso K q hq0 hq1).elim fun κ _ => corXVa_of_iso q T hqL _ ψ κ
 
 end aj
 

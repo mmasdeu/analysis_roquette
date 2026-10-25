@@ -26,6 +26,11 @@ universe u
 
 open Polynomial
 
+/-- Shortcut for `map_sub` & co. on ring homomorphisms: the generic search first tries (failing)
+paths such as `Module ℚ≥0 O_Q`. -/
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R →+* S) R S := RingHomClass.toAddMonoidHomClass
+
 section good
 
 variable {K E F : Type u} [Field K] [Field E] [Field F] [Algebra K E] [Algebra K F] [Algebra E F]
@@ -34,6 +39,14 @@ variable {K E F : Type u} [Field K] [Field E] [Field F] [Algebra K E] [Algebra K
 namespace PrimeDivisor
 
 variable (Q : PrimeDivisor K E)
+
+/-- Shortcut: instance search otherwise needs tens of seconds to find this instance. -/
+local instance : Module.IsTorsionFree Q.ring (Q.intCl F) :=
+  have : Module.IsTorsionFree Q.ring F := FaithfulSMul.to_isTorsionFree Q.ring F
+  inferInstance
+
+local instance : FaithfulSMul Q.ring (FractionRing (Q.intCl F)) :=
+  FractionRing.instFaithfulSMul _ _
 
 /-- `y` is a *good generator at `Q`*. -/
 structure IsGoodGen (y : F) : Prop where
@@ -80,11 +93,12 @@ theorem IsGoodGen.adjoin_gen : Algebra.adjoin E {algebraMap (Q.intCl F) F hy.gen
 
 /-- `S = O_Q[y]`. -/
 theorem IsGoodGen.mem_adjoin (s : Q.intCl F) : s ∈ Algebra.adjoin Q.ring {hy.gen} := by
-  have hc : conductor Q.ring hy.gen * differentIdeal Q.ring (Q.intCl F) = Ideal.span {hy.deriv} :=
-    conductor_mul_differentIdeal Q.ring E F hy.gen hy.adjoin_gen
-  rw [Ideal.span_singleton_eq_top.mpr hy.isUnit_deriv] at hc
-  have htop : conductor Q.ring hy.gen = ⊤ := eq_top_iff.mpr (hc ▸ Ideal.mul_le_left)
-  have h1 : (1 : Q.intCl F) ∈ conductor Q.ring hy.gen := htop ▸ Submodule.mem_top
+  have hc : conductor Q.ring hy.gen * differentIdeal Q.ring (Q.intCl F) = ⊤ :=
+    (conductor_mul_differentIdeal Q.ring E F hy.gen hy.adjoin_gen).trans
+      (Ideal.span_singleton_eq_top.mpr hy.isUnit_deriv)
+  have htop : conductor Q.ring hy.gen = ⊤ :=
+    eq_top_iff.mpr ((hc.symm.trans (mul_comm _ _)).le.trans Ideal.mul_le_right)
+  have h1 : (1 : Q.intCl F) ∈ conductor Q.ring hy.gen := by rw [htop]; exact Submodule.mem_top
   simpa using mem_conductor_iff.mp h1 s
 
 omit hy in
@@ -98,7 +112,7 @@ theorem ramIdx_eq_one_of_ramificationIdx (P : Q.Over F)
   by_contra hne
   obtain ⟨t, ht, ht1, ht0⟩ := Q.exists_generator P
   have hπ0 : algebraMap E F Q.uniformizer ≠ 0 :=
-    (map_ne_zero_iff _ (algebraMap E F).injective).mpr Q.uniformizer_ne_zero
+    (_root_.map_ne_zero_iff _ (algebraMap E F).injective).mpr Q.uniformizer_ne_zero
   have htF : (t : F) ≠ 0 := by
     intro h0
     apply Q.idealOf_ne_bot P.1 P.2
@@ -135,18 +149,23 @@ theorem ramIdx_eq_one_of_ramificationIdx (P : Q.Over F)
     Q.maximalIdeal_ne_bot] at h'
   exact h' h
 
+omit hy [Algebra K F] [IsScalarTower K E F] in
+attribute [local instance] FractionRing.liftAlgebra in
+private theorem isSeparable_fractionRing :
+    Algebra.IsSeparable (FractionRing Q.ring) (FractionRing (Q.intCl F)) :=
+  Algebra.IsSeparable.of_equiv_equiv (FractionRing.algEquiv Q.ring E).symm.toRingEquiv
+    (FractionRing.algEquiv (Q.intCl F) F).symm.toRingEquiv <| by
+      ext _
+      exact IsFractionRing.algEquiv_commutes (FractionRing.algEquiv Q.ring E).symm
+        (FractionRing.algEquiv (Q.intCl F) F).symm _
+
 attribute [local instance] FractionRing.liftAlgebra in
 /-- Every prime over `Q` is unramified. -/
 theorem IsGoodGen.ramIdx_eq_one (P : Q.Over F) : P.1.ramIdx (E := E) = 1 := by
   have := Q.isDVR
   have := Q.idealOf_liesOver P.1 P.2
   have := Q.idealOf_isMaximal P.1 P.2
-  have : Algebra.IsSeparable (FractionRing Q.ring) (FractionRing (Q.intCl F)) := by
-    refine Algebra.IsSeparable.of_equiv_equiv (FractionRing.algEquiv Q.ring E).symm.toRingEquiv
-      (FractionRing.algEquiv (Q.intCl F) F).symm.toRingEquiv ?_
-    ext _
-    exact IsFractionRing.algEquiv_commutes (FractionRing.algEquiv Q.ring E).symm
-      (FractionRing.algEquiv (Q.intCl F) F).symm _
+  have := isSeparable_fractionRing (Q := Q) (F := F)
   have hD : hy.deriv ∈ differentIdeal Q.ring (Q.intCl F) :=
     aeval_derivative_mem_differentIdeal Q.ring E F hy.gen hy.adjoin_gen
   have hnot : hy.deriv ∉ Q.idealOf P.1 P.2 := by
@@ -235,17 +254,14 @@ theorem IsGoodGen.exists_poly (hQ : Q.degree = 1) (P : Q.Over F) (x : P.1.ring) 
   have h1 : x - Q.toRingOf P.1 P.2 (a * s') = x * Q.toRingOf P.1 P.2 i := by
     apply Subtype.ext
     show (x : F) - (a : F) * s' = x * i
-    have hi' : (i : F) = 1 - s' * s := by
-      have := congrArg Subtype.val hss
-      push_cast at this
-      linear_combination this
+    have hi' : (i : F) = 1 - s' * s := eq_sub_of_add_eq' (congrArg Subtype.val hss)
     rw [hi', hxas]; field_simp
   have h2 : x - Q.toRingOf P.1 P.2 (a * s') ∈ IsLocalRing.maximalIdeal P.1.ring := by
     rw [h1]; exact Ideal.mul_mem_left _ _ hi
   have h3 : Q.toRingOf P.1 P.2 (a * s') = G.eval₂ (toRingOver P) ⟨y, hy.integral P⟩ := by
     rw [← hG]
-    show Q.toRingOf P.1 P.2 (G.eval₂ (algebraMap Q.ring (Q.intCl F)) hy.gen) = _
-    rw [Polynomial.hom_eval₂]; rfl
+    change Q.toRingOf P.1 P.2 (aeval hy.gen G) = _
+    rw [aeval_def, Polynomial.hom_eval₂]; rfl
   have h4 := eval₂_sub_mem hQ P G ⟨y, hy.integral P⟩
   rw [h3] at h2
   have := Ideal.add_mem _ h2 h4
@@ -259,8 +275,7 @@ theorem IsGoodGen.reduction (hQ : Q.degree = 1) (P : Q.Over F) :
         IsLocalRing.maximalIdeal P.1.ring := by
   have hev : ∀ G : Q.ring[X], G.eval₂ (toRingOver P) ⟨y, hy.integral P⟩ =
       Q.toRingOf P.1 P.2 (aeval hy.gen G) := fun G => by
-    show _ = Q.toRingOf P.1 P.2 (G.eval₂ (algebraMap Q.ring (Q.intCl F)) hy.gen)
-    rw [Polynomial.hom_eval₂]; rfl
+    rw [aeval_def, Polynomial.hom_eval₂]; rfl
   constructor
   · have h := eval₂_sub_mem hQ P (minpoly Q.ring hy.gen) ⟨y, hy.integral P⟩
     rw [hev, minpoly.aeval, map_zero, zero_sub, neg_mem_iff] at h

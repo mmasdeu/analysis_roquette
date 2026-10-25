@@ -20,6 +20,12 @@ namespace AnalyticTheory
 
 universe u
 
+/-- Instance shortcut: `map_add`, `map_sum`, ... for ring homs between the subfields used below
+would otherwise first try (and slowly fail) the `ℚ≥0`-linear-map route. -/
+private local instance (priority := high) ringHom_addMonoidHomClass {A B : Type*}
+    [NonAssocSemiring A] [NonAssocSemiring B] : AddMonoidHomClass (A →+* B) A B :=
+  RingHomClass.toAddMonoidHomClass
+
 section compat
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
@@ -80,13 +86,13 @@ noncomputable def cocycleExt (q : K) (ζ : CocycleModQ K L q) :
     obtain ⟨k, hk⟩ := ζ.2 (resHom K L L' M τ) (resHom K L L' M τ')
     refine ⟨k, ?_⟩
     have h1 := congrArg (algebraMap L M) hk
-    rw [map_mul, map_mul, map_zpow₀, algebraMap_q_eq (L := L) (L' := L') (M := M) q,
-      resHom_commutes] at h1
+    rw [RingHom.map_mul, RingHom.map_mul, map_zpow₀ (algebraMap L M),
+      algebraMap_q_eq (L := L) (L' := L') (M := M) q, resHom_commutes] at h1
     show algebraMap L M ((ζ.1 (resHom K L L' M (τ * τ')) : Lˣ) : L) =
       algebraMap L M ((ζ.1 (resHom K L L' M τ) : Lˣ) : L) *
         τ (algebraMap L M ((ζ.1 (resHom K L L' M τ') : Lˣ) : L)) *
           (algebraMap L' M (algebraMap K L' q)) ^ k
-    rw [map_mul]
+    rw [map_mul (resHom K L L' M)]
     exact h1⟩
 
 theorem cocycleExt_apply (q : K) (ζ : CocycleModQ K L q) (τ : M ≃ₐ[L'] M) :
@@ -155,7 +161,8 @@ theorem fqM_decomp_eq_zero (f : ι → FqSub L q0)
 theorem linearCombination_embed {J : Type*} (w : J → FqSub L q0) (c : J →₀ M) :
     Finsupp.linearCombination M (fun j => embedGen q0 hq q1 h (w j)) c =
       ∑ i, FqHom M q1 (b i) * embedGen q0 hq q1 h
-        (Finsupp.linearCombination L w (Finsupp.mapRange (fun m => b.repr m i) (by simp) c)) := by
+        (Finsupp.linearCombination L w (Finsupp.mapRange (fun m => b.repr m i)
+          (by rw [LinearEquiv.map_zero, Finsupp.coe_zero, Pi.zero_apply]) c)) := by
   classical
   simp only [Finsupp.linearCombination_apply]
   simp_rw [Finsupp.sum_mapRange_index (h := fun (i : J) (a : L) => a • w i)
@@ -196,8 +203,8 @@ theorem embedGen_mem_span (T : Set (FqSub L q0)) {f : FqSub L q0} (hf : f ∈ Su
     embedGen q0 hq q1 h f ∈ Submodule.span M (embedGen q0 hq q1 h '' T) := by
   induction hf using Submodule.span_induction with
   | mem x hx => exact Submodule.subset_span ⟨x, hx, rfl⟩
-  | zero => rw [map_zero]; exact Submodule.zero_mem _
-  | add x y _ _ hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
+  | zero => rw [RingHom.map_zero]; exact Submodule.zero_mem _
+  | add x y _ _ hx hy => rw [RingHom.map_add]; exact Submodule.add_mem _ hx hy
   | smul c x _ hx =>
     have : embedGen q0 hq q1 h (c • x) = algebraMap L M c • embedGen q0 hq q1 h x := by
       rw [Algebra.smul_def c x]
@@ -341,10 +348,10 @@ theorem embedFq_mem_Ezeta (e : Ezeta q ζ) :
 noncomputable def EzetaEmbed : Ezeta q ζ →+* Ezeta (algebraMap K L' q) (cocycleExt (L' := L') (M := M) q ζ) where
   toFun e := ⟨embedFq (L := L) (L' := L') (M := M) q hq0 (e : FqSub L (algebraMap K L q)),
     embedFq_mem_Ezeta q hq0 ζ e⟩
-  map_one' := Subtype.ext (map_one _)
-  map_mul' _ _ := Subtype.ext (map_mul _ _ _)
-  map_zero' := Subtype.ext (map_zero _)
-  map_add' _ _ := Subtype.ext (map_add _ _ _)
+  map_one' := Subtype.ext (embedFq (L' := L') (M := M) q hq0).map_one
+  map_mul' _ _ := Subtype.ext ((embedFq (L' := L') (M := M) q hq0).map_mul _ _)
+  map_zero' := Subtype.ext (embedFq (L' := L') (M := M) q hq0).map_zero
+  map_add' _ _ := Subtype.ext ((embedFq (L' := L') (M := M) q hq0).map_add _ _)
 
 include hq0 in
 theorem Ezeta_constExt_equiv (FL : Type u) [Field FL] [Algebra (Ezeta q ζ) FL] [Algebra L' FL]

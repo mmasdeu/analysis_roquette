@@ -173,8 +173,8 @@ theorem evalP_XI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     rw [PowerSeries.coeff_map, XI, PowerSeries.coeff_mk]
     by_cases hn : n = 0
     · subst hn; simp [E_T_one]
-    · simp only [hn, ite_false, zero_add, map_add, map_mul, map_pow, map_sub, map_one, map_sum,
-        E_T_one, hF]
+    · simp only [hn, ite_false, zero_add, RingHom.map_add, RingHom.map_mul, RingHom.map_pow,
+        RingHom.map_sub, RingHom.map_one, map_sum, E_T_one, hF]
       rw [mul_assoc, Finset.sum_mul]; rfl
   have hS : Summable (fun n : ℕ => (∑ d ∈ n.divisors, F d) * q ^ n) := by
     refine (summable_coeffP hq1
@@ -213,8 +213,8 @@ theorem evalP_YI {q : ℚ_[3]} (hq1 : ‖q‖ < 1) (hy1 : yK y ≠ 1) :
     rw [PowerSeries.coeff_map, YI, PowerSeries.coeff_mk]
     by_cases hn : n = 0
     · subst hn; simp [E_T_two]
-    · simp only [hn, ite_false, zero_add, map_add, map_mul, map_pow, map_sub, map_one, map_sum,
-        E_T_one, hF]
+    · simp only [hn, ite_false, zero_add, RingHom.map_add, RingHom.map_mul, RingHom.map_pow,
+        RingHom.map_sub, RingHom.map_one, map_sum, E_T_one, hF]
       rw [mul_assoc, Finset.sum_mul]; rfl
   have hS : Summable (fun n : ℕ => (∑ d ∈ n.divisors, F d) * q ^ n) := by
     refine (summable_coeffP hq1
@@ -264,13 +264,14 @@ theorem map_E_GI (hy1 : yK y ≠ 1) : PowerSeries.map (E y) GI = 0 := by
       PowerSeries.C ((1 - (y : ℤ_[3])) ^ 4) * PowerSeries.map (E y) BI * PowerSeries.map (E y) XI -
       PowerSeries.C ((1 - (y : ℤ_[3])) ^ 6) * PowerSeries.map (E y) CI := by
     rw [GI]
-    simp only [map_sub, map_add, map_mul, map_pow, PowerSeries.map_C, E_T_one, map_one]
+    simp only [RingHom.map_sub, RingHom.map_add, RingHom.map_mul, RingHom.map_pow,
+      PowerSeries.map_C, E_T_one, RingHom.map_one]
   rw [← key, hG]
-  simp only [map_sub, map_add, map_mul, map_pow]
+  simp only [RingHom.map_sub, RingHom.map_add, RingHom.map_mul, RingHom.map_pow]
   simp only [key, evalP_C]
   rw [evalP_XI hq1 hy1, evalP_YI hq1 hy1, BI, CI, evalP_map_int, evalP_map_int,
     AnalyticTheory.evalZ_serB hq1, AnalyticTheory.evalZ_serC]
-  simp only [map_one, ι_apply]
+  simp only [RingHom.map_one, ι_apply]
   have hrel := AnalyticTheory.thmVI_relation ℚ_[3] q hq0 hq1
   rw [AnalyticTheory.wpM_eq hq0 hq1, AnalyticTheory.wpPrimeM_eq hq0 hq1] at hrel
   have hr := AnalyticTheory.relK hq0 hq1 (A := 0) (by simpa using hrel) (norm_yK y) hy1
@@ -289,7 +290,7 @@ theorem isUnit_three_mul_add_two (k : ℕ) : IsUnit (((3 * k + 2 : ℤ) : ℤ) :
 
 theorem GI_eq_zero : GI = 0 := by
   refine PowerSeries.ext (fun N => ?_)
-  rw [map_zero]
+  rw [LinearMap.map_zero]
   let y : ℕ → ℤ_[3]ˣ := fun k => (isUnit_three_mul_add_two k).unit
   have hy : ∀ k, (y k : ℤ_[3]) = ((3 * k + 2 : ℤ) : ℤ_[3]) := fun k => IsUnit.unit_spec _
   have hinj : Function.Injective y := by
@@ -308,7 +309,7 @@ theorem GI_eq_zero : GI = 0 := by
     have := Int.cast_injective h'
     omega
   have := congrArg (PowerSeries.coeff N) (map_E_GI hy1)
-  rw [PowerSeries.coeff_map, map_zero] at this
+  rw [PowerSeries.coeff_map, LinearMap.map_zero] at this
   exact this
 
 /-! ### From `ℤ[T,T⁻¹]` to `ℚ(u)` -/
@@ -318,7 +319,7 @@ theorem u_ne_zero : u ≠ 0 := RatFunc.X_ne_zero
 theorem one_sub_u_ne_zero : (1 - u : RatFunc ℚ) ≠ 0 := by
   intro h
   have h1 : (RatFunc.X : RatFunc ℚ) = algebraMap (Polynomial ℚ) (RatFunc ℚ) 1 := by
-    rw [map_one]; exact (sub_eq_zero.mp h).symm
+    rw [RingHom.map_one]; exact (sub_eq_zero.mp h).symm
   rw [← RatFunc.algebraMap_X] at h1
   exact Polynomial.X_ne_C 1 ((IsFractionRing.injective (Polynomial ℚ) (RatFunc ℚ)) (by simpa using h1))
 
@@ -337,8 +338,8 @@ theorem map_XI : PowerSeries.map ψ XI = PowerSeries.C ((1 - u) ^ 2) * X := by
   ext n
   rw [PowerSeries.coeff_map, PowerSeries.coeff_C_mul, XI, X, PowerSeries.coeff_mk,
     PowerSeries.coeff_mk]
-  simp only [map_add, map_mul, map_pow, map_sub, map_one, map_sum, map_natCast, ψ_T_one, ψ_T_nat,
-    ψ_T_neg, map_ofNat]
+  simp only [RingHom.map_add, RingHom.map_mul, RingHom.map_pow, RingHom.map_sub, RingHom.map_one,
+    map_sum, map_natCast, ψ_T_one, ψ_T_nat, ψ_T_neg, map_ofNat]
   have h := one_sub_u_ne_zero
   by_cases hn : n = 0
   · subst hn; simp only [ite_true, Nat.divisors_zero, Finset.sum_empty, mul_zero, add_zero, ψ_T_one]
@@ -349,8 +350,8 @@ theorem map_YI : PowerSeries.map ψ YI = PowerSeries.C ((1 - u) ^ 3) * Y := by
   ext n
   rw [PowerSeries.coeff_map, PowerSeries.coeff_C_mul, YI, Y, PowerSeries.coeff_mk,
     PowerSeries.coeff_mk]
-  simp only [map_add, map_mul, map_pow, map_sub, map_one, map_sum, map_natCast, ψ_T_one, ψ_T_nat,
-    ψ_T_neg]
+  simp only [RingHom.map_add, RingHom.map_mul, RingHom.map_pow, RingHom.map_sub, RingHom.map_one,
+    map_sum, map_natCast, ψ_T_one, ψ_T_nat, ψ_T_neg]
   have h := one_sub_u_ne_zero
   by_cases hn : n = 0
   · subst hn
@@ -375,8 +376,8 @@ theorem twelve_dvd (n : ℕ) :
 
 theorem map_CI : PowerSeries.map ψ CI = a6 := by
   ext n
-  rw [CI, PowerSeries.coeff_map, PowerSeries.coeff_map, a6, PowerSeries.coeff_C_mul, map_add,
-    PowerSeries.coeff_C_mul, PowerSeries.coeff_C_mul, s, s, PowerSeries.coeff_mk,
+  rw [CI, PowerSeries.coeff_map, PowerSeries.coeff_map, a6, PowerSeries.coeff_C_mul,
+    LinearMap.map_add, PowerSeries.coeff_C_mul, PowerSeries.coeff_C_mul, s, s, PowerSeries.coeff_mk,
     PowerSeries.coeff_mk, AnalyticTheory.serC, PowerSeries.coeff_mk, AnalyticTheory.cCoef]
   obtain ⟨c, hc⟩ := twelve_dvd n
   rw [neg_add, ← neg_add, hc, show -(12 * c) = 12 * (-c) by ring,
@@ -392,14 +393,14 @@ theorem map_CI : PowerSeries.map ψ CI = a6 := by
 theorem buzzard_identity : Y ^ 2 + X * Y = X ^ 3 + a4 * X + a6 := by
   have h := congrArg (PowerSeries.map ψ) GI_eq_zero
   rw [GI] at h
-  simp only [map_sub, map_add, map_mul, map_pow, PowerSeries.map_C, map_XI, map_YI, map_BI, map_CI,
-    map_zero, map_one, ψ_T_one] at h
+  simp only [RingHom.map_sub, RingHom.map_add, RingHom.map_mul, RingHom.map_pow, PowerSeries.map_C,
+    map_XI, map_YI, map_BI, map_CI, RingHom.map_zero, RingHom.map_one, ψ_T_one] at h
   have hne : PowerSeries.C ((1 - u) ^ 6) ≠ (0 : PowerSeries (RatFunc ℚ)) := by
     exact (map_ne_zero_iff _ PowerSeries.C_injective).mpr (pow_ne_zero _ one_sub_u_ne_zero)
   rw [← sub_eq_zero]
   refine (mul_eq_zero.mp ?_).resolve_left hne
   rw [← h]
-  simp only [map_pow, map_sub, map_one]
+  simp only [RingHom.map_pow, RingHom.map_sub, RingHom.map_one]
   ring
 
 end

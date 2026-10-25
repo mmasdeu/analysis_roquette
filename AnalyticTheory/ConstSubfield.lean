@@ -46,6 +46,12 @@ noncomputable def constExtSub : Subfield (FqSub L (algebraMap K L q)) :=
 
 variable {ι : Type*} [Fintype ι] (b : Module.Basis ι K L)
 
+/-- `map_sum` for a ring homomorphism; stated once so that the uses below do not search for a
+morphism class on the subfields `F_K(q)`, `F_L(q)`. -/
+private theorem ringHom_map_sum {R S α : Type*} [Semiring R] [Semiring S] (f : R →+* S)
+    (g : α → R) (s : Finset α) : f (∑ a ∈ s, g a) = ∑ a ∈ s, f (g a) :=
+  map_sum f g s
+
 /-- The elements of `E_L` are the `∑ bᵢ eᵢ`, `eᵢ ∈ E`. -/
 theorem mem_constExtSub_iff (h : FqSub L (algebraMap K L q)) :
     h ∈ constExtSub L hq E ↔ ∃ e : ι → E,
@@ -57,17 +63,16 @@ theorem mem_constExtSub_iff (h : FqSub L (algebraMap K L q)) :
   have hKE : ∀ c : K, algebraMap E (FqSub L (algebraMap K L q)) (algebraMap K E c) =
       algebraMap L _ (algebraMap K L c) := fun c => by
     rw [hE, ← IsScalarTower.algebraMap_apply, fqExt_algebraMap_K]
-  set S := Set.range (algebraMap L (FqSub L (algebraMap K L q)))
-  have hKE' : (algebraMap E (FqSub L (algebraMap K L q))).comp (algebraMap K E) =
-      (algebraMap L (FqSub L (algebraMap K L q))).comp (algebraMap K L) :=
-    RingHom.ext hKE
+  let S := Set.range (algebraMap L (FqSub L (algebraMap K L q)))
   have halg : ∀ x ∈ S, IsAlgebraic E x := by
     rintro _ ⟨l, rfl⟩
-    obtain ⟨p, hp0, hp⟩ := (Algebra.IsAlgebraic.isAlgebraic (R := K) l)
-    refine ⟨p.map (algebraMap K E), (Polynomial.map_ne_zero_iff (algebraMap K E).injective).mpr hp0, ?_⟩
-    rw [Polynomial.aeval_def, Polynomial.eval₂_map, hKE', ← Polynomial.hom_eval₂]
-    rw [Polynomial.aeval_def] at hp
-    rw [hp, map_zero]
+    obtain ⟨p, hp0, hp⟩ := IsAlgebraic.of_finite K l
+    refine ⟨p.map (algebraMap K E),
+      (Polynomial.map_ne_zero_iff (algebraMap K E).injective).mpr hp0, ?_⟩
+    have hKE' : (algebraMap E (FqSub L (algebraMap K L q))).comp (algebraMap K E) =
+        (algebraMap L (FqSub L (algebraMap K L q))).comp (algebraMap K L) := RingHom.ext hKE
+    rw [Polynomial.aeval_def, Polynomial.eval₂_map, hKE', ← Polynomial.hom_eval₂,
+      ← Polynomial.aeval_def, hp, RingHom.map_zero]
   have hmem : h ∈ constExtSub L hq E ↔ h ∈ Algebra.adjoin E S := by
     show h ∈ IntermediateField.adjoin E S ↔ _
     rw [← IntermediateField.mem_toSubalgebra,
@@ -75,45 +80,36 @@ theorem mem_constExtSub_iff (h : FqSub L (algebraMap K L q)) :
   have hclos : (Submonoid.closure S : Set _) = S := by
     have : S = ((algebraMap L (FqSub L (algebraMap K L q))).rangeS.toSubmonoid : Set _) := rfl
     rw [this, Submonoid.closure_eq]
-  rw [hmem, ← Subalgebra.mem_toSubmodule, Algebra.adjoin_eq_span, hclos]
-  clear hmem
-  constructor
-  · intro hspan
-    induction hspan using Submodule.span_induction with
-    | mem x hx =>
-      obtain ⟨l, rfl⟩ := hx
-      refine ⟨fun i => algebraMap K E (b.repr l i), ?_⟩
-      conv_lhs => rw [← b.sum_repr l]
-      rw [map_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [← hE, hKE, ← map_mul, Algebra.smul_def, mul_comm]
-    | zero => exact ⟨0, by simp⟩
-    | add x y _ _ hx hy =>
-      obtain ⟨e, rfl⟩ := hx
-      obtain ⟨e', rfl⟩ := hy
-      exact ⟨e + e', by simp [mul_add, Finset.sum_add_distrib]⟩
-    | smul c x _ hx =>
-      obtain ⟨e, rfl⟩ := hx
-      refine ⟨c • e, ?_⟩
-      rw [Finset.smul_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [Algebra.smul_def, Pi.smul_apply, smul_eq_mul, map_mul, map_mul, ← hE, ← hE]; ring
-  · rintro ⟨e, rfl⟩
+  -- `span_E (L) = span_E (bᵢ)`
+  have hspan : Submodule.span E S =
+      Submodule.span E (Set.range fun i => algebraMap L (FqSub L (algebraMap K L q)) (b i)) := by
+    refine le_antisymm (Submodule.span_le.mpr ?_)
+      (Submodule.span_mono (Set.range_comp_subset_range _ _))
+    rintro _ ⟨l, rfl⟩
+    rw [SetLike.mem_coe, ← b.sum_repr l, ringHom_map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
-    rw [mul_comm, ← hE, ← Algebra.smul_def]
-    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨b i, rfl⟩)
+    rw [Algebra.smul_def, RingHom.map_mul, ← hKE, ← Algebra.smul_def]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+  have hsum : ∀ e : ι → E, ∑ i, e i • algebraMap L (FqSub L (algebraMap K L q)) (b i) =
+      ∑ i, algebraMap L _ (b i) * fqExt hq (algebraMap E (FqSub K q) (e i)) := fun e =>
+    Finset.sum_congr rfl fun i _ => by rw [Algebra.smul_def, hE, mul_comm]
+  rw [hmem, ← Subalgebra.mem_toSubmodule, Algebra.adjoin_eq_span, hclos, hspan,
+    Submodule.mem_span_range_iff_exists_fun]
+  exact exists_congr fun e => by rw [hsum, eq_comm]
+
+omit [FiniteDimensional K L] in
+private theorem coe_sum_fqExt (e : ι → FqSub K q) :
+    ((∑ i, algebraMap L (FqSub L (algebraMap K L q)) (b i) * fqExt hq (e i) :
+      FqSub L (algebraMap K L q)) : MeroRing L) = mcombo b (fun i => (e i : MeroRing K)) :=
+  (AddSubmonoidClass.coe_finsetSum _ _).trans rfl
 
 /-- Coordinates in `F_L(q) = ⊕ bᵢ F_K(q)` are unique. -/
 theorem fq_coord_unique {e e' : ι → FqSub K q}
     (h : ∑ i, algebraMap L (FqSub L (algebraMap K L q)) (b i) * fqExt hq (e i) =
       ∑ i, algebraMap L (FqSub L (algebraMap K L q)) (b i) * fqExt hq (e' i)) : e = e' := by
-  have h' : mcombo b (fun i => (e i : MeroRing K)) = mcombo b (fun i => (e' i : MeroRing K)) := by
-    have := congrArg Subtype.val h
-    unfold mcombo
-    push_cast at this
-    exact this
-  funext i
-  exact Subtype.ext (congrFun (mcombo_injective b h') i)
+  have h' := mcombo_injective b ((coe_sum_fqExt hq b e).symm.trans
+    ((congrArg Subtype.val h).trans (coe_sum_fqExt hq b e')))
+  exact funext fun i => Subtype.ext (congrFun h' i)
 
 /-- `E_L ∩ F_K(q) = E`. -/
 theorem fqExt_mem_constExtSub_iff (x : FqSub K q) :
@@ -121,33 +117,36 @@ theorem fqExt_mem_constExtSub_iff (x : FqSub K q) :
   classical
   let b := Module.finBasis K L
   rw [mem_constExtSub_iff hq b]
-  set c : Fin _ → K := fun i => b.repr 1 i
-  have hx : fqExt (L := L) hq x =
-      ∑ i, algebraMap L _ (b i) * fqExt hq (algebraMap K (FqSub K q) (c i) * x) := by
-    have h1 : (1 : L) = ∑ i, c i • b i := (b.sum_repr 1).symm
-    have : fqExt (L := L) hq x = algebraMap L _ 1 * fqExt hq x := by rw [map_one, one_mul]
-    rw [this, h1, map_sum, Finset.sum_mul]
+  have hx : ∀ l : L, algebraMap L (FqSub L (algebraMap K L q)) l * fqExt hq x =
+      ∑ i, algebraMap L _ (b i) * fqExt hq (algebraMap K (FqSub K q) (b.repr l i) * x) := by
+    intro l
+    conv_lhs => rw [← b.sum_repr l]
+    rw [ringHom_map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [map_mul, fqExt_algebraMap_K, Algebra.smul_def, map_mul]; ring
+    rw [Algebra.smul_def, RingHom.map_mul, RingHom.map_mul, fqExt_algebraMap_K]
+    exact (mul_assoc _ _ _).trans (mul_left_comm _ _ _)
+  have h1 := hx 1
+  rw [RingHom.map_one, one_mul] at h1
   constructor
   · rintro ⟨e, he⟩
-    rw [hx] at he
+    rw [h1] at he
     have hcoord := fq_coord_unique hq b he
-    obtain ⟨i, hi⟩ : ∃ i, c i ≠ 0 := by
-      by_contra hall
-      push Not at hall
-      have : (1 : L) = 0 := by
-        rw [← b.sum_repr 1]; simp [show ∀ i, b.repr 1 i = 0 from hall]
-      exact one_ne_zero this
-    refine ⟨(algebraMap K E (c i))⁻¹ * e i, ?_⟩
-    have := congrFun hcoord i
-    rw [map_mul, map_inv₀, ← this, ← IsScalarTower.algebraMap_apply, ← mul_assoc,
-      inv_mul_cancel₀ ((map_ne_zero _).mpr hi), one_mul]
+    obtain ⟨i, hi⟩ : ∃ i, b.repr 1 i ≠ 0 := by
+      by_contra! hall
+      exact one_ne_zero (b.repr.map_eq_zero_iff.mp (Finsupp.ext hall))
+    have hi' : algebraMap K (FqSub K q) (b.repr 1 i) ≠ 0 := fun h0 =>
+      hi ((algebraMap K _).injective (h0.trans (RingHom.map_zero _).symm))
+    have hi'' : algebraMap K E (b.repr 1 i) ≠ 0 := fun h0 =>
+      hi ((algebraMap K _).injective (h0.trans (RingHom.map_zero _).symm))
+    have hci := congrFun hcoord i
+    refine ⟨(algebraMap K E (b.repr 1 i))⁻¹ * e i, mul_left_cancel₀ hi' ?_⟩
+    rw [hci, IsScalarTower.algebraMap_apply K E (FqSub K q),
+      ← RingHom.map_mul, mul_inv_cancel_left₀ hi'']
   · rintro ⟨e, rfl⟩
-    refine ⟨fun i => algebraMap K E (c i) * e, ?_⟩
-    rw [hx]
+    refine ⟨fun i => algebraMap K E (b.repr 1 i) * e, ?_⟩
+    rw [h1]
     refine Finset.sum_congr rfl fun i _ => ?_
-    simp only [map_mul, ← IsScalarTower.algebraMap_apply]
+    rw [RingHom.map_mul (algebraMap E (FqSub K q)), ← IsScalarTower.algebraMap_apply]
 
 omit [FiniteDimensional K L] [Algebra K E] [IsScalarTower K E (FqSub K q)] [Fintype ι] b in
 theorem algebraMap_mem_constExtSub (l : L) :
@@ -173,44 +172,34 @@ instance constAlgebraL_tower :
 
 variable [FiniteDimensional E (FqSub K q)]
 
-omit [Fintype ι] b in
+omit [Algebra K E] [IsScalarTower K E (FqSub K q)] [Fintype ι] b in
 /-- The images of a basis of `F_K(q) | E` span `F_L(q)` over `E_L`. -/
 theorem span_constExtSub_eq_top :
     Submodule.span (constExtSub L hq E)
       (Set.range fun j => fqExt (L := L) hq (Module.finBasis E (FqSub K q) j)) = ⊤ := by
   classical
   let bL := Module.finBasis K L
-  set f := Module.finBasis E (FqSub K q)
-  rw [eq_top_iff]
-  intro z _
-  obtain ⟨e, he⟩ := fq_decomp bL hq z
-  have hz : z = ∑ i, algebraMap L _ (bL i) * fqExt hq (e i) := by
-    apply Subtype.ext; rw [he]; unfold mcombo; push_cast; rfl
-  have he' : ∀ i, e i = ∑ j, algebraMap E (FqSub K q) (f.repr (e i) j) * f j := fun i => by
-    conv_lhs => rw [← f.sum_repr (e i)]
-    simp only [Algebra.smul_def]
-  have hz2 : z = ∑ j, (∑ i, algebraMap L _ (bL i) *
-      fqExt hq (algebraMap E (FqSub K q) (f.repr (e i) j))) * fqExt hq (f j) := by
-    rw [hz]
-    simp_rw [Finset.sum_mul]
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    calc algebraMap L _ (bL i) * fqExt hq (e i)
-        = algebraMap L _ (bL i) *
-            fqExt hq (∑ j, algebraMap E (FqSub K q) (f.repr (e i) j) * f j) := by rw [← he' i]
-      _ = _ := by
-        rw [map_sum, Finset.mul_sum]
-        refine Finset.sum_congr rfl fun j _ => ?_
-        rw [map_mul]; ring
-  rw [hz2]
-  refine Submodule.sum_mem _ fun j _ => ?_
-  have hc : (∑ i, algebraMap L _ (bL i) *
-      fqExt hq (algebraMap E (FqSub K q) (f.repr (e i) j))) ∈ constExtSub L hq E :=
-    (mem_constExtSub_iff hq bL _).mpr ⟨fun i => f.repr (e i) j, rfl⟩
-  have := Submodule.smul_mem (Submodule.span (constExtSub L hq E)
-    (Set.range fun j => fqExt (L := L) hq (f j))) (⟨_, hc⟩ : constExtSub L hq E)
+  let f := Module.finBasis E (FqSub K q)
+  let V := Submodule.span (constExtSub L hq E) (Set.range fun j => fqExt (L := L) hq (f j))
+  -- `fqExt (F_K(q)) ⊆ V`, through the coordinates in the basis `f` of `F_K(q) | E`
+  have hV : ∀ x : FqSub K q, fqExt (L := L) hq x ∈ V := fun x => by
+    rw [← f.sum_repr x, ringHom_map_sum]
+    refine Submodule.sum_mem _ fun j _ => ?_
+    have := Submodule.smul_mem V
+      (⟨_, fqExt_algebraMap_mem_constExtSub hq (f.repr x j)⟩ : constExtSub L hq E)
       (Submodule.subset_span ⟨j, rfl⟩)
-  exact this
+    rwa [Subfield.smul_def, smul_eq_mul, ← RingHom.map_mul, ← Algebra.smul_def] at this
+  -- `F_L(q) = ⊕ bᵢ F_K(q)` with `bᵢ ∈ E_L`
+  rw [eq_top_iff]
+  rintro z -
+  obtain ⟨e, he⟩ := fq_decomp bL hq z
+  have hz : z = ∑ i, algebraMap L _ (bL i) * fqExt hq (e i) :=
+    Subtype.ext (he.trans (coe_sum_fqExt hq bL e).symm)
+  rw [hz]
+  refine Submodule.sum_mem _ fun i _ => ?_
+  have := Submodule.smul_mem V
+    (⟨_, algebraMap_mem_constExtSub hq (bL i)⟩ : constExtSub L hq E) (hV (e i))
+  rwa [Subfield.smul_def, smul_eq_mul] at this
 
 omit [Fintype ι] b in
 instance finiteDimensional_constExtSub :
@@ -223,42 +212,27 @@ omit [Fintype ι] b in
 instance isSeparable_constExtSub [Algebra.IsSeparable E (FqSub K q)] :
     Algebra.IsSeparable (constExtSub L hq E) (FqSub L (algebraMap K L q)) := by
   classical
-  set EL := constExtSub L hq E
-  set f := Module.finBasis E (FqSub K q)
   let := constAlgebra (L := L) (E := E) hq
   -- the generators `fqExt fⱼ` are separable over `E`, hence over `E_L`
-  let φE : E →+* EL := (algebraMap E (FqSub L (algebraMap K L q))).codRestrict EL
-    (fqExt_algebraMap_mem_constExtSub hq)
-  have hφ : (algebraMap EL (FqSub L (algebraMap K L q))).comp φE =
-      algebraMap E (FqSub L (algebraMap K L q)) := rfl
-  have hsep : ∀ y : FqSub K q, IsSeparable EL (fqExt (L := L) hq y) := by
+  let φE : E →+* constExtSub L hq E :=
+    (algebraMap E (FqSub L (algebraMap K L q))).codRestrict _ (fqExt_algebraMap_mem_constExtSub hq)
+  have hsep : ∀ y : FqSub K q, IsSeparable (constExtSub L hq E) (fqExt (L := L) hq y) := by
     intro y
-    have hy := Algebra.IsSeparable.isSeparable E y
-    set p := minpoly E y
-    have hroot : Polynomial.aeval (fqExt (L := L) hq y) (p.map φE) = 0 := by
-      rw [Polynomial.aeval_def, Polynomial.eval₂_map, hφ]
-      have h0 := minpoly.aeval E y
-      rw [Polynomial.aeval_def] at h0
-      have := congrArg (fqExt (L := L) hq) h0
-      rw [Polynomial.hom_eval₂, map_zero] at this
-      exact this
-    show (minpoly EL _).Separable
-    exact (Polynomial.Separable.map (f := φE) hy).of_dvd (minpoly.dvd EL _ hroot)
-  -- `F_L(q)` is generated over `E_L` by the `fqExt fⱼ`
-  set S := Set.range fun j => fqExt (L := L) hq (f j)
-  have htop : IntermediateField.adjoin EL S = ⊤ := by
-    rw [eq_top_iff]
-    intro z _
-    have hz : z ∈ Submodule.span EL S := by rw [span_constExtSub_eq_top hq]; trivial
-    have hle : Submodule.span EL S ≤ (IntermediateField.adjoin EL S).toSubalgebra.toSubmodule :=
-      Submodule.span_le.mpr (IntermediateField.subset_adjoin EL S)
-    exact hle hz
-  have h1 : Algebra.IsSeparable EL (IntermediateField.adjoin EL S) :=
-    (IntermediateField.isSeparable_adjoin_iff_isSeparable EL _).mpr (by
-      rintro _ ⟨j, rfl⟩; exact hsep _)
-  rw [htop] at h1
-  exact Algebra.IsSeparable.of_algHom EL _ (IntermediateField.topEquiv (F := EL)
-    (E := FqSub L (algebraMap K L q))).symm.toAlgHom
+    have hroot : Polynomial.aeval (fqExt (L := L) hq y) ((minpoly E y).map φE) = 0 := by
+      rw [Polynomial.aeval_def, Polynomial.eval₂_map]
+      refine (Polynomial.hom_eval₂ (minpoly E y) (algebraMap E (FqSub K q)) (fqExt hq) y).symm.trans
+        ?_
+      rw [← Polynomial.aeval_def, minpoly.aeval, RingHom.map_zero]
+    exact (Polynomial.Separable.map (f := φE) (Algebra.IsSeparable.isSeparable E y)).of_dvd
+      (minpoly.dvd (constExtSub L hq E) _ hroot)
+  -- `F_L(q)` is spanned over `E_L` by the `fqExt fⱼ`, which lie in the separable closure
+  have hle : Submodule.span (constExtSub L hq E)
+      (Set.range fun j => fqExt (L := L) hq (Module.finBasis E (FqSub K q) j)) ≤
+        (separableClosure (constExtSub L hq E)
+          (FqSub L (algebraMap K L q))).toSubalgebra.toSubmodule :=
+    Submodule.span_le.mpr (by rintro _ ⟨j, rfl⟩; exact mem_separableClosure_iff.mpr (hsep _))
+  rw [span_constExtSub_eq_top hq] at hle
+  exact ⟨fun z => mem_separableClosure_iff.mp (hle Submodule.mem_top)⟩
 
 end constSub
 

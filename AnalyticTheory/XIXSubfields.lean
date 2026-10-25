@@ -16,6 +16,31 @@ namespace AnalyticTheory
 
 universe u
 
+/-! Instance shortcuts for the generic `map_*` lemmas applied to ring homomorphisms and ring
+equivalences (`H_K → M_K`, `K → H_K`, automorphisms of `M_K`, …): otherwise each use searches
+through failing paths such as `Module ℚ≥0 H_K` or `CharZero M_K`, which takes seconds. -/
+
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R →+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R →+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidHomClass (R →+* S) R S := RingHomClass.toMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddHomClass (R →+* S) R S := AddMonoidHomClass.toAddHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    ZeroHomClass (R →+* S) R S := AddMonoidHomClass.toZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R →+* S) R S := MonoidHomClass.toMulHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    OneHomClass (R →+* S) R S := MonoidHomClass.toOneHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R ≃+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R ≃+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R ≃+* S) R S := MonoidHomClass.toMulHomClass
+
 section relDegAux
 
 variable {M : Type*} [Field M]
@@ -306,9 +331,7 @@ theorem Em_subDeg (ζ : CocycleModQ K L q)
       relDeg_map (FqSub L qL).subtype le_top, relDeg_top]
     exact Ezeta_finrank_eq qb hqb0 _
   rw [rAF, rFT, rAB, rBT] at h2
-  have hn : 0 < Module.finrank K L := Module.finrank_pos
-  have := h2.symm
-  nlinarith [this]
+  exact Nat.eq_of_mul_eq_mul_right Module.finrank_pos (h2.trans (mul_comm _ _))
 
 end Em
 

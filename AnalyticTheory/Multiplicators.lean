@@ -19,6 +19,21 @@ universe u
 
 open IntermediateField
 
+/-- Shortcut: with an algebra structure between two intermediate fields in context (the
+inclusion, introduced by `letI`), find the module structure directly instead of trying all
+module instances on subtypes first (which takes seconds). -/
+local instance (priority := high) {K' L' : Type*} [Field K'] [Field L'] [Algebra K' L']
+    {E₁ E₂ : IntermediateField K' L'} [Algebra E₁ E₂] : Module E₁ E₂ :=
+  Algebra.toModule
+
+local instance (priority := high) {K' L' : Type*} [Field K'] [Field L'] [Algebra K' L']
+    {E₁ E₂ : IntermediateField K' L'} [Algebra E₁ E₂] : SMul E₁ E₂ :=
+  Algebra.toSMul
+
+local instance {K' L' : Type*} [Field K'] [Field L'] [Algebra K' L'] {E : IntermediateField K' L'} :
+    NeZero (1 : E) :=
+  NeZero.one
+
 section norms
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]

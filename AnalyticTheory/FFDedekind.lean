@@ -71,7 +71,7 @@ variable [FiniteDimensional E F] [Algebra.IsSeparable E F]
 
 instance : FaithfulSMul Q.ring F :=
   (faithfulSMul_iff_algebraMap_injective _ _).mpr
-    ((algebraMap E F).injective.comp (FaithfulSMul.algebraMap_injective Q.ring E))
+    ((algebraMap E F).injective.comp Subtype.val_injective)
 
 instance : FaithfulSMul Q.ring (Q.intCl F) :=
   (faithfulSMul_iff_algebraMap_injective _ _).mpr fun _ _ h =>
@@ -199,6 +199,7 @@ theorem mem_locOf (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] {x : F} :
 omit [Algebra K F] [IsScalarTower K E F] in
 theorem locOf_isDVR (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] (h : 𝔪 ≠ ⊥) :
     IsDiscreteValuationRing (Q.locOf 𝔪) :=
+  let : Algebra (Q.intCl F) (Q.locOf 𝔪) := Subalgebra.algebra _
   IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (Q.intCl F) h _
 
 omit [Algebra K F] [IsScalarTower K E F] in
@@ -280,18 +281,17 @@ theorem isUnit_subring_iff {R : Subring F} (x : R) (hx : (x : F) ≠ 0) :
 /-- `S ∩ 𝔪(S_𝔪) = 𝔪`. -/
 theorem idealOf_primeOfIdeal (𝔪 : Ideal (Q.intCl F)) [𝔪.IsPrime] (h : 𝔪 ≠ ⊥) :
     Q.idealOf (Q.primeOfIdeal 𝔪 h) (Q.restrict_primeOfIdeal 𝔪 h) = 𝔪 := by
+  let : Algebra (Q.intCl F) (Q.locOf 𝔪) := Subalgebra.algebra _
   ext x
   have := IsLocalization.AtPrime.isLocalRing (Q.locOf 𝔪) 𝔪
   have hcomap := IsLocalization.AtPrime.under_maximalIdeal (Q.locOf 𝔪) 𝔪
   have h1 : x ∈ 𝔪 ↔ algebraMap (Q.intCl F) (Q.locOf 𝔪) x ∈ IsLocalRing.maximalIdeal (Q.locOf 𝔪) := by
     rw [← Ideal.mem_comap]
     exact (Set.ext_iff.mp (congrArg (fun I : Ideal (Q.intCl F) => (I : Set (Q.intCl F))) hcomap) x).symm
-  rw [h1, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
-  show Q.toRingOf _ _ x ∈ IsLocalRing.maximalIdeal _ ↔ _
-  rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
+  refine Iff.trans ?_ h1.symm
   by_cases hx : (x : F) = 0
-  · have : x = 0 := Subtype.ext hx
-    subst this; simp
+  · obtain rfl : x = 0 := Subtype.ext hx
+    exact iff_of_true (Ideal.zero_mem _) (Ideal.zero_mem _)
   · have e1 := isUnit_subring_iff (R := (Q.primeOfIdeal 𝔪 h).ring.toSubring)
       (Q.toRingOf _ (Q.restrict_primeOfIdeal 𝔪 h) x) hx
     have e2 := isUnit_subring_iff (R := (Q.locOf 𝔪).toSubring)
@@ -349,17 +349,11 @@ theorem inertiaDeg_idealOf_eq_one (P : PrimeDivisor K F) (hP : P.restrict (E := 
       apply Subtype.ext
       show algebraMap E F (algebraMap K E c) = algebraMap K F c
       rw [← IsScalarTower.algebraMap_apply]
-    rw [map_sub, heq, ← neg_sub]
+    rw [RingHom.map_sub, heq, ← neg_sub]
     exact (IsLocalRing.maximalIdeal P.ring).neg_mem hc
-  have hbot : (⊥ : Subalgebra (Q.ring ⧸ IsLocalRing.maximalIdeal Q.ring)
-      (Q.intCl F ⧸ Q.idealOf P hP)) = ⊤ := by
-    rw [eq_top_iff]
-    intro y _
-    obtain ⟨x, rfl⟩ := hsurj y
-    exact Subalgebra.algebraMap_mem _ x
-  have e := (Subalgebra.topEquiv (R := Q.ring ⧸ IsLocalRing.maximalIdeal Q.ring)
-    (A := Q.intCl F ⧸ Q.idealOf P hP)).toLinearEquiv.finrank_eq
-  rw [← e, ← hbot, Subalgebra.finrank_bot]
+  exact Module.finrank_of_bijective_algebraMap
+    ⟨(algebraMap (Q.ring ⧸ IsLocalRing.maximalIdeal Q.ring) (Q.intCl F ⧸ Q.idealOf P hP)).injective,
+      hsurj⟩
 
 omit [FiniteDimensional E F] in
 /-- Elements of `𝔪_P²` are divisible by `π_P²` in `O_P`. -/
@@ -401,6 +395,8 @@ theorem ramificationIdx_idealOf_eq_one (P : PrimeDivisor K F) (hP : P.restrict (
     (he : P.ramIdx (E := E) = 1) : (Q.idealOf P hP).ramificationIdx Q.ring = 1 := by
   have := Q.idealOf_liesOver P hP
   have := Q.idealOf_isMaximal P hP
+  have : Module.IsTorsionFree Q.ring (Q.intCl F) :=
+    Module.isTorsionFree_iff_faithfulSMul.mpr inferInstance
   rw [← Ideal.ramificationIdx'_eq_ramificationIdx (IsLocalRing.maximalIdeal Q.ring) _
     Q.maximalIdeal_ne_bot]
   refine Ideal.ramificationIdx'_spec ?_ ?_
@@ -455,7 +451,9 @@ theorem card_over_eq_finrank
     (hall : ∀ P : Q.Over F, P.1.degree = 1 ∧ P.1.ramIdx (E := E) = 1) :
     Nat.card (Q.Over F) = Module.finrank E F := by
   have := Q.isDVR
+  have : Module.IsTorsionFree Q.ring F := Module.isTorsionFree_iff_faithfulSMul.mpr inferInstance
   have : Module.Free Q.ring (Q.intCl F) := IsIntegralClosure.module_free Q.ring E F (Q.intCl F)
+  have : Module.Flat Q.ring (Q.intCl F) := Module.Flat.of_free
   have hsum := Ideal.sum_ramification_inertia_eq_finrank (R := Q.ring) (S := Q.intCl F)
     (IsLocalRing.maximalIdeal Q.ring)
   rw [IsIntegralClosure.rank Q.ring E F (Q.intCl F)] at hsum

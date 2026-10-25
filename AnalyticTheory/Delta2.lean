@@ -20,7 +20,16 @@ universe u
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
+/-- Shortcut: instance search finds this only after trying many paths through the subring. -/
+private local instance holSubring_isLeftCancelMulZero : IsLeftCancelMulZero (holSubring K) :=
+  IsDomain.toIsCancelMulZero.toIsLeftCancelMulZero
+
 section scaling
+
+private theorem polyHol_X_sub_C (a : K) :
+    polyHol K (Omega K) (Polynomial.X - Polynomial.C a) =
+      monoHol K (Omega K) 1 - algebraMap K (holSubring K) a := by
+  rw [polyHol, Polynomial.aeval_sub, Polynomial.aeval_X, Polynomial.aeval_C]
 
 theorem holD_holScale (c : Kˣ) (f : holSubring K) : holD (holScale K c f) = holScale K c (holD f) := by
   apply holCoeff_injective K
@@ -38,28 +47,22 @@ theorem valK_holScale (c a : K) (hc : c ≠ 0) (ha : a ≠ 0) (f : holSubring K)
 /-- `(X − a)²` divides `G` if `G` and `DG` vanish at `a`. -/
 theorem lin_sq_dvd {a : K} (ha : a ≠ 0) {G : holSubring K} (h0 : valK G a ha = 0)
     (h1 : valK (holD G) a ha = 0) : (monoHol K (Omega K) 1 - algebraMap K (holSubring K) a) ^ 2 ∣ G := by
-  set X := monoHol K (Omega K) 1 with hX
-  set L := X - algebraMap K (holSubring K) a with hL
-  have hLdef : L = polyHol K (Omega K) (minpoly K (algebraMap K (Omega K) a)) := by
-    rw [minpoly.eq_X_sub_C (Omega K) a]; simp [polyHol, hL, hX]
-  have hdvd : ∀ H : holSubring K, valK H a ha = 0 → L ∣ H := by
+  have hdvd : ∀ H : holSubring K, valK H a ha = 0 →
+      monoHol K (Omega K) 1 - algebraMap K (holSubring K) a ∣ H := by
     intro H hH
-    rw [hLdef, phi_dvd_iff K ((map_ne_zero _).mpr ha)]
+    rw [← polyHol_X_sub_C, ← minpoly.eq_X_sub_C (Omega K) a,
+      phi_dvd_iff K ((map_ne_zero _).mpr ha)]
     have := valK_spec H a ha
-    rw [hH, map_zero] at this
+    rw [hH, RingHom.map_zero] at this
     exact this
   obtain ⟨G1, hG1⟩ := hdvd G h0
-  have hDL : holD L = X := by
-    rw [hL, holD_sub, holD_const, sub_zero, hX, holD_monoHol_one]
   have hval : valK G1 a ha = 0 := by
     have h2 := h1
-    rw [hG1, holD_leibniz, hDL, valK_add, valK_mul, valK_mul] at h2
-    have hLa : valK L a ha = 0 := by
-      rw [hL, valK_sub, hX, valK_monoHol, valK_const]; simp
-    rw [hLa, zero_mul, zero_add, hX, valK_monoHol, zpow_one] at h2
+    rw [hG1, holD_leibniz, holD_sub, holD_const, sub_zero, holD_monoHol_one, valK_add, valK_mul,
+      valK_mul, valK_sub, valK_monoHol, valK_const, zpow_one, sub_self, zero_mul, zero_add] at h2
     exact (mul_eq_zero.mp h2).resolve_right ha
-  obtain ⟨G2, hG2⟩ := hdvd G1 hval
-  exact ⟨G2, by rw [hG1, hG2]; ring⟩
+  rw [sq, hG1]
+  exact mul_dvd_mul_left _ (hdvd G1 hval)
 
 end scaling
 
@@ -157,12 +160,13 @@ include hq0 hq1 in
 theorem Th_FE : holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ (Th hq0 hq1) =
     -(monoHol K (Omega K) 1 * Th hq0 hq1) := by
   have h := (thetaFun_spec hq0 hq1 (one_ne_zero (α := Omega K))).2.1
-  change holScale K _ (Th hq0 hq1) = _ at h
-  have hd : (Polynomial.X - 1 : Polynomial K).natDegree = 1 := by
-    simpa using Polynomial.natDegree_X_sub_C (1 : K)
-  rw [h, minpoly.one, hd]
-  simp [map_neg, neg_mul]
-  exact Or.inl rfl
+  change holScale K _ (Th hq0 hq1) = _ * _ * Th hq0 hq1 at h
+  have hd : ((minpoly K (1 : Omega K)).natDegree : ℤ) = 1 := by
+    rw [minpoly.one, ← Polynomial.C_1, Polynomial.natDegree_X_sub_C, Nat.cast_one]
+  have hc : ((minpoly K (1 : Omega K)).coeff 0)⁻¹ = -1 := by
+    rw [minpoly.one, Polynomial.coeff_sub, Polynomial.coeff_X_zero, Polynomial.coeff_one_zero,
+      zero_sub, inv_neg, inv_one]
+  rw [h, hd, hc, RingHom.map_neg, RingHom.map_one, neg_one_mul, neg_mul]
 
 include hq0 hq1 in
 theorem Gw_FE : FE2 q (norm_pos_iff.mp hq0) (Gw hq0 hq1) := by
@@ -174,15 +178,20 @@ theorem Gw_FE : FE2 q (norm_pos_iff.mp hq0) (Gw hq0 hq1) := by
     alg_hol_ne_zero (monoHol_ne_zero 1)
   unfold FE2
   apply IsFractionRing.injective (holSubring K) (MeroRing K)
-  rw [map_mul, map_mul]
-  rw [map_neg, map_mul] at hper
-  field_simp at hper
-  linear_combination hper
+  rw [RingHom.map_mul, RingHom.map_mul]
+  rw [RingHom.map_neg, RingHom.map_mul, neg_sq, mul_pow,
+    div_eq_div_iff (mul_ne_zero (pow_ne_zero 2 hA) (pow_ne_zero 2 hT)) (pow_ne_zero 2 hT)] at hper
+  refine mul_right_cancel₀ (pow_ne_zero 2 hT) (hper.trans ?_)
+  ring
 
 end fe
 
 
 section Mb
+
+private theorem neg_mul_neg_scale {R : Type*} [CommRing R] {u v x a b : R} (h : u * v = 1) :
+    -(u * x * a) * -(v * x * b) = x * x * (a * b) := by
+  linear_combination x * x * a * b * h
 
 variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
@@ -192,27 +201,21 @@ noncomputable def Mb (b : K) (hb : b ≠ 0) : holSubring K :=
 
 include hq0 hq1 in
 theorem Mb_ne_zero {b : K} (hb : b ≠ 0) : Mb hq0 hq1 b hb ≠ 0 :=
-  mul_ne_zero ((map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1))
-    ((map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1))
+  mul_ne_zero ((holScale K _).map_ne_zero_iff.mpr (Th_ne_zero hq0 hq1))
+    ((holScale K _).map_ne_zero_iff.mpr (Th_ne_zero hq0 hq1))
+
+include hq0 hq1 in
+private theorem holScale_Th_FE (c : Kˣ) :
+    holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ (holScale K c (Th hq0 hq1)) =
+      -(algebraMap K (holSubring K) c * monoHol K (Omega K) 1 * holScale K c (Th hq0 hq1)) := by
+  rw [holScale_comm, Th_FE hq0 hq1, RingEquiv.map_neg, RingEquiv.map_mul, holScale_monoHol,
+    zpow_one]
 
 include hq0 hq1 in
 theorem Mb_FE {b : K} (hb : b ≠ 0) : FE2 q (norm_pos_iff.mp hq0) (Mb hq0 hq1 b hb) := by
-  have hq0' := norm_pos_iff.mp hq0
   unfold FE2 Mb
-  rw [map_mul]
-  have e1 : holScale K (Units.mk0 q hq0')⁻¹ (holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1)) =
-      -(algebraMap K (holSubring K) b⁻¹ * monoHol K (Omega K) 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1)) := by
-    rw [holScale_comm, Th_FE hq0 hq1, map_neg, map_mul, holScale_monoHol]
-    simp [mul_assoc]
-  have e2 : holScale K (Units.mk0 q hq0')⁻¹ (holScale K (Units.mk0 b hb) (Th hq0 hq1)) =
-      -(algebraMap K (holSubring K) b * monoHol K (Omega K) 1 * holScale K (Units.mk0 b hb) (Th hq0 hq1)) := by
-    rw [holScale_comm, Th_FE hq0 hq1, map_neg, map_mul, holScale_monoHol]
-    simp [mul_assoc]
-  rw [e1, e2]
-  have : algebraMap K (holSubring K) b⁻¹ * algebraMap K (holSubring K) b = 1 := by
-    rw [← map_mul, inv_mul_cancel₀ hb, map_one]
-  linear_combination (monoHol K (Omega K) 1 * monoHol K (Omega K) 1 * holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1) *
-    holScale K (Units.mk0 b hb) (Th hq0 hq1)) * this
+  rw [RingEquiv.map_mul, holScale_Th_FE, holScale_Th_FE]
+  exact neg_mul_neg_scale (by rw [← RingHom.map_mul, Units.inv_mul, RingHom.map_one])
 
 end Mb
 
@@ -229,21 +232,15 @@ theorem anVal_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {α : Om
   have hq0' := norm_pos_iff.mp hq0
   have hB : algebraMap K (Omega K) b ≠ 0 := (map_ne_zero _).mpr hb
   have hQ : algebraMap K (Omega K) q ≠ 0 := (map_ne_zero _).mpr hq0'
-  have hTh := alg_hol_ne_zero (Th_ne_zero hq0 hq1)
-  have hS1 : holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1) ≠ 0 :=
-    (map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1)
-  have hS2 : holScale K (Units.mk0 b hb) (Th hq0 hq1) ≠ 0 :=
-    (map_ne_zero_iff _ (holScale K _).injective).mpr (Th_ne_zero hq0 hq1)
   have hB2 : (algebraMap K (Omega K) b) ^ 2 = algebraMap K (Omega K) q ^ m := by
     have := congrArg (algebraMap K (Omega K)) hbm
     rwa [map_pow, map_zpow₀] at this
-  have hbi : algebraMap K (Omega K) b⁻¹ ≠ 0 := (map_ne_zero _).mpr (inv_ne_zero hb)
   -- first factor
   have f1 : anVal K α (algebraMap (holSubring K) (MeroRing K) (holScale K (Units.mk0 b hb)⁻¹ (Th hq0 hq1))) =
       if ConjModQ K q 1 ((algebraMap K (Omega K) b)⁻¹ * α) then 1 else 0 := by
     have hξ : (algebraMap K (Omega K) b)⁻¹ * α ≠ 0 := mul_ne_zero (inv_ne_zero hB) hα
     have := anVal_holScale_shift hb hξ (Th_ne_zero hq0 hq1)
-    rw [show algebraMap K (Omega K) b * ((algebraMap K (Omega K) b)⁻¹ * α) = α by field_simp] at this
+    rw [mul_inv_cancel_left₀ hB] at this
     rw [this]; exact anVal_Th hq0 hq1 hξ
   have f2 : anVal K α (algebraMap (holSubring K) (MeroRing K) (holScale K (Units.mk0 b hb) (Th hq0 hq1))) =
       if ConjModQ K q 1 (algebraMap K (Omega K) b * α) then 1 else 0 := by
@@ -253,7 +250,8 @@ theorem anVal_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {α : Om
       map_inv₀, inv_mul_cancel_left₀ hB] at this
     rw [this]; exact anVal_Th hq0 hq1 hξ
   unfold Mb
-  rw [map_mul, (anVal_isValuation K α hα).2.2.1, f1, f2]
+  rw [RingHom.map_mul (algebraMap (holSubring K) (MeroRing K)), (anVal_isValuation K α hα).2.2.1,
+    f1, f2]
   simp only [conjModQ_one_iff hq0']
   have hcls1 : (∃ k : ℤ, (algebraMap K (Omega K) b)⁻¹ * α = algebraMap K (Omega K) q ^ k) ↔
       ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b := by
@@ -295,76 +293,76 @@ theorem q_zpow_ne_one (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {n : ℤ} (hn : n 
     (show ‖q‖ ^ n = ‖q‖ ^ (0 : ℤ) by rw [zpow_zero]; exact h1)
   exact hn this
 
+private theorem anVal_X_sub_C {c : K} (hc : algebraMap K (Omega K) c ≠ 0) :
+    anVal K (algebraMap K (Omega K) c) (algebraMap (holSubring K) (MeroRing K)
+      (monoHol K (Omega K) 1 - algebraMap K (holSubring K) c)) = 1 := by
+  have := anVal_polyHol_minpoly (K := K) hc hc
+  rwa [ite_eq_left rfl, minpoly.eq_X_sub_C (Omega K), polyHol_X_sub_C] at this
+
+include hq0 hq1 in
+private theorem anVal_Mb_le {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {G : holSubring K}
+    (hG : FE2 q (norm_pos_iff.mp hq0) G) (h0 : valK G b hb = 0) (h1 : valK (holD G) b hb = 0)
+    {α : Omega K} (hα : α ≠ 0) :
+    anVal K α (algebraMap (holSubring K) (MeroRing K) (Mb hq0 hq1 b hb)) ≤
+      anVal K α (algebraMap (holSubring K) (MeroRing K) G) := by
+  classical
+  rw [anVal_Mb hq0 hq1 hb hbm hα]
+  by_cases hc : ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b
+  · rw [ite_eq_left hc]
+    obtain ⟨j, hj⟩ := hc
+    have haj : q ^ j * b ≠ 0 := mul_ne_zero (zpow_ne_zero j (norm_pos_iff.mp hq0)) hb
+    obtain ⟨v0, v1⟩ := prop_zpow (norm_pos_iff.mp hq0) hG hb h0 h1 j
+    obtain ⟨G2, rfl⟩ := lin_sq_dvd haj v0 v1
+    have haj' : algebraMap K (Omega K) (q ^ j * b) ≠ 0 := (map_ne_zero _).mpr haj
+    rw [show α = algebraMap K (Omega K) (q ^ j * b) by rw [hj, map_mul, map_zpow₀],
+      RingHom.map_mul (algebraMap (holSubring K) (MeroRing K)),
+      (anVal_isValuation K _ haj').2.2.1, map_pow, anVal_pow' haj', anVal_X_sub_C haj',
+      two_nsmul, one_add_one_eq_two]
+    exact le_add_of_nonneg_right (anVal_hol_nonneg haj' G2)
+  · rw [ite_eq_right hc]; exact_mod_cast anVal_hol_nonneg hα G
+
+include hq0 hq1 in
+/-- A function fixed by `X ↦ q⁻¹X` is constant. -/
+private theorem eq_const_of_holScale_eq {u : holSubring K}
+    (h : holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ u = u) :
+    u = algebraMap K (holSubring K) (holCoeff K u 0) := by
+  have hcoef : ∀ n : ℤ, n ≠ 0 → holCoeff K u n = 0 := by
+    intro n hn
+    have := congrFun (congrArg (holCoeff K) h) n
+    rw [holCoeff_holScale] at this
+    simp only [Units.val_inv_eq_inv_val, Units.val_mk0] at this
+    have hne : (q⁻¹) ^ n ≠ 1 := by
+      rw [inv_zpow']
+      exact q_zpow_ne_one hq0 hq1 (neg_ne_zero.mpr hn)
+    have : ((q⁻¹) ^ n - 1) * holCoeff K u n = 0 := by linear_combination this
+    exact (mul_eq_zero.mp this).resolve_left (sub_ne_zero.mpr hne)
+  apply holCoeff_injective K
+  have h1 := holCoeff_algebraMap_mul K (L := Omega K) (holCoeff K u 0) 1
+  rw [mul_one, holCoeff_one] at h1
+  rw [h1]
+  funext n
+  by_cases hn : n = 0
+  · subst hn; simp [deltaSeq]
+  · simp [deltaSeq, hn, hcoef n hn]
+
 include hq0 hq1 in
 /-- A function with `G(q⁻¹X) = X² G(X)` and a double zero at the `2`-torsion point `b` is a
 multiple of `Θ(X/b) Θ(bX)`. -/
 theorem eq_const_mul_Mb {b : K} (hb : b ≠ 0) {m : ℤ} (hbm : b ^ 2 = q ^ m) {G : holSubring K}
     (hG : FE2 q (norm_pos_iff.mp hq0) G) (h0 : valK G b hb = 0) (h1 : valK (holD G) b hb = 0) :
     ∃ c : K, G = algebraMap K (holSubring K) c * Mb hq0 hq1 b hb := by
-  classical
-  have hq0' := norm_pos_iff.mp hq0
-  by_cases hG0 : G = 0
-  · exact ⟨0, by rw [hG0, map_zero, zero_mul]⟩
   have hM0 := Mb_ne_zero hq0 hq1 hb
-  have hdvd : Mb hq0 hq1 b hb ∣ G := by
-    refine hol_dvd_of_anVal_le K hM0 (fun α hα => ?_)
-    rw [anVal_Mb hq0 hq1 hb hbm hα]
-    by_cases hc : ∃ j : ℤ, α = algebraMap K (Omega K) q ^ j * algebraMap K (Omega K) b
-    · rw [ite_eq_left hc]
-      obtain ⟨j, hj⟩ := hc
-      have haj : q ^ j * b ≠ 0 := mul_ne_zero (zpow_ne_zero j hq0') hb
-      obtain ⟨v0, v1⟩ := prop_zpow hq0' hG hb h0 h1 j
-      obtain ⟨G2, hG2⟩ := lin_sq_dvd haj v0 v1
-      have hα' : α = algebraMap K (Omega K) (q ^ j * b) := by rw [hj, map_mul, map_zpow₀]
-      rw [hα']
-      have hL : anVal K (algebraMap K (Omega K) (q ^ j * b)) (algebraMap (holSubring K) (MeroRing K)
-          (monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ j * b))) = 1 := by
-        have := anVal_polyHol_minpoly (K := K) (ξ := algebraMap K (Omega K) (q ^ j * b))
-          (β := algebraMap K (Omega K) (q ^ j * b)) ((map_ne_zero _).mpr haj) ((map_ne_zero _).mpr haj)
-        rw [ite_eq_left rfl, minpoly.eq_X_sub_C (Omega K)] at this
-        simpa [polyHol] using this
-      rw [hG2, map_mul (algebraMap (holSubring K) (MeroRing K)),
-        (anVal_isValuation K _ ((map_ne_zero _).mpr haj)).2.2.1,
-        map_pow (algebraMap (holSubring K) (MeroRing K)),
-        anVal_pow' ((map_ne_zero _).mpr haj), hL]
-      have hn := anVal_hol_nonneg ((map_ne_zero _).mpr haj : algebraMap K (Omega K) (q ^ j * b) ≠ 0) G2
-      calc ((2 : ℕ) : WithTop ℤ) = ((2 : ℕ) • (1 : WithTop ℤ)) + 0 := by simp
-        _ ≤ _ := by gcongr
-    · rw [ite_eq_right hc]; exact_mod_cast anVal_hol_nonneg hα G
-  obtain ⟨u, hu⟩ := hdvd
-  have hfeM := Mb_FE hq0 hq1 hb
-  unfold FE2 at hG hfeM
-  have hX : monoHol K (Omega K) 1 * monoHol K (Omega K) 1 ≠ 0 := mul_ne_zero (monoHol_ne_zero 1) (monoHol_ne_zero 1)
-  have hscale : holScale K (Units.mk0 q hq0')⁻¹ u = u := by
-    have e : monoHol K (Omega K) 1 * monoHol K (Omega K) 1 * (Mb hq0 hq1 b hb * holScale K (Units.mk0 q hq0')⁻¹ u) =
-        monoHol K (Omega K) 1 * monoHol K (Omega K) 1 * (Mb hq0 hq1 b hb * u) := by
-      have := hG
-      rw [hu, map_mul, hfeM] at this
-      linear_combination this
-    exact mul_left_cancel₀ (mul_ne_zero hX hM0) (by linear_combination e)
-  have hcoef : ∀ n : ℤ, n ≠ 0 → holCoeff K u n = 0 := by
-    intro n hn
-    have := congrFun (congrArg (holCoeff K) hscale) n
-    rw [holCoeff_holScale] at this
-    simp only [Units.val_inv_eq_inv_val, Units.val_mk0] at this
-    have hne : (q⁻¹) ^ n ≠ 1 := by
-      rw [inv_zpow', ]
-      exact q_zpow_ne_one hq0 hq1 (neg_ne_zero.mpr hn)
-    have : ((q⁻¹) ^ n - 1) * holCoeff K u n = 0 := by linear_combination this
-    exact (mul_eq_zero.mp this).resolve_left (sub_ne_zero.mpr hne)
-  have hu' : u = algebraMap K (holSubring K) (holCoeff K u 0) := by
-    apply holCoeff_injective K
-    have h1 := holCoeff_algebraMap_mul K (L := Omega K) (holCoeff K u 0) 1
-    rw [mul_one, holCoeff_one] at h1
-    rw [h1]
-    funext n
-    by_cases hn : n = 0
-    · subst hn; simp [deltaSeq]
-    · simp [deltaSeq, hn, hcoef n hn]
-  refine ⟨holCoeff K u 0, ?_⟩
-  calc G = Mb hq0 hq1 b hb * u := hu
-    _ = Mb hq0 hq1 b hb * algebraMap K (holSubring K) (holCoeff K u 0) := by rw [← hu']
-    _ = _ := mul_comm _ _
+  obtain ⟨u, hu⟩ := hol_dvd_of_anVal_le K hM0 fun α hα =>
+    anVal_Mb_le hq0 hq1 hb hbm hG h0 h1 hα
+  have hscale : holScale K (Units.mk0 q (norm_pos_iff.mp hq0))⁻¹ u = u := by
+    have h := hG
+    have hfeM := Mb_FE hq0 hq1 hb
+    unfold FE2 at h hfeM
+    rw [hu, RingEquiv.map_mul, hfeM] at h
+    exact mul_left_cancel₀ (mul_ne_zero (mul_ne_zero (monoHol_ne_zero 1) (monoHol_ne_zero 1)) hM0)
+      (h.trans (mul_assoc _ _ _).symm)
+  exact ⟨_, hu.trans ((congrArg (Mb hq0 hq1 b hb * ·) (eq_const_of_holScale_eq hq0 hq1 hscale)).trans
+    (mul_comm _ _))⟩
 
 end mainMb
 

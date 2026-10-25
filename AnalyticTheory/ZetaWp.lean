@@ -108,7 +108,8 @@ theorem infprod_D {g : ℕ → holSubring K}
       intro N
       induction N with
       | zero => simp
-      | succ N ih => rw [Finset.prod_range_succ, Finset.sum_range_succ, ih]; ring
+      | succ N ih =>
+        rw [Finset.prod_range_succ, Finset.sum_range_succ, ih, mul_one_add, add_assoc]
     have h1 := (holD_hasSum_family hnull hsum x).tendsto_sum_nat
     refine h1.congr (fun N => ?_)
     rw [hP N, holD_add, holD_one, zero_add, holD_sum, sum_apply_hol]
@@ -118,8 +119,7 @@ theorem infprod_D {g : ℕ → holSubring K}
       induction N with
       | zero => simp [holD_one]
       | succ N ih =>
-        rw [Finset.prod_range_succ, Finset.sum_range_succ, ← ih, ← holD_add]
-        congr 1; ring
+        rw [Finset.prod_range_succ, Finset.sum_range_succ, ← ih, ← holD_add, mul_one_add]
     have hnull' := nullFamily_holD hnull
     have hsum' := fun x => holD_hasSum_family hnull hsum x
     have h1 := (holD_hasSum_family hnull' hsum' x).tendsto_sum_nat
@@ -153,12 +153,12 @@ theorem finprod_D (f : ℕ → holSubring K) (x : OmegaX K) (N : ℕ)
     rw [Finset.prod_range_succ, Finset.sum_range_succ, Finset.sum_range_succ]
     generalize ∏ j ∈ Finset.range N, f j = P at h1 h2 ⊢
     have hL : (holD (P * f N)).1 x = P.1 x * (holD (f N)).1 x + (f N).1 x * (holD P).1 x := by
-      rw [holD_leibniz]; simp [add_apply_hol, mul_apply_hol]
+      rw [holD_leibniz, add_apply_hol, mul_apply_hol, mul_apply_hol]
     have hL2 : (holD (holD (P * f N))).1 x = (holD (f N)).1 x * (holD P).1 x +
         (f N).1 x * (holD (holD P)).1 x + (holD P).1 x * (holD (f N)).1 x +
         P.1 x * (holD (holD (f N))).1 x := by
       rw [holD_leibniz, holD_add, holD_leibniz, holD_leibniz]
-      simp [add_apply_hol, mul_apply_hol]; ring
+      simp only [add_apply_hol, mul_apply_hol]; ring
     constructor
     · rw [hL, h1]
       simp only [lda, mul_apply_hol]
@@ -215,10 +215,10 @@ theorem neg_apply_hol_aux (f : holSubring K) (x : OmegaX K) : (-f).1 x = -f.1 x 
 theorem holD_neg (f : holSubring K) : holD (-f) = -holD f := by
   have := holD_add f (-f)
   rw [add_neg_cancel, holD_zero] at this
-  linear_combination -this
+  exact eq_neg_of_add_eq_zero_right this.symm
 
 theorem holD_sub (f g : holSubring K) : holD (f - g) = holD f - holD g := by
-  rw [sub_eq_add_neg, holD_add, holD_neg]; ring
+  rw [sub_eq_add_neg, holD_add, holD_neg, ← sub_eq_add_neg]
 
 /-- A binomial factor `1 − c Xᵏ`. -/
 noncomputable def binom1 (c : K) (k : ℤ) : holSubring K :=
@@ -227,16 +227,14 @@ noncomputable def binom1 (c : K) (k : ℤ) : holSubring K :=
 theorem holD_binom1 (c : K) (k : ℤ) :
     holD (binom1 c k) = -(algebraMap K (holSubring K) (c * (k : K)) * monoHol K (Omega K) k) := by
   unfold binom1
-  rw [holD_sub, holD_one, holD_leibniz, holD_const, holD_monoHol]
-  simp only [map_mul]
-  ring
+  rw [holD_sub, holD_one, holD_leibniz, holD_const, holD_monoHol, mul_zero, add_zero, zero_sub,
+    RingHom.map_mul, mul_assoc]
 
 theorem holD_holD_binom1 (c : K) (k : ℤ) :
     holD (holD (binom1 c k)) =
       -(algebraMap K (holSubring K) (c * (k : K) * (k : K)) * monoHol K (Omega K) k) := by
-  rw [holD_binom1, holD_neg, holD_leibniz, holD_const, holD_monoHol]
-  simp only [map_mul]
-  ring
+  rw [holD_binom1, holD_neg, holD_leibniz, holD_const, holD_monoHol, mul_zero, add_zero,
+    ← mul_assoc, ← RingHom.map_mul]
 
 theorem binom1_apply (c : K) (k : ℤ) (x : OmegaX K) :
     (binom1 c k).1 x = 1 - algebraMap K (Omega K) c * x.1 ^ k := by
@@ -373,6 +371,30 @@ end terms
 
 section mainpt
 
+private theorem holD_one_add (f : holSubring K) : holD (1 + f) = holD f := by
+  rw [holD_add, holD_one, zero_add]
+
+private theorem holD_one_add_mul_apply (f g : holSubring K) (x : OmegaX K) :
+    (holD ((1 + f) * (1 + g))).1 x = (1 + f.1 x) * (holD g).1 x + (1 + g.1 x) * (holD f).1 x := by
+  rw [holD_leibniz, holD_one_add, holD_one_add]
+  simp only [add_apply_hol, mul_apply_hol, one_apply_hol]
+
+private theorem holD_holD_one_add_mul_apply (f g : holSubring K) (x : OmegaX K) :
+    (holD (holD ((1 + f) * (1 + g)))).1 x = (1 + f.1 x) * (holD (holD g)).1 x +
+      2 * ((holD f).1 x * (holD g).1 x) + (1 + g.1 x) * (holD (holD f)).1 x := by
+  rw [holD_leibniz, holD_one_add, holD_one_add, holD_add, holD_leibniz, holD_leibniz, holD_one_add,
+    holD_one_add]
+  simp only [add_apply_hol, mul_apply_hol, one_apply_hol]
+  ring
+
+/-- The field identity behind `GP_pointwise`: with `Θ = a b`, `DΘ = a b₁ + b a₁` and
+`D²Θ = a b₂ + 2 a₁ b₁ + b a₂`. -/
+private theorem GP_field_identity {F : Type*} [Field F] {a b a1 b1 a2 b2 G : F} (ha : a ≠ 0)
+    (hb : b ≠ 0) (h : G / (a * b) ^ 2 = -((a2 / a - (a1 / a) ^ 2) + (b2 / b - (b1 / b) ^ 2))) :
+    G = (a * b1 + b * a1) ^ 2 - a * b * (a * b2 + 2 * (a1 * b1) + b * a2) := by
+  field_simp at h
+  linear_combination h
+
 include hq0 hq1 in
 theorem GP_pointwise (x : OmegaX K) (hx : (Th hq0 hq1).1 x ≠ 0) :
     (GP hq0 hq1).1 x = ((holD (Th hq0 hq1)).1 x) ^ 2 -
@@ -451,29 +473,9 @@ theorem GP_pointwise (x : OmegaX K) (hx : (Th hq0 hq1).1 x ≠ 0) :
   have hThEq : Th hq0 hq1 = (1 + g'F) * (1 + g'G) :=
     Subtype.ext (funext fun y => by
       rw [hTh y]; simp only [mul_apply_hol, add_apply_hol, one_apply_hol])
-  have hDF : holD (1 + g'F) = holD g'F := by rw [holD_add, holD_one, zero_add]
-  have hDG : holD (1 + g'G) = holD g'G := by rw [holD_add, holD_one, zero_add]
-  have hD1 : (holD (Th hq0 hq1)).1 x =
-      (1 + g'F.1 x) * (holD g'G).1 x + (1 + g'G.1 x) * (holD g'F).1 x := by
-    rw [hThEq, holD_leibniz, hDF, hDG]
-    simp only [add_apply_hol, mul_apply_hol, one_apply_hol]
-  have hD2 : (holD (holD (Th hq0 hq1))).1 x =
-      (1 + g'F.1 x) * (holD (holD g'G)).1 x + 2 * ((holD g'F).1 x * (holD g'G).1 x) +
-        (1 + g'G.1 x) * (holD (holD g'F)).1 x := by
-    rw [hThEq, holD_leibniz, hDF, hDG, holD_add, holD_leibniz, holD_leibniz, hDF, hDG]
-    simp only [add_apply_hol, mul_apply_hol, one_apply_hol]
-    ring
-  rw [hD1, hD2]
-  rw [hTh x] at hGT ⊢
-  generalize 1 + g'F.1 x = a at *
-  generalize 1 + g'G.1 x = b at *
-  generalize (holD g'F).1 x = a1 at *
-  generalize (holD g'G).1 x = b1 at *
-  generalize (holD (holD g'F)).1 x = a2 at *
-  generalize (holD (holD g'G)).1 x = b2 at *
-  generalize (GP hq0 hq1).1 x = G at *
-  field_simp at hGT
-  linear_combination hGT
+  rw [hThEq, holD_one_add_mul_apply, holD_holD_one_add_mul_apply, ← hThEq, hTh x]
+  rw [hTh x] at hGT
+  exact GP_field_identity hF0 hG0 hGT
 
 end mainpt
 
@@ -507,7 +509,7 @@ theorem wp_eq_neg_D_zeta : wpM K q = -Dop K (zetaM K q) - 2 * algebraMap K (Mero
   rw [wpM_eq hq0 hq1, hζ, Dop_eq _ _ (Th_ne_zero hq0 hq1)]
   unfold wpAlg Dquot DM
   have hG := congrArg (algebraMap (holSubring K) (MeroRing K)) (GP_eq hq0 hq1)
-  simp only [map_sub, map_mul, map_pow] at hG
+  simp only [RingHom.map_sub, RingHom.map_mul, map_pow] at hG
   rw [map_mul, map_ofNat]
   rw [hG]
   field_simp

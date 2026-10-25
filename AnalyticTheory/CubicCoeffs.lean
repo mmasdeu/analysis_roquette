@@ -23,6 +23,31 @@ universe u
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
+/-! Instance shortcuts for the generic `map_*` lemmas applied to ring homomorphisms and ring
+equivalences (`H_K → M_K`, `K → H_K`, automorphisms of `M_K`, …): otherwise each use searches
+through failing paths such as `Module ℚ≥0 H_K` or `CharZero M_K`, which takes seconds. -/
+
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R →+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R →+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidHomClass (R →+* S) R S := RingHomClass.toMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddHomClass (R →+* S) R S := AddMonoidHomClass.toAddHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    ZeroHomClass (R →+* S) R S := AddMonoidHomClass.toZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R →+* S) R S := MonoidHomClass.toMulHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    OneHomClass (R →+* S) R S := MonoidHomClass.toOneHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    AddMonoidHomClass (R ≃+* S) R S := RingHomClass.toAddMonoidHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MonoidWithZeroHomClass (R ≃+* S) R S := RingHomClass.toMonoidWithZeroHomClass
+local instance (priority := high) {R S : Type*} [NonAssocSemiring R] [NonAssocSemiring S] :
+    MulHomClass (R ≃+* S) R S := MonoidHomClass.toMulHomClass
+
 section trunc
 
 /-- Splitting a power series with bounded coefficients after `n` terms. -/
@@ -204,6 +229,23 @@ theorem Erel_decomp (A B C r2 r3 r4 p1 p2 p3 x t u : K) :
   simp only [Erel, U6, V6, cL, Rfull, R0, R0c, Finset.sum_range_succ, Finset.sum_range_zero]
   ring
 
+/-- The remainder `Rfull` is bounded along bounded sequences. -/
+theorem BdS.rfull {A B r2 r3 r4 p1 p2 p3 : K} {x t u : ℕ → K} (h1 : BdS x) (h2 : BdS t)
+    (h3 : BdS u) : BdS (fun j => Rfull A B r2 r3 r4 p1 p2 p3 (x j) (t j) (u j)) := by
+  have h4 : BdS (fun j => U6 r2 r3 r4 (x j)) :=
+    ((((BdS.const (1 : K)).add h1).add ((BdS.const r2).mul (h1.pow 4))).add
+      ((BdS.const r3).mul (h1.pow 5))).add ((BdS.const r4).mul (h1.pow 6))
+  have h5 : BdS (fun j => V6 p1 p2 p3 (x j)) :=
+    (((((BdS.const (1 : K)).add h1).pow 2).neg.add ((BdS.const p1).mul (h1.pow 4))).add
+      ((BdS.const p2).mul (h1.pow 5))).add ((BdS.const p3).mul (h1.pow 6))
+  have h6 : BdS (fun j => R0 A B r2 r3 r4 p1 p2 p3 (x j)) := h1.poly _ 12
+  have h7 := h1.pow 7
+  have hU := h4.add (h7.mul h2)
+  have hV := h5.add (h7.mul h3)
+  exact (h6.add (h3.mul ((((BdS.const (2 : K)).mul h5).add (h7.mul h3)).add (h1.mul h4)))).add
+    (h2.mul ((((h1.mul hV).sub (((hU.pow 2).add (hU.mul h4)).add (h4.pow 2))).sub
+      (((BdS.const A).mul (h1.pow 2)).mul (hU.add h4))).sub ((BdS.const B).mul (h1.pow 4))))
+
 end algebra
 
 section main
@@ -337,16 +379,7 @@ theorem coeffs_of_rel {A B C : K}
     linear_combination (hs j) ^ 6 * hr
   choose t u ht hu hE using key
   have hBd : BdS (fun j => Rfull A B (rhoC q 2) (rhoC q 3) (rhoC q 4) (piC q 1) (piC q 2) (piC q 3)
-      (hs j) (t j) (u j)) := by
-    have h1 : BdS hs := ⟨1, fun j => (hs1 j).le⟩
-    have h2 : BdS t := ⟨1, ht⟩
-    have h3 : BdS u := ⟨1, hu⟩
-    have h4 : BdS (fun j => U6 (rhoC q 2) (rhoC q 3) (rhoC q 4) (hs j)) := by simp only [U6]; bds
-    have h5 : BdS (fun j => V6 (piC q 1) (piC q 2) (piC q 3) (hs j)) := by simp only [V6]; bds
-    have h6 : BdS (fun j => R0 A B (rhoC q 2) (rhoC q 3) (rhoC q 4) (piC q 1) (piC q 2) (piC q 3)
-      (hs j)) := h1.poly _ 12
-    simp only [Rfull]
-    bds
+      (hs j) (t j) (u j)) := BdS.rfull ⟨1, fun j => (hs1 j).le⟩ ⟨1, ht⟩ ⟨1, hu⟩
   obtain ⟨M, hM⟩ := hBd
   have hL : ∀ j, ‖∑ k ∈ Finset.range 7, cL A B C (rhoC q 2) (rhoC q 3) (rhoC q 4) (piC q 1) (piC q 2)
       (piC q 3) k * hs j ^ k‖ ≤ M * ‖hs j‖ ^ 7 := by

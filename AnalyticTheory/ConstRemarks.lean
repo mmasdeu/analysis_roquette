@@ -177,7 +177,7 @@ theorem quotFun_transfer (φ : Omega K₁ ≃+* Omega K₂) {g₁ : holSubring K
     have e : (⟨φ (φ.symm x), (map_ne_zero φ).mpr hx'⟩ : {y : Omega K₂ // y ≠ 0}) = ⟨x, hx⟩ := by
       apply Subtype.ext; simp
     rw [e] at this
-    rw [this, map_div₀, map_zpow₀, map_sub]
+    rw [this, map_div₀, map_zpow₀, RingEquiv.map_sub]
     simp
 
 theorem hasOrd_transfer (φ : Omega K₁ ≃+* Omega K₂) (hφ : Isometry φ) {g₁ : holSubring K₁}
@@ -277,7 +277,7 @@ def extAlgEquiv {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExt
 
 theorem ext_isometry {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ') :
     Isometry σ' := by
-  refine AddMonoidHomClass.isometry_of_norm σ' (fun y => ?_)
+  refine AddMonoidHomClass.isometry_of_norm σ'.toAddEquiv.toAddMonoidHom (fun y => ?_)
   rw [omegaL_norm_eq K L, omegaL_norm_eq K L]
   show spectralValue (minpoly K (extAlgEquiv K L hσ' y)) = spectralValue (minpoly K y)
   rw [minpoly.algEquiv_eq]
@@ -510,6 +510,11 @@ section degPhi
 variable {K L}
 variable (ψ : Omega K ≃ₐ[K] Omega L)
 
+private theorem eq_inv_mul_mul_inv {F : Type*} [Field F] {x A Q : F} (hx : x ≠ 0) (hA : A ≠ 0) :
+    Q = (x * (A * Q⁻¹))⁻¹ * (x * A) := by
+  rw [mul_inv, mul_inv, inv_inv, mul_mul_mul_comm, inv_mul_cancel₀ hx, one_mul, mul_right_comm,
+    inv_mul_cancel₀ hA, one_mul]
+
 theorem degQ_PhiQ_divExt {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ}
     (hm : m ∈ DivisorsPeriodic K q) (hqL : algebraMap K L q ≠ 0) :
     degQ L (algebraMap K L q) (divExtFun ψ m) = degQ K q m ∧
@@ -607,11 +612,11 @@ theorem degQ_PhiQ_divExt {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Om
       rw [he, mul_inv_eq_one₀ haL] at h
       exact h.symm
     simp only [Units.val_zpow_eq_zpow_val, Units.val_mul, Units.val_inv_eq_inv_val, Units.val_mk0,
-      Units.coe_map, MonoidHom.coe_ofClass, map_mul, map_zpow₀, map_neg, map_one]
+      Units.coe_map, MonoidHom.coe_ofClass, RingHom.map_mul, map_zpow₀, RingHom.map_neg,
+      RingHom.map_one]
     rw [hdd, he', zpow_neg]
-    have hq'0 : algebraMap K L q ≠ 0 := hqL
-    field_simp
-    exact (div_self haL').symm
+    exact eq_inv_mul_mul_inv (zpow_ne_zero _ (neg_ne_zero.mpr one_ne_zero)) haL'
+
 
 end degPhi
 
@@ -665,8 +670,10 @@ theorem eIdx_le_of_separable [Algebra.IsSeparable K L] (ψ : Omega K ≃ₐ[K] O
   have hle : E₁ ≤ E₂ := by
     rw [hE₁, IntermediateField.adjoin_simple_le_iff]
     exact IntermediateField.mem_adjoin_simple_self L (ψ α)
-  let : Algebra E₁ E₂ := (IntermediateField.inclusion hle).toAlgebra
-  have : IsScalarTower K E₁ E₂ := .of_algebraMap_eq' rfl
+  let alg : Algebra E₁ E₂ := (IntermediateField.inclusion hle).toAlgebra
+  -- providing the `SMul` instance directly avoids a long instance search
+  let : SMul E₁ E₂ := alg.toSMul
+  have : IsScalarTower K E₁ E₂ := .of_algebraMap_eq fun _ => Subtype.ext rfl
   have : FiniteDimensional K E₁ :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral (ψ α))
   have htower := Field.finInsepDegree_mul_finInsepDegree_of_isAlgebraic K E₁ E₂
@@ -845,13 +852,15 @@ theorem galAct_holRel {σ : L ≃ₐ[K] L} {ρ : MeroRing L ≃+* MeroRing L} (h
   have e : g' = g'' := IsFractionRing.injective (holSubring L) (MeroRing L) (hg.symm.trans hg'')
   subst e
   have h1 := hsum ⟨σ' x, (map_ne_zero σ').mpr hx⟩
-  have h2 := (holCoeff_hasSum L g ⟨x, hx⟩).map (σ' : Omega L →+ Omega L)
+  have h2 := (holCoeff_hasSum L g ⟨x, hx⟩).map σ'.toAddEquiv.toAddMonoidHom
     (ext_isometry K L hσ').continuous
   refine h1.unique ?_
   convert h2 using 1
-  funext n
-  simp only [Function.comp, AddMonoidHom.coe_ofClass, map_mul, map_zpow₀]
-  rw [hσ']
+  · funext n
+    simp only [Function.comp, AddEquiv.coe_toAddMonoidHom, RingEquiv.toAddEquiv_eq_coe,
+      RingEquiv.coe_toAddEquiv, RingEquiv.map_mul, map_zpow₀]
+    rw [hσ']
+  · rfl
 
 omit [IsUltrametricDist K] [CompleteSpace K] [IsUltrametricDist L] [CompleteSpace L] [FiniteDimensional K L] [IsGalois K L] in
 theorem minpoly_ext {σ : L ≃ₐ[K] L} {σ' : Omega L ≃+* Omega L} (hσ' : IsExtension K L σ σ')
@@ -984,8 +993,7 @@ theorem remark_galois_fixed_field :
     set X := x * R with hX
     have hXf : algebraMap (holSubring L) (MeroRing L) X =
         f * algebraMap (holSubring L) (MeroRing L) Y := by
-      rw [← hxy, hX, hYR, map_mul, map_mul]
-      field_simp [alg_hol_ne_zero hy0]
+      rw [← hxy, hX, hYR, map_mul, map_mul, ← mul_assoc, div_mul_cancel₀ _ (alg_hol_ne_zero hy0)]
     have hXfix : ∀ τ : L ≃ₐ[K] L, holGal τ X = X := by
       intro τ
       apply IsFractionRing.injective (holSubring L) (MeroRing L)
@@ -994,7 +1002,7 @@ theorem remark_galois_fixed_field :
     obtain ⟨Y₀, hY₀⟩ := hol_descend hYfix
     refine ⟨algebraMap (holSubring K) (MeroRing K) X₀ / algebraMap (holSubring K) (MeroRing K) Y₀, ?_⟩
     rw [map_div₀, meroExt_alg, meroExt_alg, hX₀, hY₀, hXf]
-    field_simp [alg_hol_ne_zero hY0]
+    exact mul_div_cancel_right₀ _ (alg_hol_ne_zero hY0)
   · rintro ⟨h, rfl⟩ σ ρ hρ
     obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := holSubring K) h
     rw [map_div₀, map_div₀, meroExt_alg, meroExt_alg, galAct_fix_holExt hρ, galAct_fix_holExt hρ]
