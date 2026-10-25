@@ -26,6 +26,7 @@ variable (hqL : algebraMap K L q ≠ 0)
 attribute [local instance 10] fqKAlgebra
 attribute [-instance] fqSubfieldAlgebra fqSubfieldSMul
 attribute [local instance] resAlg
+attribute [local instance] zpowers_qU_normal
 
 theorem sub_one_apply_div (w : Omega L → ℤ) :
     (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) w = divAct K L q T w - w := rfl
@@ -69,6 +70,180 @@ theorem divB_mul_mem_principal (b b' : L) (hb : b ≠ 0) (hb' : b' ≠ 0) :
     abel
 
 include hq0 hq1 hqL in
+/-- Surjectivity in `row4_H1`: every `a ∈ P ∩ ker N` is `(s - 1) z + (s - 1) [b_c]` with `z ∈ P`. -/
+theorem row4_H1_surj {a : Omega L → ℤ}
+    (haP : a ∈ principalDivisors L (algebraMap K L q))
+    (haN : a ∈ (cycNorm (divAct K L q T) (Module.finrank K L)).ker) :
+    ∃ c : Kˣ, ∃ z ∈ principalDivisors L (algebraMap K L q),
+      (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) z =
+        a - (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ))
+          (divB q (algebraMap K L (c : K))) := by
+  classical
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  set n := Module.finrank K L with hn
+  have hn0 : (n : ℤ) ≠ 0 := Int.natCast_ne_zero.mpr Module.finrank_pos.ne'
+  let Dd := degDataD q hq0 hq1 T
+  let bK : Kˣ → L := fun c => algebraMap K L (c : K)
+  have hbK : ∀ c : Kˣ, bK c ≠ 0 := fun c => (map_ne_zero _).mpr c.ne_zero
+  have hDb : ∀ c : Kˣ, divB q (bK c) ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    fun c => divB_mem q hq0 hq1 _ (hbK c)
+  obtain ⟨haD, had, haΦ⟩ := (mem_principal_iff q hq0 hq1 hqL a).mp haP
+  obtain ⟨u, huD, hu⟩ := AddSubgroup.mem_map.mp (rowD_H1 q hq0 hq1 T a ⟨haD, haN⟩)
+  have hsuD := divAct_mem_periodic q T huD
+  have hsu : divAct K L q T u - u = a := hu
+  have hΦa : PhiA q hqL (divAct K L q T u) - PhiA q hqL u = 0 := by
+    rw [← PhiA_sub q hq0 hq1 hqL hsuD huD, hsu]; exact haΦ
+  rw [PhiA_divAct q hq0 hq1 T hqL huD] at hΦa
+  have hk : (n : ℤ) ∣ degQ L (algebraMap K L q) u := by
+    have h1 : (n : ℤ) ∣ -degQ L (algebraMap K L q) u := by
+      refine (row3_ord q hq0 hq1 T hqL _).mp ⟨PhiA q hqL u, ?_⟩
+      have := hΦa
+      calc sigmaOnQuot K L q hqL T.gen (PhiA q hqL u) - PhiA q hqL u
+          = (sigmaOnQuot K L q hqL T.gen (PhiA q hqL u) +
+            degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne) - PhiA q hqL u) -
+            degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne) := by abel
+        _ = -(degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne)) := by
+          rw [this]; exact zero_sub (degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne))
+        _ = (-degQ L (algebraMap K L q) u) • cls q hqL (Units.mk0 T.Q T.Q_ne) :=
+          (neg_zsmul (cls q hqL (Units.mk0 T.Q T.Q_ne)) (degQ L (algebraMap K L q) u)).symm
+    exact (Int.dvd_neg).mp h1
+  obtain ⟨m, hm⟩ := hk
+  -- adjust `u` by a multiple of the fixed divisor `N [1]`
+  set e := cycNorm (divAct K L q T) n Dd.p with he
+  have heD : e ∈ DivisorsPeriodic L (algebraMap K L q) := (Dd.norm_mem Dd.pA).1
+  have hed : degQ L (algebraMap K L q) e = n := by
+    have h2 := (Dd.norm_mem Dd.pA).2
+    have h3 := Dd.deg_p
+    exact h2.trans (by rw [h3]; ring)
+  set u' := u - m • e with hu'
+  have hu'D : u' ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    (DivisorsPeriodic L (algebraMap K L q)).sub_mem huD
+      ((DivisorsPeriodic L (algebraMap K L q)).zsmul_mem heD m)
+  have hu'd : degQ L (algebraMap K L q) u' = 0 := by
+    rw [hu', degQ_sub hq0L hq1L huD ((DivisorsPeriodic L (algebraMap K L q)).zsmul_mem heD m),
+      degQ_zsmul hq0L hq1L heD, hed, hm]; ring
+  have hsu' : divAct K L q T u' - u' = a := by
+    have h0 : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) e = 0 := Dd.sub_one_norm Dd.pA
+    have : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) u' = a := by
+      rw [hu', map_sub, map_zsmul, h0, smul_zero, sub_zero]; exact hu
+    exact this
+  have hsu'D := divAct_mem_periodic q T hu'D
+  have hΦa' : PhiA q hqL (divAct K L q T u') - PhiA q hqL u' = 0 := by
+    rw [← PhiA_sub q hq0 hq1 hqL hsu'D hu'D, hsu']; exact haΦ
+  rw [PhiA_divAct q hq0 hq1 T hqL hu'D, hu'd, zero_zsmul, add_zero] at hΦa'
+  have hfixΦ : sigmaOnQuot K L q hqL T.gen (PhiA q hqL u') = PhiA q hqL u' :=
+    sub_eq_zero.mp hΦa'
+  obtain ⟨v, hv⟩ := QuotientGroup.mk_surjective (Additive.toMul (PhiA q hqL u'))
+  have hΦv : PhiA q hqL u' = cls q hqL v := by unfold cls; rw [hv]; rfl
+  rw [hΦv] at hfixΦ
+  obtain ⟨c, hc⟩ := exists_K_of_fixed q hq0 hq1 T hqL hfixΦ
+  have hzD : u' - divB q (bK c) ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    (DivisorsPeriodic L (algebraMap K L q)).sub_mem hu'D (hDb c)
+  have hz : u' - divB q (bK c) ∈ principalDivisors L (algebraMap K L q) := by
+    refine (mem_principal_iff q hq0 hq1 hqL _).mpr ⟨hzD, ?_, ?_⟩
+    · rw [degQ_sub hq0L hq1L hu'D (hDb c), hu'd, degQ_divB q hq0 hq1 _ (hbK c)]; ring
+    · rw [PhiA_sub q hq0 hq1 hqL hu'D (hDb c), PhiA_divB q hq0 hq1 hqL _ (hbK c), hΦv]
+      have : Units.mk0 (bK c) (hbK c) = v := by rw [← hc]; exact Units.ext rfl
+      rw [this]
+      exact sub_self (cls q hqL v)
+  refine ⟨c, u' - divB q (bK c), hz, ?_⟩
+  rw [map_sub]
+  have : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) u' = a := hsu'
+  rw [this]
+
+include hq0 hq1 hqL in
+/-- Kernel in `row4_H1`, forward direction. -/
+theorem row4_H1_ker_mp {c : Kˣ} (hcN : c ∈ normGroupK K L) :
+    ∃ p ∈ principalDivisors L (algebraMap K L q),
+      (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) p =
+        (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) (divB q (algebraMap K L (c : K))) := by
+  classical
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  set n := Module.finrank K L with hn
+  have hn0 : (n : ℤ) ≠ 0 := Int.natCast_ne_zero.mpr Module.finrank_pos.ne'
+  let Dd := degDataD q hq0 hq1 T
+  let bK : Kˣ → L := fun c => algebraMap K L (c : K)
+  have hbK : ∀ c : Kˣ, bK c ≠ 0 := fun c => (map_ne_zero _).mpr c.ne_zero
+  have hDb : ∀ c : Kˣ, divB q (bK c) ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    fun c => divB_mem q hq0 hq1 _ (hbK c)
+  obtain ⟨x, -, hx⟩ := (constHom_mem_norm q hq0 hq1 T hqL c).mp hcN
+  obtain ⟨v, hv⟩ := QuotientGroup.mk_surjective (Additive.toMul x)
+  have hxv : x = cls q hqL v := by unfold cls; rw [hv]; rfl
+  rw [hxv] at hx
+  have hvD := divB_mem q hq0 hq1 (v : L) v.ne_zero
+  have hvd := degQ_divB q hq0 hq1 (v : L) v.ne_zero
+  have hNv := Dd.norm_mem hvD
+  have hbD := hDb c
+  have hbd := degQ_divB q hq0 hq1 _ (hbK c)
+  refine ⟨divB q (bK c) - cycNorm (divAct K L q T) n (divB q (v : L)), ?_, ?_⟩
+  · refine (mem_principal_iff q hq0 hq1 hqL _).mpr
+      ⟨(DivisorsPeriodic L (algebraMap K L q)).sub_mem hbD hNv.1, ?_, ?_⟩
+    · rw [degQ_sub hq0L hq1L hbD hNv.1, hbd]
+      have : degQ L (algebraMap K L q) (cycNorm (divAct K L q T) n (divB q (v : L))) = 0 := by
+        have h2 := hNv.2
+        exact h2.trans (by
+          show (n : ℤ) * degQ L (algebraMap K L q) (divB q (v : L)) = 0
+          rw [hvd]; ring)
+      rw [this]; ring
+    · rw [PhiA_sub q hq0 hq1 hqL hbD hNv.1, PhiA_divB q hq0 hq1 hqL _ (hbK c),
+        PhiA_cycNorm q hq0 hq1 T hqL hvD hvd, PhiA_divB q hq0 hq1 hqL _ v.ne_zero]
+      have h1 : Units.mk0 (v : L) v.ne_zero = v := Units.ext rfl
+      have h2 : Units.mk0 (bK c) (hbK c) = Units.map (algebraMap K L : K →* L) c := Units.ext rfl
+      rw [h1, h2]
+      exact sub_eq_zero.mpr ((constHom_apply q hqL c).symm.trans hx.symm)
+  · show (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) _ = _
+    rw [map_sub, Dd.sub_one_norm hvD, sub_zero]
+
+include hq0 hq1 hqL in
+/-- Kernel in `row4_H1`, backward direction. -/
+theorem row4_H1_ker_mpr {c : Kˣ}
+    (h : ∃ p ∈ principalDivisors L (algebraMap K L q),
+      (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) p =
+        (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) (divB q (algebraMap K L (c : K)))) :
+    c ∈ normGroupK K L := by
+  classical
+  have hq0L := norm_alg_pos (L := L) q hq0
+  have hq1L := norm_alg_lt (L := L) q hq1
+  set n := Module.finrank K L with hn
+  have hn0 : (n : ℤ) ≠ 0 := Int.natCast_ne_zero.mpr Module.finrank_pos.ne'
+  let Dd := degDataD q hq0 hq1 T
+  let bK : Kˣ → L := fun c => algebraMap K L (c : K)
+  have hbK : ∀ c : Kˣ, bK c ≠ 0 := fun c => (map_ne_zero _).mpr c.ne_zero
+  have hDb : ∀ c : Kˣ, divB q (bK c) ∈ DivisorsPeriodic L (algebraMap K L q) :=
+    fun c => divB_mem q hq0 hq1 _ (hbK c)
+  obtain ⟨p, hpP, hp⟩ := h
+  obtain ⟨hpD, hpd, hpΦ⟩ := (mem_principal_iff q hq0 hq1 hqL p).mp hpP
+  have hbD := hDb c
+  have hbd := degQ_divB q hq0 hq1 _ (hbK c)
+  have hfixd : divB q (bK c) - p ∈ DivisorsPeriodic L (algebraMap K L q) ⊓
+      cycFixed (divAct K L q T) := by
+    refine ⟨(DivisorsPeriodic L (algebraMap K L q)).sub_mem hbD hpD, ?_⟩
+    have h0 : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) (divB q (bK c) - p) = 0 := by
+      rw [map_sub]
+      exact sub_eq_zero.mpr hp.symm
+    exact h0
+  obtain ⟨d, hdD, hNd⟩ := AddSubgroup.mem_map.mp (rowD_H0 q hq0 hq1 T _ hfixd)
+  have hdd : degQ L (algebraMap K L q) d = 0 := by
+    have h1 := (Dd.norm_mem hdD).2
+    have h2 : degQ L (algebraMap K L q) (cycNorm (divAct K L q T) n d) = 0 := by
+      rw [show cycNorm (divAct K L q T) n d = divB q (bK c) - p from hNd,
+        degQ_sub hq0L hq1L hbD hpD, hbd, hpd]; ring
+    have h3 : (n : ℤ) * degQ L (algebraMap K L q) d = 0 := h1.symm.trans h2
+    exact (mul_eq_zero.mp h3).resolve_left hn0
+  refine (constHom_mem_norm q hq0 hq1 T hqL c).mpr ⟨PhiA q hqL d, trivial, ?_⟩
+  show cycNorm (sigmaOnQuot K L q hqL T.gen) n (PhiA q hqL d) = _
+  rw [← PhiA_cycNorm q hq0 hq1 T hqL hdD hdd, show cycNorm (divAct K L q T) n d =
+    divB q (bK c) - p from hNd, PhiA_sub q hq0 hq1 hqL hbD hpD, PhiA_divB q hq0 hq1 hqL _ (hbK c)]
+  have hpΦ' : PhiA q hqL p = 0 := hpΦ
+  have h2 : Units.mk0 (bK c) (hbK c) = Units.map (algebraMap K L : K →* L) c := Units.ext rfl
+  rw [hpΦ', h2]
+  exact (sub_zero (cls q hqL (Units.map (algebraMap K L : K →* L) c))).trans
+    (constHom_apply q hqL c).symm
+
+
+include hq0 hq1 hqL in
 theorem row4_H1 :
     Nonempty (cycH1 (divAct K L q T) (Module.finrank K L) (principalDivisors L (algebraMap K L q)) ≃+
       Additive (Kˣ ⧸ normGroupK K L)) := by
@@ -76,7 +251,7 @@ theorem row4_H1 :
   have hq0L := norm_alg_pos (L := L) q hq0
   have hq1L := norm_alg_lt (L := L) q hq1
   set n := Module.finrank K L with hn
-  have hn0 : (n : ℤ) ≠ 0 := by exact_mod_cast Module.finrank_pos.ne'
+  have hn0 : (n : ℤ) ≠ 0 := Int.natCast_ne_zero.mpr Module.finrank_pos.ne'
   let Dd := degDataD q hq0 hq1 T
   let bK : Kˣ → L := fun c => algebraMap K L (c : K)
   have hbK : ∀ c : Kˣ, bK c ≠ 0 := fun c => (map_ne_zero _).mpr c.ne_zero
@@ -104,133 +279,11 @@ theorem row4_H1 :
   · exact ⟨key.some.trans (addQuotEquiv (normGroupK K L))⟩
   · -- surjectivity
     rintro a ⟨haP, haN⟩
-    obtain ⟨haD, had, haΦ⟩ := (mem_principal_iff q hq0 hq1 hqL a).mp haP
-    obtain ⟨u, huD, hu⟩ := AddSubgroup.mem_map.mp (rowD_H1 q hq0 hq1 T a ⟨haD, haN⟩)
-    have hsuD := divAct_mem_periodic q T huD
-    have hsu : divAct K L q T u - u = a := hu
-    have hΦa : PhiA q hqL (divAct K L q T u) - PhiA q hqL u = 0 := by
-      rw [← PhiA_sub q hq0 hq1 hqL hsuD huD, hsu]; exact haΦ
-    rw [PhiA_divAct q hq0 hq1 T hqL huD] at hΦa
-    have hk : (n : ℤ) ∣ degQ L (algebraMap K L q) u := by
-      have h1 : (n : ℤ) ∣ -degQ L (algebraMap K L q) u := by
-        refine (row3_ord q hq0 hq1 T hqL _).mp ⟨PhiA q hqL u, ?_⟩
-        have := hΦa
-        calc sigmaOnQuot K L q hqL T.gen (PhiA q hqL u) - PhiA q hqL u
-            = (sigmaOnQuot K L q hqL T.gen (PhiA q hqL u) +
-              degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne) - PhiA q hqL u) -
-              degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne) := by abel
-          _ = -(degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne)) := by
-            rw [this]; exact zero_sub (degQ L (algebraMap K L q) u • cls q hqL (Units.mk0 T.Q T.Q_ne))
-          _ = (-degQ L (algebraMap K L q) u) • cls q hqL (Units.mk0 T.Q T.Q_ne) :=
-            (neg_zsmul (cls q hqL (Units.mk0 T.Q T.Q_ne)) (degQ L (algebraMap K L q) u)).symm
-      exact (Int.dvd_neg).mp h1
-    obtain ⟨m, hm⟩ := hk
-    -- adjust `u` by a multiple of the fixed divisor `N [1]`
-    set e := cycNorm (divAct K L q T) n Dd.p with he
-    have heD : e ∈ DivisorsPeriodic L (algebraMap K L q) := (Dd.norm_mem Dd.pA).1
-    have hed : degQ L (algebraMap K L q) e = n := by
-      have h2 := (Dd.norm_mem Dd.pA).2
-      have h3 := Dd.deg_p
-      exact h2.trans (by rw [h3]; ring)
-    set u' := u - m • e with hu'
-    have hu'D : u' ∈ DivisorsPeriodic L (algebraMap K L q) :=
-      (DivisorsPeriodic L (algebraMap K L q)).sub_mem huD
-        ((DivisorsPeriodic L (algebraMap K L q)).zsmul_mem heD m)
-    have hu'd : degQ L (algebraMap K L q) u' = 0 := by
-      rw [hu', degQ_sub hq0L hq1L huD ((DivisorsPeriodic L (algebraMap K L q)).zsmul_mem heD m),
-        degQ_zsmul hq0L hq1L heD, hed, hm]; ring
-    have hsu' : divAct K L q T u' - u' = a := by
-      have h0 : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) e = 0 := Dd.sub_one_norm Dd.pA
-      have : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) u' = a := by
-        rw [hu', map_sub, map_zsmul, h0, smul_zero, sub_zero]; exact hu
-      exact this
-    have hsu'D := divAct_mem_periodic q T hu'D
-    have hΦa' : PhiA q hqL (divAct K L q T u') - PhiA q hqL u' = 0 := by
-      rw [← PhiA_sub q hq0 hq1 hqL hsu'D hu'D, hsu']; exact haΦ
-    rw [PhiA_divAct q hq0 hq1 T hqL hu'D, hu'd, zero_zsmul, add_zero] at hΦa'
-    have hfixΦ : sigmaOnQuot K L q hqL T.gen (PhiA q hqL u') = PhiA q hqL u' :=
-      sub_eq_zero.mp hΦa'
-    obtain ⟨v, hv⟩ := QuotientGroup.mk_surjective (Additive.toMul (PhiA q hqL u'))
-    have hΦv : PhiA q hqL u' = cls q hqL v := by unfold cls; rw [hv]; rfl
-    rw [hΦv] at hfixΦ
-    obtain ⟨c, hc⟩ := exists_K_of_fixed q hq0 hq1 T hqL hfixΦ
-    refine ⟨Additive.ofMul c, ?_⟩
-    have hzD : u' - divB q (bK c) ∈ DivisorsPeriodic L (algebraMap K L q) :=
-      (DivisorsPeriodic L (algebraMap K L q)).sub_mem hu'D (hDb c)
-    have hz : u' - divB q (bK c) ∈ principalDivisors L (algebraMap K L q) := by
-      refine (mem_principal_iff q hq0 hq1 hqL _).mpr ⟨hzD, ?_, ?_⟩
-      · rw [degQ_sub hq0L hq1L hu'D (hDb c), hu'd, degQ_divB q hq0 hq1 _ (hbK c)]; ring
-      · rw [PhiA_sub q hq0 hq1 hqL hu'D (hDb c), PhiA_divB q hq0 hq1 hqL _ (hbK c), hΦv]
-        have : Units.mk0 (bK c) (hbK c) = v := by rw [← hc]; exact Units.ext rfl
-        rw [this]
-        exact sub_self (cls q hqL v)
-    refine ⟨u' - divB q (bK c), hz, ?_⟩
-    show (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) _ = a - F (Additive.ofMul c)
-    rw [map_sub]
-    have : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) u' = a := by
-      exact hsu'
-    rw [this]; rfl
+    obtain ⟨c, z, hz, hzz⟩ := row4_H1_surj q hq0 hq1 T hqL haP haN
+    exact ⟨Additive.ofMul c, z, hz, hzz⟩
   · -- kernel
     intro g
-    show Additive.toMul g ∈ normGroupK K L ↔ _
-    set c := Additive.toMul g with hc
-    constructor
-    · intro hcN
-      obtain ⟨x, -, hx⟩ := (constHom_mem_norm q hq0 hq1 T hqL c).mp hcN
-      obtain ⟨v, hv⟩ := QuotientGroup.mk_surjective (Additive.toMul x)
-      have hxv : x = cls q hqL v := by unfold cls; rw [hv]; rfl
-      rw [hxv] at hx
-      have hvD := divB_mem q hq0 hq1 (v : L) v.ne_zero
-      have hvd := degQ_divB q hq0 hq1 (v : L) v.ne_zero
-      have hNv := Dd.norm_mem hvD
-      have hbD := hDb c
-      have hbd := degQ_divB q hq0 hq1 _ (hbK c)
-      refine ⟨divB q (bK c) - cycNorm (divAct K L q T) n (divB q (v : L)), ?_, ?_⟩
-      · refine (mem_principal_iff q hq0 hq1 hqL _).mpr
-          ⟨(DivisorsPeriodic L (algebraMap K L q)).sub_mem hbD hNv.1, ?_, ?_⟩
-        · rw [degQ_sub hq0L hq1L hbD hNv.1, hbd]
-          have : degQ L (algebraMap K L q) (cycNorm (divAct K L q T) n (divB q (v : L))) = 0 := by
-            have h2 := hNv.2
-            exact h2.trans (by
-              show (n : ℤ) * degQ L (algebraMap K L q) (divB q (v : L)) = 0
-              rw [hvd]; ring)
-          rw [this]; ring
-        · rw [PhiA_sub q hq0 hq1 hqL hbD hNv.1, PhiA_divB q hq0 hq1 hqL _ (hbK c),
-            PhiA_cycNorm q hq0 hq1 T hqL hvD hvd, PhiA_divB q hq0 hq1 hqL _ v.ne_zero]
-          have h1 : Units.mk0 (v : L) v.ne_zero = v := Units.ext rfl
-          have h2 : Units.mk0 (bK c) (hbK c) = Units.map (algebraMap K L : K →* L) c := Units.ext rfl
-          rw [h1, h2]
-          exact sub_eq_zero.mpr ((constHom_apply q hqL c).symm.trans hx.symm)
-      · show (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) _ = _
-        rw [map_sub, Dd.sub_one_norm hvD, sub_zero]
-    · rintro ⟨p, hpP, hp⟩
-      obtain ⟨hpD, hpd, hpΦ⟩ := (mem_principal_iff q hq0 hq1 hqL p).mp hpP
-      have hbD := hDb c
-      have hbd := degQ_divB q hq0 hq1 _ (hbK c)
-      have hfixd : divB q (bK c) - p ∈ DivisorsPeriodic L (algebraMap K L q) ⊓
-          cycFixed (divAct K L q T) := by
-        refine ⟨(DivisorsPeriodic L (algebraMap K L q)).sub_mem hbD hpD, ?_⟩
-        have h0 : (divAct K L q T - 1 : AddMonoid.End (Omega L → ℤ)) (divB q (bK c) - p) = 0 := by
-          rw [map_sub]
-          exact sub_eq_zero.mpr hp.symm
-        exact h0
-      obtain ⟨d, hdD, hNd⟩ := AddSubgroup.mem_map.mp (rowD_H0 q hq0 hq1 T _ hfixd)
-      have hdd : degQ L (algebraMap K L q) d = 0 := by
-        have h1 := (Dd.norm_mem hdD).2
-        have h2 : degQ L (algebraMap K L q) (cycNorm (divAct K L q T) n d) = 0 := by
-          rw [show cycNorm (divAct K L q T) n d = divB q (bK c) - p from hNd,
-            degQ_sub hq0L hq1L hbD hpD, hbd, hpd]; ring
-        have h3 : (n : ℤ) * degQ L (algebraMap K L q) d = 0 := h1.symm.trans h2
-        exact (mul_eq_zero.mp h3).resolve_left hn0
-      refine (constHom_mem_norm q hq0 hq1 T hqL c).mpr ⟨PhiA q hqL d, trivial, ?_⟩
-      show cycNorm (sigmaOnQuot K L q hqL T.gen) n (PhiA q hqL d) = _
-      rw [← PhiA_cycNorm q hq0 hq1 T hqL hdD hdd, show cycNorm (divAct K L q T) n d =
-        divB q (bK c) - p from hNd, PhiA_sub q hq0 hq1 hqL hbD hpD, PhiA_divB q hq0 hq1 hqL _ (hbK c)]
-      have hpΦ' : PhiA q hqL p = 0 := hpΦ
-      have h2 : Units.mk0 (bK c) (hbK c) = Units.map (algebraMap K L : K →* L) c := Units.ext rfl
-      rw [hpΦ', h2]
-      exact (sub_zero (cls q hqL (Units.map (algebraMap K L : K →* L) c))).trans
-        (constHom_apply q hqL c).symm
+    exact ⟨row4_H1_ker_mp q hq0 hq1 T hqL, row4_H1_ker_mpr q hq0 hq1 T hqL⟩
 
 end row4H1
 

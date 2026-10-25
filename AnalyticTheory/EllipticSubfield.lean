@@ -230,6 +230,13 @@ omit [FiniteDimensional E (FqSub K q)] in
 theorem ptE_degree (a : Kˣ) : (ptE hq0 hq1 E a).degree = 1 :=
   PrimeDivisor.degree_restrict_eq_one _ (ptPrime_degree hq0 hq1 a)
 
+private theorem ite_sub_aux (p q r s : Prop) {_ : Decidable p} {_ : Decidable q} {_ : Decidable r}
+    {_ : Decidable s} :
+    ((((if p then 1 else 0) + if q then 1 else 0) - if r then 1 else 0) - if s then 1 else 0 : ℤ) =
+      (((if p then 1 else 0) + if q then 1 else 0) + if r then -1 else 0) +
+        if s then -1 else 0 := by
+  split_ifs <;> ring
+
 /-- `π(ab) + π(1) ∼ π(a) + π(b)`. -/
 theorem isPrincipalDiv_ptE (a b : Kˣ) :
     IsPrincipalDiv (pdiv (ptE hq0 hq1 E (a * b)) + pdiv (ptE hq0 hq1 E 1) -
@@ -238,11 +245,13 @@ theorem isPrincipalDiv_ptE (a b : Kˣ) :
   have := isPrincipalDiv_norm (E := E) (Finset.univ : Finset (Fin 4))
     ![ptPrime hq0 hq1 (a * b), ptPrime hq0 hq1 1, ptPrime hq0 hq1 a, ptPrime hq0 hq1 b]
     ![1, 1, -1, -1] (fun i _ => by fin_cases i <;> exact ptPrime_degree hq0 hq1 _) hg
-    (fun P => by simp [Fin.sum_univ_four, hdiv, pdiv]; split_ifs <;> simp_all)
+    (fun P => by
+      simp [Fin.sum_univ_four, hdiv, pdiv]
+      exact ite_sub_aux _ _ _ _)
   convert this using 1
   funext R
   simp [Fin.sum_univ_four, ptE, pdiv]
-  split_ifs <;> simp_all
+  exact ite_sub_aux _ _ _ _
 
 /-! #### Rigidity: the group `V` -/
 
@@ -297,7 +306,7 @@ theorem translation_fixes_of_mem {v : Kˣ} (hv : v ∈ Vsub hq0 hq1 E hrig) (S :
   set x := algebraMap E (FqSub K q) e
   by_contra hne
   have hx0 : x ≠ 0 := by
-    intro h; apply hne; rw [h, map_zero]
+    intro h; apply hne; rw [h, RingEquiv.map_zero]
   set y := translationFq q v x - x
   have hy : y ≠ 0 := sub_ne_zero.mpr hne
   -- at every rigid point `b` where `x` has no pole, `y` vanishes at `p_{vb}`
@@ -309,11 +318,11 @@ theorem translation_fixes_of_mem {v : Kˣ} (hv : v ∈ Vsub hq0 hq1 E hrig) (S :
     obtain ⟨c, hc⟩ := Q.exists_const_of_degree_one (ptE_degree hq0 hq1 b) ⟨e, he⟩
     set e' := e - algebraMap K E c
     have hx' : algebraMap E (FqSub K q) e' = x - algebraMap K (FqSub K q) c := by
-      rw [map_sub, ← IsScalarTower.algebraMap_apply]
+      rw [RingHom.map_sub, ← IsScalarTower.algebraMap_apply]
     have he'0 : e' ≠ 0 := by
       intro h0
       apply hne
-      have : x = algebraMap K (FqSub K q) c := by rw [← sub_eq_zero, ← hx', h0, map_zero]
+      have : x = algebraMap K (FqSub K q) c := by rw [← sub_eq_zero, ← hx', h0, RingHom.map_zero]
       rw [this]
       exact Subtype.ext (translation_algebraMap K v c)
     have hQe : 0 < Q.ord e' := Q.ord_pos_of_mem_maximalIdeal _ hc he'0
@@ -325,7 +334,7 @@ theorem translation_fixes_of_mem {v : Kˣ} (hv : v ∈ Vsub hq0 hq1 E hrig) (S :
     set x' := x - algebraMap K (FqSub K q) c
     have hx'0 : x' ≠ 0 := by rw [← hx']; exact (map_ne_zero_iff _ (algebraMap E _).injective).mpr he'0
     have hτ : translationFq q v x' = translationFq q v x - algebraMap K (FqSub K q) c := by
-      rw [map_sub]; congr 1; exact Subtype.ext (translation_algebraMap K v c)
+      rw [RingEquiv.map_sub]; congr 1; exact Subtype.ext (translation_algebraMap K v c)
     have hτ0 : translationFq q v x' ≠ 0 :=
       (map_ne_zero_iff _ (translationFq q v).injective).mpr hx'0
     have h1 : 0 < (ptPrime hq0 hq1 (v * b)).ord (translationFq q v x') := by

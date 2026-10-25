@@ -374,9 +374,9 @@ theorem anPt_isValuation (α : Omega K) (hα : α ≠ 0) :
     obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := holSubring K) f
     exact ⟨x, y, nonZeroDivisors.ne_zero hy, hxy.symm⟩
   refine ⟨?_, ?_, ?_, ?_⟩
-  · rw [anPt_eq_of_rep K hα 0 0 1 (one_ne_zero (α := holSubring K)) (by simp)]
+  · rw [anPt_eq_of_rep K hα 0 0 1 (NeZero.one (M₀ := holSubring K)).out (by rw [RingHom.map_zero, RingHom.map_one, zero_div])]
     simp [anOrdHol_zero, anOrdHol_one K hα]
-  · rw [anPt_eq_of_rep K hα 1 1 1 (one_ne_zero (α := holSubring K)) (by simp)]
+  · rw [anPt_eq_of_rep K hα 1 1 1 (NeZero.one (M₀ := holSubring K)).out (by simp)]
     simp [anOrdHol_one K hα]
   · intro f f'
     obtain ⟨g, h, hh, hf⟩ := rep f
@@ -384,7 +384,7 @@ theorem anPt_isValuation (α : Omega K) (hα : α ≠ 0) :
     have hhh : h * h' ≠ 0 := mul_ne_zero hh hh'
     have hff : f * f' = algebraMap (holSubring K) (MeroRing K) (g * g') /
         algebraMap (holSubring K) (MeroRing K) (h * h') := by
-      rw [hf, hf', div_mul_div_comm, map_mul, map_mul]
+      rw [hf, hf', div_mul_div_comm, RingHom.map_mul, RingHom.map_mul]
     rw [anPt_eq_of_rep K hα _ _ _ hhh hff, anPt_eq_of_rep K hα f g h hh hf,
       anPt_eq_of_rep K hα f' g' h' hh' hf', anOrdHol_mul K α hα, anOrdHol_mul K α hα]
     obtain ⟨a, ha, -⟩ := exists_anOrd K hα hh
@@ -399,7 +399,7 @@ theorem anPt_isValuation (α : Omega K) (hα : α ≠ 0) :
         algebraMap (holSubring K) (MeroRing K) (h * h') := by
       have h1 := alg_ne_zero K hh
       have h2 := alg_ne_zero K hh'
-      rw [hf, hf', div_add_div _ _ h1 h2, map_add, map_mul, map_mul, map_mul,
+      rw [hf, hf', div_add_div _ _ h1 h2, RingHom.map_add, RingHom.map_mul, RingHom.map_mul, RingHom.map_mul,
         mul_comm (algebraMap (holSubring K) (MeroRing K) g')]
     rw [anPt_eq_of_rep K hα _ _ _ hhh hff, anPt_eq_of_rep K hα f g h hh hf,
       anPt_eq_of_rep K hα f' g' h' hh' hf', anOrdHol_mul K α hα]

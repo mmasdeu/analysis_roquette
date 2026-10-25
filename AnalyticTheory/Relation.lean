@@ -16,6 +16,12 @@ namespace AnalyticTheory
 
 universe u
 
+/-- `(1 : Ω) ≠ 0`; elaborating `one_ne_zero` directly at `Omega K` runs a slow `NeZero 1`
+search (through `CharZero (Omega K)`). -/
+private theorem one_ne_zero_omega {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K]
+    [CompleteSpace K] : (1 : Omega K) ≠ 0 :=
+  one_ne_zero
+
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
 section rel
@@ -29,12 +35,12 @@ theorem anVal_ellM : anVal K 1 (ellM (q := q)) = ((1 : ℤ) : WithTop ℤ) := by
   have e : linF (q := q) 0 = polyHol K (Omega K) (minpoly K (1 : Omega K)) := by
     rw [linF, show (1 : Omega K) = algebraMap K (Omega K) 1 from (map_one _).symm, minpoly_alg]
     simp
-  rw [ellM, e, anVal_polyHol_minpoly one_ne_zero one_ne_zero, ite_eq_left rfl]; rfl
+  rw [ellM, e, anVal_polyHol_minpoly one_ne_zero_omega one_ne_zero_omega, ite_eq_left rfl]; rfl
 
 theorem ellM_ne_zero : ellM (q := q) ≠ 0 := by
   intro h
   have := anVal_ellM (q := q)
-  rw [h, anVal_zero K 1 one_ne_zero] at this
+  rw [h, anVal_zero K 1 one_ne_zero_omega] at this
   exact WithTop.top_ne_coe this
 
 theorem Th_eq_ell : algebraMap (holSubring K) (MeroRing K) (Th hq0 hq1) =
@@ -45,8 +51,8 @@ theorem anVal_ge_of_hol_zero_quot {N D : holSubring K} (hN : N.1 oneX = 0) (hD :
     ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 (algebraMap (holSubring K) (MeroRing K) N /
       algebraMap (holSubring K) (MeroRing K) D) := by
   have hD0 : D ≠ 0 := by rintro rfl; exact hD rfl
-  rw [div_eq_mul_inv, (anVal_isValuation K 1 one_ne_zero).2.2.1,
-    anVal_inv_of one_ne_zero (alg_hol_ne_zero hD0) (anVal_hol_nonvanishing one_ne_zero hD0 hD)]
+  rw [div_eq_mul_inv, (anVal_isValuation K 1 one_ne_zero_omega).2.2.1,
+    anVal_inv_of one_ne_zero_omega (alg_hol_ne_zero hD0) (anVal_hol_nonvanishing one_ne_zero_omega hD0 hD)]
   simpa using anVal_one_ge_one_of_zero hN
 
 theorem anVal_ge_add {ξ : Omega K} (hξ : ξ ≠ 0) {f g : MeroRing K} {n : ℤ}
@@ -84,14 +90,14 @@ theorem Uf_sub_one : ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 (Uf hq0 hq1 - 1) :=
       algebraMap (holSubring K) (MeroRing K) (GP hq0 hq1 - Rq hq0 hq1 0 ^ 2) /
         algebraMap (holSubring K) (MeroRing K) (Rq hq0 hq1 0 ^ 2) +
       -(algebraMap K (MeroRing K) (2 * sK K 1 q) * ellM (q := q) ^ 2) := by
-    rw [Uf, wpAlg, Th_eq_ell hq0 hq1, map_sub, map_pow]
+    rw [Uf, wpAlg, Th_eq_ell hq0 hq1, RingHom.map_sub, map_pow]
     field_simp
     ring
   rw [e]
-  refine anVal_ge_add one_ne_zero (anVal_ge_of_hol_zero_quot ?_ ?_) (anVal_ge_neg one_ne_zero ?_)
+  refine anVal_ge_add one_ne_zero_omega (anVal_ge_of_hol_zero_quot ?_ ?_) (anVal_ge_neg one_ne_zero_omega ?_)
   · rw [sub_apply_hol, GP_one, pow_apply_hol, sub_self]
   · rw [pow_apply_hol]; exact pow_ne_zero 2 hR0
-  · refine anVal_ge_const_mul one_ne_zero _ (le_trans ?_ (anVal_pow_of one_ne_zero (anVal_ellM (q := q)) 2).ge)
+  · refine anVal_ge_const_mul one_ne_zero_omega _ (le_trans ?_ (anVal_pow_of one_ne_zero_omega (anVal_ellM (q := q)) 2).ge)
     exact_mod_cast (by norm_num : (1 : ℤ) ≤ 2 * 1)
 
 theorem Vf_add_one : ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 (Vf hq0 hq1 + 1) := by
@@ -103,14 +109,14 @@ theorem Vf_add_one : ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 (Vf hq0 hq1 + 1) :=
       algebraMap (holSubring K) (MeroRing K) (GP' hq0 hq1 + Rq hq0 hq1 0 ^ 3) /
         algebraMap (holSubring K) (MeroRing K) (Rq hq0 hq1 0 ^ 3) +
       algebraMap K (MeroRing K) (sK K 1 q) * ellM (q := q) ^ 3 := by
-    rw [Vf, wpPrimeAlg, Th_eq_ell hq0 hq1, map_add, map_pow]
+    rw [Vf, wpPrimeAlg, Th_eq_ell hq0 hq1, RingHom.map_add, map_pow]
     field_simp
     ring
   rw [e]
-  refine anVal_ge_add one_ne_zero (anVal_ge_of_hol_zero_quot ?_ ?_) ?_
+  refine anVal_ge_add one_ne_zero_omega (anVal_ge_of_hol_zero_quot ?_ ?_) ?_
   · rw [add_apply_hol, GP'_one, pow_apply_hol, neg_add_cancel]
   · rw [pow_apply_hol]; exact pow_ne_zero 3 hR0
-  · refine anVal_ge_const_mul one_ne_zero _ (le_trans ?_ (anVal_pow_of one_ne_zero (anVal_ellM (q := q)) 3).ge)
+  · refine anVal_ge_const_mul one_ne_zero_omega _ (le_trans ?_ (anVal_pow_of one_ne_zero_omega (anVal_ellM (q := q)) 3).ge)
     exact_mod_cast (by norm_num : (1 : ℤ) ≤ 3 * 1)
 
 
@@ -151,35 +157,35 @@ theorem InL_rel : InL (q := q) 5
   rw [hkey]
   have hone : ∀ x : MeroRing K, ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 x →
       ((0 : ℤ) : WithTop ℤ) ≤ anVal K 1 (x + 1) := fun x hx =>
-    anVal_ge_add one_ne_zero (anVal_ge_weaken (by norm_num) hx)
-      (by rw [(anVal_isValuation K 1 one_ne_zero).2.1]; rfl)
+    anVal_ge_add one_ne_zero_omega (anVal_ge_weaken (by norm_num) hx)
+      (by rw [(anVal_isValuation K 1 one_ne_zero_omega).2.1]; rfl)
   have hS : ((1 : ℤ) : WithTop ℤ) ≤
       anVal K 1 (b ^ 2 + -(2 * b) + -(a ^ 3) + -(3 * a ^ 2) + -(3 * a)) := by
     have hb2 : ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 (b ^ 2) := by
-      rw [pow_two]; exact anVal_ge_weaken (by norm_num) (anVal_ge_mul one_ne_zero hb1 hb1)
+      rw [pow_two]; exact anVal_ge_weaken (by norm_num) (anVal_ge_mul one_ne_zero_omega hb1 hb1)
     have ha2 : ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 (a ^ 2) := by
-      rw [pow_two]; exact anVal_ge_weaken (by norm_num) (anVal_ge_mul one_ne_zero ha1 ha1)
+      rw [pow_two]; exact anVal_ge_weaken (by norm_num) (anVal_ge_mul one_ne_zero_omega ha1 ha1)
     have ha3 : ((1 : ℤ) : WithTop ℤ) ≤ anVal K 1 (a ^ 3) := by
-      rw [pow_succ]; exact anVal_ge_weaken (by norm_num) (anVal_ge_mul one_ne_zero ha2 ha1)
-    refine anVal_ge_add one_ne_zero (anVal_ge_add one_ne_zero (anVal_ge_add one_ne_zero
-      (anVal_ge_add one_ne_zero hb2 (anVal_ge_neg one_ne_zero ?_)) (anVal_ge_neg one_ne_zero ha3))
-      (anVal_ge_neg one_ne_zero ?_)) (anVal_ge_neg one_ne_zero ?_)
-    · exact_mod_cast anVal_ge_natmul one_ne_zero 2 hb1
-    · exact_mod_cast anVal_ge_natmul one_ne_zero 3 ha2
-    · exact_mod_cast anVal_ge_natmul one_ne_zero 3 ha1
+      rw [pow_succ]; exact anVal_ge_weaken (by norm_num) (anVal_ge_mul one_ne_zero_omega ha2 ha1)
+    refine anVal_ge_add one_ne_zero_omega (anVal_ge_add one_ne_zero_omega (anVal_ge_add one_ne_zero_omega
+      (anVal_ge_add one_ne_zero_omega hb2 (anVal_ge_neg one_ne_zero_omega ?_)) (anVal_ge_neg one_ne_zero_omega ha3))
+      (anVal_ge_neg one_ne_zero_omega ?_)) (anVal_ge_neg one_ne_zero_omega ?_)
+    · exact_mod_cast anVal_ge_natmul one_ne_zero_omega 2 hb1
+    · exact_mod_cast anVal_ge_natmul one_ne_zero_omega 3 ha2
+    · exact_mod_cast anVal_ge_natmul one_ne_zero_omega 3 ha1
   have hinv : ∀ k : ℕ, anVal K 1 ((ellM (q := q) ^ k)⁻¹) = ((-(k : ℤ) : ℤ) : WithTop ℤ) := by
     intro k
-    rw [anVal_inv_of one_ne_zero (pow_ne_zero k hl) (anVal_pow_of one_ne_zero (anVal_ellM (q := q)) k)]
+    rw [anVal_inv_of one_ne_zero_omega (pow_ne_zero k hl) (anVal_pow_of one_ne_zero_omega (anVal_ellM (q := q)) k)]
     simp
-  refine anVal_ge_add one_ne_zero ?_ ?_
-  · have := anVal_ge_mul one_ne_zero hS (le_of_eq (hinv 6).symm)
+  refine anVal_ge_add one_ne_zero_omega ?_ ?_
+  · have := anVal_ge_mul one_ne_zero_omega hS (le_of_eq (hinv 6).symm)
     exact anVal_ge_weaken (by norm_num) this
   · have hU := hone a ha1
     have hV : ((0 : ℤ) : WithTop ℤ) ≤ anVal K 1 (b - 1) := by
       rw [sub_eq_add_neg]
-      exact anVal_ge_add one_ne_zero (anVal_ge_weaken (by norm_num) hb1)
-        (by rw [anVal_neg one_ne_zero, (anVal_isValuation K 1 one_ne_zero).2.1]; rfl)
-    have := anVal_ge_mul one_ne_zero (anVal_ge_mul one_ne_zero hU hV) (le_of_eq (hinv 5).symm)
+      exact anVal_ge_add one_ne_zero_omega (anVal_ge_weaken (by norm_num) hb1)
+        (by rw [anVal_neg one_ne_zero_omega, (anVal_isValuation K 1 one_ne_zero_omega).2.1]; rfl)
+    have := anVal_ge_mul one_ne_zero_omega (anVal_ge_mul one_ne_zero_omega hU hV) (le_of_eq (hinv 5).symm)
     exact anVal_ge_weaken (by norm_num) this
 
 end rel
@@ -280,21 +286,21 @@ theorem two_wpPrime_add_wp_ne_zero : 2 * wpPrimeAlg hq0 hq1 + wpAlg hq0 hq1 ≠ 
       rw [show (2 : MeroRing K) = algebraMap K (MeroRing K) 2 from (map_ofNat _ 2).symm, h2, map_zero]
     rw [this, zero_mul, zero_add] at h
     have := anVal_wpAlg_one hq0 hq1
-    rw [h, anVal_zero K 1 one_ne_zero] at this
+    rw [h, anVal_zero K 1 one_ne_zero_omega] at this
     exact WithTop.top_ne_coe this
   · have e2 : anVal K 1 (2 * wpPrimeAlg hq0 hq1) = ((-3 : ℤ) : WithTop ℤ) := by
       rw [show (2 : MeroRing K) = algebraMap K (MeroRing K) 2 from (map_ofNat _ 2).symm,
-        (anVal_isValuation K 1 one_ne_zero).2.2.1, anVal_wpPrimeAlg_one hq0 hq1,
-        ← algebraMap_hol_mero, anVal_algebraMap_hol one_ne_zero h2, zero_add]
-    have := anVal_add_eq_of_lt one_ne_zero (f := 2 * wpPrimeAlg hq0 hq1) (g := wpAlg hq0 hq1) (by
+        (anVal_isValuation K 1 one_ne_zero_omega).2.2.1, anVal_wpPrimeAlg_one hq0 hq1,
+        ← algebraMap_hol_mero, anVal_algebraMap_hol one_ne_zero_omega h2, zero_add]
+    have := anVal_add_eq_of_lt one_ne_zero_omega (f := 2 * wpPrimeAlg hq0 hq1) (g := wpAlg hq0 hq1) (by
       rw [e2, anVal_wpAlg_one hq0 hq1]; exact_mod_cast (by norm_num : (-3 : ℤ) < -2))
-    rw [h, anVal_zero K 1 one_ne_zero, e2] at this
+    rw [h, anVal_zero K 1 one_ne_zero_omega, e2] at this
     exact WithTop.top_ne_coe this
 
 theorem wpAlg_ne_const (c : K) : wpAlg hq0 hq1 ≠ algebraMap K (MeroRing K) c := by
   intro h
   have h1 := anVal_wpAlg_one hq0 hq1
-  have h2 := anVal_algebraMap_nonneg one_ne_zero c
+  have h2 := anVal_algebraMap_nonneg one_ne_zero_omega c
   rw [h, ] at h1
   rw [h1] at h2
   exact absurd h2 (by exact_mod_cast (by norm_num : ¬ (0 : ℤ) ≤ -2))

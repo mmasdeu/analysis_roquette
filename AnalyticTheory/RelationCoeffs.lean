@@ -19,6 +19,12 @@ namespace AnalyticTheory
 
 universe u
 
+/-- Instance shortcut: `map_add`, `map_mul`, ... for ring homs would otherwise first try (and
+slowly fail) the `ℚ≥0`-linear-map route through `holSubring K`. -/
+private local instance (priority := high) ringHom_addMonoidHomClass {A B : Type*}
+    [NonAssocSemiring A] [NonAssocSemiring B] : AddMonoidHomClass (A →+* B) A B :=
+  RingHomClass.toAddMonoidHomClass
+
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
 section pointwise

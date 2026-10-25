@@ -17,6 +17,11 @@ namespace AnalyticTheory
 
 universe u
 
+/-- `(1 : Ω) ≠ 0`, avoiding a slow `NeZero 1` search at the type `Omega K`. -/
+private theorem one_ne_zero_omega {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K]
+    [CompleteSpace K] : (1 : Omega K) ≠ 0 :=
+  one_ne_zero
+
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 
 theorem anVal_hol_nonvanishing {ξ : Omega K} (hξ : ξ ≠ 0) {f : holSubring K} (hf0 : f ≠ 0)
@@ -94,11 +99,11 @@ theorem monoHol_ne_zero (n : ℤ) : monoHol K (Omega K) n ≠ 0 := by
   intro h
   have := monoHol_neg_mul K (L := Omega K) n
   rw [h, mul_zero] at this
-  exact zero_ne_one this
+  exact one_ne_zero_omega (congrArg (fun y : holSubring K => y.1 ⟨1, one_ne_zero_omega⟩) this).symm
 
 theorem algebraMap_hol_ne_zero {c : K} (hc : c ≠ 0) : algebraMap K (holSubring K) c ≠ 0 := by
   intro h
-  have := congrArg (fun y : holSubring K => y.1 ⟨1, one_ne_zero⟩) h
+  have := congrArg (fun y : holSubring K => y.1 ⟨1, one_ne_zero_omega⟩) h
   simp only [algebraMap_apply_hol] at this
   exact (_root_.map_ne_zero (algebraMap K (Omega K))).mpr hc this
 
@@ -295,7 +300,7 @@ theorem theta_spec {q : K} (hq0 : 0 < ‖q‖) (hq : ‖q‖ < 1) {α : Omega K}
     refine Finset.sum_congr rfl (fun n _ => ?_)
     norm_cast
   have hTne : T ≠ 0 := by
-    obtain ⟨J0, hJ0⟩ := htail ⟨1, one_ne_zero⟩
+    obtain ⟨J0, hJ0⟩ := htail ⟨1, one_ne_zero_omega⟩
     obtain ⟨R, hR0, hTR⟩ := hJ0 J0 le_rfl
     have hRne : R ≠ 0 := by rintro rfl; exact hR0 rfl
     rw [hTR]

@@ -17,6 +17,13 @@ namespace AnalyticTheory
 
 universe u
 
+/-- Instance shortcut: `map_add`, `map_mul`, ... for ring homs would otherwise first try (and
+slowly fail) the `ℚ≥0`-linear-map route through the subrings/subfields used here. -/
+private local instance (priority := high) ringHomClass_addMonoidHomClass {F A B : Type*}
+    [NonAssocSemiring A] [NonAssocSemiring B] [FunLike F A B] [RingHomClass F A B] :
+    AddMonoidHomClass F A B :=
+  RingHomClass.toAddMonoidHomClass
+
 section descent
 
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
@@ -302,10 +309,14 @@ theorem isFqTorsor_of_period (ζ : CocycleModQ K L q)
     exact ⟨_, range_mem_elSub (L := L) _ e, rfl⟩
   let ι' : E →+* FqSub L qb := μ0.rangeRestrictFieldEquiv.symm.toRingHom.comp
     { toFun := fun e => ⟨_, hEmem e⟩
-      map_one' := Subtype.ext (by simp [xiIota])
-      map_mul' := fun x y => Subtype.ext (by simp [xiIota])
-      map_zero' := Subtype.ext (by simp [xiIota])
-      map_add' := fun x y => Subtype.ext (by simp [xiIota]) }
+      map_one' := Subtype.ext (congrArg (fun z : FqSub L (algebraMap K L q) => (z : MeroRing L))
+        (xiIota q T E).map_one)
+      map_mul' := fun x y => Subtype.ext (congrArg
+        (fun z : FqSub L (algebraMap K L q) => (z : MeroRing L)) ((xiIota q T E).map_mul x y))
+      map_zero' := Subtype.ext (congrArg (fun z : FqSub L (algebraMap K L q) => (z : MeroRing L))
+        (xiIota q T E).map_zero)
+      map_add' := fun x y => Subtype.ext (congrArg
+        (fun z : FqSub L (algebraMap K L q) => (z : MeroRing L)) ((xiIota q T E).map_add x y)) }
   have hι' : ∀ e, μ0 (ι' e) = ((xiIota q T E e : FqSub L (algebraMap K L q)) : MeroRing L) := by
     intro e
     exact μ0.rangeRestrictFieldEquiv_apply_symm_apply ⟨_, hEmem e⟩

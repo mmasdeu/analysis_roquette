@@ -20,6 +20,12 @@ namespace AnalyticTheory
 
 universe u
 
+/-- Instance shortcut: `map_add`, `map_mul`, ... for ring homs would otherwise first try (and
+slowly fail) the `ℚ≥0`-linear-map route through `holSubring K`. -/
+private local instance (priority := high) ringHom_addMonoidHomClass {A B : Type*}
+    [NonAssocSemiring A] [NonAssocSemiring B] : AddMonoidHomClass (A →+* B) A B :=
+  RingHomClass.toAddMonoidHomClass
+
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 
@@ -33,15 +39,33 @@ theorem holD_monoHol_one : holD (monoHol K (Omega K) 1) = monoHol K (Omega K) 1 
 theorem monoHol_two : monoHol K (Omega K) 2 = monoHol K (Omega K) 1 * monoHol K (Omega K) 1 := by
   rw [← monoHol_add]; rfl
 
+theorem linF_eq_sub (n : ℤ) :
+    linF (q := q) n = monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ (-n)) := by
+  rw [linF, polyHol, Polynomial.aeval_sub, Polynomial.aeval_X, Polynomial.aeval_C]
+
 theorem holD_linF (n : ℤ) : holD (linF (q := q) n) = monoHol K (Omega K) 1 := by
-  have : linF (q := q) n = monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ (-n)) := by
-    unfold linF polyHol
-    simp
-  rw [this]
-  have h := holD_add (monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ (-n))) (algebraMap K (holSubring K) (q ^ (-n)))
-  rw [sub_add_cancel, holD_const] at h
-  rw [holD_monoHol_one] at h
-  linear_combination -h
+  rw [linF_eq_sub]
+  have h := holD_add (monoHol K (Omega K) 1 - algebraMap K (holSubring K) (q ^ (-n)))
+    (algebraMap K (holSubring K) (q ^ (-n)))
+  rw [sub_add_cancel, holD_const, add_zero, holD_monoHol_one] at h
+  exact h.symm
+
+private theorem termwise_ring {A : Type*} [CommRing A] (X c R D : A) :
+    2 * (-c * (X * X) * R ^ 3) = (X - c) * R * (c * (X * R ^ 2 + 2 * X * R * D)) -
+      2 * (c * X * R ^ 2) * (X * R + (X - c) * D) - (X - c) * R * (c * X * R ^ 2) := by
+  ring
+
+private theorem derivative_sq_ring {A : Type*} [CommRing A] (X c R D : A) :
+    c * X * (2 * R * D) + R ^ 2 * (c * X + X * 0) = c * (X * R ^ 2 + 2 * X * R * D) := by
+  ring
+
+private theorem sq_deriv_ring {A : Type*} [CommRing A] (R D : A) :
+    R * D + R * D = 2 * R * D := by
+  ring
+
+theorem holD_sq (f : holSubring K) : holD (f ^ 2) = 2 * f * holD f := by
+  rw [pow_two, holD_leibniz]
+  exact sq_deriv_ring f (holD f)
 
 include hq0 hq1 in
 theorem termwise (n : ℤ) :
@@ -52,27 +76,26 @@ theorem termwise (n : ℤ) :
   set R := Rq hq0 hq1 n
   set X := monoHol K (Omega K) 1
   set c := algebraMap K (holSubring K) (q ^ (-n))
-  have hlin : linF (q := q) n = X - c := by unfold linF polyHol; simp [X, c]
+  have hlin : linF (q := q) n = X - c := linF_eq_sub n
   have hDlin := holD_linF (q := q) n
   have hDT : holD T = X * R + (X - c) * holD R := by
     have := congrArg holD hT
     rw [holD_leibniz, hDlin, hlin] at this
-    linear_combination this
-  have hDR2 : holD (R ^ 2) = 2 * R * holD R := by
-    rw [pow_two, holD_leibniz]; ring
+    rw [this, add_comm, mul_comm R X]
+  have hDR2 : holD (R ^ 2) = 2 * R * holD R := holD_sq R
   have hDt : holD (tP hq0 hq1 n) = c * (X * R ^ 2 + 2 * X * R * holD R) := by
     unfold tP
     change holD (c * X * R ^ 2) = _
     rw [holD_leibniz, holD_leibniz, hDR2, holD_monoHol_one]
     have hc : holD c = 0 := holD_const _
     rw [hc, show monoHol K (Omega K) 1 = X from rfl]
-    ring
+    exact derivative_sq_ring X c R (holD R)
   have htP : tP hq0 hq1 n = c * X * R ^ 2 := rfl
   have htP' : tP' hq0 hq1 n = -c * (X * X) * R ^ 3 := by
     unfold tP'
-    rw [monoHol_two, map_neg]
+    rw [monoHol_two, RingHom.map_neg]
   rw [hDt, hDT, htP, htP', hT, hlin]
-  ring
+  exact termwise_ring X c R (holD R)
 
 
 include hq0 hq1 in
@@ -138,8 +161,7 @@ theorem wpPrime_spec : 2 * wpPrimeM K q = Dop K (wpM K q) - wpM K q := by
       algebraMap (holSubring K) (MeroRing K) (Th hq0 hq1 ^ 2) := by rw [map_pow]
   rw [hsq, Dop_sub, Dop_eq _ _ (pow_ne_zero 2 (Th_ne_zero hq0 hq1)), Dop_const, sub_zero]
   unfold Dquot DM
-  have hD2 : holD (Th hq0 hq1 ^ 2) = 2 * Th hq0 hq1 * holD (Th hq0 hq1) := by
-    rw [pow_two, holD_leibniz]; ring
+  have hD2 : holD (Th hq0 hq1 ^ 2) = 2 * Th hq0 hq1 * holD (Th hq0 hq1) := holD_sq _
   rw [hD2]
   simp only [map_mul, map_pow, map_ofNat]
   rw [← hsq] at *

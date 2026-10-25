@@ -61,12 +61,53 @@ omit [FiniteDimensional K L] [IsGalois K L] in
 theorem pow_ord_mem_ker : σ ^ orderOf (χ σ) ∈ MonoidHom.ker χ := by
   rw [MonoidHom.mem_ker, map_pow, pow_orderOf_eq_one]
 
+private theorem restrictNormalHom_pow_injOn (j j' : ℕ) (hj : j < orderOf (χ σ))
+    (hj' : j' < orderOf (χ σ))
+    (h : AlgEquiv.restrictNormalHom (Mχ χ) (σ ^ j) = AlgEquiv.restrictNormalHom (Mχ χ) (σ ^ j')) :
+    j = j' := by
+  have : (MonoidHom.ker χ).Normal := MonoidHom.normal_ker χ
+  set n := orderOf (χ σ) with hn
+  have hk : (σ ^ j) * (σ ^ j')⁻¹ ∈ MonoidHom.ker (AlgEquiv.restrictNormalHom (Mχ χ)) := by
+    rw [MonoidHom.mem_ker, map_mul, map_inv, h, mul_inv_cancel]
+  rw [IntermediateField.restrictNormalHom_ker (Mχ χ),
+    IntermediateField.fixingSubgroup_fixedField] at hk
+  have h1 : (χ σ) ^ ((j : ℤ) - j') = 1 := by
+    rw [MonoidHom.mem_ker, map_mul, map_inv, map_pow, map_pow] at hk
+    rw [zpow_sub, zpow_natCast, zpow_natCast, ← div_eq_mul_inv]
+    exact hk
+  have h2 : (n : ℤ) ∣ (j : ℤ) - j' := orderOf_dvd_iff_zpow_eq_one.mpr h1
+  have h3 : (j : ℤ) - j' = 0 := Int.eq_zero_of_abs_lt_dvd h2 (by rw [abs_lt]; constructor <;> omega)
+  omega
+
 include hσ in
-theorem norm_eq_prod_pow (x : Mχ χ) :
-    algebraMap K L (Algebra.norm K x) = ∏ j ∈ Finset.range (orderOf (χ σ)), (σ ^ j) (x : L) := by
+private theorem exists_pow_restrictNormalHom (τ : (Mχ χ) ≃ₐ[K] (Mχ χ)) :
+    ∃ j ∈ Finset.range (orderOf (χ σ)), AlgEquiv.restrictNormalHom (Mχ χ) (σ ^ j) = τ := by
   have : (MonoidHom.ker χ).Normal := MonoidHom.normal_ker χ
   set n := orderOf (χ σ) with hn
   have hnpos : 0 < n := (MonoidHom.isOfFinOrder χ (isOfFinOrder_of_finite σ)).orderOf_pos
+  obtain ⟨g, rfl⟩ := AlgEquiv.restrictNormalHom_surjective L τ
+  obtain ⟨a, ha⟩ := hσ g
+  have hn' : (n : ℤ) ≠ 0 := by exact_mod_cast hnpos.ne'
+  refine ⟨(a % (n : ℤ)).toNat, Finset.mem_range.mpr ?_, ?_⟩
+  · have := Int.emod_lt_of_pos a (by exact_mod_cast hnpos : (0 : ℤ) < n)
+    have := Int.emod_nonneg a hn'
+    omega
+  · set j := (a % (n : ℤ)).toNat with hj
+    have hjz : (j : ℤ) = a % (n : ℤ) := by
+      rw [hj]; exact Int.toNat_of_nonneg (Int.emod_nonneg a hn')
+    have hk : g⁻¹ * σ ^ j ∈ MonoidHom.ker (AlgEquiv.restrictNormalHom (Mχ χ)) := by
+      rw [IntermediateField.restrictNormalHom_ker (Mχ χ),
+        IntermediateField.fixingSubgroup_fixedField, MonoidHom.mem_ker, map_mul, map_inv, map_pow,
+        ha, ← zpow_natCast, ← zpow_neg, ← zpow_add]
+      have h1 : (-a + j : ℤ) = - (n * (a / n)) := by
+        rw [hjz]; have := Int.emod_add_mul_ediv a n; linarith
+      rw [h1, zpow_neg, zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow, inv_one]
+    rw [MonoidHom.mem_ker, map_mul, map_inv, inv_mul_eq_one] at hk
+    exact hk.symm
+
+include hσ in
+theorem norm_eq_prod_pow (x : Mχ χ) :
+    algebraMap K L (Algebra.norm K x) = ∏ j ∈ Finset.range (orderOf (χ σ)), (σ ^ j) (x : L) := by
   have h1 := Algebra.norm_eq_prod_automorphisms K x
   have h2 : algebraMap K L (Algebra.norm K x) =
       ∏ τ : (Mχ χ) ≃ₐ[K] (Mχ χ), ((τ x : Mχ χ) : L) := by
@@ -78,41 +119,10 @@ theorem norm_eq_prod_pow (x : Mχ χ) :
   refine Finset.prod_bij (fun j _ => AlgEquiv.restrictNormalHom (Mχ χ) (σ ^ j)) ?_ ?_ ?_ ?_
   · intro j _; exact Finset.mem_univ _
   · intro j hj j' hj' h
-    have hj1 : j < n := Finset.mem_range.mp hj
-    have hj2 : j' < n := Finset.mem_range.mp hj'
-    have h' : AlgEquiv.restrictNormalHom (Mχ χ) (σ ^ j) =
-        AlgEquiv.restrictNormalHom (Mχ χ) (σ ^ j') := h
-    have hk : (σ ^ j) * (σ ^ j')⁻¹ ∈ MonoidHom.ker (AlgEquiv.restrictNormalHom (Mχ χ)) := by
-      rw [MonoidHom.mem_ker, map_mul, map_inv, h', mul_inv_cancel]
-    rw [IntermediateField.restrictNormalHom_ker (Mχ χ),
-      IntermediateField.fixingSubgroup_fixedField] at hk
-    have h1 : (χ σ) ^ ((j : ℤ) - j') = 1 := by
-      have := hk
-      rw [MonoidHom.mem_ker, map_mul, map_inv, map_pow, map_pow] at this
-      rw [zpow_sub, zpow_natCast, zpow_natCast, ← div_eq_mul_inv] at *
-      exact this
-    have h2 : (n : ℤ) ∣ (j : ℤ) - j' := orderOf_dvd_iff_zpow_eq_one.mpr h1
-    have h3 : (j : ℤ) - j' = 0 := Int.eq_zero_of_abs_lt_dvd h2 (by rw [abs_lt]; constructor <;> omega)
-    omega
+    exact restrictNormalHom_pow_injOn χ σ j j' (Finset.mem_range.mp hj) (Finset.mem_range.mp hj') h
   · intro τ _
-    obtain ⟨g, rfl⟩ := AlgEquiv.restrictNormalHom_surjective L τ
-    obtain ⟨a, ha⟩ := hσ g
-    have hn' : (n : ℤ) ≠ 0 := by exact_mod_cast hnpos.ne'
-    refine ⟨(a % (n : ℤ)).toNat, Finset.mem_range.mpr ?_, ?_⟩
-    · have := Int.emod_lt_of_pos a (by exact_mod_cast hnpos : (0 : ℤ) < n)
-      have := Int.emod_nonneg a hn'
-      omega
-    · set j := (a % (n : ℤ)).toNat with hj
-      have hjz : (j : ℤ) = a % (n : ℤ) := by
-        rw [hj]; exact Int.toNat_of_nonneg (Int.emod_nonneg a hn')
-      have hk : g⁻¹ * σ ^ j ∈ MonoidHom.ker (AlgEquiv.restrictNormalHom (Mχ χ)) := by
-        rw [IntermediateField.restrictNormalHom_ker (Mχ χ),
-          IntermediateField.fixingSubgroup_fixedField, MonoidHom.mem_ker, map_mul, map_inv, map_pow,
-          ha, ← zpow_natCast, ← zpow_neg, ← zpow_add]
-        have h1 : (-a + j : ℤ) = - (n * (a / n)) := by rw [hjz]; have := Int.emod_add_mul_ediv a n; linarith
-        rw [h1, zpow_neg, zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow, inv_one]
-      rw [MonoidHom.mem_ker, map_mul, map_inv, inv_mul_eq_one] at hk
-      exact hk.symm
+    obtain ⟨j, hj, h⟩ := exists_pow_restrictNormalHom χ σ hσ τ
+    exact ⟨j, hj, h⟩
   · intro j hj
     exact (AlgEquiv.restrictNormal_commutes (σ ^ j) (Mχ χ) x).symm
 

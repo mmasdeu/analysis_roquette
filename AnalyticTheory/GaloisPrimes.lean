@@ -65,7 +65,7 @@ theorem prime_orbit_count {ι : Type*} [Fintype ι] (σ : ι → (F ≃ₐ[K] F)
   have hTge : ∀ x : P.Over F, (x.1.degree : ℤ) ≤ T x := fun x => by
     have h1 : (1 : ℤ) ≤ x.1.ramIdx (E := E) := by exact_mod_cast x.1.ramIdx_pos (E := E)
     have h2 : (0 : ℤ) ≤ x.1.degree := by positivity
-    nlinarith
+    exact le_mul_of_one_le_left h2 h1
   have hSdeg : ∀ x ∈ S, x.1.degree = Q.degree := fun x hx => by
     obtain ⟨i, -, rfl⟩ := Finset.mem_image.mp hx
     exact hdeg i
@@ -94,7 +94,7 @@ theorem prime_orbit_count {ι : Type*} [Fintype ι] (σ : ι → (F ≃ₐ[K] F)
       Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) fun x _ _ => (hTpos x).le
     rw [Finset.sum_insert hnot] at h1
     have := hTpos ⟨Q', hQ'⟩
-    linarith
+    linarith only [h1, this, hEq]
   · have hmem : ι' i ∈ S := Finset.mem_image_of_mem _ (Finset.mem_univ i)
     have hall : ∑ x ∈ S, T x = ∑ x ∈ S, (Q.degree : ℤ) := by
       rw [hEq, hT, hdegEq, Finset.sum_const, hScard]; simp
@@ -106,8 +106,8 @@ theorem prime_orbit_count {ι : Type*} [Fintype ι] (σ : ι → (F ≃ₐ[K] F)
       rw [h3, hdeg i] at this
       exact this.symm
     have hQ0 : (0 : ℤ) < Q.degree := by exact_mod_cast hQpos
-    have : ((Q.transfer (σ i)).ramIdx (E := E) : ℤ) = 1 := by
-      nlinarith
+    have : ((Q.transfer (σ i)).ramIdx (E := E) : ℤ) = 1 :=
+      mul_right_cancel₀ hQ0.ne' (h2.trans (one_mul _).symm)
     exact_mod_cast this
 
 end count

@@ -66,11 +66,11 @@ noncomputable def solSpace (q : K) (hq0 : q ≠ 0) (κ : K) (d : ℤ) : Submodul
   carrier := {G | holScale K (Units.mk0 q hq0)⁻¹ G = algebraMap K (holSubring K) κ * monoHol K (Omega K) d * G}
   add_mem' := fun {G H} hG hH => by
     simp only [Set.mem_ofPred_eq] at hG hH ⊢
-    rw [map_add, hG, hH]; ring
-  zero_mem' := by simp
+    rw [map_add, hG, hH, mul_add]
+  zero_mem' := by simp only [Set.mem_ofPred_eq, map_zero, mul_zero]
   smul_mem' := fun c G hG => by
     simp only [Set.mem_ofPred_eq] at hG ⊢
-    rw [Algebra.smul_def, map_mul, hG, holScale_algebraMap]; ring
+    rw [Algebra.smul_def, map_mul, hG, holScale_algebraMap, mul_left_comm]
 
 theorem mem_solSpace_iff {q : K} (hq0 : q ≠ 0) {κ : K} {d : ℤ} (G : holSubring K) :
     G ∈ solSpace q hq0 κ d ↔
@@ -146,7 +146,7 @@ theorem solSpace_eq_bot_of_neg {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {
       have hκn : 0 < ‖κ‖ := norm_pos_iff.mpr hκ
       have : 1 ≤ ‖κ‖⁻¹ * ‖q‖ ^ (-(n0 + (j : ℤ) * e)) := by
         rw [le_inv_mul_iff₀ hκn, mul_one]; exact h1
-      nlinarith [norm_nonneg (h j)]
+      exact le_mul_of_one_le_left (norm_nonneg _) this
   -- but the coefficients tend to zero
   have htend : Tendsto (fun j : ℕ => ‖h j‖) atTop (𝓝 0) := by
     have hc := holCoeff_convergent K G 1 one_pos
@@ -170,7 +170,7 @@ theorem triZ_two (j : ℤ) : triZ j * 2 = j * (j + 1) :=
   Int.ediv_mul_cancel (Int.even_mul_succ_self j).two_dvd
 
 theorem triZ_succ (j : ℤ) : triZ (j + 1) = triZ j + (j + 1) := by
-  have h1 := triZ_two j; have h2 := triZ_two (j + 1); nlinarith
+  have h1 := triZ_two j; have h2 := triZ_two (j + 1); linarith only [h1, h2]
 
 theorem triZ_nonneg (j : ℤ) : 0 ≤ triZ j := by
   have h := triZ_two j; nlinarith [sq_nonneg (2 * j + 1)]
@@ -191,7 +191,7 @@ theorem finite_quad {A s : ℝ} (hA : 0 < A) (hs0 : 0 < s) (hs1 : s < 1) {ε : �
     intro m
     simp only [hF]
     have : triZ (-((m : ℤ) + 1)) = triZ (-(m : ℤ)) + m := by
-      have h1 := triZ_two (-((m : ℤ) + 1)); have h2 := triZ_two (-(m : ℤ)); nlinarith
+      have h1 := triZ_two (-((m : ℤ) + 1)); have h2 := triZ_two (-(m : ℤ)); linarith only [h1, h2]
     rw [this, zpow_add₀ hs0.ne', show -((m : ℤ) + 1) = -(m : ℤ) + (-1) by ring,
       zpow_add₀ hA.ne', zpow_neg_one]; ring
   have hsum : ∀ (c : ℝ) (u : ℕ → ℝ), (∀ m, 0 < u m) → (∀ m, u (m + 1) = u m * (c * s ^ m)) →
@@ -203,7 +203,8 @@ theorem finite_quad {A s : ℝ} (hA : 0 < A) (hs0 : 0 < s) (hs1 : s < 1) {ε : �
       filter_upwards [hlim.eventually (gt_mem_nhds (by norm_num : (0 : ℝ) < 1 / 2))] with m hm
       rw [hrec, Real.norm_eq_abs, Real.norm_eq_abs, abs_mul, abs_mul, abs_of_pos (hu m),
         abs_of_pos (pow_pos hs0 m)]
-      nlinarith [hu m]
+      have := hu m
+      nlinarith only [this, hm]
     exact (summable_of_ratio_norm_eventually_le (by norm_num) hev).tendsto_atTop_zero
   have h1 : Tendsto (fun m : ℕ => F m) atTop (𝓝 0) := by
     refine hsum (A * s) (fun m => F m) (fun m => hFpos m) (fun m => ?_)
@@ -305,7 +306,8 @@ theorem seqOf_convergent {q κ : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) (hκ
     rw [mul_zpow, mul_zpow, ← zpow_mul, ← zpow_mul]
   have key : s ^ (d * triZ j) ≤ s ^ (triZ j) := by
     refine zpow_le_zpow_right_of_le_one₀ hq0 hq1.le ?_
-    have := triZ_nonneg j; nlinarith
+    have := triZ_nonneg j
+    exact le_mul_of_one_le_left this (by omega)
   rw [← hs, e1, e2, e3]
   have hP : 0 ≤ ‖c i.toNat‖ * ‖κ‖ ^ j * s ^ (i * j) * r ^ i * r ^ (d * j) := by positivity
   calc ‖c i.toNat‖ * ‖κ‖ ^ j * (s ^ (i * j) * s ^ (d * triZ j)) * (r ^ i * r ^ (d * j))

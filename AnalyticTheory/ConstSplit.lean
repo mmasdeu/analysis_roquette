@@ -24,6 +24,12 @@ section split
 variable {K : Type u} [NontriviallyNormedField K] [IsUltrametricDist K] [CompleteSpace K]
 variable {L : Type u} [NontriviallyNormedField L] [IsUltrametricDist L] [CompleteSpace L]
   [NormedAlgebra K L] [FiniteDimensional K L] [IsGalois K L]
+omit [IsUltrametricDist K] [CompleteSpace K] in
+/-- Nonvanishing is preserved by the identity automorphism (avoids a slow coercion search in
+`map_ne_zero`). -/
+private theorem refl_apply_ne_zero {x : Omega K} (h : x ≠ 0) :
+    (AlgEquiv.refl : Omega K ≃ₐ[K] Omega K) x ≠ 0 := h
+
 variable (ψ : Omega K ≃ₐ[K] Omega L)
 variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
 variable {E : Type u} [Field E] [Algebra K E] [Algebra E (FqSub K q)]
@@ -60,7 +66,7 @@ theorem restrict_ptE_constExt (a : Kˣ) (e : E) :
   have heq : ptE (normL_pos hq0) (normL_lt_one hq1) (constExtSub L (norm_pos_iff.mp hq0) E)
       (Units.map (algebraMap K L : K →* L) a) =
       (primeAt (normL_pos (L := L) hq0) (normL_lt_one hq1)
-        (psi_ne_zero ψ ((map_ne_zero (AlgEquiv.refl : Omega K ≃ₐ[K] Omega K)).mpr hpt))).restrict
+        (psi_ne_zero ψ (refl_apply_ne_zero hpt))).restrict
           (E := constExtSub L (norm_pos_iff.mp hq0) E) := by
     show (primeAt _ _ (algebraMap_omega_ne_zero _)).restrict = _
     congr 1
@@ -83,10 +89,11 @@ theorem constExt_split (a : Kˣ) {y : FqSub K q} (hgood : (ptE hq0 hq1 E a).IsGo
   set β := ptOf PL
   have hPLβ : PL = primeAt (normL_pos hq0) (normL_lt_one hq1) hβ := eq_primeAt _ _ PL
   set α := ψ.symm β
-  have hα : α ≠ 0 := (map_ne_zero ψ.symm).mpr hβ
+  have hα : α ≠ 0 := fun h =>
+    hβ ((ψ.apply_symm_apply β).symm.trans ((congrArg ψ h).trans (map_zero ψ)))
   have hψα : ψ ((AlgEquiv.refl : Omega K ≃ₐ[K] Omega K) α) = β := ψ.apply_symm_apply β
   have hPL' : PL = primeAt (normL_pos hq0) (normL_lt_one hq1)
-      (psi_ne_zero ψ ((map_ne_zero (AlgEquiv.refl : Omega K ≃ₐ[K] Omega K)).mpr hα)) :=
+      (psi_ne_zero ψ (refl_apply_ne_zero hα)) :=
     hPLβ.trans (primeAt_congr _ _ hψα.symm _ _)
   set P := primeAt hq0 hq1 hα
   have hPres : P.restrict (E := E) = ptE hq0 hq1 E a := by

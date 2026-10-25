@@ -240,7 +240,7 @@ theorem isRigidAt_constExt (hE : IsEllipticOver K E) (b : Kˣ) :
         simp only [Pi.sub_apply, pdiv, N]
         by_cases hRb : R = Rb
         · simp only [hRb, ↓reduceIte]
-          split_ifs <;> push_cast <;> nlinarith
+          split_ifs <;> push_cast <;> omega
         · simp only [hRb, ↓reduceIte]
           have hRL : RL ≠ Q₂ := by
             intro hRLQ
@@ -253,7 +253,7 @@ theorem isRigidAt_constExt (hE : IsEllipticOver K E) (b : Kˣ) :
             rw [← hPR, hP]
             exact h2.trans (by rfl)
           simp only [hRL, ↓reduceIte]
-          split_ifs <;> push_cast <;> nlinarith
+          split_ifs <;> push_cast <;> omega
       have hNle : N ≤ P.ramIdx (E := E) * R.ord (e i) := by
         rw [← hordP]
         have := ord_primeAt hq0 hq1 hα heF
@@ -261,7 +261,7 @@ theorem isRigidAt_constExt (hE : IsEllipticOver K E) (b : Kˣ) :
         rw [← this] at hbound
         exact_mod_cast hbound
       simp only [N] at hNle
-      split_ifs at hNle ⊢ <;> nlinarith
+      split_ifs at hNle ⊢ <;> nlinarith only [hNle, hrP]
     refine ⟨?_, fun R hR => ?_⟩
     · have := key Rb; simpa using this
     · have := key R; simpa [hR] using this

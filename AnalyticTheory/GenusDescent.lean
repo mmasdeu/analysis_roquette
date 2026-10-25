@@ -64,6 +64,8 @@ theorem finiteDimensional_of_transcendental' {K F : Type u} [Field K] [Field F] 
     (htr : Algebra.trdeg K F = 1) (E : Subfield F) (hKE : ∀ c : K, algebraMap K F c ∈ E) {t : F}
     (htE : t ∈ E) (ht : Transcendental K t) : FiniteDimensional E F := by
   classical
+  -- find the module structure once, as the instance search is slow
+  let _instEF : Module E F := inferInstance
   have hind : AlgebraicIndependent K (fun _ : Unit => t) :=
     algebraicIndependent_unique_type_iff.mpr ht
   have hbasis : IsTranscendenceBasis K (fun _ : Unit => t) :=
@@ -103,8 +105,8 @@ theorem finiteDimensional_of_transcendental' {K F : Type u} [Field K] [Field F] 
     exact hle' hx
   have : FiniteDimensional E (IntermediateField.adjoin E (s : Set F)) :=
     IntermediateField.finiteDimensional_adjoin fun x _ => (hEalg x).isIntegral
-  rw [htop] at this
-  exact (IntermediateField.topEquiv (F := E) (E := F)).toLinearEquiv.finiteDimensional
+  exact Module.Finite.equiv
+    (((IntermediateField.equivOfEq htop).trans IntermediateField.topEquiv).toLinearEquiv)
 
 theorem fg_of_fieldRange {K E F : Type u} [Field K] [Field E] [Field F] [Algebra K E]
     [Algebra K F] (f : E →ₐ[K] F) (hf : Function.Injective f)
@@ -130,6 +132,40 @@ theorem fg_of_fieldRange {K E F : Type u} [Field K] [Field E] [Field F] [Algebra
   rw [← himg, ← IntermediateField.adjoin_map] at hx
   obtain ⟨z, hz, hzx⟩ := hx
   rw [← hf hzx]; exact hz
+
+/-- If `M = K(t')` is contained in an intermediate field `E₁` and `F` is finite over `M`, then `E₁`
+is finitely generated over `K`. -/
+theorem exists_finset_adjoin_eq_of_adjoin_simple_le {K F : Type u} [Field K] [Field F]
+    [Algebra K F] (t' : F) (M E₁ : IntermediateField K F) (hM : M = IntermediateField.adjoin K {t'})
+    (hME : M ≤ E₁) [hfinM : FiniteDimensional M F] :
+    ∃ s : Finset F, IntermediateField.adjoin K (s : Set F) = E₁ := by
+  classical
+  let alg : Algebra M E₁ := (IntermediateField.inclusion hME).toRingHom.toAlgebra
+  -- fix the module structure explicitly, to avoid repeated instance searches
+  let : SMul M E₁ := alg.toSMul
+  let : Module M E₁ := alg.toModule
+  have hT : IsScalarTower M E₁ F := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  have hfinE₁ : FiniteDimensional M E₁ := FiniteDimensional.left M E₁ F
+  let bE := Module.finBasis M E₁
+  refine ⟨insert t' (Finset.univ.image fun i => (bE i : F)), le_antisymm ?_ ?_⟩
+  · rw [IntermediateField.adjoin_le_iff]
+    intro y hy
+    simp only [Finset.coe_insert, Finset.coe_image, Finset.coe_univ, Set.image_univ,
+      Set.mem_insert_iff, Set.mem_range] at hy
+    rcases hy with rfl | ⟨i, rfl⟩
+    · exact hME (hM ▸ IntermediateField.mem_adjoin_simple_self K y)
+    · exact (bE i).2
+  · intro x hx
+    have hx' : (⟨x, hx⟩ : E₁) = ∑ i, bE.repr ⟨x, hx⟩ i • bE i := (bE.sum_repr _).symm
+    have := congrArg (fun z : E₁ => (z : F)) hx'
+    simp only [IntermediateField.coe_sum] at this
+    rw [this]
+    refine IntermediateField.sum_mem _ fun i _ => ?_
+    refine IntermediateField.mul_mem _ ?_ (IntermediateField.subset_adjoin K _ (by simp))
+    have hsub : ({t'} : Set F) ⊆ ((insert t' (Finset.univ.image fun i => (bE i : F)) :
+        Finset F) : Set F) := by
+      intro y hy; simp at hy ⊢; left; exact hy
+    exact IntermediateField.adjoin.mono K _ _ hsub (hM ▸ (bE.repr ⟨x, hx⟩ i).2)
 
 end ff
 
@@ -212,42 +248,12 @@ theorem isFunctionFieldOver_of_descent (hF : IsFunctionFieldOver L F) : IsFuncti
     have htM : t' ∈ M.toSubfield := IntermediateField.mem_adjoin_simple_self K t'
     have hfin : FiniteDimensional M.toSubfield F :=
       finiteDimensional_of_transcendental' hfgF hKF1 M.toSubfield hKM htM ht'
-    let E₁ : IntermediateField K F := (IsScalarTower.toAlgHom K E F).fieldRange
-    have hME : M ≤ E₁ := by
+    have hME : M ≤ (IsScalarTower.toAlgHom K E F).fieldRange := by
       rw [IntermediateField.adjoin_le_iff]
       rintro _ rfl
       exact ⟨t, rfl⟩
-    let := (IntermediateField.inclusion hME).toRingHom.toAlgebra
-    have hT : IsScalarTower M E₁ F := IsScalarTower.of_algebraMap_eq fun _ => rfl
-    have hfinM : FiniteDimensional M F := hfin
-    have hfinE₁ : FiniteDimensional M E₁ := FiniteDimensional.left M E₁ F
-    have : Module.Free M E₁ := Module.Free.of_divisionRing M E₁
-    let bE := Module.finBasis M E₁
-    refine fg_of_fieldRange (IsScalarTower.toAlgHom K E F) (algebraMap E F).injective
-      ⟨insert t' (Finset.univ.image fun i => (bE i : F)), ?_⟩
-    apply le_antisymm
-    · rw [IntermediateField.adjoin_le_iff]
-      intro y hy
-      simp only [Finset.coe_insert, Finset.coe_image, Finset.coe_univ, Set.image_univ,
-        Set.mem_insert_iff, Set.mem_range] at hy
-      rcases hy with rfl | ⟨i, rfl⟩
-      · exact ⟨t, rfl⟩
-      · exact (bE i).2
-    · intro x hx
-      have hx' : (⟨x, hx⟩ : E₁) = ∑ i, bE.repr ⟨x, hx⟩ i • bE i := (bE.sum_repr _).symm
-      have := congrArg (fun z : E₁ => (z : F)) hx'
-      simp only [IntermediateField.coe_sum] at this
-      rw [this]
-      refine IntermediateField.sum_mem _ fun i _ => ?_
-      refine IntermediateField.mul_mem _ ?_ (IntermediateField.subset_adjoin K _ (by simp))
-      have hm : ((bE.repr ⟨x, hx⟩ i : M) : F) ∈
-          IntermediateField.adjoin K ((insert t' (Finset.univ.image fun i => (bE i : F)) :
-            Finset F) : Set F) := by
-        have hsub : ({t'} : Set F) ⊆ ((insert t' (Finset.univ.image fun i => (bE i : F)) :
-            Finset F) : Set F) := by
-          intro y hy; simp at hy ⊢; left; exact hy
-        exact IntermediateField.adjoin.mono K _ _ hsub (bE.repr ⟨x, hx⟩ i).2
-      exact hm
+    exact fg_of_fieldRange (IsScalarTower.toAlgHom K E F) (algebraMap E F).injective
+      (exists_finset_adjoin_eq_of_adjoin_simple_le t' M _ rfl hME (hfinM := hfin))
   · -- the constant field is `K`
     intro x hx
     have hxF : IsIntegral K (algebraMap E F x) := hx.map (IsScalarTower.toAlgHom K E F)

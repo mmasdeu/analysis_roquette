@@ -322,6 +322,14 @@ theorem exists_prodG {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
 theorem one_add_sub_apply (f : holSubring K) (x : OmegaX K) : 1 + (f - 1).1 x = f.1 x := by
   rw [sub_apply_hol, one_apply_hol]; ring
 
+/-- An algebraic step in the proof of `exists_theta`: cancelling `P` in `M P S = A P W` and
+multiplying by the inverse `M'` of `M`. -/
+private theorem eq_mul_mul_of_cancel_aux {R : Type*} [CommRing R] (P M M' S A W : R)
+    (hMM : M' * M = 1) (hcancel : ∀ x y : R, P * x = P * y → x = y)
+    (key : M * P * S = A * P * W) : S = A * M' * W := by
+  have h : M * S = A * W := hcancel _ _ (by linear_combination key)
+  linear_combination (-S) * hMM + M' * h
+
 theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial K} (hφ : φ.Monic)
     (hc0 : φ.coeff 0 ≠ 0) : ∃ T : holSubring K,
     holScale K (Units.mk0 q hq0)⁻¹ T =
@@ -360,24 +368,24 @@ theorem exists_theta {q : K} (hq0 : q ≠ 0) (hq : ‖q‖ < 1) {φ : Polynomial
       have := tendsto_nhds_unique (h1.congr (fun J => h2 J)) h3
       rw [this]; ring
     have hφne := polyHol_ne_zero_of_monic hφ
+    have hψ0 : psi q φ ((0 : ℕ) : ℤ) = φ := by
+      rw [psi, Nat.cast_zero, zpow_zero, Polynomial.scaleRoots_one]
+    have hψ0' : psi q φ (-((0 : ℕ) : ℤ)) = φ := by
+      rw [Nat.cast_zero, neg_zero, psi, zpow_zero, Polynomial.scaleRoots_one]
+    have hg0 : gcoef q φ 0 = (φ.coeff 0)⁻¹ := by
+      rw [gcoef, Nat.cast_zero, zero_mul, zpow_zero, div_eq_inv_mul, mul_one]
     have hF0 : thF q φ 0 = monoHol K (Omega K) (-(φ.natDegree : ℤ)) * polyHol K (Omega K) φ := by
-      simp [thF, psi, Polynomial.scaleRoots_one]
+      rw [thF, hψ0]
     have hG0 : thG q φ 0 = algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * polyHol K (Omega K) φ := by
-      simp [thG, gcoef, psi, Polynomial.scaleRoots_one]
+      rw [thG, hψ0', hg0]
     have key : thF q φ 0 * holScale K c (PF * PG) = thG q φ 0 * (PF * PG) := by
       refine Subtype.ext (funext fun x => ?_)
       show (thF q φ 0).1 x * ((PF * PG).1 (scalePt K c x)) = (thG q φ 0).1 x * (PF * PG).1 x
       rw [mul_apply_hol, mul_apply_hol, hG, ← hF x]
       ring
     rw [hF0, hG0] at key
-    have key2 : polyHol K (Omega K) φ * (monoHol K (Omega K) (-(φ.natDegree : ℤ)) * holScale K c (PF * PG)) =
-        polyHol K (Omega K) φ * (algebraMap K (holSubring K) (φ.coeff 0)⁻¹ * (PF * PG)) := by
-      linear_combination key
-    have key3 := mul_left_cancel₀ hφne key2
-    have := congrArg (fun y => monoHol K (Omega K) (φ.natDegree : ℤ) * y) key3
-    rw [← mul_assoc, ← monoHol_add, show (φ.natDegree : ℤ) + -(φ.natDegree : ℤ) = 0 by ring,
-      monoHol_zero, one_mul] at this
-    rw [this]; ring
+    refine eq_mul_mul_of_cancel_aux _ _ _ _ _ _ ?_ (fun x y h => mul_left_cancel₀ hφne h) key
+    rw [← monoHol_add, add_neg_cancel, monoHol_zero]
   · intro ξ
     have hPF' : ∀ x : OmegaX K, Tendsto (fun J : ℕ => ∏ j ∈ Finset.range J, (1 + (thF q φ j - 1).1 x))
         atTop (𝓝 (PF.1 x)) := fun x => (hPF x).congr (fun J =>

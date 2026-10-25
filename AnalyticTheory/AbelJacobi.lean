@@ -364,7 +364,6 @@ theorem cor_construct {α : Omega K} (hα : α ≠ 0) {β : Omega K} (hβ : β �
       (anVal_isValuation K α hα).2.2.1, anVal_thM_zpow hq0 hq1 hα _ hα,
       anVal_thM_zpow hq0 hq1 haw _ hα, anVal_thM_zpow hq0 hq1 hau _ hα,
       anVal_thM_zpow hq0 hq1 hav _ hα, ite_eq_left (conjModQ_refl q α), ite_eq_right h1, ite_eq_right h2, ite_eq_right h3]
-    norm_cast
     simp
   · intro hαβ
     have h1 : ¬ ConjModQ K q (algebraMap K (Omega K) w) β := fun h =>
@@ -377,7 +376,6 @@ theorem cor_construct {α : Omega K} (hα : α ≠ 0) {β : Omega K} (hβ : β �
       (anVal_isValuation K β hβ).2.2.1, anVal_thM_zpow hq0 hq1 hα _ hβ,
       anVal_thM_zpow hq0 hq1 haw _ hβ, anVal_thM_zpow hq0 hq1 hau _ hβ,
       anVal_thM_zpow hq0 hq1 hav _ hβ, ite_eq_right hαβ, ite_eq_right h1, ite_eq_right h2, ite_eq_right h3]
-    norm_cast
     simp
 
 end cor
@@ -610,9 +608,11 @@ variable {q : K} (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1) {m : Omega K → ℤ} (
 noncomputable def solToL :
     solSpace q (norm_pos_iff.mp hq0) (aTheta hq0 hq1 hm)⁻¹ (dTheta hq0 hq1 hm) →ₗ[K] MeroRing K where
   toFun G := algebraMap (holSubring K) (MeroRing K) (G : holSubring K) * (thetaDiv hq0 hq1 hm)⁻¹
-  map_add' G H := by simp only [Submodule.coe_add, map_add, add_mul]
+  map_add' G H := by
+    simp only [Submodule.coe_add, RingHom.map_add, add_mul]
   map_smul' c G := by
-    simp only [Submodule.coe_smul, Algebra.smul_def, map_mul, RingHom.id_apply, algebraMap_hol_mero]
+    simp only [Submodule.coe_smul, Algebra.smul_def, RingHom.map_mul, RingHom.id_apply,
+      algebraMap_hol_mero]
     ring
 
 theorem solToL_injective : Function.Injective (solToL hq0 hq1 hm) := by
@@ -715,7 +715,7 @@ theorem riemann_roch_analytic (q : K) (hq0 : 0 < ‖q‖) (hq1 : ‖q‖ < 1)
         have : (G : holSubring K) ∈ (⊥ : Submodule K (holSubring K)) := by rw [← hb]; exact G.2
         exact (Submodule.mem_bot K).mp this
       have hG0 : G = 0 := Subtype.ext h1
-      rw [hG0, map_zero]
+      rw [hG0, LinearMap.map_zero]
     · rintro rfl; exact Submodule.zero_mem _
   obtain ⟨hx, hPhi⟩ := PhiQ_eq_mk hq0 hq1 hm hq0'
   refine ⟨fun h => hbot (solSpace_eq_bot_of_neg hq0 hq1 hκ (by rw [← hdeg]; exact h)),

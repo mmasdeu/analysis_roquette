@@ -660,7 +660,7 @@ theorem extend_Ezeta (ζ ζ' : CocycleModQ K L q)
     rw [hmap]
     have := minpoly.aeval (Ezeta q ζ') a
     rw [minpoly_Ezeta q hq0 ζ' hα] at this
-    rw [map_mul, this, zero_mul]
+    rw [Polynomial.aeval_mul, this, zero_mul]
   obtain ⟨Φ, hΦe, hΦa⟩ := Subfield.exists_ringEquiv_extend (Ezeta q ζ) (Ezeta q ζ') φ.toRingEquiv a
     (Ezeta_adjoin q hq0 ζ hα) (Ezeta_adjoin q hq0 ζ' hα) hmin
   refine ⟨AlgEquiv.ofRingEquiv (f := Φ) (fun l => ?_), hΦe⟩
@@ -673,9 +673,9 @@ theorem extend_Ezeta (ζ ζ' : CocycleModQ K L q)
     rw [h1, hΦe]
     show ((φ (algebraMap K (Ezeta q ζ) c) : Ezeta q ζ') : F) = _
     rw [φ.commutes]; rfl
-  | add x y _ _ hx hy => rw [map_add, map_add, hx, hy]
+  | add x y _ _ hx hy => rw [RingHom.map_add, RingEquiv.map_add, hx, hy]
   | inv x _ hx => rw [map_inv₀, map_inv₀, hx]
-  | mul x y _ _ hx hy => rw [map_mul, map_mul, hx, hy]
+  | mul x y _ _ hx hy => rw [RingHom.map_mul, RingEquiv.map_mul, hx, hy]
 
 end minpolyE
 
@@ -735,8 +735,8 @@ theorem iso_of_conj (ζ ζ' : CocycleModQ K L q) (Ψ : FqSub L (algebraMap K L q
       invFun := fun g => ⟨Ψ.symm g, hmem' g g.2⟩
       left_inv := fun f => Subtype.ext (Ψ.symm_apply_apply f)
       right_inv := fun g => Subtype.ext (Ψ.apply_symm_apply g)
-      map_mul' := fun f g => Subtype.ext (map_mul Ψ _ _)
-      map_add' := fun f g => Subtype.ext (map_add Ψ _ _)
+      map_mul' := fun f g => Subtype.ext (Ψ.map_mul _ _)
+      map_add' := fun f g => Subtype.ext (Ψ.map_add _ _)
       commutes' := fun c => Subtype.ext (Ψ.commutes (algebraMap K L c)) }⟩
 
 end isoconj
