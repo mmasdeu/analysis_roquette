@@ -1,24 +1,19 @@
-/* Companion book: folding of the Lean layer (see fold.js). */
+/* Companion book: foldable Lean layer (see fold.js).
+   Folded: a one-line bar under the paragraph.  Unfolded: as in the companion to Analysis I, i.e. a
+   plain label (the Lean docstring) followed by the declaration in an ordinary code block. */
 
 :root {
   --lean-accent: #5b6ee1;
-  --lean-accent-soft: rgba(91, 110, 225, 0.10);
-  --lean-panel-shadow: rgba(0, 0, 0, 0.18);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --lean-accent: #8f9cf0;
-    --lean-accent-soft: rgba(143, 156, 240, 0.14);
-    --lean-panel-shadow: rgba(0, 0, 0, 0.5);
-  }
+  :root { --lean-accent: #8f9cf0; }
 }
 
 .lean-emptied { display: none !important; }
 
-/* ---------- formal units (common) ---------- */
-details.lean-unit {
-  margin: 0 0 1.25rem 0;
-}
+details.lean-unit { margin: 0 0 1.25rem 0; }
+
+/* the bar */
 details.lean-unit > summary {
   list-style: none;
   cursor: pointer;
@@ -44,6 +39,11 @@ details.lean-unit > summary::before {
 }
 details.lean-unit[open] > summary::before { transform: rotate(90deg); }
 details.lean-unit > summary:hover { border-color: var(--lean-accent); color: var(--verso-text-color); }
+details.lean-unit[open] > summary {
+  border-color: transparent;
+  background: transparent;
+  padding-left: 0;
+}
 .lean-unit-label {
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -57,19 +57,39 @@ details.lean-unit > summary:hover { border-color: var(--lean-accent); color: var
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.lean-unit-body { margin-top: 0.6rem; }
-.lean-unit-body > blockquote {
-  font-family: var(--verso-text-font-family);
-  font-size: 0.92rem;
-  color: var(--verso-blockquote-color);
-  border-left: 3px solid var(--lean-accent);
-  padding: 0.1rem 0 0.1rem 0.8rem;
-  margin: 0 0 0.6rem 0;
-  max-width: var(--verso-prose-max-width);
-}
-.lean-unit-body > .code-box { margin-bottom: 0.75rem; }
 
-/* ---------- title-bar tools ---------- */
+/* unfolded: label text, then code */
+.lean-unit-body { margin-top: 0.35rem; }
+.lean-unit-body > blockquote {
+  margin: 0 0 0.5rem 0;
+  padding: 0;
+  border: none;
+  max-width: var(--verso-prose-max-width);
+  font-family: var(--verso-text-font-family);
+  font-size: 1rem;
+  line-height: 1.7;
+  font-style: normal;
+  color: var(--verso-text-color);
+}
+.lean-unit-body > blockquote p { margin: 0 0 0.4rem 0; }
+.lean-unit-body > .code-box { margin-bottom: 0.9rem; }
+
+/* `#stmt` boxes: hide the command line, keep the printed statement as the code */
+.code-box.stmt-box > code.hl.lean.block { display: none; }
+.code-box.stmt-box > pre.hl.lean.lean-output {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--verso-text-color);
+  font-family: var(--verso-code-font-family);
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre-wrap;
+}
+.code-box.stmt-box > pre.hl.lean.lean-output + pre.hl.lean.lean-output { margin-top: 0.5rem; }
+
+/* title-bar tools */
 .lean-tools {
   display: flex;
   gap: 0.5rem;
@@ -78,7 +98,7 @@ details.lean-unit > summary:hover { border-color: var(--lean-accent); color: var
   font-family: var(--verso-text-font-family);
   font-size: 0.8rem;
 }
-.lean-tools button, .lean-switch {
+.lean-tools button {
   border: 1px solid var(--verso-border-color);
   background: var(--verso-surface-color);
   color: var(--verso-text-color);
@@ -87,130 +107,5 @@ details.lean-unit > summary:hover { border-color: var(--lean-accent); color: var
   cursor: pointer;
   font: inherit;
 }
-.lean-tools button:hover, .lean-switch:hover { border-color: var(--lean-accent); }
-.lean-switch input { accent-color: var(--lean-accent); vertical-align: -2px; }
-
-/* ---------- A: inline folds ---------- */
-/* (the common styles above) */
-
-/* ---------- B: text-only switch ---------- */
-body[data-layout="switch"] details.lean-unit > summary { display: none; }
-body[data-layout="switch"] .lean-unit-body { margin-top: 0; }
-body.lean-hidden details.lean-unit,
-body.lean-hidden .lean-marker { display: none !important; }
-
-/* ---------- C: margin cards ---------- */
-@media (min-width: 1200px) {
-  body[data-layout="margin"] { --lean-margin-w: 15rem; }
-  body[data-layout="margin"] .code-content > .verso-text.mod-doc {
-    max-width: min(var(--verso-prose-max-width), calc(100% - var(--lean-margin-w) - 2rem));
-  }
-  body[data-layout="margin"] details.lean-unit.in-margin {
-    float: right;
-    clear: right;
-    width: var(--lean-margin-w);
-    margin: 0.15rem calc(-1 * var(--lean-margin-w) - 2rem) 0.6rem 0;
-    font-size: 1rem;
-  }
-  body[data-layout="margin"] details.lean-unit.in-margin > summary {
-    display: flex;
-    border-radius: 0.4rem;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  body[data-layout="margin"] details.lean-unit.in-margin .lean-unit-names { white-space: normal; }
-  body[data-layout="margin"] .code-content > details.lean-unit[open] {
-    border-left: 3px solid var(--lean-accent);
-    padding-left: 0.9rem;
-  }
-}
-
-/* ---------- D: side-panel notes ---------- */
-body[data-layout="notes"] .code-content > details.lean-unit { display: none; }
-.lean-marker {
-  display: inline-block;
-  vertical-align: 0.15em;
-  margin-left: 0.15rem;
-  padding: 0 0.4rem;
-  border: 1px solid var(--lean-accent);
-  border-radius: 0.3rem;
-  background: transparent;
-  color: var(--lean-accent);
-  font-family: var(--verso-text-font-family);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  line-height: 1.5;
-  cursor: pointer;
-}
-.lean-marker:hover, .lean-marker.active { background: var(--lean-accent); color: var(--verso-background-color); }
-.lean-marker-row { margin: 0 0 1rem 0; }
-.lean-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  width: min(46rem, 92vw);
-  box-sizing: border-box;
-  background: var(--verso-background-color);
-  border-left: 1px solid var(--verso-border-color);
-  box-shadow: -8px 0 24px var(--lean-panel-shadow);
-  transform: translateX(105%);
-  transition: transform 0.2s ease;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
-.lean-panel.open { transform: none; }
-.lean-panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem 1.2rem;
-  border-bottom: 1px solid var(--verso-border-color);
-  font-family: var(--verso-code-font-family);
-  font-size: 0.85rem;
-  color: var(--verso-muted-color);
-}
-.lean-panel-close {
-  border: none;
-  background: transparent;
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--verso-muted-color);
-}
-.lean-panel-content { overflow-y: auto; padding: 1rem 1.2rem; }
-.lean-panel-content .lean-unit-body { margin-top: 0; }
-
-/* ---------- prototype switcher ---------- */
-.layout-switcher {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 1100;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.6rem 0.7rem;
-  background: var(--verso-surface-color);
-  border: 1px solid var(--verso-border-color);
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 14px var(--lean-panel-shadow);
-  font-family: var(--verso-text-font-family);
-  font-size: 0.78rem;
-}
-.layout-switcher-title {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.66rem;
-  color: var(--verso-muted-color);
-  margin-bottom: 0.2rem;
-}
-.layout-switcher a { text-decoration: none; color: var(--verso-text-color); padding: 0.1rem 0.3rem; border-radius: 0.25rem; }
-.layout-switcher a:visited { color: var(--verso-text-color); }
-.layout-switcher a:hover { background: var(--lean-accent-soft); }
-.layout-switcher a.current { background: var(--lean-accent); color: var(--verso-background-color); }
-@media print { .layout-switcher, .lean-tools, .lean-marker { display: none !important; } }
+.lean-tools button:hover { border-color: var(--lean-accent); }
+@media print { .lean-tools { display: none !important; } }

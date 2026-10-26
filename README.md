@@ -47,8 +47,10 @@ paragraph headed _Formalization note._ explains how and why. Appendix B (`Book/N
 lists everything that is not formalized, with the reasons, and shows the statements of the twelve
 unproved results. Weierstraß equations use Tate's (Mathlib's) notation `a₁, …, a₆, b₂, …, c₄, c₆`
 throughout; the §A1 chapter has a remark on the book's different notation. The Lean layer of the
-pages can be folded away (`book-assets/fold.js`, `fold.css`, loaded through `extra_js`/`extra_css`
-in `literate.toml`). The site is configured by `literate.toml`.
+pages is folded into one-line bars (`book-assets/fold.js`, `fold.css`, loaded through
+`extra_js`/`extra_css` in `literate.toml`; "Expand all Lean" / "Fold all Lean" in the title bar).
+Unfolded, a statement looks as in the companion to Analysis I: the Lean docstring as a plain label,
+then the declaration in a code block. The site is configured by `literate.toml`.
 
 ```
 ./build-book.sh                  # builds the pages, prints the output directory
