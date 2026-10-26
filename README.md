@@ -46,11 +46,11 @@ dependencies are free of `sorry`). Where a formal statement differs from the pri
 paragraph headed _Formalization note._ explains how and why. Appendix B (`Book/NotFormalized.lean`)
 lists everything that is not formalized, with the reasons, and shows the statements of the twelve
 unproved results. Weierstraß equations use Tate's (Mathlib's) notation `a₁, …, a₆, b₂, …, c₄, c₆`
-throughout; the §A1 chapter has a remark on the book's different notation. The Lean layer of the
-pages is folded into one-line bars (`book-assets/fold.js`, `fold.css`, loaded through
-`extra_js`/`extra_css` in `literate.toml`; "Expand all Lean" / "Fold all Lean" in the title bar).
-Unfolded, a statement looks as in the companion to Analysis I: the Lean docstring as a plain label,
-then the declaration in a code block. The site is configured by `literate.toml`.
+throughout; the §A1 chapter has a remark on the book's different notation. Each statement is printed by `#stmt name` (`Book/Stmt.lean`) as Lean code with
+hover-linked identifiers (the signature `theorem name (binders) : statement`, without the standing
+assumptions on `K`; for definitions the body is appended), followed by the Lean docstring as
+ordinary text, as in the companion to Analysis I. `book-assets/book.css` only hides the `#stmt`
+command line itself. The site is configured by `literate.toml`.
 
 ```
 ./build-book.sh                  # builds the pages, prints the output directory

@@ -42,11 +42,14 @@ This condition means that $`\bar q` has finite order $`\bmod^\times q`.
 
 _Formalization note._ The normalization $`0 < |\bar q| < 1` is not part of the predicate
 `Commensurable`; it appears as separate hypotheses in every statement that needs it.
-
-> Book, §6, (71): `q̄ ∈ K` (`0 < |q̄| < 1`) is *commensurable* with `q` if `q̄^d = q^m` for some nonzero integers `d, m`.
 -/
 
 #stmt Commensurable
+
+/-!
+
+> Book, §6, (71): `q̄ ∈ K` (`0 < |q̄| < 1`) is *commensurable* with `q` if `q̄^d = q^m` for some nonzero integers `d, m`.
+-/
 
 /-!
 
@@ -63,18 +66,22 @@ defined on holomorphic functions, on their Laurent coefficients:
 $`\sum a_n X^n \mapsto \sum a_n X^{mn}`. This is a general construction of the
 library `EntireLaurent`, together with the decomposition of an arbitrary holomorphic function as
 $`f = \sum_{0 \le i < m} X^{-i} g_i(X^m)`.
-
-> The substitution `f(X) ↦ f(Xᵐ)` (`m ≠ 0`) as a ring endomorphism of `holSubring K L`.
 -/
 
 #stmt holExpand
 
 /-!
 
-> `H_L = ⊕ bᵢ H_K`.
+> The substitution `f(X) ↦ f(Xᵐ)` (`m ≠ 0`) as a ring endomorphism of `holSubring K L`.
 -/
 
+
 #stmt EntireLaurent.hol_decomp
+
+/-!
+
+> `H_L = ⊕ bᵢ H_K`.
+-/
 
 /-!
 
@@ -82,41 +89,50 @@ It extends to the field of fractions $`M_K`, and it is the unique endomorphism o
 as the substitution on $`H_K`. The library's `substPow` is defined by Hilbert's choice operator as
 an endomorphism with this property, and `substPow_eq` identifies it, for $`m \ne 0`, with the
 explicit extension `meroSubst` (for $`m = 0` it is unspecified).
-
-> Book, §6: `μ` is the substitution `X ↦ Xᵐ` on `M_K`: it maps the holomorphic function `g` to the holomorphic function `g(Xᵐ)`.
 -/
 
 #stmt IsSubstPow
 
 /-!
 
+> Book, §6: `μ` is the substitution `X ↦ Xᵐ` on `M_K`: it maps the holomorphic function `g` to the holomorphic function `g(Xᵐ)`.
+-/
+
+
+#stmt substPow
+
+/-!
+
 > Book, §6: the substitution `μ_m : f(X) ↦ f(Xᵐ)` as an endomorphism of `M_K`.
 -/
 
-#stmt substPow
+
+#stmt meroSubst
 
 /-!
 
 > `μ_m` on `M_K`: the extension of `holSubst` to the field of fractions.
 -/
 
-#stmt meroSubst
+
+#stmt substPow_eq
 
 /-!
 
 > For `m ≠ 0`, `substPow K m` is the substitution `μ_m` (it is uniquely characterised by its action on `H_K`).
 -/
 
-#stmt substPow_eq
-
 /-!
 
 The substitution intertwines the translations: $`\mu_m \circ \tau_{a^m} = \tau_a \circ \mu_m`.
-
-> `μ_m ∘ τ_{aᵐ} = τ_a ∘ μ_m`.
 -/
 
 #stmt substPow_translation
+
+/-!
+
+> `μ_m ∘ τ_{aᵐ} = τ_a ∘ μ_m`.
+-/
 
 /-!
 
@@ -134,11 +150,14 @@ of $`q \bmod^\times \bar q`, as in (72). The formal condition `OrderDvd` is exac
 ($`q^m = \bar q^{\,d}` for some $`d \in \mathbb Z`), and the inclusion `fq_qbar_Xm_subset` assumes
 it; the condition is also necessary, since $`\tau_u` fixes $`F_K(\bar q)` only for
 $`u \in \bar q^{\mathbb Z}`.
-
-> Book, §6: `m` is divisible by the order of `q mod^× q̄`, i.e. `q^m` is a power of `q̄`.
 -/
 
 #stmt OrderDvd
+
+/-!
+
+> Book, §6: `m` is divisible by the order of `q mod^× q̄`, i.e. `q^m` is a power of `q̄`.
+-/
 
 /-!
 
@@ -158,25 +177,30 @@ where $`\varepsilon\colon \bar f(X) \mapsto \bar f(X^{-1})` is the reflection au
 $`F_K(\bar q\,|\,X)` as defined in §3. This shows that
 $`F_K(\bar q\,|\,X^{-m}) = F_K(\bar q\,|\,X^m)`. Hence, in order to study the elliptic fields
 $`F_K(\bar q\,|\,X^m)` we may assume $`m > 0`.
-
-> Book, §6, (72): the image field `F_K(q̄ | Xᵐ)` of `μ_m : F_K(q̄) → M_K`.
 -/
 
 #stmt FqbarXm
 
 /-!
 
-> Book, §6, (73): `μ_{-m} = μ_m ε` with `ε` the reflection.
+> Book, §6, (72): the image field `F_K(q̄ | Xᵐ)` of `μ_m : F_K(q̄) → M_K`.
 -/
+
 
 #stmt substPow_neg
 
 /-!
 
-> Book, §6, (72)–(73): `F_K(q̄ | Xᵐ) ⊆ F_K(q)` whenever `q̄` is commensurable with `q` and `m ≠ 0` is divisible by the order of `q mod^× q̄`; moreover `F_K(q̄|X⁻ᵐ) = F_K(q̄|Xᵐ)`.
+> Book, §6, (73): `μ_{-m} = μ_m ε` with `ε` the reflection.
 -/
 
+
 #stmt fq_qbar_Xm_subset
+
+/-!
+
+> Book, §6, (72)–(73): `F_K(q̄ | Xᵐ) ⊆ F_K(q)` whenever `q̄` is commensurable with `q` and `m ≠ 0` is divisible by the order of `q mod^× q̄`; moreover `F_K(q̄|X⁻ᵐ) = F_K(q̄|Xᵐ)`.
+-/
 
 /-!
 
@@ -185,46 +209,54 @@ extensions); the formalization uses the following notions of degree, separabilit
 group for a pair of subfields $`E \le F` of a field $`M`. The degree `relDeg` is $`0` if
 $`E \not\le F` and (being a `Module.finrank`) also if $`F\,|\,E` is infinite; the degree of
 inseparability `relInsepDeg` is the degree of $`F` over the separable closure of $`E` in $`F`.
-
-> The degree `[F : E]` of subfields `E ≤ F` of `M` (and `0` if `E ≰ F`).
 -/
 
 #stmt relDeg
 
 /-!
 
+> The degree `[F : E]` of subfields `E ≤ F` of `M` (and `0` if `E ≰ F`).
+-/
+
+
+#stmt relInsepDeg
+
+/-!
+
 > The degree of inseparability of `F | E`.
 -/
 
-#stmt relInsepDeg
+
+#stmt IsRelSeparable
 
 /-!
 
 > `F | E` is a separable extension.
 -/
 
-#stmt IsRelSeparable
+
+#stmt IsRelPurelyInseparable
 
 /-!
 
 > `F | E` is purely inseparable.
 -/
 
-#stmt IsRelPurelyInseparable
+
+#stmt IsRelGalois
 
 /-!
 
 > `F | E` is a Galois extension.
 -/
 
-#stmt IsRelGalois
+
+#stmt autFixing
 
 /-!
 
 > The group of automorphisms of `F` fixing `E` pointwise.
 -/
-
-#stmt autFixing
 
 /-!
 
@@ -256,39 +288,46 @@ $`0`), and "maximal separable intermediate field" is expressed by: $`F_K(q^{p^r}
 separable over $`F_K(\bar q\,|\,X^m)` and $`F_K(q)` is purely inseparable over it. In (iv), "$`K`
 contains the $`m`-th roots of unity" is expressed by a primitive $`m`-th root of unity in $`K`
 (equivalent when $`p \nmid m`).
-
-> Book, §6, Theorem XVII (i): for `m > 0` a multiple of the order of `q mod^× q̄` (so that `q̄^d = q^m` with `d > 0`), `[F_K(q) : F_K(q̄|Xᵐ)] = dm`.
 -/
 
 #stmt thmXVII_degree
 
 /-!
 
+> Book, §6, Theorem XVII (i): for `m > 0` a multiple of the order of `q mod^× q̄` (so that `q̄^d = q^m` with `d > 0`), `[F_K(q) : F_K(q̄|Xᵐ)] = dm`.
+-/
+
+
+#stmt thmXVII_inseparability
+
+/-!
+
 > Book, §6, Theorem XVII (ii): the degree of inseparability of `F_K(q) | F_K(q̄|Xᵐ)` is the largest power `p^r` of the characteristic dividing `m`, with maximal separable subextension `F_K(q^{p^r} | X^{p^r})`.
 -/
 
-#stmt thmXVII_inseparability
+
+#stmt Usub
 
 /-!
 
 > The subgroup `U ⊂ K^×` of elements `u` with `u^m ≡ 1 mod^× q̄`.
 -/
 
-#stmt Usub
+
+#stmt thmXVII_automorphisms
 
 /-!
 
 > Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are the translations `τ_u`, `u ∈ U`, and the automorphism group is `U/q`. (The book writes `u^m ≡ 1 mod^× q`; the proof and Corollary XIXa show that `q̄` is meant.)
 -/
 
-#stmt thmXVII_automorphisms
+
+#stmt thmXVII_galois
 
 /-!
 
 > Book, §6, Theorem XVII (iv): `F_K(q)` is Galois over `F_K(q̄|Xᵐ)` iff `p ∤ m`, `K` contains the `m`-th roots of unity, and `q̄` is an `m`-th power in `K`.
 -/
-
-#stmt thmXVII_galois
 
 /-!
 
@@ -323,25 +362,30 @@ $`F_K(q^m\,|\,X)` the translation $`\tau_{\bar q}` has order $`d` since $`\bar q
 $`\bmod^\times q^m` in view of (71). From Galois theory we conclude therefore that
 
 $$`\text{the extension (75) is cyclic of degree } d. \qquad (76)`
-
-> `τ_{q̄}` as an automorphism of `F_K(Q)`.
 -/
 
 #stmt tauBar
 
 /-!
 
-> Book, §6, (76): `τ_{q̄}` has order `d` as an automorphism of `F_K(Q)` when `q̄ᵈ = Q`.
+> `τ_{q̄}` as an automorphism of `F_K(Q)`.
 -/
+
 
 #stmt orderOf_tauBar
 
 /-!
 
-> `[F_K(Q) : F_K(q̄)] = d` for `q̄ᵈ = Q`: the extension is cyclic, generated by `τ_{q̄}`.
+> Book, §6, (76): `τ_{q̄}` has order `d` as an automorphism of `F_K(Q)` when `q̄ᵈ = Q`.
 -/
 
+
 #stmt relDeg_FqSub_bar
+
+/-!
+
+> `[F_K(Q) : F_K(q̄)] = d` for `q̄ᵈ = Q`: the extension is cyclic, generated by `τ_{q̄}`.
+-/
 
 /-!
 
@@ -355,18 +399,22 @@ $$`u_i(q\,|\,X) = X^{-i}\frac{\Theta(q^m\,|\,q^{-i}X^m)}{\Theta(q^m\,|\,X^m)} \q
 satisfy the functional equation
 $`u_i(q\,|\,q^{-1}X) = q^i\,\frac{-q^{-i}X^m}{-X^m}\,u_i(q\,|\,X) = u_i(q\,|\,X)`. That is,
 $`u_i(q\,|\,X) \in F_K(q\,|\,X)`.
-
-> `uᵢ = X⁻ⁱ μ_m(Θ(q^{-i}Xᵐ)/Θ(Xᵐ))`, `Θ` of period `qᵐ` (book, (77)).
 -/
 
 #stmt uq
 
 /-!
 
-> Book, §6, (77): the functions `uᵢ` are `q`-periodic.
+> `uᵢ = X⁻ⁱ μ_m(Θ(q^{-i}Xᵐ)/Θ(Xᵐ))`, `Θ` of period `qᵐ` (book, (77)).
 -/
 
+
 #stmt uq_mem
+
+/-!
+
+> Book, §6, (77): the functions `uᵢ` are `q`-periodic.
+-/
 
 /-!
 
@@ -374,32 +422,38 @@ On the other hand, the $`u_i` form a basis of $`M_K(X)` over $`M_K(X^m)`. For, t
 from the $`X^{-i}` by multiplication with elements in $`M_K(X^m)`, and the $`X^{-i}`
 ($`0 \le i < m`) obviously form a basis of $`H_K(X)` over $`H_K(X^m)`, hence also of $`M_K(X)` over
 $`M_K(X^m)`.
-
-> `μ_m(M_K)`, the meromorphic functions of `Xᵐ`.
 -/
 
 #stmt Sm
 
 /-!
 
+> `μ_m(M_K)`, the meromorphic functions of `Xᵐ`.
+-/
+
+
+#stmt basisTX
+
+/-!
+
 > The basis `1, X⁻¹, …, X^{-(m-1)}` of `M_K` over `μ_m(M_K)`.
 -/
 
-#stmt basisTX
+
+#stmt finrank_Sm
 
 /-!
 
 > `[M_K : μ_m(M_K)] = m`.
 -/
 
-#stmt finrank_Sm
+
+#stmt uq_linearIndependent
 
 /-!
 
 > Book, §6, (77): the functions `u₀, …, u_{m−1}` are linearly independent over `μ_m(M_K)`.
 -/
-
-#stmt uq_linearIndependent
 
 /-!
 
@@ -415,25 +469,30 @@ $$`M_K(X^m) \cap F_K(q\,|\,X) = F_K(q^m\,|\,X^m). \qquad (78)`
 
 _Formalization note._ Only the inclusion $`\subset` of (78) is stated as a separate result
 (`mem_FqbarXm_of_mem_Sm` below, for every $`n > 0`); the reverse inclusion is immediate from (72).
-
-> `[F_K(q) : F_K(qᵐ | Xᵐ)] = m` (book, (77)–(78)).
 -/
 
 #stmt relDeg_upper
 
 /-!
 
-> Formula (78): `μ_n(M_K) ∩ F_K(q) ⊆ F_K(qⁿ | Xⁿ)`.
+> `[F_K(q) : F_K(qᵐ | Xᵐ)] = m` (book, (77)–(78)).
 -/
+
 
 #stmt mem_FqbarXm_of_mem_Sm
 
 /-!
 
-> **Theorem XVII (i)**: for `q̄ᵈ = qᵐ` (`d, m > 0`), `[F_K(q) : F_K(q̄ | Xᵐ)] = d m`.
+> Formula (78): `μ_n(M_K) ∩ F_K(q) ⊆ F_K(qⁿ | Xⁿ)`.
 -/
 
+
 #stmt relDeg_FqbarXm
+
+/-!
+
+> **Theorem XVII (i)**: for `q̄ᵈ = qᵐ` (`d, m > 0`), `[F_K(q) : F_K(q̄ | Xᵐ)] = d m`.
+-/
 
 /-!
 
@@ -450,25 +509,30 @@ $$`F_K(q^m\,|\,X^m) \subset F_K(q^{p^r}\,|\,X^{p^r}) \subset F_K(q\,|\,X)`
 and from what we have said above, the upper extension is purely inseparable of degree $`p^r` while
 the lower extension is separable of degree $`m/p^r`. As to the extension
 $`F_K(\bar q\,|\,X^m) \subset F_K(q^m\,|\,X^m)`, this is separable in view of (76).
-
-> `F_K(q)` is separable over `F_K(qⁿ | Xⁿ)` when `n ≠ 0` in `K`.
 -/
 
 #stmt isRelSeparable_upper
 
 /-!
 
-> In characteristic `p`, `F_K(q)` is purely inseparable over `F_K(q^{pᵛ} | X^{pᵛ})`.
+> `F_K(q)` is separable over `F_K(qⁿ | Xⁿ)` when `n ≠ 0` in `K`.
 -/
+
 
 #stmt isRelPurelyInseparable_upper
 
 /-!
 
-> `F_K(Q) | F_K(q̄)` is Galois, hence separable.
+> In characteristic `p`, `F_K(q)` is purely inseparable over `F_K(q^{pᵛ} | X^{pᵛ})`.
 -/
 
+
 #stmt isRelSeparable_FqSub_bar
+
+/-!
+
+> `F_K(Q) | F_K(q̄)` is Galois, hence separable.
+-/
 
 /-!
 
@@ -489,49 +553,59 @@ $`F_K(q)` over $`K` are known: they are the translations $`\tau_a` and the refle
 $`\tau_a\varepsilon` (this rests on Lemma A of the appendix and on the homogeneity of $`F_K(q)`).
 A translation $`\tau_u` fixes $`F_K(\bar q\,|\,X^m)` exactly when $`u \in U`, and a reflected
 translation never does.
-
-> `Aut(F_L(q) | L) = T ∪ T ε`.
 -/
 
 #stmt aut_structure
 
 /-!
 
+> `Aut(F_L(q) | L) = T ∪ T ε`.
+-/
+
+
+#stmt translation_fixes_iff
+
+/-!
+
 > `τ_u` fixes `F_K(q̄ | Xᵐ)` iff `u ∈ U`, i.e. `uᵐ ∈ q̄^ℤ`.
 -/
 
-#stmt translation_fixes_iff
+
+#stmt not_translation_refl_fixes
 
 /-!
 
 > A reflected translation `τ_a ε` never fixes `F_K(q̄ | Xᵐ)`.
 -/
 
-#stmt not_translation_refl_fixes
+
+#stmt mem_autFixing_iff
 
 /-!
 
 > Book, §6, Theorem XVII (iii): the automorphisms of `F_K(q)` over `F_K(q̄|Xᵐ)` are exactly the translations `τ_u` with `u ∈ U`.
 -/
 
-#stmt mem_autFixing_iff
-
 /-!
 
 The map $`u \mapsto \tau_u` is therefore a surjective homomorphism from $`U` onto the
 automorphism group, with kernel the subgroup generated by $`q`.
-
-> `u ↦ τ_u`, `U → Aut(F_K(q) | F_K(q̄|Xᵐ))`.
 -/
 
 #stmt translationHom
 
 /-!
 
-> The kernel of `u ↦ τ_u` on `U` is the subgroup generated by `q`.
+> `u ↦ τ_u`, `U → Aut(F_K(q) | F_K(q̄|Xᵐ))`.
 -/
 
+
 #stmt translationHom_ker
+
+/-!
+
+> The kernel of `u ↦ τ_u` on `U` is the subgroup generated by `q`.
+-/
 
 /-!
 
@@ -547,25 +621,30 @@ $`K` and that the $`m`-th roots of unity are in $`K`. ∎
 _Formalization note._ In the formalization the count is organised through the homomorphism $`\psi\colon U \to \mathbb{Z}`
 defined by $`u^m = \bar q^{\,\psi(u)}`, whose kernel is the group of $`m`-th roots of unity in
 $`K`; this gives $`|U/q| \cdot [\mathbb{Z} : \psi(U)] = |\mu_m(K)| \cdot d`.
-
-> `ψ : U → ℤ`, `uᵐ = q̄^{ψ(u)}`.
 -/
 
 #stmt psiHom
 
 /-!
 
-> `|U/⟨q⟩| · [ℤ : ψ(U)] = |μ_m(K)| · d`.
+> `ψ : U → ℤ`, `uᵐ = q̄^{ψ(u)}`.
 -/
+
 
 #stmt card_quot_mul_index
 
 /-!
 
-> `ψ(U) = ℤ` iff `q̄` is an `m`-th power in `K`.
+> `|U/⟨q⟩| · [ℤ : ψ(U)] = |μ_m(K)| · d`.
 -/
 
+
 #stmt range_psiHom_eq_top_iff
+
+/-!
+
+> `ψ(U) = ℤ` iff `q̄` is an `m`-th power in `K`.
+-/
 
 /-!
 ## Isogenies between the fields of periodic functions

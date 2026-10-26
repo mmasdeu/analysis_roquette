@@ -28,18 +28,22 @@ elliptic fields).
 Let $`F\,|\,K` be an elliptic function field having a prime divisor $`\mathfrak{p}` of degree
 $`1`. By the Riemann–Roch theorem, there exists an element $`x \in F` having $`2\mathfrak{p}` as
 its pole divisor, and an element $`y \in F` having $`3\mathfrak{p}` as its pole divisor.
-
-> `L(n𝔭)`.
 -/
 
 #stmt Ln
 
 /-!
 
-> Riemann–Roch for an elliptic function field: `dim L(n𝔭) = n` for a prime divisor `𝔭` of degree `1` and `n ≥ 1`.
+> `L(n𝔭)`.
 -/
 
+
 #stmt finrank_Ln_nat
+
+/-!
+
+> Riemann–Roch for an elliptic function field: `dim L(n𝔭) = n` for a prime divisor `𝔭` of degree `1` and `n ≥ 1`.
+-/
 
 /-!
 
@@ -66,11 +70,14 @@ with coefficients in $`K` and $`\alpha, \beta \ne 0`. Since $`a_0 \ne 0`, we may
 substitution $`x \mapsto a_0x`, $`y \mapsto a_0y` and thus assume that $`a_0 = 1`:
 
 $$`y^2 + (a_1x+a_3)y = x^3 + a_2x^2 + a_4x + a_6. \qquad (A1.26)`
-
-> Book, §A1, equation (A1.1)/(A1.26) (with `a₀ = 1`), in Mathlib's notation: `y² + (a₁x + a₃)y = x³ + a₂x² + a₄x + a₆`. The book writes `u, v, a₁, a₂, a₃` for `a₁, a₃, a₂, a₄, a₆`; the arguments are in the order in which they occur in the equation.
 -/
 
 #stmt IsNormalFormA1
+
+/-!
+
+> Book, §A1, equation (A1.1)/(A1.26) (with `a₀ = 1`), in Mathlib's notation: `y² + (a₁x + a₃)y = x³ + a₂x² + a₄x + a₆`. The book writes `u, v, a₁, a₂, a₃` for `a₁, a₃, a₂, a₄, a₆`; the arguments are in the order in which they occur in the equation.
+-/
 
 /-!
 
@@ -81,11 +88,14 @@ conditions which the book derives: $`F = K(x, y)` and non-vanishing discriminant
 $`\Delta \ne 0`. The first is proved below in every characteristic, the second only for
 $`\operatorname{char}(K) \ne 2, 3`; so in characteristic $`2` and $`3` the existence of a datum is
 open, and the results below that need one assume it.
-
-> Book, §A1: the data of generators `x, y` of `F | K` with a Weierstraß equation (A1.26) of non-zero discriminant, where `x` and `y` have the pole divisors `2𝔭` and `3𝔭` for a prime divisor `𝔭` of degree `1` (`x ∈ L(2𝔭) ∖ L(𝔭)`, `y ∈ L(3𝔭) ∖ L(2𝔭)`).
 -/
 
 #stmt WeierstrassData
+
+/-!
+
+> Book, §A1: the data of generators `x, y` of `F | K` with a Weierstraß equation (A1.26) of non-zero discriminant, where `x` and `y` have the pole divisors `2𝔭` and `3𝔭` for a prime divisor `𝔭` of degree `1` (`x ∈ L(2𝔭) ∖ L(𝔭)`, `y ∈ L(3𝔭) ∖ L(2𝔭)`).
+-/
 
 /-!
 
@@ -106,25 +116,30 @@ $`c_6 = -b_2^3 + 36b_2b_4 - 216b_6` (A1.7).
 In characteristic $`3` (with $`j \ne 0`) the form $`y^2 = x^3 + b_2x^2 + b_6'` (A1.21), and in
 characteristic $`2` (with $`j \ne 0`) the form $`y^2 + xy = x^3 + A'x^2 + C'` (A1.32), serve as
 substitutes of the Weierstraß normal form.
-
-> Book, §A1, equation (A1.3), in Mathlib's notation: `y² = 4x³ + b₂x² + 2b₄x + b₆` over `F` (the book writes `b₁, b₂, b₃` for `b₂, 2b₄, b₆`).
 -/
 
 #stmt IsNormalFormA3
 
 /-!
 
-> Book, §A1, equation (A1.6): Weierstraß normal form `y² = 4x³ − g₂x − g₃`.
+> Book, §A1, equation (A1.3), in Mathlib's notation: `y² = 4x³ + b₂x² + 2b₄x + b₆` over `F` (the book writes `b₁, b₂, b₃` for `b₂, 2b₄, b₆`).
 -/
+
 
 #stmt IsWeierstrassNormal
 
 /-!
 
-> Book, §A1, equation (A1.32) (characteristic 2): `y² + xy = x³ + A′x² + C′`.
+> Book, §A1, equation (A1.6): Weierstraß normal form `y² = 4x³ − g₂x − g₃`.
 -/
 
+
 #stmt IsNormalFormA32
+
+/-!
+
+> Book, §A1, equation (A1.32) (characteristic 2): `y² + xy = x³ + A′x² + C′`.
+-/
 
 /-!
 
@@ -143,11 +158,14 @@ _Formalization note._ The book asserts $`\Delta \ne 0` in every characteristic (
 The library proves it (`wDisc_ne_zero`) only under the hypotheses $`2 \ne 0` and $`3 \ne 0` in
 $`K`, so the existence of Weierstraß data (`nonempty_weierstrassData`) is proved only for
 $`\operatorname{char}(K) \ne 2, 3`.
-
-> Book, §A1: existence of $`x, y` with pole divisors $`2\mathfrak p`, $`3\mathfrak p` satisfying a Weierstraß relation.
 -/
 
 #stmt exists_weierstrass_relation
+
+/-!
+
+> Book, §A1: existence of $`x, y` with pole divisors $`2\mathfrak p`, $`3\mathfrak p` satisfying a Weierstraß relation.
+-/
 
 #stmt exists_normalForm
 
@@ -194,46 +212,54 @@ $`-\frac12 g_2/g_3` modulo squares, see `hasseInv_weierstrass`), $`b_2` in chara
 $`a_2/a_1^2 + a_3/a_1^3`, the coefficient $`A = A'` of (A1.29), (A1.32), in characteristic $`2`. `SquareEquiv` requires the
 factor $`t` in $`a = t^2 b` to be non-zero: otherwise $`0 = 0^2 b` would make every $`b` equivalent
 to $`0`.
-
-> Book, §A1: `a ∈ K` and `b ∈ K` are in the same class modulo squares, i.e. `a = t² b` for some `t ∈ K^×`.
 -/
 
 #stmt SquareEquiv
 
 /-!
 
+> Book, §A1: `a ∈ K` and `b ∈ K` are in the same class modulo squares, i.e. `a = t² b` for some `t ∈ K^×`.
+-/
+
+
+#stmt PiEquiv
+
+/-!
+
 > Book, §A1, char 2: `a` and `b` agree modulo `π(K⁺)`, `π(z) = z² + z`.
 -/
 
-#stmt PiEquiv
+
+#stmt wC4
 
 /-!
 
 > `c₄ = b₂² − 24 b₄`.
 -/
 
-#stmt wC4
+
+#stmt wDisc
 
 /-!
 
 > The discriminant `Δ = −b₂²b₈ − 8b₄³ − 27b₆² + 9b₂b₄b₆`.
 -/
 
-#stmt wDisc
+
+#stmt jOfData
 
 /-!
 
 > The absolute invariant `j = c₄³/Δ` of a Weierstraß equation.
 -/
 
-#stmt jOfData
+
+#stmt hasseOfData
 
 /-!
 
 > The Hasse invariant (as a representative in `K`) of a Weierstraß equation, following (A1.13) (characteristic `≠ 2, 3`: `−c₄/c₆`, equivalent to `−½ g₂/g₃` modulo squares), (A1.25) (characteristic `3`: `b₂`) and (A1.36) (characteristic `2`: `a₂/a₁² + a₃/a₁³`, the class of `A′` modulo `π(K⁺)`).
 -/
-
-#stmt hasseOfData
 
 /-!
 
@@ -242,18 +268,22 @@ _Formalization note._ `absInv` and `hasseInv` are the invariants of a Weierstra�
 characteristic $`2` or $`3`); their independence of the choice is proved below
 (`absInv_eq_jOfData`, `hasseInv_eq_hasseOfData`). `hasseInv` is defined for every $`j`, but is
 meaningful only for $`j \ne 0, 12^3`.
-
-> Book, §A1: the absolute invariant `j` of an elliptic function field `F | K` with a prime divisor of degree `1`: computed from any Weierstraß equation of `F`. (Independence of the choice is a theorem of the book.)
 -/
 
 #stmt absInv
 
 /-!
 
-> Book, §A1: the Hasse invariant `γ` of `F | K` (with `j ≠ 0, 12³`), represented by an element of `K` (see the module documentation), computed from any Weierstraß equation.
+> Book, §A1: the absolute invariant `j` of an elliptic function field `F | K` with a prime divisor of degree `1`: computed from any Weierstraß equation of `F`. (Independence of the choice is a theorem of the book.)
 -/
 
+
 #stmt hasseInv
+
+/-!
+
+> Book, §A1: the Hasse invariant `γ` of `F | K` (with `j ≠ 0, 12³`), represented by an element of `K` (see the module documentation), computed from any Weierstraß equation.
+-/
 
 /-!
 
@@ -261,11 +291,14 @@ meaningful only for $`j \ne 0, 12^3`.
 $`x, y` at a fixed prime $`\mathfrak{p}`: the substitutions preserving the normal forms change
 $`j` not at all and $`\gamma` by squares (resp. by elements $`\pi(\beta')`), by (A1.12), (A1.24),
 (A1.35).
-
-> Invariance of `j` and of the Hasse class for two data at the same prime divisor (A1.12), (A1.24), (A1.35).
 -/
 
 #stmt same_prime_invariants
+
+/-!
+
+> Invariance of `j` and of the Hasse class for two data at the same prime divisor (A1.12), (A1.24), (A1.35).
+-/
 
 /-!
 
@@ -277,18 +310,22 @@ _Formalization note._ The book quotes this homogeneity as well known. The formal
 by the group law (translations), see the next section, for every elliptic field that has a
 Weierstraß datum (`degOneHomogeneous_of_data`), hence for all of them if
 $`\operatorname{char}(K) \ne 2, 3`, and directly for $`F_K(q)` (`fq_homogeneous`).
-
-> Prime divisors of degree one of `F | K` are permuted transitively by `K`-automorphisms (book, footnote of §A1).
 -/
 
 #stmt DegOneHomogeneous
 
 /-!
 
-> The prime divisors of degree `1` of `F_K(q)` are permuted transitively by its `K`-automorphisms (the translations `τ_a`, `a ∈ K^×`).
+> Prime divisors of degree one of `F | K` are permuted transitively by `K`-automorphisms (book, footnote of §A1).
 -/
 
+
 #stmt fq_homogeneous
+
+/-!
+
+> The prime divisors of degree `1` of `F_K(q)` are permuted transitively by its `K`-automorphisms (the translations `τ_a`, `a ∈ K^×`).
+-/
 
 /-!
 
@@ -304,32 +341,38 @@ $`\psi_{-T}` by associativity of the group law (`exists_translation_equiv`). Fin
 $`\psi_T(x) = \lambda^2 + a_1 \lambda - a_2 - x - \xi` with $`\lambda = (y - y_T)/(x - \xi)` has a
 pole at $`\mathfrak{p}'` (for a $`2`-torsion point $`T`: $`\psi_T(x) = \xi + c/(x-\xi)` with $`c \ne 0`,
 by non-singularity), so that $`\psi_T(\mathfrak{p}) = \mathfrak{p}'` (`translate_pole`).
-
-> Every prime divisor of degree one is the image of the prime of a Weierstraß datum under a `K`-automorphism.
 -/
 
 #stmt WeierstrassData.exists_aut
 
 /-!
 
+> Every prime divisor of degree one is the image of the prime of a Weierstraß datum under a `K`-automorphism.
+-/
+
+
+#stmt degOneHomogeneous_of_data
+
+/-!
+
 > The prime divisors of degree one of an elliptic function field with a Weierstraß datum are permuted transitively by its `K`-automorphisms.
 -/
 
-#stmt degOneHomogeneous_of_data
+
+#stmt absInv_eq_jOfData
 
 /-!
 
 > Book, §A1: the absolute invariant computed from *any* Weierstraß datum equals `absInv`.
 -/
 
-#stmt absInv_eq_jOfData
+
+#stmt hasseInv_eq_hasseOfData
 
 /-!
 
 > Book, §A1: the Hasse invariant computed from *any* Weierstraß datum is equivalent to `hasseInv`.
 -/
-
-#stmt hasseInv_eq_hasseOfData
 
 /-!
 
@@ -344,18 +387,22 @@ $`k(x)` at which $`x` has a pole. The extension $`F\,|\,k(x)` is separable of de
 ramification indices $`e_P` of the primes above $`\infty` satisfy $`\sum e_P \deg P \le 2`, while
 the equation gives $`2\operatorname{ord}_P y = 3 \operatorname{ord}_P x = -3 e_P`, so each $`e_P` is
 even and there is exactly one such prime, with $`e_P = 2`.
-
-> The prime at infinity of `k(X)` has degree one.
 -/
 
 #stmt inftyPrime_degree
 
 /-!
 
-> Model-prime lemma: a Weierstraß model `(x, y)` of `F | k` with `Δ ≠ 0` has a prime `𝔓` of degree one with pole divisors `2𝔓`, `3𝔓`.
+> The prime at infinity of `k(X)` has degree one.
 -/
 
+
 #stmt exists_prime_of_model
+
+/-!
+
+> Model-prime lemma: a Weierstraß model `(x, y)` of `F | k` with `Δ ≠ 0` has a prime `𝔓` of degree one with pole divisors `2𝔓`, `3𝔓`.
+-/
 
 /-!
 
@@ -368,18 +415,22 @@ Remarks.
 _Formalization note._ The non-vanishing of the discriminant, which the book takes for granted
 ((A1.9), (A1.28)), is a hypothesis of these statements, since the model-prime lemma needs it and it
 is not proved in characteristic $`2`, $`3`.
-
-> Book, §A1, (A1.8).
 -/
 
 #stmt absInv_weierstrass
 
 /-!
 
-> Book, §A1, (A1.13).
+> Book, §A1, (A1.8).
 -/
 
+
 #stmt hasseInv_weierstrass
+
+/-!
+
+> Book, §A1, (A1.13).
+-/
 
 /-!
 
@@ -387,11 +438,14 @@ is not proved in characteristic $`2`, $`3`.
 
 _Formalization note._ Only the formula (39), (40) for $`j` is formalized (with the hypothesis
 $`\Delta \ne 0`); the book's formula (44) for the Hasse invariant of such an equation is not.
-
-> Book, §A1, Remark 1.
 -/
 
 #stmt remark_A1_absinv
+
+/-!
+
+> Book, §A1, Remark 1.
+-/
 
 /-!
 
@@ -401,11 +455,14 @@ _Formalization note._ The statement assumes $`j \ne 0, 12^3` (as the book does) 
 a Weierstraß datum (automatic for $`\operatorname{char}(K) \ne 2, 3`). The consequence that $`j`
 alone determines $`F` (which follows with `absolute_hasse_determine`) is not stated separately, and
 the normal forms (45) for the exceptional cases $`j = 0, 12^3` are not formalized.
-
-> Book, §A1, Remark 2 (for $`j \ne 0, 12^3` and $`F` with a Weierstraß datum).
 -/
 
 #stmt remark_A2_sep_closed
+
+/-!
+
+> Book, §A1, Remark 2 (for $`j \ne 0, 12^3` and $`F` with a Weierstraß datum).
+-/
 
 /-!
 
@@ -418,11 +475,14 @@ $`L`, and it assumes that $`F` has a Weierstraß datum and that $`FL\,|\,L` is e
 divisor of degree $`1` (the conservativity of an arbitrary elliptic field is not available in the
 library). The second half of the remark (the criterion for $`F`, $`F'` to become isomorphic over
 $`L`, and the minimal such field) is not formalized.
-
-> Book, §A1, Remark 3 (finite constant extensions).
 -/
 
 #stmt remark_A3
+
+/-!
+
+> Book, §A1, Remark 3 (finite constant extensions).
+-/
 
 /-!
 
@@ -432,19 +492,21 @@ but not proved: it needs the genus of the function field of a Weierstraß curve 
 arbitrary divisors). Its statement and the reasons are given in Appendix B.
 -/
 
-/-!
-
-> Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv` (given the homogeneity of the degree-one primes).
--/
 
 #stmt absInv_eq_of_data
 
 /-!
 
-> Book, §A1: the Hasse invariant computed from any Weierstraß datum is equivalent to `hasseInv` (given the homogeneity).
+> Book, §A1: the absolute invariant computed from any Weierstraß datum equals `absInv` (given the homogeneity of the degree-one primes).
 -/
 
+
 #stmt hasseInv_eq_of_data
+
+/-!
+
+> Book, §A1: the Hasse invariant computed from any Weierstraß datum is equivalent to `hasseInv` (given the homogeneity).
+-/
 
 /-!
 
@@ -471,25 +533,30 @@ normalizations (A1.14), (A1.15) and their analogues in characteristic $`2`, $`3`
 of curves is derived from Mathlib's normal forms. In `absolute_hasse_determine` no Weierstraß datum
 needs to be assumed in characteristic $`2`, $`3`: since `absInv` is $`0` for fields without a
 datum, the hypothesis $`j \ne 0` provides one.
-
-> Classification of Weierstraß curves by `(j, γ)`: equal `j ≠ 0, 12³` and equivalent Hasse classes imply that the curves differ by a change of variables. This is `WeierstrassCurve.exists_variableChange_of_c₄_pow_div_eq` (`ForMathlib`) in the book's notation.
 -/
 
 #stmt exists_variableChange_of_invariants
 
 /-!
 
-> Two function fields generated by solutions `(x, y)`, `(x', y')` of the same Weierstraß equation with pole orders `(2, 3)` are `K`-isomorphic, by an isomorphism mapping `x ↦ x'`, `y ↦ y'`.
+> Classification of Weierstraß curves by `(j, γ)`: equal `j ≠ 0, 12³` and equivalent Hasse classes imply that the curves differ by a change of variables. This is `WeierstrassCurve.exists_variableChange_of_c₄_pow_div_eq` (`ForMathlib`) in the book's notation.
 -/
+
 
 #stmt exists_algEquiv_of_normalForm
 
 /-!
 
-> Book, §A1, uniqueness: two fields with a prime divisor of degree 1 and equal absolute invariants and equivalent Hasse invariants are `K`-isomorphic (for `j ≠ 0, 12³`).
+> Two function fields generated by solutions `(x, y)`, `(x', y')` of the same Weierstraß equation with pole orders `(2, 3)` are `K`-isomorphic, by an isomorphism mapping `x ↦ x'`, `y ↦ y'`.
 -/
 
+
 #stmt absolute_hasse_determine
+
+/-!
+
+> Book, §A1, uniqueness: two fields with a prime divisor of degree 1 and equal absolute invariants and equivalent Hasse invariants are `K`-isomorphic (for `j ≠ 0, 12³`).
+-/
 
 /-!
 
@@ -503,11 +570,14 @@ _Formalization note._ The formal statement is made for the prime $`\mathfrak p` 
 Weierstraß datum, with $`j` computed from that datum. For $`\operatorname{char}(K) \ne 2, 3` every
 prime of degree $`1` carries a datum, so this is the book's statement; in characteristic $`2`,
 $`3` the datum is an extra hypothesis.
-
-> Book, Appendix §A1, Lemma A: if `j ≠ 0, 12³`, there is exactly one non-trivial automorphism `ε` of `F | K` fixing a given prime divisor `𝔭` of degree `1`.
 -/
 
 #stmt lemmaA
+
+/-!
+
+> Book, Appendix §A1, Lemma A: if `j ≠ 0, 12³`, there is exactly one non-trivial automorphism `ε` of `F | K` fixing a given prime divisor `𝔭` of degree `1`.
+-/
 
 /-!
 
@@ -539,11 +609,14 @@ the long Weierstraß form (A1.26) instead of the three normal forms: the non-tri
 $`x \mapsto x`, $`y \mapsto -y - a_1x - a_3`. The hypothesis $`j \ne 0, 12^3` appears as
 $`c_4 \ne 0`, $`c_6 \ne 0`, which is equivalent since $`j = c_4^3/\Delta` and
 $`j - 12^3 = c_6^2/\Delta`.
-
-> Lemma A in terms of a Weierstraß datum `(x, y)` at `𝔭`: the non-trivial automorphism fixing `𝔭` is `x ↦ x`, `y ↦ −y − a₁x − a₃`.
 -/
 
 #stmt lemmaA_data
+
+/-!
+
+> Lemma A in terms of a Weierstraß datum `(x, y)` at `𝔭`: the non-trivial automorphism fixing `𝔭` is `x ↦ x`, `y ↦ −y − a₁x − a₃`.
+-/
 
 /-!
 

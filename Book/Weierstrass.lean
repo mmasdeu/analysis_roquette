@@ -23,11 +23,14 @@ Note that $`F_K(q)` has a prime divisor of degree $`1`, for instance $`\mathfrak
 notation of §2. Hence $`F_K(q)` can be generated over $`K` by two elements whose defining relation
 over $`K` is a cubic (see §A1 of the appendix). We are now going to exhibit
 explicitly two such functions and compute the coefficients of their defining relation over $`K`.
-
-> Book, §3: `F_K(q)` has a prime divisor of degree `1` (for instance `𝔭₁`).
 -/
 
 #stmt fq_hasPrime
+
+/-!
+
+> Book, §3: `F_K(q)` has a prime divisor of degree `1` (for instance `𝔭₁`).
+-/
 
 /-!
 
@@ -45,18 +48,22 @@ the representation is proved (`Dop_eq`), and the derivation property is stated a
 the Leibniz rule (constants are killed by `Dop_const`). The commutation of $`D` with the translation
 $`f(X) \mapsto f(q^{-1}X)` is not formalized: the $`q`-periodicity of the functions $`\wp, \wp'`
 used below is proved directly.
-
-> The derivation `D = X d/dX` on `M_K`: `D(g/h) = (Dg · h − g · Dh)/h²` for holomorphic `g, h` (with `D` acting on Laurent coefficients). That `D` is a well-defined derivation of `M_K` is `Dop_derivation`.
 -/
 
 #stmt Dop
 
 /-!
 
-> `D` is a derivation of `M_K`.
+> The derivation `D = X d/dX` on `M_K`: `D(g/h) = (Dg · h − g · Dh)/h²` for holomorphic `g, h` (with `D` acting on Laurent coefficients). That `D` is a well-defined derivation of `M_K` is `Dop_derivation`.
 -/
 
+
 #stmt Dop_derivation
+
+/-!
+
+> `D` is a derivation of `M_K`.
+-/
 
 /-!
 
@@ -69,18 +76,22 @@ _Formalization note._ $`\Theta` is the element of $`M_K` given by a chosen holom
 on $`\Omega^\times` with the values of the function $`\Theta` of §2, (6). The functional
 equation $`\zeta(q^{-1}X) = \zeta(X) + 1` is not formalized; the formalization does not define $`\wp` as $`-D\zeta` but directly by the
 series (29) below, and proves the relation with $`\zeta` afterwards (formula (16) below).
-
-> The meromorphic function `Θ(X)` (book, §2, (6)) viewed in `M_K` (it is holomorphic on `Ω^×`).
 -/
 
 #stmt thetaM
 
 /-!
 
-> `ζ = D log Θ`.
+> The meromorphic function `Θ(X)` (book, §2, (6)) viewed in `M_K` (it is holomorphic on `Ω^×`).
 -/
 
+
 #stmt zetaM
+
+/-!
+
+> `ζ = D log Θ`.
+-/
 
 /-!
 
@@ -109,11 +120,14 @@ induced $`K`-automorphism $`\varepsilon` of $`F_K(q)` is `reflAlg` (in `FqDescen
 non-trivial is proved in `reflAlg_eq_eps`, not through the rule
 $`\varepsilon(\mathfrak p_\alpha) = \mathfrak p_{\alpha^{-1}}` but by identifying $`\varepsilon`
 with the involution of Lemma A (§A1) for the Weierstraß datum $`(\wp, \wp')`.
-
-> Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`.
 -/
 
 #stmt reflectionM
+
+/-!
+
+> Book, §3 (reflection `ε`): the reflection `f(X) ↦ f(X⁻¹)` of `M_K`.
+-/
 
 /-!
 
@@ -131,11 +145,14 @@ $`s_k` are defined as the power series $`\sum_{n} \sigma_k(n) q^n` with the divi
 $`\sigma_k(n) = \sum_{d \mid n} d^k`, so that their integrality and universality are visible from
 the definition; for $`|q| < 1` the equality with the Lambert series (35) is proved
 (`hasSum_sK`).
-
-> The sums `s_k = ∑_{m>0} m^k q^m/(1 − q^m) = ∑_n (∑_{d|n} d^k) qⁿ` (book, (35)).
 -/
 
 #stmt sK
+
+/-!
+
+> The sums `s_k = ∑_{m>0} m^k q^m/(1 − q^m) = ∑_n (∑_{d|n} d^k) qⁿ` (book, (35)).
+-/
 
 /-!
 
@@ -151,18 +168,22 @@ values on $`\Omega^\times` (away from the poles) are given by the series (29). E
 proved by constructing $`\wp` and $`\wp'` as quotients of explicit holomorphic functions by
 $`\Theta^2` and $`\Theta^3` (minus $`2s_1`, plus $`s_1`); uniqueness is `evalsTo_unique`, and
 `wpM_eq`, `wpPrimeM_eq` identify the chosen elements with these quotients.
-
-> Book, §3, (30) (new definition): `℘(X) = ∑_{n∈ℤ} qⁿX/(1 − qⁿX)² − 2 s₁`, the element of `M_K` with these values on `Ω^×`.
 -/
 
 #stmt wpM
 
 /-!
 
-> Book, §3, (18) and (new definition): `℘′(X) = ∑_{n∈ℤ} q²ⁿX²/(1 − qⁿX)³ + s₁`, i.e. `½(D℘ − ℘)` formally in every characteristic.
+> Book, §3, (30) (new definition): `℘(X) = ∑_{n∈ℤ} qⁿX/(1 − qⁿX)² − 2 s₁`, the element of `M_K` with these values on `Ω^×`.
 -/
 
+
 #stmt wpPrimeM
+
+/-!
+
+> Book, §3, (18) and (new definition): `℘′(X) = ∑_{n∈ℤ} q²ⁿX²/(1 − qⁿX)³ + s₁`, i.e. `½(D℘ − ℘)` formally in every characteristic.
+-/
 
 /-!
 
@@ -171,18 +192,22 @@ the new $`\wp` of (29) is the old one minus $`2s_1`, (16) is formalized as
 $`\wp = -D\zeta - 2s_1`. Formula (18) is stated as $`2\wp' = D\wp - \wp`, without dividing by
 $`2`: in characteristic $`2` the division by $`2` is only "formal", so $`\wp'` is defined by its
 series (29) and (18) is proved multiplied by $`2` (in characteristic $`2` it says $`D\wp = \wp`).
-
-> Book, §3, (16): `℘ = −Dζ − 2 s₁`.
 -/
 
 #stmt wp_eq_neg_D_zeta
 
 /-!
 
-> Book, §3, (18): `2℘′ = D℘ − ℘`.
+> Book, §3, (16): `℘ = −Dζ − 2 s₁`.
 -/
 
+
 #stmt wpPrime_spec
+
+/-!
+
+> Book, §3, (18): `2℘′ = D℘ − ℘`.
+-/
 
 /-!
 
@@ -224,18 +249,22 @@ coefficient $`C` is defined directly as the integral power series with coefficie
 $`-(5\sigma_3(n) + 7\sigma_5(n))/12` (an exact integer division by (38a)), since dividing by $`12`
 in $`K` is impossible in characteristic $`2, 3`; the formula (38) is the theorem
 $`12C = -5s_3 - 7s_5` (`twelve_coeffC`).
-
-> The coefficient `B = −5 s₃` (book, (37)).
 -/
 
 #stmt coeffB
 
 /-!
 
-> The coefficient `C = −(5 s₃ + 7 s₅)/12` (book, (38)), written as the universal power series with integral coefficients `c_n = −(5σ₃(n) + 7σ₅(n))/12`.
+> The coefficient `B = −5 s₃` (book, (37)).
 -/
 
+
 #stmt coeffC
+
+/-!
+
+> The coefficient `C = −(5 s₃ + 7 s₅)/12` (book, (38)), written as the universal power series with integral coefficients `c_n = −(5σ₃(n) + 7σ₅(n))/12`.
+-/
 
 /-!
 
@@ -263,32 +292,38 @@ stated separately for $`F_K(q)`; they follow from the general results of §A1 on
 (for a datum $`x, y`, the minimal polynomial of $`y` over $`K(x)` is the quadratic Weierstraß
 polynomial) applied to `wpData`. For the reflection only its action (20)–(21) on $`\wp, \wp'` is
 stated here; that it is the non-trivial automorphism over $`K(\wp)` comes from `reflAlg_eq_eps`.
-
-> Book, §3, Theorem VI: the functions `℘, ℘′` generate `F_K(q)` over `K`, the pole divisors are `2𝔭₁` and `3𝔭₁`, and they satisfy the relation (32)/(39).
 -/
 
 #stmt thmVI_generation
 
 /-!
 
+> Book, §3, Theorem VI: the functions `℘, ℘′` generate `F_K(q)` over `K`, the pole divisors are `2𝔭₁` and `3𝔭₁`, and they satisfy the relation (32)/(39).
+-/
+
+
+#stmt thmVI_poles
+
+/-!
+
 > Book, §3, Theorem VI: `℘` has a pole of order `2` and `℘′` a pole of order `3` at `1` (their pole divisors are `2𝔭₁` and `3𝔭₁`).
 -/
 
-#stmt thmVI_poles
+
+#stmt thmVI_relation
 
 /-!
 
 > Book, §3, Theorem VI, (39): `℘′² + ℘℘′ = ℘³ + B℘ + C` with `B = −5s₃`, `C = −(5s₃ + 7s₅)/12`.
 -/
 
-#stmt thmVI_relation
+
+#stmt thmVI_reflection
 
 /-!
 
 > Book, §3, (20)–(21): the reflection fixes `℘` and sends `℘′ ↦ −℘′ − ℘`.
 -/
-
-#stmt thmVI_reflection
 
 /-!
 
@@ -316,11 +351,14 @@ $$`g_2 = \tfrac{1}{12} + 20s_3, \qquad g_3 = -\tfrac{1}{216} + \tfrac{7}{3}s_5. 
 _Formalization note._ Only the relation (40), (41) is formalized, under the hypotheses
 `ringChar K ≠ 2`, `ringChar K ≠ 3`; that $`\wp + \frac{1}{12}` and $`D\wp` generate $`F_K(q)` is not
 stated separately (it follows from Theorem VI and $`D\wp = 2\wp' + \wp`).
-
-> Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with `g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
 -/
 
 #stmt thmVI_weierstrass_form
+
+/-!
+
+> Book, §3, Remark (char ≠ 2, 3): `(D℘)² = 4(℘ + 1/12)³ − g₂(℘ + 1/12) − g₃` with `g₂ = 1/12 + 20 s₃`, `g₃ = −1/216 + (7/3) s₅` (formulas (40), (41)).
+-/
 
 /-!
 
@@ -337,18 +375,22 @@ $`F_K(q)`. That the absolute invariant of $`F_K(q)` (and of every field $`K`-iso
 computed from a Weierstraß datum as in §A1, equals `jInvQ` is proved in `invariants_of_equiv`
 (`Sec3VIII.lean`), using that $`\Delta` is the discriminant of the equation (39). Theorems VII
 and VIIIa below are stated for `jInvQ` resp. for the absolute invariant.
-
-> Book, §3, (42): `Δ = B² − C − 64B³ + 72BC − 432C²`.
 -/
 
 #stmt deltaPoly
 
 /-!
 
-> Book, §3, (42): the absolute invariant `j(q) = (1 − 48B)³/Δ`.
+> Book, §3, (42): `Δ = B² − C − 64B³ + 72BC − 432C²`.
 -/
 
+
 #stmt jInvQ
+
+/-!
+
+> Book, §3, (42): the absolute invariant `j(q) = (1 − 48B)³/Δ`.
+-/
 
 /-!
 
@@ -370,11 +412,14 @@ For the following lemma, the non-archimedean property of the valuation of $`K` i
 $`|c_i| \le 1`. Then the function $`u \mapsto \frac{1}{u} + R(u)` defines a bijection of the
 interior $`0 < |u| < 1` of the unit circle of $`K` onto its exterior $`|v| > 1`. We have
 $`\left|\frac{1}{u} + R(u)\right| = \frac{1}{|u|}` if $`0 < |u| < 1`._
-
-> Book, §3, Lemma 1: for `R = ∑ cᵢ Xⁱ` with `|cᵢ| ≤ 1`, the map `u ↦ 1/u + R(u)` is a bijection from `0 < |u| < 1` onto `|v| > 1`, and `|1/u + R(u)| = 1/|u|`.
 -/
 
 #stmt lemma1_inversion
+
+/-!
+
+> Book, §3, Lemma 1: for `R = ∑ cᵢ Xⁱ` with `|cᵢ| ≤ 1`, the map `u ↦ 1/u + R(u)` is a bijection from `0 < |u| < 1` onto `|v| > 1`, and `|1/u + R(u)| = 1/|u|`.
+-/
 
 /-!
 
@@ -406,18 +451,22 @@ $`q`, so as displayed it only says that $`j(q) - 1/q` is the value at $`q` of _s
 series. The universality is the auxiliary theorem `exists_R` (`Sec3VII.lean`): one
 $`R \in \mathbb Z[[q]]` with $`j(q) = 1/q + R(q)` for all $`0 < |q| < 1`, built from the integer
 power series $`B, C, \Delta \in \mathbb Z[[q]]`, which do not depend on $`K`.
-
-> Book, §3, Theorem VII: `j(q) = 1/q + R(q)` with `R` a universal power series with integral coefficients; `|j(q)| = 1/|q| > 1`; and every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one `q` with `0 < |q| < 1`.
 -/
 
 #stmt thmVII_absinv
 
 /-!
 
-> Book, §3, Theorem VII (last part): every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one `q` with `0 < |q| < 1`.
+> Book, §3, Theorem VII: `j(q) = 1/q + R(q)` with `R` a universal power series with integral coefficients; `|j(q)| = 1/|q| > 1`; and every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one `q` with `0 < |q| < 1`.
 -/
 
+
 #stmt thmVII_bijective
+
+/-!
+
+> Book, §3, Theorem VII (last part): every `j ∈ K` with `|j| > 1` is `j(q)` for exactly one `q` with `0 < |q| < 1`.
+-/
 
 /-!
 
@@ -425,11 +474,14 @@ _Formalization note._ In the formalization, the universality is made precise by 
 $`B`, $`C` and $`\Delta` as elements of $`\mathbb{Z}[[q]]` and by the evaluation homomorphism
 $`\mathbb{Z}[[q]] \to K`, $`q \mapsto q`, which is a ring homomorphism for a fixed $`q` with
 $`|q| < 1`.
-
-> Evaluation as a ring homomorphism.
 -/
 
 #stmt evalZHom
+
+/-!
+
+> Evaluation as a ring homomorphism.
+-/
 
 /-!
 
@@ -449,11 +501,14 @@ first over fields of characteristic $`\ne 2` containing $`\sqrt q`, and then tra
 arbitrary $`K` through the universal power series (and the $`2`-adic field $`\mathbb{Q}_2`). The
 displayed statement is the evaluated identity in $`K` for $`0 < |q| < 1`; its Lean name says
 "remark3" although it is Remark 2 of the book.
-
-> Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic.
 -/
 
 #stmt remark3_delta_product
+
+/-!
+
+> Book, §3, Remark 2, (45): `Δ = q ∏_{n>0}(1 − qⁿ)²⁴` in every characteristic.
+-/
 
 /-!
 
@@ -478,11 +533,14 @@ element represents the class, and
 `SquareEquiv γ 1` ($`\gamma = t^2`, $`t \ne 0`) resp. `PiEquiv γ 0` ($`\gamma = z^2 + z`). The
 extra hypothesis `hp` is Lean-technical: `hasseInv` takes a proof that a prime divisor of degree
 $`1` exists as an argument (any proof gives the same value, and one is `fq_hasPrime`).
-
-> Book, §3, Theorem VIII: the Hasse invariant of `F_K(q)` is trivial: `γ ≡ 1 mod K^{×2}` if `char K ≠ 2`, and `γ ≡ 0 mod π(K⁺)` if `char K = 2`. Here `F_K(q)` has a prime divisor of degree `1` (`fq_hasPrime`). Modulo the independence of the invariants of the choice of Weierstraß datum (`A1Invariance.lean`).
 -/
 
 #stmt thmVIII_hasse
+
+/-!
+
+> Book, §3, Theorem VIII: the Hasse invariant of `F_K(q)` is trivial: `γ ≡ 1 mod K^{×2}` if `char K ≠ 2`, and `γ ≡ 0 mod π(K⁺)` if `char K = 2`. Here `F_K(q)` has a prime divisor of degree `1` (`fq_hasPrime`). Modulo the independence of the invariants of the choice of Weierstraß datum (`A1Invariance.lean`).
+-/
 
 /-!
 
@@ -513,11 +571,14 @@ from the datum $`(\wp, \wp')`: it is $`0` in characteristic $`2`, $`b_2 = 1` in 
 and $`-c_4/c_6 = (1 + 240s_3)/(1 - 504s_5)`, i.e. (47), otherwise; only $`|s_3|, |s_5| < 1` is used,
 not the equality (43). The last step is a general lemma of the library `ForMathlib` (the Newton
 iteration above, which needs $`2 \ne 0`):
-
-> If `2 ≠ 0` and `|s| < 1`, then `1 + 4s` is a square (Newton's iteration `u ↦ u + (v/u − u)/2` from `u₀ = 1` converges).
 -/
 
 #stmt IsUltrametricDist.exists_sq_eq_one_add_four_mul
+
+/-!
+
+> If `2 ≠ 0` and `|s| < 1`, then `1 + 4s` is a square (Newton's iteration `u ↦ u + (v/u − u)/2` from `u₀ = 1` converges).
+-/
 
 /-!
 
@@ -542,15 +603,19 @@ the equivalence, because the invariants `absInv`, `hasseInv` take a proof of it 
 `fq_hasPrime`, transported along the isomorphism. The invariants are encoded as in Theorem VIII.
 The uniqueness of the period is stated as: if $`F_K(q) \cong F_K(q')` over $`K` with
 $`0 < |q|, |q'| < 1`, then $`q = q'`.
-
-> Book, §3, Theorem VIIIa: an elliptic function field `F | K` with a prime divisor of degree `1` is `K`-isomorphic to some `F_K(q)`, `0 < |q| < 1`, if and only if `|j| > 1` and the Hasse invariant is trivial.
 -/
 
 #stmt thmVIIIa_characterization
 
 /-!
 
-> Book, §3, after Theorem VIIIa: the period `q` of `F` is unique.
+> Book, §3, Theorem VIIIa: an elliptic function field `F | K` with a prime divisor of degree `1` is `K`-isomorphic to some `F_K(q)`, `0 < |q| < 1`, if and only if `|j| > 1` and the Hasse invariant is trivial.
 -/
 
+
 #stmt thmVIIIa_period_unique
+
+/-!
+
+> Book, §3, after Theorem VIIIa: the period `q` of `F` is unique.
+-/

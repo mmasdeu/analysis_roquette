@@ -5,8 +5,7 @@ hide_commands = ["import", "set_option", "open"]
 show_output = ["#stmt"]
 show_imports = false
 show_docstrings = true
-extra_css = ["book-assets/fold.css"]
-extra_js = ["book-assets/fold.js"]
+extra_css = ["book-assets/book.css"]
 
 [order_children]
 "Book" = [

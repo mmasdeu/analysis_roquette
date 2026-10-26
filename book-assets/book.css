@@ -1,0 +1,7 @@
+/* Companion book: presentation of the Lean statements.
+   `#stmt name` prints the statement as hover-linked code (the command's output); the command line
+   itself is hidden, so that a statement appears as in the companion to Analysis I: the declaration
+   in a code block, followed by its docstring as ordinary text. */
+.code-box code.hl.lean.block:has([data-binding^="kw-occ-Book.«command#stmt_»"]) {
+  display: none;
+}
